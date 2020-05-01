@@ -21,18 +21,18 @@ int main(int argc, char *argv[])
 
         system("clear");
         node filePath = NULL;
+        int count = 0;
         for (i = 1; i < argc; i++) //ciclo che controlla ogni argomento
         {
-            if (strcmp("-setn", argv[i]) == 0)
+            if (!strcmp("-setn", argv[i]))
             { //Controllo se si vuole cambiare n
-                printf("\nset rilevato\n");
                 n = atoi(argv[i + 1]); //presuppongo che l'argomento dopo sia un numero, bisogna aggiungere un controllo
                 flag = TRUE;           //il prossimo argomento è il valore di n o m, non va analizzato
                 i++;
             }
             else
             {
-                if (strcmp("-setm", argv[i]) == 0)
+                if (!strcmp("-setm", argv[i]))
                 {                          //Controllo se si vuole cambiare m
                     m = atoi(argv[i + 1]); //presuppongo che l'argomento dopo sia un numero, bisogna aggiungere un controllo
                     flag = TRUE;           //il prossimo argomento è il valore di n o m, non va analizzato
@@ -59,17 +59,21 @@ int main(int argc, char *argv[])
                     printf("Failed to run command\n");
                     exit(1);
                 }
-                int count = 0;
+                
                 while (fgets(riga, sizeof(riga), fp) != NULL) //Legge riga per riga e aggiunge al set
                 {
                     char resolved_path[PATH_MAX];
                     realpath(riga, resolved_path);
                     
-                    printf("%d - %s", count, resolved_path);
+                    
                     if (!(is_present(resolved_path, filePath))){
                         count = count + 1;
                         filePath = insert_first(resolved_path,filePath);
+                        printf("\nNuovo inserimento\n");
+                    } else {
+                        printf("- E' gia' presente");
                     }
+                    printf("%d - %s", count, resolved_path);
                 }
                 pclose(fp);
             }
