@@ -32,33 +32,31 @@ void print_vector() //U //stampa quante volte sono comparsi i caratteri CHE SONO
 
 void set_add(char c) //Aggiunge al vettore definito globalmente la frequenza del char
 {
-    int val_ascii;
-    val_ascii = ((int)c) - 32;
+    int val_ascii; 
+    val_ascii = ((int)c) - 32; //prendo il valore ASCII dal carattere c e lo diminuisco di 32 (vedere intestazione per sapere perché)
     //printf("%d\n", val_ascii); //U
     v[val_ascii]++;
 }
 
 void get_subset(FILE *fp, int b, int e) //function that gets the chars from the
 {
-    int i;
-    //char *c = malloc(sizeof(char));   //Initialize c
     char c;
     fseek(fp,b,SEEK_SET); //setto la posizione iniziale del cursore
     //fseek(fp,e,SEEK_END); //setto la posizione finale del cursore
     //while (!feof(fp)) //cycle
     while(e-b != 0) //P.S.: il primo carattere non è compreso, l'ultimo si
     {
-        //printf("Diff:%d B:%d E:%d", e-b, b, e);
         if (feof(fp))
         {
-            break;
             printf("[!] Errore, sei andato oltre la fine del file");
+            break;
         }
         else
         {
             fscanf(fp, "%c", &c); //gets char
             printf("%c", c); //U
-            set_add(c);
+            set_add(c); //aggiunge al vettore delle frequenze il carattere c
+            fflush(stdout);
         }
         b++;
     }
