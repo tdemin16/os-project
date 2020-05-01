@@ -48,12 +48,12 @@ void get_subset(FILE *fp, int b, int e) //function that gets the chars from the
     {
         if (feof(fp))
         {
-            printf("[!] Errore, sei andato oltre la fine del file");
+            printf("[!] Errore, sei andato oltre la fine del file (forse il punto di end è troppo alto?)");
             break;
         }
         else
         {
-            fscanf(fp, "%c", &c); //gets char
+            fscanf(fp, "%1[^\n]%*[\n]", &c); //gets char
             printf("%c", c); //U
             set_add(c); //aggiunge al vettore delle frequenze il carattere c
             fflush(stdout);
