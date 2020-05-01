@@ -1,7 +1,6 @@
-//version 1.2 - Updated to 2020.05.01
+//version 1.3 - Updated to 2020.05.01
 #include <stdio.h>
 #include <stdlib.h>
-//assert.h, ctype.h, errno.h, fcntl.h, float.h, limits.h, math.h, pthread.h, signal.h, stddef.h, string.h, sys/ipc.h, sys/msg.h, sys/shm.h, sys/stat.h, sys/types.h, sys/wait.h, time.h, unistd.h
 
 #define DIM 1000
 
@@ -41,11 +40,10 @@ void set_add(char c) //Aggiunge al vettore definito globalmente la frequenza del
 
 void get_subset(FILE *fp, int b, int e) //function that gets the chars from the
 {
+    int i;
     char c;
     fseek(fp,b,SEEK_SET); //setto la posizione iniziale del cursore
-    //fseek(fp,e,SEEK_END); setto la posizione finale del cursore - NOT WORKING
-    //while (!feof(fp)) //cycle - Use only if SEEK_END work
-    while(e-b != 0) //P.S.: il primo carattere non è compreso, l'ultimo si
+    for(i = b; i < e; i++) //P.S.: il primo carattere non è compreso, l'ultimo si
     {
         if (feof(fp))
         {
@@ -54,12 +52,10 @@ void get_subset(FILE *fp, int b, int e) //function that gets the chars from the
         }
         else
         {
-            fscanf(fp, "%1[^\n]%*[\n]", &c); //gets char
+            fscanf(fp, "%c", &c); //gets char
             printf("%c", c); //U
             set_add(c); //aggiunge al vettore delle frequenze il carattere c
-            fflush(stdout);
         }
-        b++;
     }
 }
 
