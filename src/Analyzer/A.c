@@ -23,10 +23,10 @@ int main(int argc, char *argv[])
         for (i = 1; i < argc; i++) //ciclo che controlla ogni argomento
         {
             if (strcmp("-setn", argv[i]) == 0)
-            {                          //Controllo se si vuole cambiare n
+            { //Controllo se si vuole cambiare n
                 printf("\nset rilevato\n");
                 n = atoi(argv[i + 1]); //presuppongo che l'argomento dopo sia un numero, bisogna aggiungere un controllo
-                flag = TRUE; //il prossimo argomento è il valore di n o m, non va analizzato
+                flag = TRUE;           //il prossimo argomento è il valore di n o m, non va analizzato
                 i++;
             }
             else
@@ -34,12 +34,12 @@ int main(int argc, char *argv[])
                 if (strcmp("-setm", argv[i]) == 0)
                 {                          //Controllo se si vuole cambiare m
                     m = atoi(argv[i + 1]); //presuppongo che l'argomento dopo sia un numero, bisogna aggiungere un controllo
-                    flag = TRUE; //il prossimo argomento è il valore di n o m, non va analizzato
+                    flag = TRUE;           //il prossimo argomento è il valore di n o m, non va analizzato
                     i++;
                 }
             }
 
-            if (flag == FALSE)  //se è falso vuol dire che il prossimo argomento è un file o una cartella
+            if (flag == FALSE) //se è falso vuol dire che il prossimo argomento è un file o una cartella
             {
                 printf("\n ANALIZZO: %s\n", argv[i]);
                 char *analyze = argv[i]; //Costruzione comando
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
             flag = FALSE;
         }
         //printf("\nFile da analizzare: %lu\nda dividere in n=%d e m=%d\n", set_length(&filePath),n,m);
-        printf("\nn=%d e m=%d\n",n,m);
+        printf("\nn=%d e m=%d\n", n, m);
         //set_destroy(&filePath);
     }
     else //APERTURA MANUALE (SENZA ARGOMENTI)
