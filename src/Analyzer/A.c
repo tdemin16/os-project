@@ -1,13 +1,4 @@
 #include "../lib/lib.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <string.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-#define TRUE 1
-#define FALSE 0
 
 int main(int argc, char *argv[])
 {
