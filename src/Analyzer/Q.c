@@ -42,8 +42,8 @@ void get_subset(FILE *fp, int b, int e) //function that gets the chars from the
 {
     char c;
     fseek(fp,b,SEEK_SET); //setto la posizione iniziale del cursore
-    //fseek(fp,e,SEEK_END); //setto la posizione finale del cursore
-    //while (!feof(fp)) //cycle
+    //fseek(fp,e,SEEK_END); setto la posizione finale del cursore - NOT WORKING
+    //while (!feof(fp)) //cycle - Use only if SEEK_END work
     while(e-b != 0) //P.S.: il primo carattere non è compreso, l'ultimo si
     {
         if (feof(fp))
