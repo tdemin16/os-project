@@ -12,14 +12,15 @@ int main(int argc, char *argv[])
     int n = 3;
     int m = 4;
 
-    char flag = FALSE;
+    char flag = FALSE; // se flag = true, l'argomento successivo è il numero o di n o di m
+    char setn = FALSE; // quando 
+    char setm = FALSE;
     int i;
     if (argc > 1) //APERTURA TRAMITE MAIN (ARGOMENTI)
     {
 
         system("clear");
-        //SimpleSet filePath; //creo e inizializzo set
-        //set_init(&filePath);
+        node filePath = NULL;
         for (i = 1; i < argc; i++) //ciclo che controlla ogni argomento
         {
             if (strcmp("-setn", argv[i]) == 0)
@@ -63,9 +64,12 @@ int main(int argc, char *argv[])
                 {
                     char resolved_path[PATH_MAX];
                     realpath(riga, resolved_path);
-                    count = count + 1;
+                    
                     printf("%d - %s", count, resolved_path);
-                    //set_add(&filePath, resolved_path);
+                    if (!(is_present(resolved_path, filePath))){
+                        count = count + 1;
+                        filePath = insert_first(resolved_path,filePath);
+                    }
                 }
                 pclose(fp);
             }
@@ -73,7 +77,6 @@ int main(int argc, char *argv[])
         }
         //printf("\nFile da analizzare: %lu\nda dividere in n=%d e m=%d\n", set_length(&filePath),n,m);
         printf("\nn=%d e m=%d\n", n, m);
-        //set_destroy(&filePath);
     }
     else //APERTURA MANUALE (SENZA ARGOMENTI)
     {
