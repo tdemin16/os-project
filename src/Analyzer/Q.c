@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 
     get_subset(fp, begin, end); //getting all the chars
 
-    print_vector();
+    print_vector(); //U
 
     fclose(fp);
     printf("\n");
