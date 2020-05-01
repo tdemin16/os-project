@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -11,17 +13,27 @@ int main(int argc, char *argv[])
 {
     int n = 3;
     int m = 4;
+    int i;
+    int value_return = 0; //Valore di ritorno
+    int count = 0; //numero di file univoci da analizzare
+    node filePath = NULL; //list of path's strings
+    //ATTENZIONE: args puo' essere sostituita da filePath qualora questa non sia piu' utile dopo il fork
+    //Rimuovere questi commenti alla fine del progetto :)
+    node msg; //list used to pass path's to child
+    char* args [] = {"./C", "", NULL};
 
     char flag = FALSE; // se flag = true, l'argomento successivo è il numero o di n o di m
     char setn = FALSE; // quando 
     char setm = FALSE;
-    int i;
+
+    //Variables for IPC
+    int fd[2]; //Pipe
+    pid_t f; //fork return value
+
     if (argc > 1) //APERTURA TRAMITE MAIN (ARGOMENTI)
     {
 
         system("clear");
-        node filePath = NULL;
-        int count = 0;
         for (i = 1; i < argc; i++) //ciclo che controlla ogni argomento
         {
             if (!strcmp("-setn", argv[i]))
@@ -84,8 +96,53 @@ int main(int argc, char *argv[])
     }
     else //APERTURA MANUALE (SENZA ARGOMENTI)
     {
-        printf("\nErrore nella sintassi del comando\nusa: /A nomeFile nomeCartella\nPuoi usare -setn e -setm per cambiare n e m\nes: /A A.c ../Analyzer/ -setn 3 -setm 4\n\n");
+        value_return = err_args(); //in caso di errore setta il valore di ritorno a ERR_ARGS
     }
 
-    return 0;
+    if(value_return == 0 && count == 0) {
+        value_return = err_file();
+    }
+
+    //IPC
+    if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
+        if(pipe(fd) == -1) { //Controllo se nella creazione della pipe ci sono errori
+            value_return = err_pipe(); //in caso di errore setta il valore di ritorno a ERR_PIPE
+        }
+    }
+
+    if(value_return == 0) { //same as before
+        printf("FORK\n");
+        f = fork(); //Fork dei processi
+        if(f == -1) { //Controllo che non ci siano stati errori durante il fork
+            value_return = err_fork(); //in caso di errore setta il valore di ritorno a ERR_FORK
+        }
+    }
+
+    if(value_return == 0) { //same
+        msg = filePath; //copia il riferimento alla lista cosi' da poterla scorrere senza perdere i riferimanti effettivi
+        if(f > 0) { //PARENT SIDE
+            printf("START parent: %d\n", getpid());
+            while(msg != NULL && value_return == 0) { //cicla su tutti gli elementi della lista
+                if (write(fd[WRITE], msg->path, sizeof(msg->path)) == -1) {
+                    value_return = err_write();
+                    //Capire cosa fare (killare tutto?)
+                }
+                msg = msg->next;
+            }
+            close(fd[WRITE]);
+        }
+    }
+
+    if(value_return == 0) {
+        if(f == 0) { //SON SIDE
+            printf("START son: %d\n", getpid());
+            sprintf(args[1], "%d", count);
+            dup2(STDOUT_FILENO, fd[WRITE]);
+            close(fd[READ]);
+            close(fd[WRITE]);
+            //execvp(args[0], args);
+        }
+    }
+
+    return value_return;
 }
