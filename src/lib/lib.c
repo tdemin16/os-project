@@ -22,9 +22,13 @@ char is_present(char *p, node l) {
     {
         while (tmp != NULL && !ret)
         {
+            printf("#COMPARO: %s con %s -> ",p,tmp->path );
             if (!strcmp(p, tmp->path))
             {
+                printf("UGUALI\n");
                 ret = TRUE;
+            } else {
+                printf("DIVERSI\n");
             }
             tmp = tmp->next;
         }
