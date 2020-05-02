@@ -6,6 +6,7 @@ node insert_first(char *p, node l) {
     //if l is null, it will produce the same result as initList
     //so it doesn't require a test
     node tmp = (node)malloc(sizeof(node));
+
     tmp->path = p;
     tmp->next = l;
 
@@ -17,17 +18,12 @@ char is_present(char *p, node l) {
     char ret = FALSE;
     node tmp = l;
 
-    if (tmp == NULL)
-    {
-        printf("Lista vuota\n");
-    }
-    else
+    if (tmp != NULL)
     {
         while (tmp != NULL && !ret)
         {
             if (!strcmp(p, tmp->path))
             {
-                printf("##### %s - %s", p, tmp->path);
                 ret = TRUE;
             }
             tmp = tmp->next;
