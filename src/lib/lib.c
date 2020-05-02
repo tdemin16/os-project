@@ -87,8 +87,7 @@ void get_subset(FILE *fp, int v[], int b, int e)
     {
         if (feof(fp))
         {
-            printf("[!] Errore, sei andato oltre la fine del file (forse il punto di end è troppo alto?)");
-            break;
+            end_file_err();
         }
         else
         {
@@ -109,6 +108,19 @@ void print_vector(int v[])
             printf("\n%c è comparso %d volte", (i + 32), v[i]);
         }
     }
+}
+
+//Errors for P.c
+//Check if fopen has failed
+int file_open_err(){
+    printf("[!] Errore nell'apertura del file (Il file inserito non esiste(?))\n");
+    return ERR_FILE;
+}
+
+//Check if
+int end_file_err(){
+     printf("[!] Errore, sei andato oltre la fine del file (forse il punto di end è troppo alto?)");
+     return ERR_ARGS;
 }
 
 ///src/Analyzer/Q.c
