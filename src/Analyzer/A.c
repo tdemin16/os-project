@@ -135,12 +135,13 @@ int main(int argc, char *argv[])
             printf("START son: %d\n", getpid());
             strcpy(args[0], "./C");
             strcpy(args[1], "-nfiles");
-            sprintf(args[2], "%d");
+            sprintf(args[2], "%d", count);
+            printf("%s", args[2]);
             dup2(STDOUT_FILENO, fd_2[WRITE]); //close STDOUT_FILENO and open fd[WRITE]
             dup2(STDIN_FILENO, fd_1[READ]);
             close(fd_2[WRITE]);
             close(fd_1[READ]);
-            execvp(args[0], args);
+            //execvp(args[0], args);
         }
     } 
 

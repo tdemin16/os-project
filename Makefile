@@ -4,7 +4,7 @@ help:
 	cat ./README.md
 
 build:
-	if [ ! -d "./src/bin" ]; then \
+	if [ ! -d "./bin" ]; then \
 	mkdir -p ./src/bin; fi
 	gcc -c -std=gnu90 -o ./src/bin/lib ./src/lib/lib.c
 	gcc -c -std=gnu90 -o ./src/bin/Q ./src/Analyzer/Q.c
