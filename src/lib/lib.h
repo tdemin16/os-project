@@ -27,7 +27,6 @@ struct List{
 typedef struct List* node;
 
 //List functions
-node init_list(char*);
 node insert_first(char*, node);
 char is_present(char*, node);
 int count_list_elements(node);

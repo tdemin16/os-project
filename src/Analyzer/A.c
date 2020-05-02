@@ -127,13 +127,13 @@ int main(int argc, char *argv[])
     if(value_return == 0) {
         if(f == 0) { //SON SIDE
             printf("START son: %d\n", getpid());
-            sprintf(args[1], "%d", count);
-            dup2(STDOUT_FILENO, fd[WRITE]);
+            sprintf(args[1], "%d", count); //copy count to args[1]
+            dup2(STDOUT_FILENO, fd[WRITE]); //close STDOUT_FILENO and open fd[WRITE]
             close(fd[READ]);
             close(fd[WRITE]);
             //execvp(args[0], args);
         }
-    }
+    } 
 
     return value_return;
 }

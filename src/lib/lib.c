@@ -2,17 +2,7 @@
 #include <stdlib.h>
 #include "lib.h"
 
-node init_list(char *p)
-{
-    node tmp = (node)malloc(sizeof(List));
-    tmp->path = p;
-    tmp->next = NULL;
-
-    return tmp;
-}
-
-node insert_first(char *p, node l)
-{
+node insert_first(char *p, node l) {
     //if l is null, it will produce the same result as initList
     //so it doesn't require a test
     node tmp = (node)malloc(sizeof(node));
@@ -23,8 +13,7 @@ node insert_first(char *p, node l)
 }
 
 //Boolean result
-char is_present(char *p, node l)
-{
+char is_present(char *p, node l) {
     char ret = FALSE;
     node tmp = l;
 
@@ -60,26 +49,26 @@ int count_list_elements(node l) {
     return val;
 }
 
+
 ///src/Analyzer/Q.c
 //Initialize frequence vector all to 0
-void initialize_vector(int v[])
-{
+void initialize_vector(int v[]) {
     int i;
     for (i = 0; i < DIM_V; i++)
     {
         v[i] = 0;
     }
 }
+
 //Increase frequence of the global vector in the position val_ascii
-void set_add(int v[], char c)
-{
+void set_add(int v[], char c) {
     int val_ascii;
     val_ascii = ((int)c) - 32; //casting char to int and difference 32 (in order to save space on the vector)
     v[val_ascii]++;
 }
+
 //get the chars from the .txt files from the begin (b) to the end (e)
-void get_subset(FILE *fp, int v[], int b, int e) 
-{
+void get_subset(FILE *fp, int v[], int b, int e) {
     int i;
     char c;
     fseek(fp, b, SEEK_SET); //setting initial position of SEEK cursor
@@ -98,6 +87,7 @@ void get_subset(FILE *fp, int v[], int b, int e)
         }
     }
 }
+
 //display how meny times chars are in the text (display only visited chars)
 void print_vector(int v[])
 {
