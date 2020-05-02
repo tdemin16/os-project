@@ -37,11 +37,12 @@ void initialize_vector(int*);
 void set_add(int*, char);
 void get_subset(FILE*, int*, int, int);
 void print_vector(int *);
-int file_open_err();
+int err_end_file();
+int err_argc();
+int err_file_open();
 
 ///src/Analyzer/P.c
 int file_len(FILE*);
-int end_file_err();
 
 //Error handlers
 int err_pipe();
