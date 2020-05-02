@@ -76,7 +76,8 @@ void get_subset(FILE *fp, int v[], int b, int e) {
     {
         if (feof(fp))
         {
-            end_file_err();
+            err_end_file();
+            break;
         }
         else
         {
@@ -100,20 +101,7 @@ void print_vector(int v[])
     }
 }
 
-//Errors for P.c
-//Check if fopen has failed
-int file_open_err(){
-    printf("[!] Errore nell'apertura del file (Il file inserito non esiste(?))\n");
-    return ERR_FILE;
-}
-
-//Check if
-int end_file_err(){
-    printf("[!] Errore, sei andato oltre la fine del file (forse il punto di end è troppo alto?)");
-    return ERR_ARGS_A;
-}
-
-///src/Analyzer/Q.c
+///src/Analyzer/P.c
 //return file length in terms of chars
 int file_len(FILE* fp){
     int len = 0;
@@ -156,4 +144,21 @@ int err_fork() {
 int err_write() {
     printf("Errore, write non riuscita\n");
     return ERR_WRITE;
+}
+//Error if fopen has failed //Refers to Q.c
+int err_file_open(){
+    printf("[!] Errore nell'apertura del file, analizzo fino alla fine del file\n");
+    return ERR_FILE;
+}
+
+//Error if end point is over EOF //Refers to Q.c
+int err_end_file(){
+     printf("\n[!] Errore, sei andato oltre la fine del file\n");
+     return ERR_FILE;
+}
+
+//Error if 3 arguments are inserted //Refers to Q.c
+int err_argc() {
+    printf("[!] Errore nella sintassi del comando\nusa: ./Q nomefile inizio_analisi fine_analisi\n");
+    return ERR_ARGS;
 }

@@ -9,23 +9,32 @@ int main(int argc, char *argv[])
     int value_return;
     int v[DIM_V];
     initialize_vector(v);
-    char *DIR = argv[1];       // setup the directory
-    int begin = atoi(argv[2]); //setup start of the process in the file
-    int end = atoi(argv[3]);   //setup end of the process in the file
 
-    FILE *fp = fopen(DIR, "r"); //open in read mode the file in the directory
-
-    if (fp == NULL)
+    if (argc - 1 != 3)
     {
-        value_return = file_open_err();
+        value_return = err_argc();
     }
     else
     {
-        get_subset(fp, v, begin, end); //getting all the chars
+        char *DIR = argv[1];       // setup the directory
+        int begin = atoi(argv[2]); //setup start of the process in the file
+        int end = atoi(argv[3]);   //setup end of the process in the file
 
-        print_vector(v); //U
+        FILE *fp = fopen(DIR, "r"); //open in read mode the file in the directory
+
+        if (fp == NULL)
+        {
+            value_return = err_file_open();
+        }
+        else
+        {
+            get_subset(fp, v, begin, end); //getting all the chars
+
+            print_vector(v); //U
+        }
+        fclose(fp);
     }
-    fclose(fp);
+
     printf("\n");
     return value_return;
 }
