@@ -111,6 +111,19 @@ void print_vector(int v[])
     }
 }
 
+///src/Analyzer/Q.c
+//return file length in terms of chars
+int file_len(FILE* fp){
+    int len = 0;
+    char c;
+    while(!feof(fp)){
+        fscanf(fp,"%c",&c);
+        len++;
+        //printf("%d", len);
+    }
+    return len-1;
+}
+
 
 //Error handlers
 int err_pipe() {

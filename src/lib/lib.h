@@ -38,6 +38,9 @@ void set_add(int*, char);
 void get_subset(FILE*, int*, int, int);
 void print_vector(int *);
 
+///src/Analyzer/P.c
+int file_len(FILE* fp);
+
 //Error handlers
 int err_pipe();
 int err_args();
