@@ -6,7 +6,8 @@
 
 int main(int argc, char *argv[])
 {
-    initialize_vector();
+    int v[DIM_V];
+    initialize_vector(v);
     char *DIR = argv[1];       // setup the directory
     int begin = atoi(argv[2]); //setup start of the process in the file
     int end = atoi(argv[3]);   //setup end of the process in the file
@@ -18,9 +19,9 @@ int main(int argc, char *argv[])
         //exit(1); //serve(?)
     }
 
-    get_subset(fp, begin, end); //getting all the chars
+    get_subset(fp, v, begin, end); //getting all the chars
 
-    print_vector(); //U
+    print_vector(v); //U
 
     fclose(fp);
     printf("\n");
