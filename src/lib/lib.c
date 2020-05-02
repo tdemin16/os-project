@@ -131,11 +131,16 @@ int err_args_C() {
     return ERR_ARGS_C;
 }
 
+int err_argc_Q() {
+    printf("[!] Errore nella sintassi del comando\nusa: ./Q nomefile inizio_analisi fine_analisi\n");
+    return ERR_ARGS_Q;
+}
+
 int err_file() {
     printf("Errore, nessun file inserito\n");
     return ERR_FILE;
 }
-
+//Error if 3 arguments are inserted //Refers to Q.c
 int err_fork() {
     printf("Errore, fork non riuscito\n");
     return ERR_FORK;
@@ -153,12 +158,6 @@ int err_file_open(){
 
 //Error if end point is over EOF //Refers to Q.c
 int err_end_file(){
-     printf("\n[!] Errore, sei andato oltre la fine del file\n");
-     return ERR_FILE;
-}
-
-//Error if 3 arguments are inserted //Refers to Q.c
-int err_argc() {
-    printf("[!] Errore nella sintassi del comando\nusa: ./Q nomefile inizio_analisi fine_analisi\n");
-    return ERR_ARGS;
+    printf("\n[!] Errore, sei andato oltre la fine del file\n");
+    return ERR_FILE;
 }

@@ -15,7 +15,7 @@ int main(int argc, char const *argv[]) {
         value_return = err_args_C();
     }
     else {
-        for(i = 1; i< argc; i += 2) {
+        for(i = 1; i < argc && value_return == 0; i += 2) {
             if(!strcmp(argv[i], "-nfiles")) { //Check if the argument is equal to -nfiles
                 nfiles = atoi(argv[i + 1]);
                 if(nfiles == 0) value_return = err_args_C();

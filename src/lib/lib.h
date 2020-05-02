@@ -16,10 +16,11 @@
 #define DIM_V 100
 #define ERR_ARGS_A 1
 #define ERR_ARGS_C 2
-#define ERR_PIPE 3
-#define ERR_FILE 4
-#define ERR_FORK 5
-#define ERR_WRITE 6
+#define ERR_ARGS_Q 3
+#define ERR_PIPE 4
+#define ERR_FILE 5
+#define ERR_FORK 6
+#define ERR_WRITE 7
 
 struct List{
     char* path;
@@ -49,6 +50,7 @@ int file_len(FILE*);
 int err_pipe();
 int err_args_A();
 int err_args_C();
+int err_args_Q();
 int err_file();
 int err_fork();
 int err_write();

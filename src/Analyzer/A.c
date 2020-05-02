@@ -20,10 +20,11 @@ int main(int argc, char *argv[])
     int fd_1[2]; //Pipe
     int fd_2[2];
     pid_t f; //fork return value
+    char args[8][7];
+
 
     if (argc > 1) //APERTURA TRAMITE MAIN (ARGOMENTI)
     {
-
         system("clear");
         for (i = 1; i < argc; i++) //ciclo che controlla ogni argomento
         {
@@ -132,6 +133,9 @@ int main(int argc, char *argv[])
     if(value_return == 0) {
         if(f == 0) { //SON SIDE
             printf("START son: %d\n", getpid());
+            strcpy(args[0], "./C");
+            strcpy(args[1], "-nfiles");
+            sprintf(args[2], "%d");
             dup2(STDOUT_FILENO, fd_2[WRITE]); //close STDOUT_FILENO and open fd[WRITE]
             dup2(STDIN_FILENO, fd_1[READ]);
             close(fd_2[WRITE]);
