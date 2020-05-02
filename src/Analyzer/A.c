@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
                         printf("[+] %s\n",resolved_path);
                         count++;
                     } else {
-                        printf("[-] %s\n",resolved_path);
+                        printf("[/] %s\n",resolved_path);
                     }
                     
 
