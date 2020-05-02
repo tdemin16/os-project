@@ -111,9 +111,40 @@ int file_len(FILE* fp){
         len++;
         //printf("%d", len);
     }
-    return len;
+    return len-1;
 }
 
+m_process* splitter(FILE *fp, int m)
+{
+    //This is for splitting the parts
+    m_process* div = malloc(m);
+    int file_length = file_len(fp);                        //get the length of the file in terms of chars
+    int int_div = (file_length / m);                       //get the integer of the subdivision of the file
+    double double_div = ((double)file_length / (double)m); //get the double of the subdivision of the file
+    int rest = (double_div - int_div) * m;                 //get the number of chars that are out of consideration
+    int i;
+    for (i = 0; i < m; i++)
+    {
+        if (i == 0)
+        {
+
+            div[i].begin = 0;
+        }
+        else
+        {
+            div[i].begin = div[i - 1].end;
+        }
+        div[i].end = div[i].begin + int_div;
+        //printf("\nRest: %d", rest);
+        if (rest != 0)
+        {
+            div[i].end += 1;
+            rest--;
+        }
+        div[i].part = i;
+    }
+    return div;
+}
 
 //Error handlers
 int err_pipe() {

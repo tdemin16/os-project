@@ -27,6 +27,13 @@ struct List{
     struct List* next;
 }List;
 
+typedef struct m_process{
+    int begin;
+    int end;
+    int part;
+    //char *DIR; //Da usare per dare il file(???)
+}m_process;
+
 typedef struct List* node;
 
 //List functions
@@ -45,6 +52,7 @@ void print_vector(int *);
 
 ///src/Analyzer/P.c
 int file_len(FILE*);
+m_process* splitter(FILE*,int);
 //int err_args_P(); used here
 //int err_file_open(); used here
 

@@ -6,6 +6,7 @@ int main(int argc, char *argv[])
 {
 
     int value_return;
+    int i;
 
     if (argc - 1 != 1)
     {
@@ -15,24 +16,22 @@ int main(int argc, char *argv[])
     {
         char *DIR = "./prova.txt"; // setup the directory
         int m = atoi(argv[1]);     //setup m
+        m_process* div;
 
-        FILE *fp = fopen(DIR, "r");
+        FILE *fp = fopen(DIR, "r"); //open the file
 
         if (fp == NULL)
         {
-            value_return = err_file_open();
+            value_return = err_file_open(); //error if file is in
         }
         else
         {
-            int file_length = file_len(fp);   //get the length of the file in terms of chars
-            int division = (file_length / m); //get the subdivision of the files //DA IMPLEMENTARE CONTROLLO QUANDO SI HA UN NUMERO CHE NON E' INTERO IN DIVISION --> IL FILE VA DIVISO NON EQUAMENTE
-            int i;
-            printf("%d e %d\n", file_length, division);
-            for (i = 0; i < m; i++) //Generate 4 process
+            div = splitter(fp,m);
+
+            //printf("%d e %d e %f e %d\n", file_length, int_div, double_div, rest); //U
+            for (i = 0; i < m; i++)                                                //Generate 4 process
             {
-                int inizio = i * division;
-                int fine = ((i + 1) * division);
-                printf("Da dove inizia il file: %d (non compreso), e finisce a: %d\n", inizio, fine);
+                printf("Da dove inizia il file: %d (non compreso), e finisce a: %d\n", div[i].begin, div[i].end); //U
             }
         }
         fclose(fp);
