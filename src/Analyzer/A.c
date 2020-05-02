@@ -11,14 +11,14 @@ int main(int argc, char *argv[])
     //ATTENZIONE: args puo' essere sostituita da filePath qualora questa non sia piu' utile dopo il fork
     //Rimuovere questi commenti alla fine del progetto :)
     node msg; //list used to pass path's to child
-    char* args [] = {"./C", "", NULL};
 
     char flag = FALSE; // se flag = true, l'argomento successivo è il numero o di n o di m
     char setn = FALSE; // quando 
     char setm = FALSE;
 
     //Variables for IPC
-    int fd[2]; //Pipe
+    int fd_1[2]; //Pipe
+    int fd_2[2];
     pid_t f; //fork return value
 
     if (argc > 1) //APERTURA TRAMITE MAIN (ARGOMENTI)
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     }
     else //APERTURA MANUALE (SENZA ARGOMENTI)
     {
-        value_return = err_args(); //in caso di errore setta il valore di ritorno a ERR_ARGS
+        value_return = err_args_A(); //in caso di errore setta il valore di ritorno a ERR_ARGS
     }
 
     if(value_return == 0 && count == 0) {
@@ -96,7 +96,12 @@ int main(int argc, char *argv[])
 
     //IPC
     if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
-        if(pipe(fd) == -1) { //Controllo se nella creazione della pipe ci sono errori
+        if(pipe(fd_1) == -1) { //Controllo se nella creazione della pipe ci sono errori
+            value_return = err_pipe(); //in caso di errore setta il valore di ritorno a ERR_PIPE
+        }
+    }
+    if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
+        if(pipe(fd_2) == -1) { //Controllo se nella creazione della pipe ci sono errori
             value_return = err_pipe(); //in caso di errore setta il valore di ritorno a ERR_PIPE
         }
     }
@@ -114,24 +119,24 @@ int main(int argc, char *argv[])
         if(f > 0) { //PARENT SIDE
             printf("START parent: %d\n", getpid());
             while(msg != NULL && value_return == 0) { //cicla su tutti gli elementi della lista
-                if (write(fd[WRITE], msg->path, sizeof(msg->path)) == -1) {
+                if (write(fd_1[WRITE], msg->path, sizeof(msg->path)) == -1) {
                     value_return = err_write();
                     //Capire cosa fare (killare tutto?)
                 }
                 msg = msg->next;
             }
-            close(fd[WRITE]);
+            close(fd_1[WRITE]);
         }
     }
 
     if(value_return == 0) {
         if(f == 0) { //SON SIDE
             printf("START son: %d\n", getpid());
-            sprintf(args[1], "%d", count); //copy count to args[1]
-            dup2(STDOUT_FILENO, fd[WRITE]); //close STDOUT_FILENO and open fd[WRITE]
-            close(fd[READ]);
-            close(fd[WRITE]);
-            //execvp(args[0], args);
+            dup2(STDOUT_FILENO, fd_2[WRITE]); //close STDOUT_FILENO and open fd[WRITE]
+            dup2(STDIN_FILENO, fd_1[READ]);
+            close(fd_2[WRITE]);
+            close(fd_1[READ]);
+            execvp(args[0], args);
         }
     } 
 

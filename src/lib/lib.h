@@ -5,19 +5,21 @@
 #include<stdlib.h>
 #include<string.h>
 #include<limits.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include<sys/types.h>
+#include<unistd.h>
+#include<errno.h>
 
 #define READ 0
 #define WRITE 1
 #define TRUE 1
 #define FALSE 0
 #define DIM_V 100
-#define ERR_ARGS 1
-#define ERR_PIPE 2
-#define ERR_FILE 3
-#define ERR_FORK 4
-#define ERR_WRITE 5
+#define ERR_ARGS_A 1
+#define ERR_ARGS_C 2
+#define ERR_PIPE 3
+#define ERR_FILE 4
+#define ERR_FORK 5
+#define ERR_WRITE 6
 
 struct List{
     char* path;
@@ -44,9 +46,11 @@ int end_file_err();
 
 //Error handlers
 int err_pipe();
-int err_args();
+int err_args_A();
+int err_args_C();
 int err_file();
 int err_fork();
 int err_write();
+
 
 #endif

@@ -109,8 +109,8 @@ int file_open_err(){
 
 //Check if
 int end_file_err(){
-     printf("[!] Errore, sei andato oltre la fine del file (forse il punto di end è troppo alto?)");
-     return ERR_ARGS;
+    printf("[!] Errore, sei andato oltre la fine del file (forse il punto di end è troppo alto?)");
+    return ERR_ARGS_A;
 }
 
 ///src/Analyzer/Q.c
@@ -133,9 +133,14 @@ int err_pipe() {
     return ERR_PIPE;
 }
 
-int err_args() {
-    printf("\nErrore nella sintassi del comando\nusa: /A nomeFile nomeCartella\nPuoi usare -setn e -setm per cambiare n e m\nes: /A A.c ../Analyzer/ -setn 3 -setm 4\n\n");
-    return ERR_ARGS;
+int err_args_A() {
+    printf("\nErrore nella sintassi del comando.\nUsa: /A nomeFile nomeCartella\nPuoi usare -setn e -setm per cambiare n e m\nes: /A A.c ../Analyzer/ -setn 3 -setm 4\n\n");
+    return ERR_ARGS_A;
+}
+
+int err_args_C() {
+    printf("\nErrore nella sintassi del comando.Usa:\n-nfiles <int> per indicare il numero di files (necessario)\n-setn <int> per settare n\n-setm <int> per settare m.\n\n");
+    return ERR_ARGS_C;
 }
 
 int err_file() {
