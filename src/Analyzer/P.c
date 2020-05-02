@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
             for (i = 0; i < m; i++)                                                //Generate 4 process
             {
                 printf("Da dove inizia il file: %d (non compreso), e finisce a: %d\n", div[i].begin, div[i].end); //U
+                //exec(DIR, div[i].begin, div[i].end) //syntax not correct, only to remind we must add it (or Pipe???)
             }
         }
         fclose(fp);
