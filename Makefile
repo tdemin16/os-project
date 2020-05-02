@@ -1,8 +1,11 @@
 #!/bin/bash
 
-.PHONY: build clear
+help:
+	cat ./README.md
 
 build:
+	if [ ! -d "./src/bin" ]; then \
+	mkdir -p ./src/bin; fi
 	gcc -c -std=gnu90 -o ./src/bin/lib ./src/lib/lib.c
 	gcc -c -std=gnu90 -o ./src/bin/Q ./src/Analyzer/Q.c
 	gcc -c -std=gnu90 -o ./src/bin/P ./src/Analyzer/P.c
@@ -19,6 +22,9 @@ clean:
 	rm ./src/bin/A
 	rm ./src/bin/R
 	#rm ./src/bin/M
+	rm -r ./src/bin
+
+.PHONY: help build clean
 
 ./src/bin/lib: ./src/lib/lib.h ./src/lib/lib.c
 	gcc -c -std=gnu90 -o ./src/bin/lib ./src/lib/lib.c

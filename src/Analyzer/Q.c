@@ -1,4 +1,4 @@
-//version 1.4 - Updated to 2020.05.01
+//Updated to 2020.05.02
 #include "../lib/lib.h"
 
 //IMPORTANTE DA RICORDARE: una volta ottenuto il char viene convertito in ASCII ed il suo valore diminuito di 32 per evitare di lasciare 32 spazi vuoti nel vettore in cui lo salvo, quindi per stampare nuovamente il dato bisogna aggiungere 32
@@ -6,6 +6,7 @@
 
 int main(int argc, char *argv[])
 {
+    int value_return;
     int v[DIM_V];
     initialize_vector(v);
     char *DIR = argv[1];       // setup the directory
@@ -13,19 +14,18 @@ int main(int argc, char *argv[])
     int end = atoi(argv[3]);   //setup end of the process in the file
 
     FILE *fp = fopen(DIR, "r"); //open in read mode the file in the directory
+
     if (fp == NULL)
     {
-        printf("[!] Errore nell'apertura del file'");
-        //exit(1); //serve(?)
+        value_return = file_open_err();
     }
+    else
+    {
+        get_subset(fp, v, begin, end); //getting all the chars
 
-    get_subset(fp, v, begin, end); //getting all the chars
-
-    print_vector(v); //U
-
+        print_vector(v); //U
+    }
     fclose(fp);
     printf("\n");
-    return 1;
+    return value_return;
 }
-
-
