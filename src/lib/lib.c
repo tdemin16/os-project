@@ -111,7 +111,7 @@ int file_len(FILE* fp){
         len++;
         //printf("%d", len);
     }
-    return len-1;
+    return len;
 }
 
 
@@ -131,8 +131,13 @@ int err_args_C() {
     return ERR_ARGS_C;
 }
 
-int err_argc_Q() {
-    printf("[!] Errore nella sintassi del comando\nusa: ./Q nomefile inizio_analisi fine_analisi\n");
+int err_args_Q() {
+    printf("[!] Errore nella sintassi del comando\nusa: ./Q inizio_analisi fine_analisi\n");
+    return ERR_ARGS_Q;
+}
+
+int err_args_P() {
+    printf("[!] Errore nella sintassi del comando\nusa: ./P m\n");
     return ERR_ARGS_Q;
 }
 
