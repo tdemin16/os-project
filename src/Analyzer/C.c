@@ -36,8 +36,10 @@ int main(int argc, char const *argv[]) {
         if(nfiles == 0 && value_return == 0) value_return = err_args_C(); //CHeck if nfiles is setted, if not gives an error (value_return used to avoid double messages)
     }
 
-    read(STDIN_FILENO, path, 255);
-    printf("%s\n", path);
+    while(1) {
+        read(STDIN_FILENO, path, PATH_MAX);
+        printf("%s\n", path);
+    }
 
     return value_return;
 }

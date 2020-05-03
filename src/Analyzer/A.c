@@ -86,8 +86,7 @@ int main(int argc, char *argv[])
     
     printf("\nNumero file: %d,n=%d m=%d\n",count,n,m);
     
- 
-/*
+
     //IPC
     if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
         if(pipe(fd_1) == -1) { //Controllo se nella creazione della pipe ci sono errori
@@ -113,15 +112,15 @@ int main(int argc, char *argv[])
         if(f > 0) { //PARENT SIDE
             printf("START parent: %d\n", getpid());
             while(msg != NULL && value_return == 0) { //cicla su tutti gli elementi della lista
-                if (write(fd_1[WRITE], msg->path, sizeof(msg->path)) == -1) {
+                if (write(fd_1[WRITE], msg->path, PATH_MAX) == -1) {
                     value_return = err_write();
                     //Capire cosa fare (killare tutto?)
                 }
-                printf("%s\n", msg->path);
                 msg = msg->next;
             }
             close(fd_1[WRITE]);
         }
+        wait(NULL);
     }
 
     if(value_return == 0) {
@@ -140,11 +139,10 @@ int main(int argc, char *argv[])
             }
             args[7] = NULL;
 
-            dup2(STDOUT_FILENO, fd_2[WRITE]); //close STDOUT_FILENO and open fd[WRITE]
-            dup2(STDIN_FILENO, fd_1[READ]);
+            dup2(fd_2[WRITE], STDIN_FILENO); //close STDOUT_FILENO and open fd[WRITE]
+            dup2(fd_1[READ], STDIN_FILENO);
             execvp(args[0], args);
         }
     } 
-    */
     return value_return;
 }
