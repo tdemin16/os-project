@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include<limits.h>
 #include "lib.h"
 
 node insert_first(char *p, node l)
@@ -8,7 +9,8 @@ node insert_first(char *p, node l)
     //so it doesn't require a test
     node tmp = (node)malloc(sizeof(node));
 
-    tmp->path = p;
+    tmp->path = malloc(PATH_MAX);
+    strcpy(tmp->path,p);
     tmp->next = l;
 
     return tmp;
@@ -25,16 +27,16 @@ char is_present(char *p, node l)
         //printf(": %s con %s ",p,tmp->path );
         while (tmp != NULL && !ret)
         {
-            printf("    #COMPARO: %s con %s -> ",p,tmp->path );
+            //printf("    #COMPARO: %s con %s -> ",p,tmp->path );
             //printf(": %s con %s ",p,tmp->path );
             if (!strcmp(p, tmp->path))
             {
-                printf("UGUALI\n");
+                //printf("UGUALI\n");
                 ret = TRUE;
             }
             else
             {
-                printf("DIVERSI\n");
+                //printf("DIVERSI\n");
             }
             tmp = tmp->next;
         }

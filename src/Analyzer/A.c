@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
                     realpath(riga, resolved_path);  //risalgo al percorso assoluto
                     resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo     
                     
-                    char * tmp = &resolved_path[0];                                 
+                    char * tmp = &resolved_path[0];                           
                     if (!(is_present(tmp, filePath))){
                         filePath = insert_first(tmp,filePath);
                         printf("[+] %s\n",tmp);
@@ -70,8 +70,6 @@ int main(int argc, char *argv[])
                     } else {
                         printf("[/] %s\n",tmp);
                     }
-                    free(tmp);
-
                 }
                 pclose(fp);
                 }
