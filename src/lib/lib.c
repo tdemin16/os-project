@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include<limits.h>
+#include <limits.h>
 #include "lib.h"
 
 node insert_first(char *p, node l)
@@ -135,11 +135,12 @@ m_process *splitter(FILE *fp, int m)
 {
     //This is for splitting the parts
     m_process *div = malloc(m);
-    int file_length = file_len(fp);                        //get the length of the file in terms of chars
+    int file_length = file_len(fp);                     //get the length of the file in terms of chars
     int int_div = (file_length / m);                       //get the integer of the subdivision of the file
-    double double_div = ((double)file_length / (double)m); //get the double of the subdivision of the file
-    int rest = (double_div - int_div) * m;                 //get the number of chars that are out of consideration
+    //double double_div = ((double)file_length / (double)m); //get the double of the subdivision of the file
+    int rest = file_length - (int_div * m);                 //get the number of chars that are out of consideration
     int i;
+    
     for (i = 0; i < m; i++)
     {
         if (i == 0)
@@ -160,7 +161,63 @@ m_process *splitter(FILE *fp, int m)
         }
         div[i].part = i;
     }
+
+
     return div;
+}
+
+//The next 3 functions are for conversion of (int) to (char*)
+// inline function to swap two numbers
+inline void swap(char *x, char *y) {
+	char t = *x; *x = *y; *y = t;
+}
+
+// function to reverse buffer[i..j]
+char* reverse(char *buffer, int i, int j)
+{
+	while (i < j)
+		swap(&buffer[i++], &buffer[j--]);
+
+	return buffer;
+}
+
+// Iterative function to implement itoa() function in C
+char* itoa(int value, char* buffer, int base)
+{
+	// invalid input
+	if (base < 2 || base > 32)
+		return buffer;
+
+	// consider absolute value of number
+	int n = abs(value);
+
+	int i = 0;
+	while (n)
+	{
+		int r = n % base;
+
+		if (r >= 10) 
+			buffer[i++] = 65 + (r - 10);
+		else
+			buffer[i++] = 48 + r;
+
+		n = n / base;
+	}
+
+	// if number is 0
+	if (i == 0)
+		buffer[i++] = '0';
+
+	// If base is 10 and value is negative, the resulting string 
+	// is preceded with a minus sign (-)
+	// With any other base, value is always considered unsigned
+	if (value < 0 && base == 10)
+		buffer[i++] = '-';
+
+	buffer[i] = '\0'; // null terminate string
+
+	// reverse the string and return it
+	return reverse(buffer, 0, i - 1);
 }
 
 //Error handlers
@@ -214,7 +271,7 @@ int err_write()
 //Error if fopen has failed //Refers to Q.c
 int err_file_open()
 {
-    printf("[!] Errore nell'apertura del file, analizzo fino alla fine del file\n");
+    printf("[!] Errore nell'apertura del file\n");
     return ERR_FILE;
 }
 

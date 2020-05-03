@@ -4,9 +4,14 @@
 
 int main(int argc, char *argv[])
 {
-
+    char *DIR = "./text_file/prova1.txt"; // setup the directory
     int value_return;
     int i;
+    char *command = malloc(sizeof(char));
+    char *begin = malloc(sizeof(char));
+    char *end = malloc(sizeof(char));
+    int m = atoi(argv[1]); //setup m
+    m_process *div = malloc(sizeof(m));
 
     if (argc - 1 != 1)
     {
@@ -14,10 +19,6 @@ int main(int argc, char *argv[])
     }
     else
     {
-        char *DIR = "./prova.txt"; // setup the directory
-        int m = atoi(argv[1]);     //setup m
-        m_process* div;
-
         FILE *fp = fopen(DIR, "r"); //open the file
 
         if (fp == NULL)
@@ -26,16 +27,32 @@ int main(int argc, char *argv[])
         }
         else
         {
-            div = splitter(fp,m);
-
-            for (i = 0; i < m; i++)                                                //Generate 4 process
+            div = splitter(fp, m);
+            /*for (i = 0; i < m; i++)
             {
-                printf("Da dove inizia il file: %d (non compreso), e finisce a: %d\n", div[i].begin, div[i].end); //U
-                //exec(DIR, div[i].begin, div[i].end) //syntax not correct, only to remind we must add it (or Pipe???)
+                printf("Da dove inizia il file: %d (non compreso), e finisce a: %d\n", div[i].begin, div[i].end);
+            }*/
+
+            for (i = 0; i < m; i++) //Generate 4 process
+            {
+                itoa(div[i].begin, begin, 10);
+                itoa(div[i].end, end, 10);
+                strcat(command, "./Q "); //From here
+                strcat(command, begin);  //Creates the
+                strcat(command, " ");    //command for system
+                strcat(command, end);    //To here
+                printf("\n%s\n\n", command);
+                system(command);
+                memset(command, 0, sizeof(*command)); //Empty command string
             }
         }
         fclose(fp);
     }
+
+    free(command);
+    free(begin);
+    free(end);
+    free(div);
 
     return value_return;
 }

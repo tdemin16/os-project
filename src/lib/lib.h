@@ -53,6 +53,9 @@ void print_vector(int *);
 ///src/Analyzer/P.c
 int file_len(FILE*);
 m_process* splitter(FILE*,int);
+inline void swap(char*, char*);
+char* reverse(char*, int, int);
+char* itoa(int, char*, int);
 //int err_args_P(); used here
 //int err_file_open(); used here
 
