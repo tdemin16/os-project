@@ -60,17 +60,17 @@ int main(int argc, char *argv[])
                 {
                     char resolved_path[PATH_MAX];
                     realpath(riga, resolved_path);  //risalgo al percorso assoluto
-                    resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo                     
+                    resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo     
                     
-                    
-                    if (!(is_present(resolved_path, filePath))){
-                        filePath = insert_first(resolved_path,filePath);
-                        printf("[+] %s\n",resolved_path);
+                    char * tmp = &resolved_path[0];                                 
+                    if (!(is_present(tmp, filePath))){
+                        filePath = insert_first(tmp,filePath);
+                        printf("[+] %s\n",tmp);
                         count++;
                     } else {
-                        printf("[/] %s\n",resolved_path);
+                        printf("[/] %s\n",tmp);
                     }
-                    
+                    free(tmp);
 
                 }
                 pclose(fp);
