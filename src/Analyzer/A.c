@@ -26,7 +26,8 @@ int main(int argc, char *argv[])
     int fd_1[2]; //Pipe
     int fd_2[2];
     pid_t f; //fork return value
-    char args[8][7];
+    char array[8][20]; //Matrice di appoggio
+    char* args[8]; //String og arguments to pass to child
 
     if(argc < 1) { //if number of arguments is even or less than 1, surely it's a wrong input
         value_return = err_args_A();
@@ -104,8 +105,7 @@ int main(int argc, char *argv[])
     }
     
     
- 
-/*
+
     //IPC
     if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
         if(pipe(fd_1) == -1) { //Controllo se nella creazione della pipe ci sono errori
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
         if(f > 0) { //PARENT SIDE
             printf("START parent: %d\n", getpid());
             while(msg != NULL && value_return == 0) { //cicla su tutti gli elementi della lista
-                if (write(fd_1[WRITE], msg->path, sizeof(msg->path)) == -1) {
+                if (write(fd_1[WRITE], msg->path, PATH_MAX) == -1) {
                     value_return = err_write();
                     //Capire cosa fare (killare tutto?)
                 }
@@ -139,21 +139,29 @@ int main(int argc, char *argv[])
             }
             close(fd_1[WRITE]);
         }
+        wait(NULL);
     }
 
     if(value_return == 0) {
         if(f == 0) { //SON SIDE
             printf("START son: %d\n", getpid());
-            strcpy(args[0], "./C");
-            strcpy(args[1], "-nfiles");
-            sprintf(args[2], "%d");
-            dup2(STDOUT_FILENO, fd_2[WRITE]); //close STDOUT_FILENO and open fd[WRITE]
-            dup2(STDIN_FILENO, fd_1[READ]);
-            close(fd_2[WRITE]);
-            close(fd_1[READ]);
+
+            strcpy(array[0], "./C");
+            strcpy(array[1], "-nfiles");
+            sprintf(array[2], "%d", count);
+            strcpy(array[3], "-setn");
+            sprintf(array[4], "%d", n);
+            strcpy(array[5], "-setm");
+            sprintf(array[6], "%d", m);
+            for(i = 0; i < 7; i++) {
+                args[i] = array[i];
+            }
+            args[7] = NULL;
+
+            dup2(fd_2[WRITE], STDIN_FILENO); //close STDOUT_FILENO and open fd[WRITE]
+            dup2(fd_1[READ], STDIN_FILENO);
             execvp(args[0], args);
         }
     } 
-    */
     return value_return;
 }
