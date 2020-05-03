@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
                 strcat(command, " ");    //command for system
                 strcat(command, end);    //To here
                 printf("\n%s\n\n", command);
-                system(command);
+                //system(command);
                 memset(command, 0, sizeof(*command)); //Empty command string
             }
         }
