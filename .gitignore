@@ -1,6 +1,9 @@
 # Ignore all
 *
 
+# Ignore bin dir
+bin/
+
 # Unignore all with extensions
 !*.*
 

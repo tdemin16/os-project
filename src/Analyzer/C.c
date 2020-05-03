@@ -6,7 +6,6 @@ int main(int argc, char const *argv[]) {
     int nfiles = 0; //number of files to retreive from pipe
     int n = 3;
     int m = 4;
-    node files; //list of paths
     int i;
     char path[PATH_MAX];
 
