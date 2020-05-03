@@ -33,7 +33,7 @@ int main(int argc, char const *argv[]) {
                 value_return = err_args_C();
             }
         }
-        if(nfiles == 0 && value_return == 0) value_return = err_args_C(); //CHeck if nfiles is setted, if not gives an error (value_return used to avoid double messages)
+        if(nfiles == 0 && value_return == 0) value_return = err_args_C(); //Check if nfiles is setted, if not gives an error (value_return used to avoid double messages)
     }
 
     for(i = 0; i < nfiles; i++) {

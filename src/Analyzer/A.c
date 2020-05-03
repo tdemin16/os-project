@@ -146,6 +146,7 @@ int main(int argc, char *argv[])
         if(f == 0) { //SON SIDE
             printf("START son: %d\n", getpid());
 
+            //Creates char* args []
             strcpy(array[0], "./C");
             strcpy(array[1], "-nfiles");
             sprintf(array[2], "%d", count);
@@ -153,6 +154,7 @@ int main(int argc, char *argv[])
             sprintf(array[4], "%d", n);
             strcpy(array[5], "-setm");
             sprintf(array[6], "%d", m);
+            //Copy into args
             for(i = 0; i < 7; i++) {
                 args[i] = array[i];
             }
