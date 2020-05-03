@@ -25,9 +25,8 @@ int main(int argc, char *argv[])
     int fd_1[2]; //Pipe
     int fd_2[2];
     pid_t f; //fork return value
-    char array[8][20];
-    char* args[8];
-    char c[255];
+    char array[8][20]; //Matrice di appoggio
+    char* args[8]; //String og arguments to pass to child
 
     if(argc < 1) { //if number of arguments is even or less than 1, surely it's a wrong input
         value_return = err_args_A();

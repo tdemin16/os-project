@@ -36,7 +36,7 @@ int main(int argc, char const *argv[]) {
         if(nfiles == 0 && value_return == 0) value_return = err_args_C(); //CHeck if nfiles is setted, if not gives an error (value_return used to avoid double messages)
     }
 
-    while(1) {
+    for(i = 0; i < nfiles; i++) {
         read(STDIN_FILENO, path, PATH_MAX);
         printf("%s\n", path);
     }
