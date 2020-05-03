@@ -8,7 +8,7 @@ int main(int argc, char const *argv[]) {
     int m = 4;
     node files; //list of paths
     int i;
-    char path[255];
+    char path[PATH_MAX];
 
     
     //Parsing arguments------------------------------------------------------------------------------------------
