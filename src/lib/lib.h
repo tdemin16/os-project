@@ -64,6 +64,7 @@ int err_file_open();
 int err_pipe();
 int err_end_file();
 int err_args_A();
+int err_input_A(char*);
 int err_args_C();
 int err_args_P();
 int err_args_Q();

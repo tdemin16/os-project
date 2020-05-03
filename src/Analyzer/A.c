@@ -69,48 +69,44 @@ int main(int argc, char *argv[])
             }
 
             if (flag == FALSE && value_return == 0){ //------Vuol dire che argv[i] e' un file o una cartella
-                //printf("\n- START ANALYZE: %s\n",argv[i]);
-                char command[strlen("test -d  && find ") + strlen(argv[i])*2 + strlen(" -type f -follow -print || echo \"[ERROR]\"")+ 1];
+                /*  Viene utilizzato il comando:  test -d [dir] && find [dir] -type f -follow -print || echo "-[ERROR]"
+                    Il comando test -d controlla l'esistenza del file/directory input. In caso di successo viene lanciato find
+                    In caso di successo viene lanciato find che restituisce la lista di tutti i file nella cartella e nelle sottocartelle
+                    Se l'input non esiste restituisce -[ERROR], in modo che possa essere intercettato dal parser
+                */
+                char command[strlen("test -d  && find ") + strlen(argv[i])*2 + strlen(" -type f -follow -print || echo \"-[ERROR]\"")+ 1]; //Creazione comando
                 strcpy(command, "test -d ");
                 strcat(command, argv[i]);
                 strcat(command, " && find ");
                 strcat(command, argv[i]);
-                strcat(command, " -type f -follow -print || echo \"[ERROR]\"");
-                //printf("%s\n",command);
+                strcat(command, " -type f -follow -print || echo \"-[ERROR]\"");
                 fp = popen(command, "r"); //avvia il comando e in fp prende l'output
-                //printf("%s",fgets(riga, sizeof(riga), fp));
-                if (fp == NULL) 
+                if (fp == NULL) //Se il comando non va a buon fine
                 {
                     value_return = err_args_A();
                 } else { //Il comando va a buon fine
                     while (fgets(riga, sizeof(riga), fp) != NULL && errdir == FALSE) //Legge riga per riga e aggiunge alla lista
                 {
-                    if (strcmp(riga,"[ERROR]\n")){
+                    if (strcmp(riga,"-[ERROR]\n")){
                         realpath(riga, resolved_path);  //risalgo al percorso assoluto
                         resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo      
                         tmp = &resolved_path[0];                           
-                        if (!(is_present(tmp, filePath))){
-                            filePath = insert_first(tmp,filePath);
-                            //printf("[+] %s\n",tmp);
-                            count++;
-                        } else {
-                            //printf("[/] %s\n",tmp);
-                        }
-                    } else {
-                        errdir = TRUE;
+                        if (!(is_present(tmp, filePath))){ //Controlla se il percorso è già presente nella lista
+                            filePath = insert_first(tmp,filePath); //aggiunge il percorso alla lista
+                            count++; //incrementa il numero di percorsi inseriti con successo
+                        } 
+                    } else { //Intercetta l'errore riguardante file o cartelle non esistenti
+                        errdir = TRUE; //Metto il flag errore file/directory sbagliati
                     }
                 }
-                pclose(fp);
-                if (errdir == TRUE) value_return = err_args_A();
+                pclose(fp); //chiudo fp
+                if (errdir == TRUE) value_return = err_input_A(argv[i]); //Mando l'errore per la directory
                 }
             } else {
-                flag = FALSE;
+                flag = FALSE; //Analisi argomento saltata, rimetto flag a false
             }
-
-
         }
         if(count == 0 && value_return == 0) value_return = err_args_A(); //counter is higher than zero, if not gives an error (value_return used to avoid double messages)
-
     }
     
     if (value_return == 0){ //Esecuzione corretta

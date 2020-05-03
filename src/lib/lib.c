@@ -233,6 +233,11 @@ int err_args_A()
     printf("\nErrore nella sintassi del comando.\nUsa: /A nomeFile nomeCartella\nPuoi usare -setn e -setm per cambiare n e m\nes: /A A.c ../Analyzer/ -setn 3 -setm 4\n\n");
     return ERR_ARGS_A;
 }
+int err_input_A(char * file)
+{
+    printf("\nErrore input\nFile/Directory non esistente: %s\n\n",file);
+    return ERR_ARGS_A;
+}
 
 int err_args_C()
 {
