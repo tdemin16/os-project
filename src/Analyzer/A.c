@@ -9,6 +9,7 @@ int main(int argc, char *argv[])
     int value_return = 0; //Valore di ritorno
     int count = 0; //numero di file univoci da analizzare
     node filePath = NULL; //list of path's strings
+    char resolved_path[PATH_MAX];   //contiene il percorso assoluto di un file
     char *tmp;
     //ATTENZIONE: args puo' essere sostituita da filePath qualora questa non sia piu' utile dopo il fork
     //Rimuovere questi commenti alla fine del progetto :)
@@ -76,10 +77,9 @@ int main(int argc, char *argv[])
                 } else { //Il comando va a buon fine
                     while (fgets(riga, sizeof(riga), fp) != NULL) //Legge riga per riga e aggiunge alla lista
                 {
-                    char resolved_path[PATH_MAX];
                     realpath(riga, resolved_path);  //risalgo al percorso assoluto
                     resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo      
-                    char * tmp = &resolved_path[0];                           
+                    tmp = &resolved_path[0];                           
                     if (!(is_present(tmp, filePath))){
                         filePath = insert_first(tmp,filePath);
                         //printf("[+] %s\n",tmp);
