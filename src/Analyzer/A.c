@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
             while(msg != NULL && value_return == 0) { //cicla su tutti gli elementi della lista
                 if (write(fd_1[WRITE], msg->path, PATH_MAX) == -1) {
                     value_return = err_write();
-                    //Capire cosa fare (killare tutto?)
+                    //ADD SIGNAL HANDLING
                 }
                 msg = msg->next;
             }

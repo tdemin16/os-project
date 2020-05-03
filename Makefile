@@ -14,18 +14,10 @@ build:
 	@gcc -c -std=gnu90 -o ./bin/lib ./src/lib/lib.c
 	@gcc -c -std=gnu90 -o ./bin/Q ./src/Analyzer/Q.c
 	@gcc -c -std=gnu90 -o ./bin/P ./src/Analyzer/P.c
-	@#@gcc -c -std=gnu90 -o ./bin/C ./src/Analyser/C.c
+	@gcc -c -std=gnu90 -o ./bin/C ./src/Analyzer/C.c
 	@gcc -c -std=gnu90 -o ./bin/A ./src/Analyzer/A.c
 	@gcc -c -std=gnu90 -o ./bin/R ./src/R.c
 	@#@gcc -c -std=gnu90 -o ./bin/M ./src/M.o
 
 clean:
-	@rm ./bin/lib
-	@rm ./bin/Q
-	@rm ./bin/P
-	@#@rm ./bin/C
-	@rm ./bin/A
-	@rm ./bin/R
-	@#@rm ./bin/M
-
-
+	@rm -rf ./bin
