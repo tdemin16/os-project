@@ -20,7 +20,9 @@ int main(int argc, char *argv[])
     int fd_1[2]; //Pipe
     int fd_2[2];
     pid_t f; //fork return value
-    char args[8][7];
+    char array[8][20];
+    char* args[8];
+    char c[255];
 
 
     if (argc > 1) //APERTURA TRAMITE MAIN (ARGOMENTI)
@@ -124,6 +126,7 @@ int main(int argc, char *argv[])
                     value_return = err_write();
                     //Capire cosa fare (killare tutto?)
                 }
+                printf("%s\n", msg->path);
                 msg = msg->next;
             }
             close(fd_1[WRITE]);
@@ -133,15 +136,22 @@ int main(int argc, char *argv[])
     if(value_return == 0) {
         if(f == 0) { //SON SIDE
             printf("START son: %d\n", getpid());
-            strcpy(args[0], "./C");
-            strcpy(args[1], "-nfiles");
-            sprintf(args[2], "%d", count);
-            printf("%s", args[2]);
+
+            strcpy(array[0], "./C");
+            strcpy(array[1], "-nfiles");
+            sprintf(array[2], "%d", count);
+            strcpy(array[3], "-setn");
+            sprintf(array[4], "%d", n);
+            strcpy(array[5], "-setm");
+            sprintf(array[6], "%d", m);
+            for(i = 0; i < 7; i++) {
+                args[i] = array[i];
+            }
+            args[7] = NULL;
+
             dup2(STDOUT_FILENO, fd_2[WRITE]); //close STDOUT_FILENO and open fd[WRITE]
             dup2(STDIN_FILENO, fd_1[READ]);
-            close(fd_2[WRITE]);
-            close(fd_1[READ]);
-            //execvp(args[0], args);
+            execvp(args[0], args);
         }
     } 
 
