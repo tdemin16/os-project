@@ -11,13 +11,13 @@ help:
 build:
 	@if [ ! -d "./bin" ]; then \
 	mkdir -p ./bin; fi
-	@gcc -c -std=gnu90 -o ./bin/lib ./src/lib/lib.c
-	@gcc -c -std=gnu90 -o ./bin/Q ./src/Analyzer/Q.c
-	@gcc -c -std=gnu90 -o ./bin/P ./src/Analyzer/P.c
-	@gcc -c -std=gnu90 -o ./bin/C ./src/Analyzer/C.c
-	@gcc -c -std=gnu90 -o ./bin/A ./src/Analyzer/A.c
-	@gcc -c -std=gnu90 -o ./bin/R ./src/R.c
-	@#@gcc -c -std=gnu90 -o ./bin/M ./src/M.o
+	@gcc -std=gnu90 ./src/lib/lib.c ./src/lib/lib.c -o ./bin/lib 
+	@gcc -std=gnu90 ./src/Analyzer/P.c ./src/lib/lib.c -o ./bin/P 
+	@gcc -std=gnu90 ./src/Analyzer/C.c ./src/lib/lib.c -o ./bin/C
+	@gcc -std=gnu90 ./src/Analyzer/Q.c ./src/lib/lib.c -o ./bin/Q
+	@gcc -std=gnu90 ./src/Analyzer/A.c ./src/lib/lib.c -o ./bin/A 
+	#@gcc -c -std=gnu90 ./src/R.c -o ./bin/R 
+	#@#@gcc -c -std=gnu90 -o ./bin/M ./src/M.o
 
 clean:
 	@rm -rf ./bin
