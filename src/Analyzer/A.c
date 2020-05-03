@@ -14,9 +14,10 @@ int main(int argc, char *argv[])
     //Rimuovere questi commenti alla fine del progetto :)
     node msg; //list used to pass path's to child
 
-    char flag = FALSE; // se flag = true, l'argomento successivo è il numero o di n o di m
+    char flag = FALSE; // se flag = true, non bisogna analizzare l'argomento. (l'argomento successivo è il numero o di n o di m)
     char setn = FALSE; // se setn = true, n è stato cambiato
     char setm = FALSE; // se setn = true, m è stato cambiato
+    char done = FALSE; // true quando l'argomento è stato analizzato
     FILE *fp;
     char riga[1035];
 
@@ -32,26 +33,43 @@ int main(int argc, char *argv[])
     else {
         for(i = 1; i < argc && value_return == 0; i++) {
             if(!strcmp(argv[i], "-setn")) {//Check if argument is equal to -setn
-                n = atoi(argv[i + 1]);
-                if(n == 0) value_return = err_args_A();
-                flag = TRUE;
-                i++;
+                if (i+1<argc){ //controlla che ci sia effettivamente un argomento dopo il -setn
+                    n = atoi(argv[i + 1]);
+                    if(n == 0) value_return = err_args_A(); //Il campo dopo -setn non è un numero
+                    if(setn == TRUE) value_return = err_args_A();   //n gia' settato
+                    flag = TRUE;
+                    setn = TRUE;
+                    i++;
+                } else {
+                    value_return = err_args_A();
+                }
+                
             }
             else if(!strcmp(argv[i], "-setm")) { //Check if argument is equal to -setm
-                m = atoi(argv[i+1]);
-                if(m == 0) value_return = err_args_A();
-                flag = TRUE;
-                i++;
+                if (i+1<argc){ //controlla che ci sia effettivamente un argomento dopo il -setn
+                    m = atoi(argv[i+1]);
+                    if(m == 0) value_return = err_args_A(); //Il campo dopo -setm non è un numero
+                    if(setm == TRUE) value_return = err_args_A(); //m gia' settato
+                    flag = TRUE;
+                    setm = TRUE;
+                    i++;
+                } else {
+                    value_return = err_args_A();
+                }
+
+
             }else if(strncmp(argv[i], "-", 1) == 0){ //Se inizia per - ma non è setn/setm non è un input valido
+                flag = TRUE;
                 value_return = err_args_A();
             }
 
-            if (flag == FALSE){ //Vuol dire che argv[i] e' un file o una cartella
+            if (flag == FALSE && value_return == 0){ //Vuol dire che argv[i] e' un file o una cartella
                 char command[strlen("find ") + strlen(argv[i]) + strlen(" -type f -follow -print" + 1)];
                 strcpy(command, "find ");
                 strcat(command, argv[i]);
                 strcat(command, " -type f -follow -print");
                 fp = popen(command, "r"); //avvia il comando e in fp prende l'output
+                //printf("%s",fgets(riga, sizeof(riga), fp));
                 if (fp == NULL) 
                 {
                     value_return = err_args_A();
@@ -60,15 +78,14 @@ int main(int argc, char *argv[])
                 {
                     char resolved_path[PATH_MAX];
                     realpath(riga, resolved_path);  //risalgo al percorso assoluto
-                    resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo     
-                    
+                    resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo      
                     char * tmp = &resolved_path[0];                           
                     if (!(is_present(tmp, filePath))){
                         filePath = insert_first(tmp,filePath);
-                        printf("[+] %s\n",tmp);
+                        //printf("[+] %s\n",tmp);
                         count++;
                     } else {
-                        printf("[/] %s\n",tmp);
+                        //printf("[/] %s\n",tmp);
                     }
                 }
                 pclose(fp);
@@ -82,7 +99,10 @@ int main(int argc, char *argv[])
         if(count == 0 && value_return == 0) value_return = err_args_A(); //counter is higher than zero, if not gives an error (value_return used to avoid double messages)
     }
     
-    printf("\nNumero file: %d,n=%d m=%d\n",count,n,m);
+    if (value_return == 0){ //Esecuzione corretta
+        printf("Numero file: %d,n=%d m=%d\n",count,n,m);
+    }
+    
     
  
 /*
