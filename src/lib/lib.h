@@ -8,6 +8,7 @@
 #include<sys/types.h>
 #include<unistd.h>
 #include<errno.h>
+#include<math.h>
 
 #define READ 0
 #define WRITE 1

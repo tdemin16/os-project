@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     pid_t f; //fork return value
     char array[8][20]; //Matrice di appoggio
     char* args[8]; //String og arguments to pass to child
-
+    //system("clear");
     if(argc < 1) { //if number of arguments is even or less than 1, surely it's a wrong input
         value_return = err_args_A();
     }

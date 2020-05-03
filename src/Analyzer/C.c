@@ -35,11 +35,21 @@ int main(int argc, char const *argv[]) {
         }
         if(nfiles == 0 && value_return == 0) value_return = err_args_C(); //Check if nfiles is setted, if not gives an error (value_return used to avoid double messages)
     }
-
-    for(i = 0; i < nfiles; i++) {
-        read(STDIN_FILENO, path, PATH_MAX);
-        printf("%s\n", path);
+    
+    int fileLeft = nfiles;
+    int processLeft = n;
+    int tmpFiles = 0;
+    while (processLeft >0){
+        printf("Process %d: %d files\n",n-processLeft+1,(int)((float)fileLeft/(float)processLeft));
+        tmpFiles = (int)((float)fileLeft/(float)processLeft);
+        for (i = 0; i<tmpFiles; i++){
+            read(STDIN_FILENO, path, PATH_MAX);
+            printf("%s\n", path);
+        }
+        fileLeft-=tmpFiles;
+        processLeft-=1;
     }
+
 
     return value_return;
 }
