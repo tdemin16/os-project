@@ -9,7 +9,7 @@ node insert_first(char *p, node l)
     //so it doesn't require a test
     node tmp = (node)malloc(sizeof(node));
 
-    tmp->path = malloc(PATH_MAX);
+    tmp->path = malloc(PATH_MAX*sizeof(char));
     strcpy(tmp->path,p);
     tmp->next = l;
 
