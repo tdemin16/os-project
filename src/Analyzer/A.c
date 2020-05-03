@@ -5,20 +5,24 @@ int main(int argc, char *argv[])
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
     int m = 4;
+    
+    //ATTENZIONE: args puo' essere sostituita da filePath qualora questa non sia piu' utile dopo il fork
+    //Rimuovere questi commenti alla fine del progetto :)
+    node msg; //list used to pass path's to child
+    
+    //parser variables
     int i; //Variabile usata per ciclare gli argomenti (argv[i])
     int value_return = 0; //Valore di ritorno
     int count = 0; //numero di file univoci da analizzare
     node filePath = NULL; //list of path's strings
     char resolved_path[PATH_MAX];   //contiene il percorso assoluto di un file
     char *tmp;
-    //ATTENZIONE: args puo' essere sostituita da filePath qualora questa non sia piu' utile dopo il fork
-    //Rimuovere questi commenti alla fine del progetto :)
-    node msg; //list used to pass path's to child
-
     char flag = FALSE; // se flag = true, non bisogna analizzare l'argomento. (l'argomento successivo è il numero o di n o di m)
     char setn = FALSE; // se setn = true, n è stato cambiato
     char setm = FALSE; // se setn = true, m è stato cambiato
     char done = FALSE; // true quando l'argomento è stato analizzato
+    int dim = 0; //dimensione comando
+    char errdir = FALSE;
     FILE *fp;
     char riga[1035];
 
@@ -65,13 +69,13 @@ int main(int argc, char *argv[])
             }
 
             if (flag == FALSE && value_return == 0){ //------Vuol dire che argv[i] e' un file o una cartella
-                char command[strlen("test -d  && find ") + strlen(argv[i])*2 + strlen(" -type f -follow -print || echo \"ERROR\"" + 1)];
-                
+                //printf("\n- START ANALYZE: %s\n",argv[i]);
+                char command[strlen("test -d  && find ") + strlen(argv[i])*2 + strlen(" -type f -follow -print || echo \"[ERROR]\"")+ 1];
                 strcpy(command, "test -d ");
                 strcat(command, argv[i]);
                 strcat(command, " && find ");
                 strcat(command, argv[i]);
-                strcat(command, " -type f -follow -print || echo \"ERROR\"");
+                strcat(command, " -type f -follow -print || echo \"[ERROR]\"");
                 //printf("%s\n",command);
                 fp = popen(command, "r"); //avvia il comando e in fp prende l'output
                 //printf("%s",fgets(riga, sizeof(riga), fp));
@@ -79,20 +83,25 @@ int main(int argc, char *argv[])
                 {
                     value_return = err_args_A();
                 } else { //Il comando va a buon fine
-                    while (fgets(riga, sizeof(riga), fp) != NULL) //Legge riga per riga e aggiunge alla lista
+                    while (fgets(riga, sizeof(riga), fp) != NULL && errdir == FALSE) //Legge riga per riga e aggiunge alla lista
                 {
-                    realpath(riga, resolved_path);  //risalgo al percorso assoluto
-                    resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo      
-                    tmp = &resolved_path[0];                           
-                    if (!(is_present(tmp, filePath))){
-                        filePath = insert_first(tmp,filePath);
-                        //printf("[+] %s\n",tmp);
-                        count++;
+                    if (strcmp(riga,"[ERROR]\n")){
+                        realpath(riga, resolved_path);  //risalgo al percorso assoluto
+                        resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo      
+                        tmp = &resolved_path[0];                           
+                        if (!(is_present(tmp, filePath))){
+                            filePath = insert_first(tmp,filePath);
+                            //printf("[+] %s\n",tmp);
+                            count++;
+                        } else {
+                            //printf("[/] %s\n",tmp);
+                        }
                     } else {
-                        //printf("[/] %s\n",tmp);
+                        errdir = TRUE;
                     }
                 }
                 pclose(fp);
+                if (errdir == TRUE) value_return = err_args_A();
                 }
             } else {
                 flag = FALSE;
@@ -101,18 +110,17 @@ int main(int argc, char *argv[])
 
         }
         if(count == 0 && value_return == 0) value_return = err_args_A(); //counter is higher than zero, if not gives an error (value_return used to avoid double messages)
+
     }
     
     if (value_return == 0){ //Esecuzione corretta
         printf("Numero file: %d,n=%d m=%d\n",count,n,m);
     }
     
-    
-
     //IPC
     if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
         if(pipe(fd_1) == -1) { //Controllo se nella creazione della pipe ci sono errori
-            value_return = err_pipe(); //in caso di errore setta il valore di ritorno a ERR_PIPE
+            value_return = err_pipe(); //in caso di git errore setta il valore di ritorno a ERR_PIPE
         }
     }
     if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
@@ -168,5 +176,6 @@ int main(int argc, char *argv[])
             execvp(args[0], args);
         }
     } 
+    
     return value_return;
 }

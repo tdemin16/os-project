@@ -45,6 +45,7 @@ char is_present(char *p, node l)
     return ret;
 }
 
+
 int count_list_elements(node l)
 {
     int val = 0;
