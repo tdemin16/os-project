@@ -3,4 +3,4 @@ BUILD_DIR="bin/"
 
 $MAKE
 cd $BUILD_DIR
-./A ../src/Analizer
+./A ../src/Analyzer
