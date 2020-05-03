@@ -34,42 +34,45 @@ int main(int argc, char *argv[])
     }
     else {
         for(i = 1; i < argc && value_return == 0; i++) {
-            if(!strcmp(argv[i], "-setn")) {//Check if argument is equal to -setn
+            if(!strcmp(argv[i], "-setn")) {//----ERRORI -setn
                 if (i+1<argc){ //controlla che ci sia effettivamente un argomento dopo il -setn
                     n = atoi(argv[i + 1]);
                     if(n == 0) value_return = err_args_A(); //Il campo dopo -setn non è un numero
                     if(setn == TRUE) value_return = err_args_A();   //n gia' settato
-                    flag = TRUE;
-                    setn = TRUE;
+                    flag = TRUE; //Salto prossimo argomento
+                    setn = TRUE; //n e' stato settato, serve a controllare che non venga settato due volte
                     i++;
                 } else {
                     value_return = err_args_A();
                 }
                 
             }
-            else if(!strcmp(argv[i], "-setm")) { //Check if argument is equal to -setm
+            else if(!strcmp(argv[i], "-setm")) {//-----ERRORI -setm
                 if (i+1<argc){ //controlla che ci sia effettivamente un argomento dopo il -setn
                     m = atoi(argv[i+1]);
                     if(m == 0) value_return = err_args_A(); //Il campo dopo -setm non è un numero
                     if(setm == TRUE) value_return = err_args_A(); //m gia' settato
-                    flag = TRUE;
-                    setm = TRUE;
+                    flag = TRUE;    //Salto il prossimo argomento
+                    setm = TRUE;    //m e' stato settato, serve a controllare che non venga settato due volte
                     i++;
                 } else {
                     value_return = err_args_A();
                 }
 
 
-            }else if(strncmp(argv[i], "-", 1) == 0){ //Se inizia per - ma non è setn/setm non è un input valido
-                flag = TRUE;
+            }else if(strncmp(argv[i], "-", 1) == 0){//-----ERRORI input strani che iniziano con -
                 value_return = err_args_A();
             }
 
-            if (flag == FALSE && value_return == 0){ //Vuol dire che argv[i] e' un file o una cartella
-                char command[strlen("find ") + strlen(argv[i]) + strlen(" -type f -follow -print" + 1)];
-                strcpy(command, "find ");
+            if (flag == FALSE && value_return == 0){ //------Vuol dire che argv[i] e' un file o una cartella
+                char command[strlen("test -d  && find ") + strlen(argv[i])*2 + strlen(" -type f -follow -print || echo \"ERROR\"" + 1)];
+                
+                strcpy(command, "test -d ");
                 strcat(command, argv[i]);
-                strcat(command, " -type f -follow -print");
+                strcat(command, " && find ");
+                strcat(command, argv[i]);
+                strcat(command, " -type f -follow -print || echo \"ERROR\"");
+                //printf("%s\n",command);
                 fp = popen(command, "r"); //avvia il comando e in fp prende l'output
                 //printf("%s",fgets(riga, sizeof(riga), fp));
                 if (fp == NULL) 
