@@ -74,7 +74,7 @@ void initialize_vector(int v[])
 void set_add(int v[], char c)
 {
     int val_ascii;
-    val_ascii = ((int)c) - 32; //casting char to int and difference 32 (in order to save space on the vector)
+    val_ascii = ((int)c) - 32; //casting char to int and difference 32 (in order to save space on the vector) //Se vogliamo togliere lo spazio basta fare -33
     v[val_ascii]++;
 }
 
