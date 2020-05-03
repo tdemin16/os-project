@@ -10,15 +10,15 @@ int main(int argc, char *argv[])
     int v[DIM_V];
     initialize_vector(v);
 
-    if (argc - 1 != 3)
+    if (argc - 1 != 2)
     {
-        value_return = err_argc();
+        value_return = err_args_Q();
     }
     else
     {
-        char *DIR = argv[1];       // setup the directory
-        int begin = atoi(argv[2]); //setup start of the process in the file
-        int end = atoi(argv[3]);   //setup end of the process in the file
+        char *DIR = "directory";       // setup the directory
+        int begin = atoi(argv[1]); //setup start of the process in the file
+        int end = atoi(argv[2]);   //setup end of the process in the file
 
         FILE *fp = fopen(DIR, "r"); //open in read mode the file in the directory
 
