@@ -1,7 +1,9 @@
 #include "../lib/lib.h"
 
 int main(int argc, char *argv[])
-{
+{   
+    int v[DIM_V]; //Array contenente il count per ogni carattere
+
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
     int m = 4;
@@ -32,7 +34,10 @@ int main(int argc, char *argv[])
     pid_t f; //fork return value
     char array[8][20]; //Matrice di appoggio
     char* args[8]; //String og arguments to pass to child
-    //system("clear");
+    int _write = FALSE; //true when finish writing the pipe
+    int _read = FALSE; //true when fisnish reading from pipe
+    char* char_count;
+
     if(argc < 1) { //if number of arguments is even or less than 1, surely it's a wrong input
         value_return = err_args_A();
     }
@@ -125,6 +130,14 @@ int main(int argc, char *argv[])
         }
     }
 
+    //Set Non-blocking pipes
+    if(value_return == 0) {
+        if(fcntl(fd_2[READ], F_SETFL, O_NONBLOCK)) { //Prova a sbloccare la pipe 2 in lettura
+            value_return = err_fcntl(); //Se errore riporta il messaggio di errore
+        }
+    }
+    
+
     if(value_return == 0) { //same as before
         printf("FORK\n");
         f = fork(); //Fork dei processi
@@ -137,12 +150,28 @@ int main(int argc, char *argv[])
         msg = filePath; //copia il riferimento alla lista cosi' da poterla scorrere senza perdere i riferimanti effettivi
         if(f > 0) { //PARENT SIDE
             printf("START parent: %d\n", getpid());
-            while(msg != NULL && value_return == 0) { //cicla su tutti gli elementi della lista
-                if (write(fd_1[WRITE], msg->path, PATH_MAX) == -1) {
-                    value_return = err_write();
-                    //ADD SIGNAL HANDLING
+            
+            i = 0;
+            while(value_return == 0 && (!_read || !_write)) { //cicla su tutti gli elementi della lista
+                
+                //Write side
+                if(!_write) {
+                    if (write(fd_1[WRITE], msg->path, PATH_MAX) == -1) { //Prova a scrivere sulla pipe
+                        value_return = err_write(); //Se fallisce da` errore
+                        //ADD SIGNAL HANDLING
+                    }
+                    msg = msg->next; //Passa al messaggio successivo
+                    if(msg == NULL) _write = TRUE; //Set _write a true quando a finito di scrivere
                 }
-                msg = msg->next;
+
+                //Read side
+                if(!_read) { //Non necessario presente solo per correttezza formale
+                    if(read(fd_2[READ], char_count, 255) == 0) {
+                        parse_string(char_count, v);
+                        i++;
+                        if(i == count) _read = TRUE;
+                    }
+                }
             }
             close(fd_1[WRITE]);
         }

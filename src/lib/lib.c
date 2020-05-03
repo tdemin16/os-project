@@ -60,6 +60,22 @@ int count_list_elements(node l)
     return val;
 }
 
+
+// /src/Analyzer/A.c
+void parse_string(char* string, int v[DIM_V]) {
+    int i = 0;
+    char* token = strtok(string, ","); //Extract the first token
+    while(token != NULL) { //loop through token
+        if(i < DIM_V) {
+            v[i] = atoi(token);
+            i++;
+            token = strtok(NULL, ",");
+        } else {
+            printf("Errore nella creazione della stringa contatore");
+        }
+    }
+}
+
 ///src/Analyzer/Q.c
 //Initialize frequence vector all to 0
 void initialize_vector(int v[])
@@ -233,6 +249,7 @@ int err_args_A()
     printf("\nErrore nella sintassi del comando.\nUsa: /A nomeFile nomeCartella\nPuoi usare -setn e -setm per cambiare n e m\nes: /A A.c ../Analyzer/ -setn 3 -setm 4\n\n");
     return ERR_ARGS_A;
 }
+
 int err_input_A(char * file)
 {
     printf("\nErrore input\nFile/Directory non esistente: %s\n\n",file);
@@ -286,4 +303,9 @@ int err_end_file()
 {
     printf("\n[!] Errore, sei andato oltre la fine del file\n");
     return ERR_FILE;
+}
+
+int err_fcntl() {
+    printf("Errore, pipe sblocco pipe non riuscito\n");
+    return ERR_FCNTL;
 }
