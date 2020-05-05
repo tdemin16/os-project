@@ -12,15 +12,22 @@ int main(int argc, char *argv[])
     char *end = malloc(sizeof(char));
     int m = atoi(argv[1]); //setup m
     m_process *div = malloc(sizeof(m));
+    FILE *fp = fopen(DIR, "r"); //open the file
 
     if (argc - 1 != 1)
     {
         value_return = err_args_P();
     }
+    else if (fp == NULL)
+    {
+        value_return = err_file_open();
+    }
+    else if (m <= 0)
+    {
+        value_return = err_m_not_valid();
+    }
     else
     {
-        FILE *fp = fopen(DIR, "r"); //open the file
-
         if (fp == NULL)
         {
             value_return = err_file_open(); //error if file is in
