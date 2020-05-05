@@ -64,7 +64,7 @@ int count_list_elements(node l)
 // /src/Analyzer/A.c
 void parse_string(char* string, int v[DIM_V]) {
     int i = 0;
-    char* token = strtok(string, ","); //Extract the first token
+    char* token = strtok(string, ",");
     while(token != NULL) { //loop through token
         if(i < DIM_V) {
             v[i] = atoi(token);
@@ -74,6 +74,7 @@ void parse_string(char* string, int v[DIM_V]) {
             printf("Errore nella creazione della stringa contatore");
         }
     }
+    
 }
 
 ///src/Analyzer/Q.c
@@ -129,13 +130,16 @@ void print_vector(int v[])
         if (v[i] != 0)
         {
             printf("\n%c è comparso %d volte", (i + 32), v[i]);
+            fflush(stdout);
         }
     }
 }
 
 ///src/R.c
-void printStat(char * stringa){
-    printf("stampa statistiche\n");
+void printStat(char * char_count){
+    int v[DIM_V]; 
+    parse_string(char_count, v);
+    print_vector(v);
 }
 
 
