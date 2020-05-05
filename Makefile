@@ -9,16 +9,13 @@ help:
 	@#cat ./README.md
 
 build:
-	@sudo chmod -R 777 ./
 	@if [ ! -d "./bin" ]; then \
 	mkdir ./bin; fi
-	@gcc -c ./src/lib/lib.c -std=gnu90 -o ./bin/lib
-	@gcc -c -std=gnu90 -o ./bin/Q ./src/Analyzer/Q.c
-	@gcc -c -std=gnu90 -o ./bin/P ./src/Analyzer/P.c
-	@gcc -c -std=gnu90 -o ./bin/C ./src/Analyzer/C.c
-	@gcc -c -std=gnu90 -o ./bin/A ./src/Analyzer/A.c
-	@gcc -c -std=gnu90 -o ./bin/R ./src/R.c
-	@#@gcc -c -std=gnu90 -o ./bin/M ./src/M.o
-
+	@#@gcc -std=gnu90 ./src/lib/lib.c ./src/Analyzer/Q.c -o ./bin/Q
+	@gcc -std=gnu90 ./src/lib/lib.c ./src/Analyzer/P.c -o ./bin/P
+	@gcc -std=gnu90 ./src/lib/lib.c ./src/Analyzer/C.c -o ./bin/C
+	@gcc -std=gnu90 ./src/lib/lib.c ./src/Analyzer/A.c -o ./bin/A
+	@#@gcc -std=gnu90 ./src/lib/lib.c ./src/R.c -o ./bin/R
+	@#@gcc -std=gnu90 ./src/lib/lib.c ./src/M.c -o ./bin/M
 clean:
 	@rm -rf ./bin

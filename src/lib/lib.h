@@ -26,6 +26,7 @@
 #define ERR_WRITE 7
 #define ERR_FCNTL 8
 #define ERR_EXEC 9
+#define ERR_DATA 9
 
 struct List{
     char* path;
@@ -70,6 +71,11 @@ char* itoa(int, char*, int);
 //int err_args_P(); used here
 //int err_file_open(); used here
 
+// /src/R.c
+void printStat(char *);
+
+
+
 //Error handlers
 int err_file_open();
 int err_pipe();
@@ -84,6 +90,7 @@ int err_fork();
 int err_write();
 int err_fnctl();
 int err_exec(int);
+int err_m_not_valid();
 
 
 #endif

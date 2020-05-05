@@ -166,6 +166,7 @@ int main(int argc, char *argv[])
                 /*if(!_read) { //Non necessario presente solo per correttezza formale
                     if(read(fd_2[READ], char_count, 255) == 0) {
                         parse_string(char_count, v);
+                        printf("%s\n",char_count);
                         i++;
                         if(i == count) _read = TRUE;
                     }
@@ -207,6 +208,5 @@ int main(int argc, char *argv[])
             }
         }
     } 
-    
     return value_return;
 }

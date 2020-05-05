@@ -7,11 +7,12 @@ int main(int argc, char *argv[])
     char *DIR = "./text_file/prova1.txt"; // setup the directory
     int value_return;
     int i;
-    char *command = malloc(sizeof(char));
-    char *begin = malloc(sizeof(char));
-    char *end = malloc(sizeof(char));
+    char *command = malloc(sizeof(char*)); //command, begin, end are NOT FOR THE PROJECT, only for testing
+    char *begin = malloc(sizeof(char*));
+    char *end = malloc(sizeof(char*));
     int m = atoi(argv[1]); //setup m
     m_process *div = malloc(sizeof(m));
+    FILE *fp = fopen(DIR, "r"); //open the file
 
     printf("%d", m);
 
@@ -19,10 +20,16 @@ int main(int argc, char *argv[])
     {
         value_return = err_args_P();
     }
+    else if (fp == NULL)
+    {
+        value_return = err_file_open();
+    }
+    else if (m <= 0)
+    {
+        value_return = err_m_not_valid();
+    }
     else
     {
-        FILE *fp = fopen(DIR, "r"); //open the file
-
         if (fp == NULL)
         {
             value_return = err_file_open(); //error if file is in
@@ -31,7 +38,7 @@ int main(int argc, char *argv[])
         {
             div = splitter(fp, m);
 
-            for (i = 0; i < m; i++) //Generate 4 process
+            for (i = 0; i < m; i++) //Generate 4 process -- ONLY FOR TESTING, NOT FOR THE PROJECT
             {
                 itoa(div[i].begin, begin, 10);
                 itoa(div[i].end, end, 10);

@@ -82,7 +82,7 @@ void close_pipes(int* fd, int size) {
 // /src/Analyzer/A.c
 void parse_string(char* string, int v[DIM_V]) {
     int i = 0;
-    char* token = strtok(string, ","); //Extract the first token
+    char* token = strtok(string, ",");
     while(token != NULL) { //loop through token
         if(i < DIM_V) {
             v[i] = atoi(token);
@@ -92,6 +92,7 @@ void parse_string(char* string, int v[DIM_V]) {
             printf("Errore nella creazione della stringa contatore");
         }
     }
+    
 }
 
 ///src/Analyzer/Q.c
@@ -146,10 +147,25 @@ void print_vector(int v[])
     {
         if (v[i] != 0)
         {
-            printf("\n%c è comparso %d volte", (i + 32), v[i]);
+            printf("\n%c è comparso %d volte", (i + 31), v[i]);
+            
         }
     }
 }
+
+///src/R.c
+void printStat(char * char_count){
+    int v[DIM_V]; 
+    int i;
+    parse_string(char_count, v);
+    for (i = 0; i<DIM_V; i++){
+        printf("%d - %c\t",v[i],i+31);   
+    }
+    printf("\n");
+    print_vector(v);
+    
+}
+
 
 ///src/Analyzer/P.c
 //return file length in terms of chars
@@ -331,4 +347,9 @@ int err_fcntl() {
 int err_exec(int err) {
     printf("Errore nell'esecuzione di exec(%d) in: %d\n", err, getpid());
     return ERR_EXEC;
+}
+
+int err_m_not_valid(){
+    printf("[!] Il valore di m non è valido, deve essere m > 0\n");
+    return ERR_DATA;
 }
