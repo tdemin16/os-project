@@ -129,8 +129,8 @@ void print_vector(int v[])
     {
         if (v[i] != 0)
         {
-            printf("\n%c è comparso %d volte", (i + 32), v[i]);
-            fflush(stdout);
+            printf("\n%c è comparso %d volte", (i + 31), v[i]);
+            
         }
     }
 }
@@ -138,8 +138,14 @@ void print_vector(int v[])
 ///src/R.c
 void printStat(char * char_count){
     int v[DIM_V]; 
+    int i;
     parse_string(char_count, v);
+    for (i = 0; i<DIM_V; i++){
+        printf("%d - %c\t",v[i],i+31);   
+    }
+    printf("\n");
     print_vector(v);
+    
 }
 
 
