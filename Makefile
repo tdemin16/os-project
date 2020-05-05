@@ -9,9 +9,10 @@ help:
 	@#cat ./README.md
 
 build:
+	@sudo chmod -R 777 ./
 	@if [ ! -d "./bin" ]; then \
-	mkdir -p ./bin; fi
-	@gcc -c -std=gnu90 -o ./bin/lib ./src/lib/lib.c
+	mkdir ./bin; fi
+	@gcc -c ./src/lib/lib.c -std=gnu90 -o ./bin/lib
 	@gcc -c -std=gnu90 -o ./bin/Q ./src/Analyzer/Q.c
 	@gcc -c -std=gnu90 -o ./bin/P ./src/Analyzer/P.c
 	@gcc -c -std=gnu90 -o ./bin/C ./src/Analyzer/C.c
