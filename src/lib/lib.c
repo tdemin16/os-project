@@ -133,6 +133,12 @@ void print_vector(int v[])
     }
 }
 
+///src/R.c
+void printStat(char * stringa){
+    printf("stampa statistiche\n");
+}
+
+
 ///src/Analyzer/P.c
 //return file length in terms of chars
 int file_len(FILE *fp)

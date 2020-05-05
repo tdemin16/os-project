@@ -66,6 +66,11 @@ char* itoa(int, char*, int);
 //int err_args_P(); used here
 //int err_file_open(); used here
 
+// /src/R.c
+void printStat(char *);
+
+
+
 //Error handlers
 int err_file_open();
 int err_pipe();
