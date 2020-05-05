@@ -25,6 +25,7 @@
 #define ERR_FORK 6
 #define ERR_WRITE 7
 #define ERR_FCNTL 8
+#define ERR_DATA 9
 
 struct List{
     char* path;
@@ -84,6 +85,7 @@ int err_file();
 int err_fork();
 int err_write();
 int err_fnctl();
+int err_m_not_valid();
 
 
 #endif

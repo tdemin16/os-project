@@ -129,6 +129,7 @@ void print_vector(int v[])
         if (v[i] != 0)
         {
             printf("\n%c è comparso %d volte", (i + 32), v[i]);
+            fflush(stdout);
         }
     }
 }
@@ -314,4 +315,9 @@ int err_end_file()
 int err_fcntl() {
     printf("Errore, pipe sblocco pipe non riuscito\n");
     return ERR_FCNTL;
+}
+
+int err_m_not_valid(){
+    printf("[!] Il valore di m non è valido, deve essere m > 0\n");
+    return ERR_DATA;
 }
