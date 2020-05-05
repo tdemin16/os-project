@@ -4,6 +4,9 @@
 # Ignore bin dir
 bin/
 
+# Ignore .vscode folders
+.vscode/
+
 # Unignore all with extensions
 !*.*
 
