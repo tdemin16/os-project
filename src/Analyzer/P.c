@@ -13,6 +13,8 @@ int main(int argc, char *argv[])
     int m = atoi(argv[1]); //setup m
     m_process *div = malloc(sizeof(m));
 
+    printf("%d", m);
+
     if (argc - 1 != 1)
     {
         value_return = err_args_P();

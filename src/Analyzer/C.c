@@ -11,6 +11,17 @@ int main(int argc, char const *argv[]) {
     int processLeft;    //Processi mancanti
     int fileLeft;   //file mancanti da assegnare 
     int tmpFiles;   //Contatore file da leggere per ogni processo
+    int count = 0; //Maintain the current amount of files sended
+    
+    //IPC Variables
+    int* fd;
+    pid_t f = getpid();
+    int id; //Indica il numero del figlio (necessario per calcolare quale pipe utilizzare)
+    const int size_pipe = n*4; //Size of pipes
+    char array[2][4];
+    char* args[3];
+    int _read = FALSE; //Indica se ha finito di leggere dai figli
+    int _write = FALSE; //Indica se ha finito di scrivere
     
     //Parsing arguments------------------------------------------------------------------------------------------
     if(argc % 2 == 0 || argc < 2) { //if number of arguments is even or less than 1, surely it's a wrong input
@@ -36,21 +47,113 @@ int main(int argc, char const *argv[]) {
         }
         if(nfiles == 0 && value_return == 0) value_return = err_args_C(); //Check if nfiles is setted, if not gives an error (value_return used to avoid double messages)
     }
-    
-    fileLeft = nfiles;
-    processLeft = n;
-    tmpFiles = 0;
-    while (processLeft >0){ //Ciclo fino a che non ho assegnato i file a ogni processo
-        printf("Process %d: %d files\n",n-processLeft+1,(int)((float)fileLeft/(float)processLeft));
-        tmpFiles = (int)((float)fileLeft/(float)processLeft); //Divido i file rimanenti per i processi rimanenti e tengo il numero troncato
-        for (i = 0; i<tmpFiles; i++){ //Leggo il numero di file assegnato al processo
-            read(STDIN_FILENO, path, PATH_MAX);
-            printf("%s\n", path);
+
+    if(value_return == 0) {
+        //Crea n*4 pipes (4 per coppia padre figlio, 2 in lettura e 2 in scrittura)
+        fd = (int*) malloc(n*4*sizeof(int));
+        //Alloco le pipes a due a due
+        for(i = 0; i < n*2; i += 2) {
+            if(pipe(fd + i) == -1) { //Controlla se ci sono errori nella creazione della pipe
+                value_return = err_pipe(); //In caso di errore setta il valore di ritorno
+            }
         }
-        fileLeft-=tmpFiles;
-        processLeft-=1;
+    }
+    /*  PIPES ENCODING---------------------------------------------
+        fd[id*4 + 0] SON READ
+        fd[id*4 + 1] PARENT WRITE
+        fd[id*4 + 2] PARENT READ
+        fd[id*4 + 3] SON WRITE
+    *///-----------------------------------------------------------
+
+    if(value_return == 0) {
+        if(unlock_pipes(fd, size_pipe) == -1) { //Set nonblocking pipes
+            value_return = ERR_FCNTL;
+        }
     }
 
+    if(value_return == 0) {
+        //Ciclo n volte, controllando che f > 0 (padre) e non ci siano errori -> genera quindi n processi
+        for(i = 0; i < n && f > 0 && value_return == 0; i++) {
+            f = fork();
+            if(f == 0) { //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
+                id = i;
+            }
+            if(f == -1) { //Controllo che non ci siano stati errori durante il fork
+                value_return = err_fork(); //In caso di errore setta il valore di ritorno a ERR_FORK
+            }
+        }
+    }
+
+    //----------------------------------------------------------------------------------------
+
+    if(value_return == 0) {
+        i = 0;
+        if(f > 0) { //PARENT SIDE
+            while(value_return == 0 && (/*!_read ||*/ !_write)) {
+
+                //Write
+                if(!_write) {
+                    if(read(STDIN_FILENO, path, PATH_MAX) == 0) { //Prova a leggere dalla pipe
+                        if(write(fd[i*4 + 1], path, PATH_MAX) == -1) { //Test write
+                            value_return = err_write();
+                            //ADD SIGNAL HANDLING
+                            count++;
+                            i = (i+1) % n;
+                        }
+                    }
+                    if(count == nfiles) _write = TRUE; //Ha passato tutti i path ai figli
+                }
+
+                //Read
+                /*if(!_read) {
+
+                }*/
+            }
+
+        }
+    }
+
+    if(value_return == 0) {
+        if(f == 0) {
+            //Creates char args
+            strcpy(array[0], "./P");
+            sprintf(array[1], "%d", m);
+            args[0] = array[0];
+            args[1] = array[1];
+            args[2] = NULL;
+
+            dup2(fd[id*4 + 0], STDIN_FILENO);
+            //dup2(fd[id*4 + 3], STDOUT_FILENO); DA ATTIVARE
+            close_pipes(fd, size_pipe);
+
+            if(execvp(args[0], args) == -1) { //Test exec
+                value_return = err_exec(errno); //Set value return
+            }
+        }
+    }
 
     return value_return;
 }
+
+//NON NECESSARIO, MANTENUTO PER SICUREZZA---------------------------------------------------
+/*if(value_return == 0) {
+    if(f > 0) { //PARENT SIDE
+        fileLeft = nfiles;
+        processLeft = n;
+        tmpFiles = 0;
+
+        while (processLeft >0){ //Ciclo fino a che non ho assegnato i file a ogni processo
+            printf("Process %d: %d files\n",n-processLeft+1,(int)((float)fileLeft/(float)processLeft));
+
+            tmpFiles = (int)((float)fileLeft/(float)processLeft); //Divido i file rimanenti per i processi rimanenti e tengo il numero troncato
+            for (i = 0; i<tmpFiles; i++){ //Leggo il numero di file assegnato al processo
+                if(read(STDIN_FILENO, path, PATH_MAX) == 0) {
+
+                }
+            }
+
+            fileLeft-=tmpFiles;
+            processLeft-=1;
+        }
+    }
+}*/

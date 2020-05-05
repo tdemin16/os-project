@@ -60,6 +60,24 @@ int count_list_elements(node l)
     return val;
 }
 
+int unlock_pipes(int* fd, int size) {
+    int i;
+    int ret = 0;
+    for(i = 0; i < size && ret == 0; i += 2) {
+        if(fcntl(fd[i], F_SETFL, O_NONBLOCK)) {
+            ret = -1;
+        }
+    }
+    return ret;
+}
+
+
+void close_pipes(int* fd, int size) {
+    int i;
+    for(i = 0; i < size; i++) {
+        close(fd[i]);
+    }
+}
 
 // /src/Analyzer/A.c
 void parse_string(char* string, int v[DIM_V]) {
@@ -308,4 +326,9 @@ int err_end_file()
 int err_fcntl() {
     printf("Errore, pipe sblocco pipe non riuscito\n");
     return ERR_FCNTL;
+}
+
+int err_exec(int err) {
+    printf("Errore nell'esecuzione di exec(%d) in: %d\n", err, getpid());
+    return ERR_EXEC;
 }

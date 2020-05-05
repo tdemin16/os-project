@@ -1,9 +1,7 @@
 #include "../lib/lib.h"
 
 int main(int argc, char *argv[])
-{   
-    int v[DIM_V]; //Array contenente il count per ogni carattere
-
+{
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
     int m = 4;
@@ -17,7 +15,7 @@ int main(int argc, char *argv[])
     int value_return = 0; //Valore di ritorno
     int count = 0; //numero di file univoci da analizzare
     node filePath = NULL; //list of path's strings
-    char resolved_path[PATH_MAX];   //contiene il percorso assoluto di un file
+    char resolved_path[PATH_MAX]; //contiene il percorso assoluto di un file
     char *tmp;
     char flag = FALSE; // se flag = true, non bisogna analizzare l'argomento. (l'argomento successivo è il numero o di n o di m)
     char setn = FALSE; // se setn = true, n è stato cambiato
@@ -32,7 +30,7 @@ int main(int argc, char *argv[])
     int fd_1[2]; //Pipe
     int fd_2[2];
     pid_t f; //fork return value
-    char array[8][20]; //Matrice di appoggio
+    char array[7][20]; //Matrice di appoggio
     char* args[8]; //String og arguments to pass to child
     int _write = FALSE; //true when finish writing the pipe
     int _read = FALSE; //true when fisnish reading from pipe
@@ -139,24 +137,24 @@ int main(int argc, char *argv[])
     
 
     if(value_return == 0) { //same as before
-        printf("FORK\n");
         f = fork(); //Fork dei processi
         if(f == -1) { //Controllo che non ci siano stati errori durante il fork
             value_return = err_fork(); //in caso di errore setta il valore di ritorno a ERR_FORK
         }
     }
 
+    //------------------------------------------------------------------------------
+
     if(value_return == 0) { //same
-        msg = filePath; //copia il riferimento alla lista cosi' da poterla scorrere senza perdere i riferimanti effettivi
         if(f > 0) { //PARENT SIDE
-            printf("START parent: %d\n", getpid());
+            msg = filePath; //copia il riferimento alla lista cosi' da poterla scorrere senza perdere i riferimanti effettivi
             
             i = 0;
-            while(value_return == 0 && (!_read || !_write)) { //cicla su tutti gli elementi della lista
+            while(value_return == 0 && (/*!_read ||*/ !_write)) { //cicla finche` non ha finito di leggere e scrivere
                 
-                //Write side
+                //Write
                 if(!_write) {
-                    if (write(fd_1[WRITE], msg->path, PATH_MAX) == -1) { //Prova a scrivere sulla pipe
+                    if(write(fd_1[WRITE], msg->path, PATH_MAX) == -1) { //Prova a scrivere sulla pipe
                         value_return = err_write(); //Se fallisce da` errore
                         //ADD SIGNAL HANDLING
                     }
@@ -164,23 +162,23 @@ int main(int argc, char *argv[])
                     if(msg == NULL) _write = TRUE; //Set _write a true quando a finito di scrivere
                 }
 
-                //Read side
-                if(!_read) { //Non necessario presente solo per correttezza formale
+                //Read
+                /*if(!_read) { //Non necessario presente solo per correttezza formale
                     if(read(fd_2[READ], char_count, 255) == 0) {
                         parse_string(char_count, v);
                         i++;
                         if(i == count) _read = TRUE;
                     }
-                }
+                }*/
             }
             close(fd_1[WRITE]);
+            close(fd_2[READ]);
         }
         wait(NULL);
     }
 
     if(value_return == 0) {
         if(f == 0) { //SON SIDE
-            printf("START son: %d\n", getpid());
 
             //Creates char* args []
             strcpy(array[0], "./C");
@@ -196,9 +194,17 @@ int main(int argc, char *argv[])
             }
             args[7] = NULL;
 
-            dup2(fd_2[WRITE], STDIN_FILENO); //close STDOUT_FILENO and open fd[WRITE]
+            //Redirects pipes to STDIN and STDOUT
             dup2(fd_1[READ], STDIN_FILENO);
-            execvp(args[0], args);
+            //dup2(fd_2[WRITE], STDOUT_FILENO); DA ATTIVARE
+            //Closing pipes
+            close(fd_1[READ]);
+            close(fd_1[WRITE]);
+            close(fd_2[READ]);
+            close(fd_2[WRITE]);
+            if(execvp(args[0], args) == -1) { //Test exec
+                value_return = err_exec(errno); //Set value return
+            }
         }
     } 
     

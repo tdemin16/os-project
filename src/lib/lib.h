@@ -25,6 +25,7 @@
 #define ERR_FORK 6
 #define ERR_WRITE 7
 #define ERR_FCNTL 8
+#define ERR_EXEC 9
 
 struct List{
     char* path;
@@ -45,8 +46,11 @@ node insert_first(char*, node);
 char is_present(char*, node);
 int count_list_elements(node);
 
+void close_pipes(int*, int);
+int unlock_pipes(int*, int);
+
 // /src/Analyzer/A.c
-void parse_string(char*, int* v);
+void parse_string(char*, int* v); 
 
 // /src/Analyzer/Q.c
 void initialize_vector(int*);
@@ -79,6 +83,7 @@ int err_file();
 int err_fork();
 int err_write();
 int err_fnctl();
+int err_exec(int);
 
 
 #endif
