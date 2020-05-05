@@ -28,10 +28,6 @@ int main(int argc, char *argv[])
         else
         {
             div = splitter(fp, m);
-            /*for (i = 0; i < m; i++)
-            {
-                printf("Da dove inizia il file: %d (non compreso), e finisce a: %d\n", div[i].begin, div[i].end);
-            }*/
 
             for (i = 0; i < m; i++) //Generate 4 process
             {
@@ -42,7 +38,7 @@ int main(int argc, char *argv[])
                 strcat(command, " ");    //command for system
                 strcat(command, end);    //To here
                 printf("\n%s\n\n", command);
-                system(command);
+                //system(command);
                 memset(command, 0, sizeof(*command)); //Empty command string
             }
         }
