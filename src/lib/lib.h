@@ -77,6 +77,7 @@ char* itoa(int, char*, int);
 void printStat(char *);
 void printStat_Cluster(char *);
 void printInfoCluster();
+float roundValue(float, int);
 
 
 //Error handlers

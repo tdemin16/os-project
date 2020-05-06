@@ -91,7 +91,7 @@ int main(int argc, char const *argv[]) {
     }
 
     //----------------------------------------------------------------------------------------
-
+    
     if(value_return == 0) {
         i = 0;
         if(f > 0) { //PARENT SIDE
@@ -100,6 +100,7 @@ int main(int argc, char const *argv[]) {
                 //Write
                 if(!_write) {
                     if(read(STDIN_FILENO, path, PATH_MAX) == 0) { //Prova a leggere dalla pipe
+                        
                         if(write(fd[i*4 + 1], path, PATH_MAX) == -1) { //Test write
                             value_return = err_write();
                             //ADD SIGNAL HANDLING
