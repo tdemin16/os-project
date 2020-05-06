@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        char *DIR = "./A.c"; // setup the directory
+        char *DIR = "./README.md"; // setup the directory
         int part = atoi(argv[1]);            //setup start of the process in the file
         int m = atoi(argv[2]);              //setup end of the process in the file
 

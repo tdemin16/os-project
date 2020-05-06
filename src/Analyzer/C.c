@@ -56,7 +56,7 @@ int main(int argc, char const *argv[]) {
         size_pipe = n*4;
         fd = (int*) malloc(size_pipe * sizeof(int));
         //Alloco le pipes a due a due
-        for(i = 0; i < size_pipe/2; i += 2) {
+        for(i = 0; i < size_pipe-1; i += 2) {
             if(pipe(fd + i) == -1) { //Controlla se ci sono errori nella creazione della pipe
                 value_return = err_pipe(); //In caso di errore setta il valore di ritorno
             }
@@ -100,7 +100,7 @@ int main(int argc, char const *argv[]) {
                 //Write
                 if(!_write) {
                     if(read(STDIN_FILENO, path, PATH_MAX) == 0) { //Prova a leggere dalla pipe
-                        if(write(fd[i*4 + 1], path, PATH_MAX) == -1) { //Test write
+                        if(write(fd[i*4 + 3], path, PATH_MAX) == -1) { //Test write
                             value_return = err_write();
                             //ADD SIGNAL HANDLING
                             count++;
@@ -110,7 +110,7 @@ int main(int argc, char const *argv[]) {
                     if(count == nfiles) { //Ha passato tutti i path ai figli
                         _write = TRUE;
                         for(j = 0; j < n; j++) { //Manda a tutti i processi P la fine della scrittura
-                            if(write(fd[j*4 + 1], "///", PATH_MAX) == -1) {
+                            if(write(fd[j*4 + 2], "///", PATH_MAX) == -1) {
                                 value_return = err_write();
                             }
                         }

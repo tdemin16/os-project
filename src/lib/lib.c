@@ -135,7 +135,7 @@ void set_add(int v[], char c)
     v[val_ascii]++;
 }
 
-void get_frequencies(FILE *fp, int part, int m)
+void get_frequencies(FILE *fp, int part, int m) //Prima di commentarlo bene testiamo
 {
     int v[DIM_V];
     initialize_vector(v);
