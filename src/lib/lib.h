@@ -74,6 +74,7 @@ char* itoa(int, char*, int);
 // /src/R.c
 void printStat(char *);
 void printStat_Cluster(char *);
+void printInfoCluster();
 
 
 //Error handlers
