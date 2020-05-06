@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        char *DIR = "./text_file/prova1.txt"; // setup the directory
+        char *DIR = "./A.c"; // setup the directory
         int begin = atoi(argv[1]);            //setup start of the process in the file
         int end = atoi(argv[2]);              //setup end of the process in the file
 
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    printf("\n");
+    printf("\n\n");
     return value_return;
 
 }

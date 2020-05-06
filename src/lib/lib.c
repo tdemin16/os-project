@@ -132,9 +132,9 @@ void get_subset(FILE *fp, int v[], int b, int e)
         else
         {
             fscanf(fp, "%c", &c); //gets char
+            printf("%c", c); //display what you asked the process to analyze (uncomment to use)
             if (c != '\n')
             {
-                printf("%c", c); //display what you asked the process to analyze (uncomment to use)
                 set_add(v, c);   //aggiunge al vettore delle frequenze il carattere c
             }
         }
@@ -149,7 +149,7 @@ void print_vector(int v[])
     {
         if (v[i] != 0)
         {
-            printf("\n%c è comparso %d volte", (i + 31), v[i]);
+            printf("\n%c è comparso %d volte", (i + 32), v[i]);
             
         }
     }
