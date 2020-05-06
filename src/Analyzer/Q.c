@@ -5,11 +5,44 @@
 //Ove presente, 'U' sta ad indicare che quella funzione/parte di codice serve solamente se si vuole verificarne il funzionamento nel processo singolo, NON va utilizzato al di fuori di questo programma, nella release finale li toglieremo
 
 int main(int argc, char *argv[])
-{
-    int value_return;
+{   
+    //Arguments passed
+    int part;
+    int m;
 
-    if (argc - 1 != 2)
-    {
+    int value_return = 0;
+    int v[DIM_V]; //Array with character count
+    FILE* fp;
+
+    //IPC Arguments
+    char* path;
+
+
+    //Parsing Arguments--------------------------------------------------------------------
+    if(argc != 3) {
+        value_return = err_args_Q();
+    } else {
+        m = atoi(argv[2]);
+        if(m == 0) value_return = err_m_not_valid();
+    }
+    if(value_return == 0) {
+        part = atoi(argv[1]);
+        if(part >= m) value_return = err_part_not_valid();
+    }
+
+    if(value_return == 0) {
+        //get_frequencies(fp, v, part, m);
+    }
+    
+    print_vector(v);
+
+    return value_return;
+}
+
+/* ANDREA L'HO RISCRITTO PER POTER INSERIRE LA COMUNICAZIONE. HO PERO' USATO QUELLO CHE HAI
+   SCRITTO TU PER L'ELABORAZIONE------------------------------------------------------------
+
+   if (argc != 3) {
         value_return = err_args_Q();
     }
     else
@@ -39,8 +72,4 @@ int main(int argc, char *argv[])
             fclose(fp);
         }
     }
-
-    printf("\n\n");
-    return value_return;
-
-}
+*/

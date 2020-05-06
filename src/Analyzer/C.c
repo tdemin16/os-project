@@ -63,10 +63,10 @@ int main(int argc, char const *argv[]) {
         }
     }
     /*  PIPES ENCODING---------------------------------------------
-        fd[id*4 + 0] SON READ
-        fd[id*4 + 1] PARENT WRITE
-        fd[id*4 + 2] PARENT READ
-        fd[id*4 + 3] SON WRITE
+        fd[id*4 + 0] PARENT READ
+        fd[id*4 + 1] SON WRITE
+        fd[id*4 + 2] SON READ
+        fd[id*4 + 3] PARENT WRITE
     *///-----------------------------------------------------------
 
     if(value_return == 0) {
@@ -91,7 +91,7 @@ int main(int argc, char const *argv[]) {
     }
 
     //----------------------------------------------------------------------------------------
-
+    
     if(value_return == 0) {
         i = 0;
         if(f > 0) { //PARENT SIDE
@@ -99,10 +99,11 @@ int main(int argc, char const *argv[]) {
 
                 //Write
                 if(!_write) {
-                    if(read(STDIN_FILENO, path, PATH_MAX) == 0) { //Prova a leggere dalla pipe
+                    if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //Prova a leggere dalla pipe
                         if(write(fd[i*4 + 3], path, PATH_MAX) == -1) { //Test write
                             value_return = err_write();
                             //ADD SIGNAL HANDLING
+                        } else {
                             count++;
                             i = (i+1) % n;
                         }
@@ -110,7 +111,7 @@ int main(int argc, char const *argv[]) {
                     if(count == nfiles) { //Ha passato tutti i path ai figli
                         _write = TRUE;
                         for(j = 0; j < n; j++) { //Manda a tutti i processi P la fine della scrittura
-                            if(write(fd[j*4 + 2], "///", PATH_MAX) == -1) {
+                            if(write(fd[j*4 + 3], "///", PATH_MAX) == -1) {
                                 value_return = err_write();
                             }
                         }
@@ -126,7 +127,7 @@ int main(int argc, char const *argv[]) {
     }
 
     if(value_return == 0) {
-        if(f == 0) {
+        if(f == 0) { //SON SIDE
             //Creates char args
             strcpy(array[0], "./P");
             sprintf(array[1], "%d", m);
@@ -134,8 +135,8 @@ int main(int argc, char const *argv[]) {
             args[1] = array[1];
             args[2] = NULL;
 
-            dup2(fd[id*4 + 0], STDIN_FILENO);
-            //dup2(fd[id*4 + 3], STDOUT_FILENO); DA ATTIVARE
+            dup2(fd[id*4 + 2], STDIN_FILENO);
+            //dup2(fd[id*4 + 1], STDOUT_FILENO); DA ATTIVARE
             close_pipes(fd, size_pipe);
 
             if(execvp(args[0], args) == -1) { //Test exec

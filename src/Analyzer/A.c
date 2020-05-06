@@ -117,8 +117,6 @@ int main(int argc, char *argv[])
     
     if (value_return == 0){ //Esecuzione corretta
         printf("Numero file: %d,n=%d m=%d\n",count,n,m);
-        printf("%d\n",count_list_elements(filePath));
-        print_list(filePath);
     }
     
     //IPC

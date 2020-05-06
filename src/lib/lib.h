@@ -59,7 +59,7 @@ void initialize_vector(int*);
 void set_add(int*, char);
 void get_subset(FILE*, int*, int, int);
 void print_vector(int*);
-void get_frequencies(FILE*, int, int);
+void get_frequencies(FILE*, int*, int, int);
 //int err_end_file(); used here
 //int err_args_Q(); used here
 //int err_file_open(); used here
@@ -77,6 +77,7 @@ char* itoa(int, char*, int);
 void printStat(char *);
 void printStat_Cluster(char *);
 void printInfoCluster();
+float roundValue(float, int);
 
 
 //Error handlers
@@ -94,6 +95,7 @@ int err_write();
 int err_fnctl();
 int err_exec(int);
 int err_m_not_valid();
+int err_part_not_valid();
 
 
 #endif

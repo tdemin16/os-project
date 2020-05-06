@@ -22,7 +22,6 @@ int main(int argc, char *argv[])
     char* args[4];
 
 
-
     //Parsing arguments-------------------------------------------------------
     if(argc != 2) {
         value_return = err_args_P();
@@ -81,20 +80,21 @@ int main(int argc, char *argv[])
 
                 //Write
                 if(!_write) {
-                    if(read(STDIN_FILENO, path, PATH_MAX) == 0) { //Prova a leggere dalla pipe
+                    if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //Prova a leggere dalla pipe
+                        printf("%s\n", path);
                         if(strcmp(path, "///") == 0) {
                             _write = TRUE;
                             for(i = 0; i < m; i++) { //Manda a tutti i processi Q la fine della scrittura
-                                if(write(fd[i*4 + 1], "///", PATH_MAX) == -1) {
+                                /*if(write(fd[i*4 + 1], "///", PATH_MAX) == -1) {
                                     value_return = err_write();
-                                }
+                                }*/
                             }
                         } 
                         else {
                             for(i = 0; i < m; i++) { //Cicla su tutti i processi m
-                                if(write(fd[i*4 + 1], path, PATH_MAX) == -1) { //Test Write
+                                /*if(write(fd[i*4 + 1], path, PATH_MAX) == -1) { //Test Write
                                     value_return = err_write();
-                                }
+                                }*/
                             }
                         }
                     }
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     }
 
     if(value_return == 0) {
-        if(f == 0) {
+        if(f == 0) { //SON SIDE
             //Creates char args
             strcpy(array[0], "./Q");
             sprintf(array[1], "%d", id);
@@ -119,7 +119,13 @@ int main(int argc, char *argv[])
             args[2] = array[2];
             args[3] = NULL;
 
+            dup2(fd[id*4 + 2], STDIN_FILENO);
+            //dup2(fd[id*4 + 1], STDIN_FILENO);
+            close_pipes(fd, size_pipe);
 
+            if(execvp(args[0], args) == -1) {
+                value_return = err_exec(errno);
+            }
         }
     }
 
