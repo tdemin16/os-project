@@ -12,6 +12,10 @@ int main(int argc, char *argv[])
 
     int value_return = 0;
     int v[DIM_V]; //Array with character count
+    FILE* fp;
+
+    //IPC Arguments
+    char* path;
 
 
     //Parsing Arguments--------------------------------------------------------------------
@@ -27,9 +31,10 @@ int main(int argc, char *argv[])
     }
 
     if(value_return == 0) {
-        initialize_vector(v);
+        //get_frequencies(fp, v, part, m);
     }
     
+    print_vector(v);
 
     return value_return;
 }
