@@ -9,8 +9,8 @@ node insert_first(char *p, node l)
     //so it doesn't require a test
     node tmp = (node)malloc(sizeof(node));
 
-    tmp->path = malloc(PATH_MAX*sizeof(char));
-    strcpy(tmp->path,p);
+    tmp->path = malloc(PATH_MAX * sizeof(char));
+    strcpy(tmp->path, p);
     tmp->next = l;
 
     return tmp;
@@ -45,7 +45,6 @@ char is_present(char *p, node l)
     return ret;
 }
 
-
 int count_list_elements(node l)
 {
     int val = 0;
@@ -60,45 +59,57 @@ int count_list_elements(node l)
     return val;
 }
 
-void print_list(node list) {
+void print_list(node list)
+{
     node tmp = list;
-    while(tmp != NULL) {
+    while (tmp != NULL)
+    {
         printf("%s\n", tmp->path);
         tmp = tmp->next;
     }
 }
 
-int unlock_pipes(int* fd, int size) {
+int unlock_pipes(int *fd, int size)
+{
     int i;
     int ret = 0;
-    for(i = 0; i < size && ret == 0; i += 2) {
-        if(fcntl(fd[i], F_SETFL, O_NONBLOCK)) {
+    for (i = 0; i < size && ret == 0; i += 2)
+    {
+        if (fcntl(fd[i], F_SETFL, O_NONBLOCK))
+        {
             ret = -1;
         }
     }
     return ret;
 }
 
-
-void close_pipes(int* fd, int size) {
+void close_pipes(int *fd, int size)
+{
     int i;
-    for(i = 0; i < size; i++) {
+    for (i = 0; i < size; i++)
+    {
         close(fd[i]);
     }
 }
 
 // /src/Analyzer/A.c
-int parse_string(char* string, int v[DIM_V]) {
+int parse_string(char *string, int v[DIM_V])
+{
     int i = 0;
     int max = 0;
-    char* token = strtok(string, ",");
-    while(token != NULL) { //loop through token
-        if(i < DIM_V) {
+    char *token = strtok(string, ",");
+    while (token != NULL)
+    { //loop through token
+        if (i < DIM_V)
+        {
             v[i] = atoi(token);
-            if ( v[i]>max) max = v[i];
+            if (v[i] > max)
+                max = v[i];
             i++;
             token = strtok(NULL, ",");
-        } else {
+        }
+        else
+        {
             printf("Errore nella creazione della stringa contatore");
         }
     }
@@ -124,6 +135,32 @@ void set_add(int v[], char c)
     v[val_ascii]++;
 }
 
+void get_frequencies(FILE *fp, int part, int m)
+{
+    int v[DIM_V];
+    initialize_vector(v);
+    int i = 0;
+    int file_length = file_len(fp);
+    int char_parts = file_length / m;
+    int rest = file_length - (char_parts * m);
+    while (i != part)
+    {
+        if (rest != 0)
+        {
+            rest--;
+        }
+        i++;
+    }
+    int begin = i * char_parts;
+    int end = begin + char_parts;
+    if (rest != 0)
+    {
+        end++;
+    }
+    get_subset(fp, v, begin, end);
+    print_vector(v);
+}
+
 //get the chars from the .txt files from the begin (b) to the end (e)
 void get_subset(FILE *fp, int v[], int b, int e)
 {
@@ -140,10 +177,10 @@ void get_subset(FILE *fp, int v[], int b, int e)
         else
         {
             fscanf(fp, "%c", &c); //gets char
-            printf("%c", c); //display what you asked the process to analyze (uncomment to use)
+            printf("%c", c);      //display what you asked the process to analyze (uncomment to use)
             if (c != '\n')
             {
-                set_add(v, c);   //aggiunge al vettore delle frequenze il carattere c
+                set_add(v, c); //aggiunge al vettore delle frequenze il carattere c
             }
         }
     }
@@ -158,116 +195,134 @@ void print_vector(int v[])
         if (v[i] != 0)
         {
             printf("\n%c è comparso %d volte", (i + 32), v[i]);
-            
         }
     }
 }
-
 
 ///src/R.c
-void printStat(char * char_count){
-    int v[DIM_V]; 
-    int i,k;
-    int column=9;
+void printStat(char *char_count)
+{
+    int v[DIM_V];
+    int i, k;
+    int column = 9;
     int max = parse_string(char_count, v);
     printf("STAMPA STATISTICHE GENERALI\n\n");
-    if(max <= 9999999){
-        for (i = 0; i<DIM_V; i+=column){
-        for (k=i;k<i+column && k< DIM_V;k++){
-            printf("%c\t",k+32);
-            
+    if (max <= 9999999)
+    {
+        for (i = 0; i < DIM_V; i += column)
+        {
+            for (k = i; k < i + column && k < DIM_V; k++)
+            {
+                printf("%c\t", k + 32);
+            }
+            printf("\n");
+            for (k = i; k < i + column && k < DIM_V; k++)
+            {
+                printf("%d\t", v[k]);
+            }
+            printf("\n\n");
         }
-        printf("\n");
-        for (k=i;k<i+column && k< DIM_V;k++){
-            printf("%d\t",v[k]);
-            
-        }
-        printf("\n\n");
-        } 
-    }else {
-        column = 5;
-        for (i = 0; i<DIM_V; i+=column){
-        for (k=i;k<i+column && k< DIM_V;k++){
-            printf("%c\t\t",k+32);
-            
-        }
-        printf("\n");
-        for (k=i;k<i+column && k< DIM_V;k++){
-            printf("%d\t",v[k]);
-            if(v[k]<9999999)printf("\t");
-            
-        }
-        printf("\n\n");
-        } 
     }
-    
+    else
+    {
+        column = 5;
+        for (i = 0; i < DIM_V; i += column)
+        {
+            for (k = i; k < i + column && k < DIM_V; k++)
+            {
+                printf("%c\t\t", k + 32);
+            }
+            printf("\n");
+            for (k = i; k < i + column && k < DIM_V; k++)
+            {
+                printf("%d\t", v[k]);
+                if (v[k] < 9999999)
+                    printf("\t");
+            }
+            printf("\n\n");
+        }
+    }
 }
 
-void printStat_Cluster(char * char_count){
-    int v[DIM_V]; 
+void printStat_Cluster(char *char_count)
+{
+    int v[DIM_V];
     int i;
-    int lettereMin=0;
-    int lettereMai=0;
-    int spazi=0;
-    int numeri=0;
-    int punt=0;
-    int carSpec=0;
+    int lettereMin = 0;
+    int lettereMai = 0;
+    int spazi = 0;
+    int numeri = 0;
+    int punt = 0;
+    int carSpec = 0;
     parse_string(char_count, v);
-    for (i = 0; i<DIM_V; i++){
-        if (i == 0) spazi+=v[i];
-        if (i == 1 || i == 2 || (i>=7 && i<=9) || (i>=12 && i<=15) || i == 26 || i == 27 || i == 31) punt+=v[i];
-        if ((i>=3 && i<=6) || i == 10 || i == 11 || (i>=28 && i<=30) || i == 32 || (i>=59 && i<=64) || (i>=91 && i<=94)) carSpec+=v[i];
-        if (i>=16 && i<=25) numeri+=v[i];
-        if (i>=33 && i<=58) lettereMai+=v[i];
-        if (i>=65 && i<=90) lettereMin+=v[i];
+    for (i = 0; i < DIM_V; i++)
+    {
+        if (i == 0)
+            spazi += v[i];
+        if (i == 1 || i == 2 || (i >= 7 && i <= 9) || (i >= 12 && i <= 15) || i == 26 || i == 27 || i == 31)
+            punt += v[i];
+        if ((i >= 3 && i <= 6) || i == 10 || i == 11 || (i >= 28 && i <= 30) || i == 32 || (i >= 59 && i <= 64) || (i >= 91 && i <= 94))
+            carSpec += v[i];
+        if (i >= 16 && i <= 25)
+            numeri += v[i];
+        if (i >= 33 && i <= 58)
+            lettereMai += v[i];
+        if (i >= 65 && i <= 90)
+            lettereMin += v[i];
     }
     printf("STAMPA STATISTICHE PER CLUSTER\n\n");
-    printf("Lettere minuscole:\t %d\n",lettereMin);
-    printf("Lettere maiuscole:\t %d\n",lettereMai);
-    printf("Spazi:\t\t\t %d\n",spazi);
-    printf("Numeri:\t\t\t %d\n",numeri);
-    printf("Segni di punteggiatura:\t %d\n",punt);
-    printf("Caratteri speciali:\t %d\n",carSpec);
+    printf("Lettere minuscole:\t %d\n", lettereMin);
+    printf("Lettere maiuscole:\t %d\n", lettereMai);
+    printf("Spazi:\t\t\t %d\n", spazi);
+    printf("Numeri:\t\t\t %d\n", numeri);
+    printf("Segni di punteggiatura:\t %d\n", punt);
+    printf("Caratteri speciali:\t %d\n", carSpec);
     printf("\n");
 }
 
-void printInfoCluster(){
+void printInfoCluster()
+{
     int v[DIM_V];
     int i;
     printf("Lettere minuscole:\t");
-    for (i = 65; i<=90; i++){
-        printf("%c ",i+32);
+    for (i = 65; i <= 90; i++)
+    {
+        printf("%c ", i + 32);
     }
     printf("\n");
     printf("Lettere maiuscole:\t");
-    for (i = 33; i<=58; i++){
-        printf("%c ",i+32);
+    for (i = 33; i <= 58; i++)
+    {
+        printf("%c ", i + 32);
     }
     printf("\n");
     printf("Spazi:\t ");
     printf("\n");
     printf("Numeri:\t\t\t");
-    for (i = 16; i<=25; i++){
-        printf("%c ",i+32);
+    for (i = 16; i <= 25; i++)
+    {
+        printf("%c ", i + 32);
     }
     printf("\n");
     printf("Segni di punteggiatura:\t");
-    for (i = 1; i<=31; i++){
-        if (i == 1 || i == 2 || (i>=7 && i<=9) || (i>=12 && i<=15) || i == 26 || i == 27 || i == 31){
-            printf("%c ",i+32);
+    for (i = 1; i <= 31; i++)
+    {
+        if (i == 1 || i == 2 || (i >= 7 && i <= 9) || (i >= 12 && i <= 15) || i == 26 || i == 27 || i == 31)
+        {
+            printf("%c ", i + 32);
         }
-        
     }
     printf("\n");
     printf("Caratteri speciali:\t");
-    for (i = 3; i<=94; i++){
-        if ((i>=3 && i<=6) || i == 10 || i == 11 || (i>=28 && i<=30) || i == 32 || (i>=59 && i<=64) || (i>=91 && i<=94)){
-            printf("%c ",i+32);
+    for (i = 3; i <= 94; i++)
+    {
+        if ((i >= 3 && i <= 6) || i == 10 || i == 11 || (i >= 28 && i <= 30) || i == 32 || (i >= 59 && i <= 64) || (i >= 91 && i <= 94))
+        {
+            printf("%c ", i + 32);
         }
     }
     printf("\n");
 }
-
 
 ///src/Analyzer/P.c
 //return file length in terms of chars
@@ -288,12 +343,12 @@ m_process *splitter(FILE *fp, int m)
 {
     //This is for splitting the parts
     m_process *div = malloc(m);
-    int file_length = file_len(fp);                     //get the length of the file in terms of chars
-    int int_div = (file_length / m);                       //get the integer of the subdivision of the file
+    int file_length = file_len(fp);  //get the length of the file in terms of chars
+    int int_div = (file_length / m); //get the integer of the subdivision of the file
     //double double_div = ((double)file_length / (double)m); //get the double of the subdivision of the file
-    int rest = file_length - (int_div * m);                 //get the number of chars that are out of consideration
+    int rest = file_length - (int_div * m); //get the number of chars that are out of consideration
     int i;
-    
+
     for (i = 0; i < m; i++)
     {
         if (i == 0)
@@ -315,62 +370,64 @@ m_process *splitter(FILE *fp, int m)
         div[i].part = i;
     }
 
-
     return div;
 }
 
 //The next 3 functions are for conversion of (int) to (char*)
 // inline function to swap two numbers
-inline void swap(char *x, char *y) {
-	char t = *x; *x = *y; *y = t;
+inline void swap(char *x, char *y)
+{
+    char t = *x;
+    *x = *y;
+    *y = t;
 }
 
 // function to reverse buffer[i..j]
-char* reverse(char *buffer, int i, int j)
+char *reverse(char *buffer, int i, int j)
 {
-	while (i < j)
-		swap(&buffer[i++], &buffer[j--]);
+    while (i < j)
+        swap(&buffer[i++], &buffer[j--]);
 
-	return buffer;
+    return buffer;
 }
 
 // Iterative function to implement itoa() function in C
-char* itoa(int value, char* buffer, int base)
+char *itoa(int value, char *buffer, int base)
 {
-	// invalid input
-	if (base < 2 || base > 32)
-		return buffer;
+    // invalid input
+    if (base < 2 || base > 32)
+        return buffer;
 
-	// consider absolute value of number
-	int n = abs(value);
+    // consider absolute value of number
+    int n = abs(value);
 
-	int i = 0;
-	while (n)
-	{
-		int r = n % base;
+    int i = 0;
+    while (n)
+    {
+        int r = n % base;
 
-		if (r >= 10) 
-			buffer[i++] = 65 + (r - 10);
-		else
-			buffer[i++] = 48 + r;
+        if (r >= 10)
+            buffer[i++] = 65 + (r - 10);
+        else
+            buffer[i++] = 48 + r;
 
-		n = n / base;
-	}
+        n = n / base;
+    }
 
-	// if number is 0
-	if (i == 0)
-		buffer[i++] = '0';
+    // if number is 0
+    if (i == 0)
+        buffer[i++] = '0';
 
-	// If base is 10 and value is negative, the resulting string 
-	// is preceded with a minus sign (-)
-	// With any other base, value is always considered unsigned
-	if (value < 0 && base == 10)
-		buffer[i++] = '-';
+    // If base is 10 and value is negative, the resulting string
+    // is preceded with a minus sign (-)
+    // With any other base, value is always considered unsigned
+    if (value < 0 && base == 10)
+        buffer[i++] = '-';
 
-	buffer[i] = '\0'; // null terminate string
+    buffer[i] = '\0'; // null terminate string
 
-	// reverse the string and return it
-	return reverse(buffer, 0, i - 1);
+    // reverse the string and return it
+    return reverse(buffer, 0, i - 1);
 }
 
 //Error handlers
@@ -386,9 +443,9 @@ int err_args_A()
     return ERR_ARGS_A;
 }
 
-int err_input_A(char * file)
+int err_input_A(char *file)
 {
-    printf("\nErrore input\nFile/Directory non esistente: %s\n\n",file);
+    printf("\nErrore input\nFile/Directory non esistente: %s\n\n", file);
     return ERR_ARGS_A;
 }
 
@@ -441,17 +498,20 @@ int err_end_file()
     return ERR_FILE;
 }
 
-int err_fcntl() {
+int err_fcntl()
+{
     printf("Errore, sblocco pipe non riuscito\n");
     return ERR_FCNTL;
 }
 
-int err_exec(int err) {
+int err_exec(int err)
+{
     printf("Errore nell'esecuzione di exec(%d) in: %d\n", err, getpid());
     return ERR_EXEC;
 }
 
-int err_m_not_valid(){
+int err_m_not_valid()
+{
     printf("[!] Il valore di m non è valido, deve essere m > 0\n");
     return ERR_DATA;
 }

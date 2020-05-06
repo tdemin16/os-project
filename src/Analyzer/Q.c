@@ -7,8 +7,6 @@
 int main(int argc, char *argv[])
 {
     int value_return;
-    int v[DIM_V];
-    initialize_vector(v);
 
     if (argc - 1 != 2)
     {
@@ -17,10 +15,10 @@ int main(int argc, char *argv[])
     else
     {
         char *DIR = "./A.c"; // setup the directory
-        int begin = atoi(argv[1]);            //setup start of the process in the file
-        int end = atoi(argv[2]);              //setup end of the process in the file
+        int part = atoi(argv[1]);            //setup start of the process in the file
+        int m = atoi(argv[2]);              //setup end of the process in the file
 
-        if (end < begin)
+        if (m < part)
         {
             value_return = err_m_not_valid();
         }
@@ -34,9 +32,9 @@ int main(int argc, char *argv[])
             }
             else
             {
-                get_subset(fp, v, begin, end); //getting all the chars
-
-                print_vector(v); //U
+                //get_subset(fp, v, begin, end); //getting all the chars
+                get_frequencies(fp, part, m);
+                //print_vector(v); //U
             }
             fclose(fp);
         }
