@@ -16,25 +16,33 @@ int main(int argc, char *argv[])
     }
     else
     {
-        char *DIR = "./text_file/prova1.txt";       // setup the directory
-        int begin = atoi(argv[1]); //setup start of the process in the file
-        int end = atoi(argv[2]);   //setup end of the process in the file
+        char *DIR = "./text_file/prova1.txt"; // setup the directory
+        int begin = atoi(argv[1]);            //setup start of the process in the file
+        int end = atoi(argv[2]);              //setup end of the process in the file
 
-        FILE *fp = fopen(DIR, "r"); //open in read mode the file in the directory
-
-        if (fp == NULL)
+        if (end < begin)
         {
-            value_return = err_file_open();
+            value_return = err_m_not_valid();
         }
         else
         {
-            get_subset(fp, v, begin, end); //getting all the chars
+            FILE *fp = fopen(DIR, "r"); //open in read mode the file in the directory
 
-            print_vector(v); //U
+            if (fp == NULL)
+            {
+                value_return = err_file_open();
+            }
+            else
+            {
+                get_subset(fp, v, begin, end); //getting all the chars
+
+                print_vector(v); //U
+            }
+            fclose(fp);
         }
-        fclose(fp);
     }
 
     printf("\n");
     return value_return;
+
 }
