@@ -159,11 +159,38 @@ void printStat(char * char_count){
     int i;
     parse_string(char_count, v);
     for (i = 0; i<DIM_V; i++){
-        printf("%d - %c\t",v[i],i+31);   
+        printf("%d - %c\n",v[i],i+32);   
     }
-    printf("\n");
-    print_vector(v);
     
+}
+
+void printStat_Cluster(char * char_count){
+    int v[DIM_V]; 
+    int i;
+    int lettereMin=0;
+    int lettereMai=0;
+    int spazi=0;
+    int numeri=0;
+    int punt=0;
+    int carSpec=0;
+    parse_string(char_count, v);
+    for (i = 0; i<DIM_V; i++){
+        if (i == 0) spazi+=v[i];
+        if (i == 1 || i == 2 || (i>=7 && i<=9) || (i>=12 && i<=15) || i == 26 || i == 27 || i == 31) punt+=v[i];
+        if ((i>=3 && i<=6) || i == 10 || i == 11 || (i>=28 && i<=30) || i == 32 || (i>=59 && i<=64) || (i>=91 && i<=94)) carSpec+=v[i];
+        if (i>=16 && i<=25) numeri+=v[i];
+        if (i>=33 && i<=58) lettereMai+=v[i];
+        if (i>=65 && i<=90) lettereMin+=v[i];
+        
+
+    }
+    printf("Lettere minuscole:\t %d\n",lettereMin);
+    printf("Lettere maiuscole:\t %d\n",lettereMai);
+    printf("Spazi:\t\t\t %d\n",spazi);
+    printf("Numeri:\t\t\t %d\n",numeri);
+    printf("Segni di punteggiatura:\t %d\n",punt);
+    printf("Caratteri speciali:\t %d\n",carSpec);
+    //printf("\n");
 }
 
 

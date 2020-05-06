@@ -16,7 +16,7 @@
 #define WRITE 1
 #define TRUE 1
 #define FALSE 0
-#define DIM_V 96
+#define DIM_V 95
 #define ERR_ARGS_A 1
 #define ERR_ARGS_C 2
 #define ERR_ARGS_Q 3
@@ -73,7 +73,7 @@ char* itoa(int, char*, int);
 
 // /src/R.c
 void printStat(char *);
-
+void printStat_Cluster(char *);
 
 
 //Error handlers
