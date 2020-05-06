@@ -6,7 +6,8 @@ help:
 	@echo "\nmake build	[ primo comando ]"
 	@echo "make clean	[ elimina il contenuto della cartella ./bin/ ]"
 	@echo "make help	[ mostra questo testo. in futuro il contenuto di README.md ]\n"
-	@#cat ./README.md
+	@echo "-----------------------------------------------------------------------------\n"
+	@cat ./README.md
 
 build:
 	@sudo chmod -R 777 ./
