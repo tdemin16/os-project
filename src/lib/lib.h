@@ -46,6 +46,7 @@ typedef struct List* node;
 node insert_first(char*, node);
 char is_present(char*, node);
 int count_list_elements(node);
+void print_list(node);
 
 void close_pipes(int*, int);
 int unlock_pipes(int*, int);

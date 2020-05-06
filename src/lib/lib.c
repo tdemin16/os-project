@@ -60,6 +60,14 @@ int count_list_elements(node l)
     return val;
 }
 
+void print_list(node list) {
+    node tmp = list;
+    while(tmp != NULL) {
+        printf("%s\n", tmp->path);
+        tmp = tmp->next;
+    }
+}
+
 int unlock_pipes(int* fd, int size) {
     int i;
     int ret = 0;
@@ -434,7 +442,7 @@ int err_end_file()
 }
 
 int err_fcntl() {
-    printf("Errore, pipe sblocco pipe non riuscito\n");
+    printf("Errore, sblocco pipe non riuscito\n");
     return ERR_FCNTL;
 }
 

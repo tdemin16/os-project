@@ -7,6 +7,7 @@ int main(int argc, char const *argv[]) {
     int n = 3;
     int m = 4;
     int i;
+    int j;
     char path[PATH_MAX];
     int processLeft;    //Processi mancanti
     int fileLeft;   //file mancanti da assegnare 
@@ -17,7 +18,7 @@ int main(int argc, char const *argv[]) {
     int* fd;
     pid_t f = getpid();
     int id; //Indica il numero del figlio (necessario per calcolare quale pipe utilizzare)
-    const int size_pipe = n*4; //Size of pipes
+    int size_pipe; //Size of pipes
     char array[2][4];
     char* args[3];
     int _read = FALSE; //Indica se ha finito di leggere dai figli
@@ -48,11 +49,14 @@ int main(int argc, char const *argv[]) {
         if(nfiles == 0 && value_return == 0) value_return = err_args_C(); //Check if nfiles is setted, if not gives an error (value_return used to avoid double messages)
     }
 
+
+    //Generating pipes-------------------------------------------------------
     if(value_return == 0) {
         //Crea n*4 pipes (4 per coppia padre figlio, 2 in lettura e 2 in scrittura)
-        fd = (int*) malloc(n*4*sizeof(int));
+        size_pipe = n*4;
+        fd = (int*) malloc(size_pipe * sizeof(int));
         //Alloco le pipes a due a due
-        for(i = 0; i < n*2; i += 2) {
+        for(i = 0; i < size_pipe/2; i += 2) {
             if(pipe(fd + i) == -1) { //Controlla se ci sono errori nella creazione della pipe
                 value_return = err_pipe(); //In caso di errore setta il valore di ritorno
             }
@@ -67,10 +71,12 @@ int main(int argc, char const *argv[]) {
 
     if(value_return == 0) {
         if(unlock_pipes(fd, size_pipe) == -1) { //Set nonblocking pipes
-            value_return = ERR_FCNTL;
+            value_return = err_fcntl();
         }
     }
 
+
+    //Forking----------------------------------------------------------------
     if(value_return == 0) {
         //Ciclo n volte, controllando che f > 0 (padre) e non ci siano errori -> genera quindi n processi
         for(i = 0; i < n && f > 0 && value_return == 0; i++) {
@@ -101,7 +107,14 @@ int main(int argc, char const *argv[]) {
                             i = (i+1) % n;
                         }
                     }
-                    if(count == nfiles) _write = TRUE; //Ha passato tutti i path ai figli
+                    if(count == nfiles) { //Ha passato tutti i path ai figli
+                        _write = TRUE;
+                        for(j = 0; j < n; j++) { //Manda a tutti i processi P la fine della scrittura
+                            if(write(fd[j*4 + 1], "///", PATH_MAX) == -1) {
+                                value_return = err_write();
+                            }
+                        }
+                    }
                 }
 
                 //Read
