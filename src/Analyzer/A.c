@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
                 strcat(command, ") && find ");
                 strcat(command, argv[i]);
                 strcat(command, " -type f -follow -print || echo \"-[ERROR]\"");
-                printf("%s\n",command);
+                //printf("%s\n",command);
                 fp = popen(command, "r"); //avvia il comando e in fp prende l'output
                 if (fp == NULL) //Se il comando non va a buon fine
                 {
@@ -117,6 +117,7 @@ int main(int argc, char *argv[])
     
     if (value_return == 0){ //Esecuzione corretta
         printf("Numero file: %d,n=%d m=%d\n",count,n,m);
+        printf("%d\n",count_list_elements(filePath));
     }
     
     //IPC
