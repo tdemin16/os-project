@@ -26,7 +26,7 @@
 #define ERR_WRITE 7
 #define ERR_FCNTL 8
 #define ERR_EXEC 9
-#define ERR_DATA 9
+#define ERR_DATA 10
 
 struct List{
     char* path;
