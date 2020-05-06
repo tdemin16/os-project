@@ -93,6 +93,7 @@ int err_write();
 int err_fnctl();
 int err_exec(int);
 int err_m_not_valid();
+int err_part_not_valid();
 
 
 #endif

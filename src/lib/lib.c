@@ -455,3 +455,8 @@ int err_m_not_valid(){
     printf("[!] Il valore di m non è valido, deve essere m > 0\n");
     return ERR_DATA;
 }
+
+int err_part_not_valid() {
+    printf("[!] Il valore di part non è valido, deve essere < m\n");
+    return ERR_DATA;
+}
