@@ -51,7 +51,7 @@ void close_pipes(int*, int);
 int unlock_pipes(int*, int);
 
 // /src/Analyzer/A.c
-void parse_string(char*, int* v); 
+int parse_string(char*, int* v); 
 
 // /src/Analyzer/Q.c
 void initialize_vector(int*);

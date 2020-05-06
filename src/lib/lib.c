@@ -80,19 +80,21 @@ void close_pipes(int* fd, int size) {
 }
 
 // /src/Analyzer/A.c
-void parse_string(char* string, int v[DIM_V]) {
+int parse_string(char* string, int v[DIM_V]) {
     int i = 0;
+    int max = 0;
     char* token = strtok(string, ",");
     while(token != NULL) { //loop through token
         if(i < DIM_V) {
             v[i] = atoi(token);
+            if ( v[i]>max) max = v[i];
             i++;
             token = strtok(NULL, ",");
         } else {
             printf("Errore nella creazione della stringa contatore");
         }
     }
-    
+    return max;
 }
 
 ///src/Analyzer/Q.c
@@ -153,13 +155,42 @@ void print_vector(int v[])
     }
 }
 
+
 ///src/R.c
 void printStat(char * char_count){
     int v[DIM_V]; 
-    int i;
-    parse_string(char_count, v);
-    for (i = 0; i<DIM_V; i++){
-        printf("%d - %c\n",v[i],i+32);   
+    int i,k;
+    int column=9;
+    int max = parse_string(char_count, v);
+    printf("STAMPA STATISTICHE GENERALI\n\n");
+    if(max <= 9999999){
+        for (i = 0; i<DIM_V; i+=column){
+        for (k=i;k<i+column && k< DIM_V;k++){
+            printf("%c\t",k+32);
+            
+        }
+        printf("\n");
+        for (k=i;k<i+column && k< DIM_V;k++){
+            printf("%d\t",v[k]);
+            
+        }
+        printf("\n\n");
+        } 
+    }else {
+        column = 5;
+        for (i = 0; i<DIM_V; i+=column){
+        for (k=i;k<i+column && k< DIM_V;k++){
+            printf("%c\t\t",k+32);
+            
+        }
+        printf("\n");
+        for (k=i;k<i+column && k< DIM_V;k++){
+            printf("%d\t",v[k]);
+            if(v[k]<9999999)printf("\t");
+            
+        }
+        printf("\n\n");
+        } 
     }
     
 }
@@ -181,16 +212,15 @@ void printStat_Cluster(char * char_count){
         if (i>=16 && i<=25) numeri+=v[i];
         if (i>=33 && i<=58) lettereMai+=v[i];
         if (i>=65 && i<=90) lettereMin+=v[i];
-        
-
     }
+    printf("STAMPA STATISTICHE PER CLUSTER\n\n");
     printf("Lettere minuscole:\t %d\n",lettereMin);
     printf("Lettere maiuscole:\t %d\n",lettereMai);
     printf("Spazi:\t\t\t %d\n",spazi);
     printf("Numeri:\t\t\t %d\n",numeri);
     printf("Segni di punteggiatura:\t %d\n",punt);
     printf("Caratteri speciali:\t %d\n",carSpec);
-    //printf("\n");
+    printf("\n");
 }
 
 
