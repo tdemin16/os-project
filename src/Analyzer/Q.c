@@ -11,11 +11,11 @@ int main(int argc, char *argv[])
     int m;
 
     int value_return = 0;
-    int v[DIM_V]; //Array with character count
     FILE* fp;
 
     //IPC Arguments
     char* path;
+    int _write = FALSE;
 
 
     //Parsing Arguments--------------------------------------------------------------------
@@ -31,10 +31,25 @@ int main(int argc, char *argv[])
     }
 
     if(value_return == 0) {
-        //get_frequencies(fp, v, part, m);
+        while(value_return == 0 && !_write) {
+            if(read(STDIN_FILENO, path, PATH_MAX) > 0) {
+                printf("%d: %s\n", part, path);
+                if(strcmp(path, "///") == 0) {
+                    _write = TRUE;
+                }
+            } else {
+                fp = fopen(path, "r");
+                if(fp == NULL) {
+                    value_return = err_file_open();
+                } else {
+                    //getfrequencies;
+                }
+                if(value_return == 0) {
+                    //write
+                }
+            }
+        }
     }
-    
-    print_vector(v);
 
     return value_return;
 }

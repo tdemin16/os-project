@@ -37,17 +37,17 @@ int main(int argc, char *argv[])
         size_pipe = m*4;
         fd = (int*) malloc(size_pipe * sizeof(int));
         //Alloco le pipes a due a due
-        for(i = 0; i < size_pipe/2; i += 2) {
+        for(i = 0; i < size_pipe-1; i += 2) {
             if(pipe(fd + i) == -1) { //Controlla se ci sono errori nella creazione della pipe
                 value_return = err_pipe(); //In caso di errore setta il valore di ritorno
             }
         }
     }
     /*  PIPES ENCODING---------------------------------------------
-        fd[id*4 + 0] SON READ
-        fd[id*4 + 1] PARENT WRITE
-        fd[id*4 + 2] PARENT READ
-        fd[id*4 + 3] SON WRITE
+        fd[id*4 + 0] PARENT READ
+        fd[id*4 + 1] SON WRITE
+        fd[id*4 + 2] SON READ
+        fd[id*4 + 3] PARENT WRITE
     *///-----------------------------------------------------------
 
     if(value_return == 0) {
@@ -81,20 +81,19 @@ int main(int argc, char *argv[])
                 //Write
                 if(!_write) {
                     if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //Prova a leggere dalla pipe
-                        printf("%s\n", path);
                         if(strcmp(path, "///") == 0) {
                             _write = TRUE;
                             for(i = 0; i < m; i++) { //Manda a tutti i processi Q la fine della scrittura
-                                /*if(write(fd[i*4 + 1], "///", PATH_MAX) == -1) {
+                                if(write(fd[i*4 + 3], "///", PATH_MAX) == -1) {
                                     value_return = err_write();
-                                }*/
+                                }
                             }
                         } 
                         else {
                             for(i = 0; i < m; i++) { //Cicla su tutti i processi m
-                                /*if(write(fd[i*4 + 1], path, PATH_MAX) == -1) { //Test Write
+                                if(write(fd[i*4 + 3], path, PATH_MAX) == -1) { //Test Write
                                     value_return = err_write();
-                                }*/
+                                }
                             }
                         }
                     }
@@ -120,7 +119,7 @@ int main(int argc, char *argv[])
             args[3] = NULL;
 
             dup2(fd[id*4 + 2], STDIN_FILENO);
-            //dup2(fd[id*4 + 1], STDIN_FILENO);
+            //dup2(fd[id*4 + 1], STDOUT_FILENO);
             close_pipes(fd, size_pipe);
 
             if(execvp(args[0], args) == -1) {
