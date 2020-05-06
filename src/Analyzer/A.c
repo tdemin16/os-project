@@ -67,9 +67,9 @@ int main(int argc, char *argv[])
                 }
 
 
-            }else if(strncmp(argv[i], "-", 1) == 0){//-----ERRORI input strani che iniziano con -
-                value_return = err_args_A();
-            }
+            }//else if(strncmp(argv[i], "-", 1) == 0){//-----ERRORI input strani che iniziano con -
+            //    value_return = err_args_A();
+            //}
 
             if (flag == FALSE && value_return == 0){ //------Vuol dire che argv[i] e' un file o una cartella
                 /*  Viene utilizzato il comando:  test -d [dir] && find [dir] -type f -follow -print || echo "-[ERROR]"
@@ -77,12 +77,15 @@ int main(int argc, char *argv[])
                     In caso di successo viene lanciato find che restituisce la lista di tutti i file nella cartella e nelle sottocartelle
                     Se l'input non esiste restituisce -[ERROR], in modo che possa essere intercettato dal parser
                 */
-                char command[strlen("test -d  && find ") + strlen(argv[i])*2 + strlen(" -type f -follow -print || echo \"-[ERROR]\"")+ 1]; //Creazione comando
-                strcpy(command, "test -d ");
+                char command[strlen("(test -f  || test -d ) && find ") + strlen(argv[i])*2 + strlen(" -type f -follow -print || echo \"-[ERROR]\"")+ 1]; //Creazione comando
+                strcpy(command, "(test -f ");
                 strcat(command, argv[i]);
-                strcat(command, " && find ");
+                strcat(command, " || test -d ");
+                strcat(command, argv[i]);
+                strcat(command, ") && find ");
                 strcat(command, argv[i]);
                 strcat(command, " -type f -follow -print || echo \"-[ERROR]\"");
+                printf("%s\n",command);
                 fp = popen(command, "r"); //avvia il comando e in fp prende l'output
                 if (fp == NULL) //Se il comando non va a buon fine
                 {
