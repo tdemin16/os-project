@@ -200,11 +200,7 @@ void print_vector(int v[])
 
 char * arrayToCsv(int v[DIM_V]){
     int i;
-    int dim = 0;
-    for (i = 0;i<DIM_V;i++){
-        dim += countDigit(v[i]);  
-    }
-    dim +=95;
+    int dim = lenghtCsv(v);
     char * char_count = malloc(dim);
     strcpy(char_count,integer_to_string(v[i]));
     for (i = 1;i<DIM_V;i++){
@@ -213,6 +209,16 @@ char * arrayToCsv(int v[DIM_V]){
     }
     
     return &char_count[0];
+}
+
+int lenghtCsv(int v[DIM_V]){
+    int i;
+    int dim = 0;
+    for (i = 0;i<DIM_V;i++){
+        dim += countDigit(v[i]);  
+    }
+    dim +=95;
+    return dim;
 }
 
 char* integer_to_string(int x)
@@ -234,6 +240,7 @@ int countDigit(long long n)
     } 
     return count; 
 } 
+
 
 ///src/R.c
 void printStat(char *char_count)
@@ -294,24 +301,30 @@ void printStat_Cluster(char *char_count)
     parse_string(char_count, v);
     for (i = 0; i < DIM_V; i++)
     {
-        if (i == 0)
-            {spazi += v[i];
-            tot+=v[i];}
-        if (i == 1 || i == 2 || (i >= 7 && i <= 9) || (i >= 12 && i <= 15) || i == 26 || i == 27 || i == 31)
-            {punt += v[i];
-            tot+=v[i];}
-        if ((i >= 3 && i <= 6) || i == 10 || i == 11 || (i >= 28 && i <= 30) || i == 32 || (i >= 59 && i <= 64) || (i >= 91 && i <= 94))
-            {carSpec += v[i];
-            tot+=v[i];}
-        if (i >= 16 && i <= 25)
-            {numeri += v[i];
-            tot+=v[i];}
-        if (i >= 33 && i <= 58)
-            {lettereMai += v[i];
-            tot+=v[i];}
-        if (i >= 65 && i <= 90)
-            {lettereMin += v[i];
-            tot+=v[i];}
+        if (i == 0){
+            spazi += v[i];
+            tot+=v[i];
+            }
+        if (i == 1 || i == 2 || (i >= 7 && i <= 9) || (i >= 12 && i <= 15) || i == 26 || i == 27 || i == 31){
+            punt += v[i];
+            tot+=v[i];
+            }
+        if ((i >= 3 && i <= 6) || i == 10 || i == 11 || (i >= 28 && i <= 30) || i == 32 || (i >= 59 && i <= 64) || (i >= 91 && i <= 94)){
+            carSpec += v[i];
+            tot+=v[i];
+            }
+        if (i >= 16 && i <= 25){
+            numeri += v[i];
+            tot+=v[i];
+            }
+        if (i >= 33 && i <= 58){
+            lettereMai += v[i];
+            tot+=v[i];
+            }
+        if (i >= 65 && i <= 90){
+            lettereMin += v[i];
+            tot+=v[i];
+            }
     }
     printf("%d",tot);
     printf("STAMPA STATISTICHE PER CLUSTER\n\n");
