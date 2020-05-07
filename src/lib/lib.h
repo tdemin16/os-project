@@ -70,6 +70,9 @@ m_process* splitter(FILE*,int);
 inline void swap(char*, char*);
 char* reverse(char*, int, int);
 char* itoa(int, char*, int);
+char* arrayToCsv(int *);
+char* integer_to_string(int);
+int countDigit(long long);
 //int err_args_P(); used here
 //int err_file_open(); used here
 

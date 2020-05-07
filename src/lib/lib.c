@@ -198,6 +198,43 @@ void print_vector(int v[])
     }
 }
 
+char * arrayToCsv(int v[DIM_V]){
+    int i;
+    int dim = 0;
+    for (i = 0;i<DIM_V;i++){
+        dim += countDigit(v[i]);  
+    }
+    dim +=95;
+    char * char_count = malloc(dim);
+    strcpy(char_count,integer_to_string(v[i]));
+    for (i = 1;i<DIM_V;i++){
+        strcat(char_count,",");
+        strcat(char_count,integer_to_string(v[i]));
+    }
+    
+    return &char_count[0];
+}
+
+char* integer_to_string(int x)
+{
+    char* buffer = malloc(sizeof(char) * sizeof(int) * 4 + 1);
+    if (buffer)
+    {
+         sprintf(buffer, "%d", x);
+    }
+    return buffer; // caller is expected to invoke free() on this buffer to release memory
+}
+
+int countDigit(long long n) 
+{ 
+    int count = 0; 
+    while (n != 0) { 
+        n = n / 10; 
+        ++count; 
+    } 
+    return count; 
+} 
+
 ///src/R.c
 void printStat(char *char_count)
 {
