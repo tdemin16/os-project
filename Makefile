@@ -6,10 +6,11 @@ help:
 	@echo "\nmake build	[ primo comando ]"
 	@echo "make clean	[ elimina il contenuto della cartella ./bin/ ]"
 	@echo "make help	[ mostra questo testo. in futuro il contenuto di README.md ]\n"
-	@#cat ./README.md
+	@echo "-----------------------------------------------------------------------------"
+	cat ./README.md 
 
 build:
-	#@sudo chmod -R 777 ./
+	@sudo chmod -R 777 ./
 	@if [ ! -d "./bin" ]; then \
 	mkdir ./bin; fi
 	@gcc -std=gnu90 ./src/lib/lib.c ./src/Analyzer/A.c -o ./bin/A
@@ -17,7 +18,7 @@ build:
 	@gcc -std=gnu90 ./src/lib/lib.c ./src/Analyzer/P.c -o ./bin/P
 	@gcc -std=gnu90 ./src/lib/lib.c ./src/Analyzer/Q.c -o ./bin/Q
 	@gcc -std=gnu90 ./src/lib/lib.c ./src/R.c -o ./bin/R
-	#@@gcc -std=gnu90 ./src/lib/lib.c ./src/M.c -o ./bin/M
+	@#@gcc -std=gnu90 ./src/lib/lib.c ./src/M.c -o ./bin/M
 
 clean:
 	@rm -rf ./bin

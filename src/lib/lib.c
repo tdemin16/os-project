@@ -135,8 +135,9 @@ void set_add(int v[], char c)
     v[val_ascii]++;
 }
 
-void get_frequencies(FILE *fp, int v[DIM_V], int part, int m) //Prima di commentarlo bene testiamo
+char * get_frequencies(FILE *fp, int part, int m) //Prima di commentarlo bene testiamo
 {
+    int v[DIM_V];
     initialize_vector(v);
     int i = 0;
     int file_length = file_len(fp);
@@ -157,7 +158,13 @@ void get_frequencies(FILE *fp, int v[DIM_V], int part, int m) //Prima di comment
         end++;
     }
     get_subset(fp, v, begin, end);
-    print_vector(v);
+    char * tmp = malloc(lenghtCsv(v)*sizeof(char));;
+    strcpy(tmp,integer_to_string(v[i]));
+    for (i = 1;i<DIM_V;i++){
+        strcat(tmp,",");
+        strcat(tmp,integer_to_string(v[i]));
+    }
+    return &tmp[0];
 }
 
 //get the chars from the .txt files from the begin (b) to the end (e)
@@ -176,7 +183,7 @@ void get_subset(FILE *fp, int v[], int b, int e)
         else
         {
             fscanf(fp, "%c", &c); //gets char
-            printf("%c", c);      //display what you asked the process to analyze (uncomment to use)
+            //printf("%c", c);      //display what you asked the process to analyze (uncomment to use)
             if (c != '\n')
             {
                 set_add(v, c); //aggiunge al vettore delle frequenze il carattere c
@@ -197,6 +204,51 @@ void print_vector(int v[])
         }
     }
 }
+
+char * arrayToCsv(int v[DIM_V]){
+    printf("Fatto bro\n");
+    int i;
+    int dim = lenghtCsv(v);
+    char * char_count = malloc(dim*sizeof(char));
+    strcpy(char_count,integer_to_string(v[i]));
+    for (i = 1;i<DIM_V;i++){
+        strcat(char_count,",");
+        strcat(char_count,integer_to_string(v[i]));
+    }
+    
+    return &char_count[0];
+}
+
+int lenghtCsv(int v[DIM_V]){
+    int i;
+    int dim = 0;
+    for (i = 0;i<DIM_V;i++){
+        dim += countDigit(v[i]);  
+    }
+    dim +=95;
+    return dim;
+}
+
+char* integer_to_string(int x)
+{
+    char* buffer = malloc(sizeof(char) * sizeof(int) * 4 + 1);
+    if (buffer)
+    {
+         sprintf(buffer, "%d", x);
+    }
+    return buffer; // caller is expected to invoke free() on this buffer to release memory
+}
+
+int countDigit(long long n) 
+{ 
+    int count = 0; 
+    while (n != 0) { 
+        n = n / 10; 
+        ++count; 
+    } 
+    return count; 
+} 
+
 
 ///src/R.c
 void printStat(char *char_count)
@@ -257,24 +309,30 @@ void printStat_Cluster(char *char_count)
     parse_string(char_count, v);
     for (i = 0; i < DIM_V; i++)
     {
-        if (i == 0)
-            {spazi += v[i];
-            tot+=v[i];}
-        if (i == 1 || i == 2 || (i >= 7 && i <= 9) || (i >= 12 && i <= 15) || i == 26 || i == 27 || i == 31)
-            {punt += v[i];
-            tot+=v[i];}
-        if ((i >= 3 && i <= 6) || i == 10 || i == 11 || (i >= 28 && i <= 30) || i == 32 || (i >= 59 && i <= 64) || (i >= 91 && i <= 94))
-            {carSpec += v[i];
-            tot+=v[i];}
-        if (i >= 16 && i <= 25)
-            {numeri += v[i];
-            tot+=v[i];}
-        if (i >= 33 && i <= 58)
-            {lettereMai += v[i];
-            tot+=v[i];}
-        if (i >= 65 && i <= 90)
-            {lettereMin += v[i];
-            tot+=v[i];}
+        if (i == 0){
+            spazi += v[i];
+            tot+=v[i];
+            }
+        if (i == 1 || i == 2 || (i >= 7 && i <= 9) || (i >= 12 && i <= 15) || i == 26 || i == 27 || i == 31){
+            punt += v[i];
+            tot+=v[i];
+            }
+        if ((i >= 3 && i <= 6) || i == 10 || i == 11 || (i >= 28 && i <= 30) || i == 32 || (i >= 59 && i <= 64) || (i >= 91 && i <= 94)){
+            carSpec += v[i];
+            tot+=v[i];
+            }
+        if (i >= 16 && i <= 25){
+            numeri += v[i];
+            tot+=v[i];
+            }
+        if (i >= 33 && i <= 58){
+            lettereMai += v[i];
+            tot+=v[i];
+            }
+        if (i >= 65 && i <= 90){
+            lettereMin += v[i];
+            tot+=v[i];
+            }
     }
     printf("%d",tot);
     printf("STAMPA STATISTICHE PER CLUSTER\n\n");

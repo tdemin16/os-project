@@ -7,6 +7,9 @@ bin/
 # Ignore .vscode folders
 .vscode/
 
+# Ignore .DS_Store
+.DS_Store
+
 # Unignore all with extensions
 !*.*
 

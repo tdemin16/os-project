@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
     int part;
     int m;
 
+    char *res;
     int value_return = 0;
     FILE* fp;
 

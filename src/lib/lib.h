@@ -59,7 +59,7 @@ void initialize_vector(int*);
 void set_add(int*, char);
 void get_subset(FILE*, int*, int, int);
 void print_vector(int*);
-void get_frequencies(FILE*, int*, int, int);
+char * get_frequencies(FILE*, int, int);
 //int err_end_file(); used here
 //int err_args_Q(); used here
 //int err_file_open(); used here
@@ -70,6 +70,10 @@ m_process* splitter(FILE*,int);
 inline void swap(char*, char*);
 char* reverse(char*, int, int);
 char* itoa(int, char*, int);
+char* arrayToCsv(int *);
+char* integer_to_string(int);
+int countDigit(long long);
+int lenghtCsv(int *);
 //int err_args_P(); used here
 //int err_file_open(); used here
 
