@@ -123,6 +123,7 @@ int main(int argc, char const *argv[]) {
 
                 }*/
             }
+            wait(NULL);
         }
     }
 
@@ -144,7 +145,7 @@ int main(int argc, char const *argv[]) {
             }
         }
     }
-
+    printf("C chiuso\n");
     return value_return;
 }
 

@@ -104,6 +104,7 @@ int main(int argc, char *argv[])
 
                 }*/
             }
+            wait(NULL);
         }
     }
 
@@ -128,5 +129,6 @@ int main(int argc, char *argv[])
         }
     }
 
+    printf("P chiuso\n");
     return value_return;
 }
