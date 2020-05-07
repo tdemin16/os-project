@@ -135,8 +135,9 @@ void set_add(int v[], char c)
     v[val_ascii]++;
 }
 
-void get_frequencies(FILE *fp, int v[DIM_V], int part, int m) //Prima di commentarlo bene testiamo
+char * get_frequencies(FILE *fp, int part, int m) //Prima di commentarlo bene testiamo
 {
+    int v[DIM_V];
     initialize_vector(v);
     int i = 0;
     int file_length = file_len(fp);
@@ -157,7 +158,13 @@ void get_frequencies(FILE *fp, int v[DIM_V], int part, int m) //Prima di comment
         end++;
     }
     get_subset(fp, v, begin, end);
-    print_vector(v);
+    char * tmp = malloc(lenghtCsv(v)*sizeof(char));;
+    strcpy(tmp,integer_to_string(v[i]));
+    for (i = 1;i<DIM_V;i++){
+        strcat(tmp,",");
+        strcat(tmp,integer_to_string(v[i]));
+    }
+    return &tmp[0];
 }
 
 //get the chars from the .txt files from the begin (b) to the end (e)
@@ -176,7 +183,7 @@ void get_subset(FILE *fp, int v[], int b, int e)
         else
         {
             fscanf(fp, "%c", &c); //gets char
-            printf("%c", c);      //display what you asked the process to analyze (uncomment to use)
+            //printf("%c", c);      //display what you asked the process to analyze (uncomment to use)
             if (c != '\n')
             {
                 set_add(v, c); //aggiunge al vettore delle frequenze il carattere c
@@ -199,9 +206,10 @@ void print_vector(int v[])
 }
 
 char * arrayToCsv(int v[DIM_V]){
+    printf("Fatto bro\n");
     int i;
     int dim = lenghtCsv(v);
-    char * char_count = malloc(dim);
+    char * char_count = malloc(dim*sizeof(char));
     strcpy(char_count,integer_to_string(v[i]));
     for (i = 1;i<DIM_V;i++){
         strcat(char_count,",");

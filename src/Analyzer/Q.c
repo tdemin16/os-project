@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
     int part;
     int m;
 
+    char *res;
     int value_return = 0;
     FILE* fp;
 
@@ -33,19 +34,21 @@ int main(int argc, char *argv[])
     if(value_return == 0) {
         while(value_return == 0 && !_write) {
             if(read(STDIN_FILENO, path, PATH_MAX) > 0) {
-                printf("%d: %s\n", part, path);
+                //printf("%d: %s\n", part, path);
                 if(strcmp(path, "///") == 0) {
                     _write = TRUE;
-                }
-            } else {
-                fp = fopen(path, "r");
+                } else {
+                    fp = fopen(path, "r");
                 if(fp == NULL) {
                     value_return = err_file_open();
                 } else {
-                    //getfrequencies;
+                    
+                    printf("Analizzo %s parte %d di %d\n%s\n\n", path,part,m,get_frequencies(fp, part, m));
+
                 }
                 if(value_return == 0) {
                     //write
+                }
                 }
             }
         }
