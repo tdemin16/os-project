@@ -6,12 +6,10 @@ int main(int argc, char *argv[])
     int n = 3;
     int m = 4;
     
-    //ATTENZIONE: msg puo' essere sostituita da filePath qualora questa non sia piu' utile dopo il fork
+    //ATTENZIONE: args puo' essere sostituita da filePath qualora questa non sia piu' utile dopo il fork
     //Rimuovere questi commenti alla fine del progetto :)
     node msg; //list used to pass path's to child
     
-    int v[DIM_V];
-
     //parser variables
     int i; //Variabile usata per ciclare gli argomenti (argv[i])
     int value_return = 0; //Valore di ritorno
@@ -212,8 +210,6 @@ int main(int argc, char *argv[])
                 value_return = err_exec(errno); //Set value return
             }
         }
-    }
-
-    printf("A chiuso\n");
+    } 
     return value_return;
 }

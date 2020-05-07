@@ -34,25 +34,24 @@ int main(int argc, char *argv[])
     if(value_return == 0) {
         while(value_return == 0 && !_write) {
             if(read(STDIN_FILENO, path, PATH_MAX) > 0) {
-                //printf("%d: %s\n", part, path);
+                printf("%d: %s\n", part, path);
                 if(strcmp(path, "///") == 0) {
                     _write = TRUE;
+                }
+            } else {
+                fp = fopen(path, "r");
+                if(fp == NULL) {
+                    value_return = err_file_open();
                 } else {
-                    fp = fopen(path, "r");
-                    if(fp == NULL) {
-                        value_return = err_file_open();
-                    } else {
-                        //getfrequencies;
-                    }
-                    if(value_return == 0) {
-                        //write
-                    }
+                    //getfrequencies;
+                }
+                if(value_return == 0) {
+                    //write
                 }
             }
         }
     }
 
-    printf("Q chiuso\n");
     return value_return;
 }
 
