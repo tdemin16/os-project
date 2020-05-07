@@ -10,6 +10,7 @@
 #include<errno.h>
 #include<math.h>
 #include<fcntl.h>
+#include<sys/wait.h>
 
 
 #define READ 0
@@ -96,7 +97,7 @@ int err_args_Q();
 int err_file();
 int err_fork();
 int err_write();
-int err_fnctl();
+int err_fcntl();
 int err_exec(int);
 int err_m_not_valid();
 int err_part_not_valid();

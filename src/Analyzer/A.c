@@ -20,8 +20,6 @@ int main(int argc, char *argv[])
     char flag = FALSE; // se flag = true, non bisogna analizzare l'argomento. (l'argomento successivo è il numero o di n o di m)
     char setn = FALSE; // se setn = true, n è stato cambiato
     char setm = FALSE; // se setn = true, m è stato cambiato
-    char done = FALSE; // true quando l'argomento è stato analizzato
-    int dim = 0; //dimensione comando
     char errdir = FALSE;
     FILE *fp;
     char riga[1035];
@@ -33,8 +31,7 @@ int main(int argc, char *argv[])
     char array[7][20]; //Matrice di appoggio
     char* args[8]; //String og arguments to pass to child
     int _write = FALSE; //true when finish writing the pipe
-    int _read = FALSE; //true when fisnish reading from pipe
-    char* char_count;
+    //int _read = FALSE; //true when fisnish reading from pipe
 
     if(argc < 1) { //if number of arguments is even or less than 1, surely it's a wrong input
         value_return = err_args_A();

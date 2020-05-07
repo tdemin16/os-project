@@ -9,13 +9,13 @@ int main(int argc, char *argv[])
     //Arguments passed
     int part;
     int m;
+    //int v[DIM_V];
 
-    char *res;
     int value_return = 0;
     FILE* fp;
 
     //IPC Arguments
-    char* path;
+    char* path = "";
     int _write = FALSE;
 
 

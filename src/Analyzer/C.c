@@ -9,9 +9,6 @@ int main(int argc, char const *argv[]) {
     int i;
     int j;
     char path[PATH_MAX];
-    int processLeft;    //Processi mancanti
-    int fileLeft;   //file mancanti da assegnare 
-    int tmpFiles;   //Contatore file da leggere per ogni processo
     int count = 0; //Maintain the current amount of files sended
     
     //IPC Variables
@@ -21,7 +18,7 @@ int main(int argc, char const *argv[]) {
     int size_pipe; //Size of pipes
     char array[2][4];
     char* args[3];
-    int _read = FALSE; //Indica se ha finito di leggere dai figli
+    //int _read = FALSE; //Indica se ha finito di leggere dai figli
     int _write = FALSE; //Indica se ha finito di scrivere
     
     //Parsing arguments------------------------------------------------------------------------------------------

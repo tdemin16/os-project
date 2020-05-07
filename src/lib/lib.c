@@ -157,14 +157,7 @@ char * get_frequencies(FILE *fp, int part, int m) //Prima di commentarlo bene te
     {
         end++;
     }
-    get_subset(fp, v, begin, end);
-    char * tmp = malloc(lenghtCsv(v)*sizeof(char));;
-    strcpy(tmp,integer_to_string(v[i]));
-    for (i = 1;i<DIM_V;i++){
-        strcat(tmp,",");
-        strcat(tmp,integer_to_string(v[i]));
-    }
-    return &tmp[0];
+    return "a";
 }
 
 //get the chars from the .txt files from the begin (b) to the end (e)
@@ -205,19 +198,6 @@ void print_vector(int v[])
     }
 }
 
-char * arrayToCsv(int v[DIM_V]){
-    printf("Fatto bro\n");
-    int i;
-    int dim = lenghtCsv(v);
-    char * char_count = malloc(dim*sizeof(char));
-    strcpy(char_count,integer_to_string(v[i]));
-    for (i = 1;i<DIM_V;i++){
-        strcat(char_count,",");
-        strcat(char_count,integer_to_string(v[i]));
-    }
-    
-    return &char_count[0];
-}
 
 int lenghtCsv(int v[DIM_V]){
     int i;
@@ -229,15 +209,6 @@ int lenghtCsv(int v[DIM_V]){
     return dim;
 }
 
-char* integer_to_string(int x)
-{
-    char* buffer = malloc(sizeof(char) * sizeof(int) * 4 + 1);
-    if (buffer)
-    {
-         sprintf(buffer, "%d", x);
-    }
-    return buffer; // caller is expected to invoke free() on this buffer to release memory
-}
 
 int countDigit(long long n) 
 { 
@@ -347,7 +318,6 @@ void printStat_Cluster(char *char_count)
 
 void printInfoCluster()
 {
-    int v[DIM_V];
     int i;
     printf("Lettere minuscole:\t");
     for (i = 65; i <= 90; i++)

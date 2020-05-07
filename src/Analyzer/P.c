@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     int size_pipe;
     int f = getpid();
     int id; //Identifica il numero del figlio generato
-    int _read = FALSE;
+    //int _read = FALSE;
     int _write = FALSE;
     char array[4][4];
     char* args[4];
