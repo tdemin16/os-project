@@ -177,8 +177,8 @@ int main(int argc, char *argv[])
             }
             close(fd_1[WRITE]);
             close(fd_2[READ]);
+            wait(NULL);
         }
-        wait(NULL);
     }
 
     if(value_return == 0) {
