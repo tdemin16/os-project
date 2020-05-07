@@ -7,7 +7,7 @@ node insert_first(char *p, node l)
 {
     //if l is null, it will produce the same result as initList
     //so it doesn't require a test
-    node tmp = (node)malloc(sizeof(node));
+    node tmp = (node)malloc(sizeof(node) * sizeof(tmp));
 
     tmp->path = malloc(PATH_MAX * sizeof(char));
     strcpy(tmp->path, p);
