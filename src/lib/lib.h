@@ -18,6 +18,7 @@
 #define TRUE 1
 #define FALSE 0
 #define DIM_V 95
+#define DIM_RESP 1050
 #define ERR_ARGS_A 1
 #define ERR_ARGS_C 2
 #define ERR_ARGS_Q 3
@@ -35,11 +36,6 @@ typedef struct {
     int count;
 } array;
 
-struct List{
-    char* path;
-    struct List* next;
-}List;
-
 typedef struct m_process{
     int begin;
     int end;
@@ -47,20 +43,12 @@ typedef struct m_process{
     //char *DIR; //Da usare per dare il file(???)
 }m_process;
 
-typedef struct List* node;
-
 //Array struct functions -- sostituiscono lista (momentaneamente?)
 array * createPathList(int);
 char insertPathList(array*, char*);
 void printPathList(array*);
 void freePathList(array*);
 int dimPathList(array*);
-
-//List functions
-node insert_first(char*, node);
-char is_present(char*, node);
-int count_list_elements(node);
-void print_list(node);
 
 void close_pipes(int*, int);
 int unlock_pipes(int*, int);
@@ -73,7 +61,7 @@ void initialize_vector(int*);
 void set_add(int*, char);
 void get_subset(FILE*, int*, int, int);
 void print_vector(int*);
-char * get_frequencies(FILE*, int, int);
+char* get_frequencies(FILE*, int, int);
 //int err_end_file(); used here
 //int err_args_Q(); used here
 //int err_file_open(); used here

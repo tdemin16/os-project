@@ -10,16 +10,18 @@ int main(int argc, char *argv[])
     int value_return = 0;
     int i;
     char path[PATH_MAX];
+    char str[275];
 
     //IPC Variables
     int* fd;
     int size_pipe;
     int f = getpid();
     int id; //Identifica il numero del figlio generato
-    //int _read = FALSE;
+    int _read = FALSE;
     int _write = FALSE;
     char array[4][4];
     char* args[4];
+    int count = 0;
 
 
     //Parsing arguments-------------------------------------------------------
@@ -78,7 +80,7 @@ int main(int argc, char *argv[])
     //----------------------------------------------------------------------
     if(value_return == 0) {
         if(f > 0) { //PARENT SIDE
-            while(value_return == 0 && (/*1_read ||*/ !_write)) {
+            while(value_return == 0 && (!_read || !_write)) {
 
                 //Write
                 if(!_write) {
@@ -103,9 +105,21 @@ int main(int argc, char *argv[])
                 }
 
                 //Read
-                /*if(!_read) {
-
-                }*/
+                if(!_read) {
+                    for(i = 0; i < m; i++) {
+                        if(read(fd[i*4 + 0], str, 275) > 0) {
+                            if(strcmp(str, "///") == 0) {
+                                count++;
+                                if(count == m) {
+                                    _read = TRUE;
+                                    //Write
+                                }
+                            } else {
+                                printf("%s\n", str);
+                            }
+                        }
+                    }
+                }
             }
             wait(NULL);
         }
@@ -123,7 +137,7 @@ int main(int argc, char *argv[])
             args[3] = NULL;
 
             dup2(fd[id*4 + 2], STDIN_FILENO);
-            //dup2(fd[id*4 + 1], STDOUT_FILENO);
+            dup2(fd[id*4 + 1], STDOUT_FILENO);
             close_pipes(fd, size_pipe);
 
             if(execvp(args[0], args) == -1) {

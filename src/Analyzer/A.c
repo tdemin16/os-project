@@ -141,6 +141,9 @@ int main(int argc, char *argv[])
         if(fcntl(fd_2[READ], F_SETFL, O_NONBLOCK)) { //Prova a sbloccare la pipe 2 in lettura
             value_return = err_fcntl(); //Se errore riporta il messaggio di errore
         }
+        if(fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+            value_return = err_fcntl();
+        }
     }
     
 

@@ -56,6 +56,7 @@ void printPathList(array *tmp)
         printf("%d: %s\n", i, tmp->pathList[i]);
     }
 }
+
 int dimPathList(array *tmp){
     return tmp->count;
 }
@@ -69,72 +70,6 @@ void freePathList(array *tmp)
     }
     free(tmp->pathList);
     free(tmp);
-}
-
-node insert_first(char *p, node l)
-{
-    //if l is null, it will produce the same result as initList
-    //so it doesn't require a test
-    node tmp = (node)malloc(sizeof(node) * sizeof(tmp));
-
-    tmp->path = malloc(PATH_MAX * sizeof(char));
-    strcpy(tmp->path, p);
-    tmp->next = l;
-
-    return tmp;
-}
-
-//Boolean result
-char is_present(char *p, node l)
-{
-    char ret = FALSE;
-    node tmp = l;
-
-    if (tmp != NULL)
-    {
-        //printf(": %s con %s ",p,tmp->path );
-        while (tmp != NULL && !ret)
-        {
-            //printf("    #COMPARO: %s con %s -> ",p,tmp->path );
-            //printf(": %s con %s ",p,tmp->path );
-            if (!strcmp(p, tmp->path))
-            {
-                //printf("UGUALI\n");
-                ret = TRUE;
-            }
-            else
-            {
-                //printf("DIVERSI\n");
-            }
-            tmp = tmp->next;
-        }
-    }
-
-    return ret;
-}
-
-int count_list_elements(node l)
-{
-    int val = 0;
-    node tmp = l;
-
-    while (tmp != NULL)
-    {
-        val++;
-        tmp = tmp->next;
-    }
-
-    return val;
-}
-
-void print_list(node list)
-{
-    node tmp = list;
-    while (tmp != NULL)
-    {
-        printf("%s\n", tmp->path);
-        tmp = tmp->next;
-    }
 }
 
 int unlock_pipes(int *fd, int size)
@@ -203,7 +138,7 @@ void set_add(int v[], char c)
     v[val_ascii]++;
 }
 
-char * get_frequencies(FILE *fp, int part, int m) //Prima di commentarlo bene testiamo
+char* get_frequencies(FILE *fp, int part, int m) //Prima di commentarlo bene testiamo
 {
     int v[DIM_V];
     initialize_vector(v);
