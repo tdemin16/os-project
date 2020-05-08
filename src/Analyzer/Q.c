@@ -9,7 +9,6 @@ int main(int argc, char *argv[])
     //Arguments passed
     int part;
     int m;
-    //int v[DIM_V];
 
     int value_return = 0;
     FILE* fp;
@@ -35,7 +34,7 @@ int main(int argc, char *argv[])
         while(value_return == 0 && !_write) {
             if(read(STDIN_FILENO, path, PATH_MAX) > 0) {
                 printf("%d: %s\n", part, path);
-                if(strcmp(path, "///") == 0) {
+                if(strcmp(path, "///") == 0){
                     _write = TRUE;
                 } else {
                     fp = fopen(path, "r");

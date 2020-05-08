@@ -12,7 +12,7 @@ array *createPathList(int size)
     int i;
     for (i = 0; i < size; i++)
     {
-        st->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX + 1));
+        st->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX+1));
     }
     return st;
 }

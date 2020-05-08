@@ -81,6 +81,7 @@ int main(int argc, char *argv[])
                 //Write
                 if(!_write) {
                     if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //Prova a leggere dalla pipe
+                    printf("P: %s arrivato\n",path);
                         if(strcmp(path, "///") == 0) {
                             _write = TRUE;
                             for(i = 0; i < m; i++) { //Manda a tutti i processi Q la fine della scrittura
