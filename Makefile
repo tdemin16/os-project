@@ -17,7 +17,7 @@ build:
 	@gcc -std=gnu90 ./src/lib/lib.c ./src/Analyzer/P.c -o ./bin/P
 	@gcc -std=gnu90 ./src/lib/lib.c ./src/Analyzer/Q.c -o ./bin/Q
 	@gcc -std=gnu90 ./src/lib/lib.c ./src/R.c -o ./bin/R
-	@#@gcc -std=gnu90 ./src/lib/lib.c ./src/M.c -o ./bin/M
+	@gcc -std=gnu90 ./src/lib/lib.c ./src/M.c -o ./bin/M
 
 clean:
 	@rm -rf ./bin
