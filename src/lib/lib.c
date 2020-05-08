@@ -278,13 +278,16 @@ int lenghtCsv(int v[DIM_V]){
 }
 
 
-int countDigit(long long n) 
+int countDigit(int n) 
 { 
-    int count = 0; 
+    int count = 0;
+    if (n == 0){
+        count++;
+    } else {
     while (n != 0) { 
         n = n / 10; 
         ++count; 
-    } 
+    } }
     return count; 
 } 
 
