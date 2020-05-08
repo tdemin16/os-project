@@ -29,6 +29,12 @@
 #define ERR_EXEC 9
 #define ERR_DATA 10
 
+typedef struct {
+    int size; //size of array
+    char **pathList;
+    int count;
+} array;
+
 struct List{
     char* path;
     struct List* next;
@@ -42,6 +48,13 @@ typedef struct m_process{
 }m_process;
 
 typedef struct List* node;
+
+//Array struct functions -- sostituiscono lista (momentaneamente?)
+array * createPathList(int);
+char insertPathList(array*, char*);
+void printPathList(array*);
+void freePathList(array*);
+int dimPathList(array*);
 
 //List functions
 node insert_first(char*, node);
