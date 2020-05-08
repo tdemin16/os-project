@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     int value_return = 0;
     int i;
     char path[PATH_MAX];
-    char str[275];
+    char resp[DIM_RESP];
 
     //IPC Variables
     int* fd;
@@ -107,21 +107,24 @@ int main(int argc, char *argv[])
                 //Read
                 if(!_read) {
                     for(i = 0; i < m; i++) {
-                        if(read(fd[i*4 + 0], str, 275) > 0) {
-                            if(strcmp(str, "///") == 0) {
+                        if(read(fd[i*4 + 0], resp, DIM_RESP) > 0) {
+                            if(strcmp(resp, "///") == 0) {
                                 count++;
                                 if(count == m) {
                                     _read = TRUE;
-                                    //Write
+                                    if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
+                                        value_return = err_write();
+                                    }
                                 }
                             } else {
-                                printf("%s\n", str);
+                                if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
+                                    value_return = err_write();
+                                }
                             }
                         }
                     }
                 }
             }
-            wait(NULL);
         }
     }
 
