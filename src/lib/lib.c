@@ -121,7 +121,7 @@ int parse_string(char *string, int v[DIM_V])
 
 ///src/Analyzer/Q.c
 //Initialize frequence vector all to 0
-void initialize_vector(int v[])
+void initialize_vector(int* v)
 {
     int i;
     for (i = 0; i < DIM_V; i++)
@@ -131,16 +131,16 @@ void initialize_vector(int v[])
 }
 
 //Increase frequence of the global vector in the position val_ascii
-void set_add(int v[], char c)
+void set_add(int* v, char c)
 {
     int val_ascii;
     val_ascii = ((int)c) - 32; //casting char to int and difference 32 (in order to save space on the vector) //Se vogliamo togliere lo spazio basta fare -33
     v[val_ascii]++;
 }
 
-char* get_frequencies(FILE *fp, int part, int m) //Prima di commentarlo bene testiamo
+int* get_frequencies(FILE *fp, int part, int m) //Prima di commentarlo bene testiamo
 {
-    int v[DIM_V];
+    int *v = malloc(sizeof(int*) * DIM_V); //where frequencies will be stored
     initialize_vector(v);
     int i = 0;
     int file_length = file_len(fp);
@@ -160,11 +160,14 @@ char* get_frequencies(FILE *fp, int part, int m) //Prima di commentarlo bene tes
     {
         end++;
     }
-    return "a";
+
+    get_subset(fp, v, begin, end);
+
+    return v;
 }
 
 //get the chars from the .txt files from the begin (b) to the end (e)
-void get_subset(FILE *fp, int v[], int b, int e)
+void get_subset(FILE *fp, int* v, int b, int e)
 {
     int i;
     char c;
