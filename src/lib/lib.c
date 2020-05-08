@@ -138,10 +138,36 @@ void set_add(int* v, char c)
     v[val_ascii]++;
 }
 
-int* get_frequencies(FILE *fp, int part, int m) //Prima di commentarlo bene testiamo
+//get the chars from the .txt files from the begin (b) to the end (e)
+void get_subset(FILE *fp, int* v, int b, int e)
 {
-    int *v = malloc(sizeof(int*) * DIM_V); //where frequencies will be stored
-    initialize_vector(v);
+    int i;
+    char c;
+    fseek(fp, b, SEEK_SET); //setting initial position of SEEK cursor
+    for (i = b; i < e; i++) //P.S.: il primo carattere non è compreso, l'ultimo si
+    {
+        if (feof(fp))
+        {
+            printf("[!] Errore feof\n");
+            //err_end_file();
+            break;
+        }
+        else
+        {
+            fscanf(fp, "%c", &c); //gets char
+            //printf("%c", c);      //display what you asked the process to analyze (uncomment to use)
+            if (c != '\n')
+            {
+                set_add(v, c); //aggiunge al vettore delle frequenze il carattere c
+            }
+        }
+    }
+}
+
+void get_frequencies(FILE *fp, int *freq, int part, int m) //Prima di commentarlo bene testiamo
+{
+    //int *freq = malloc(sizeof(int*) * DIM_V); //where frequencies will be stored
+    //initialize_vector(freq);
     int i = 0;
     int file_length = file_len(fp);
     int char_parts = file_length / m;
@@ -160,35 +186,9 @@ int* get_frequencies(FILE *fp, int part, int m) //Prima di commentarlo bene test
     {
         end++;
     }
+    get_subset(fp, freq, begin, end);
 
-    get_subset(fp, v, begin, end);
-
-    return v;
-}
-
-//get the chars from the .txt files from the begin (b) to the end (e)
-void get_subset(FILE *fp, int* v, int b, int e)
-{
-    int i;
-    char c;
-    fseek(fp, b, SEEK_SET); //setting initial position of SEEK cursor
-    for (i = b; i < e; i++) //P.S.: il primo carattere non è compreso, l'ultimo si
-    {
-        if (feof(fp))
-        {
-            err_end_file();
-            break;
-        }
-        else
-        {
-            fscanf(fp, "%c", &c); //gets char
-            //printf("%c", c);      //display what you asked the process to analyze (uncomment to use)
-            if (c != '\n')
-            {
-                set_add(v, c); //aggiunge al vettore delle frequenze il carattere c
-            }
-        }
-    }
+    //return &freq[0];
 }
 
 //display how meny times chars are in the text (display only visited chars)
