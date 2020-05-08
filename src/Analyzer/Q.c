@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     FILE* fp;
 
     //IPC Arguments
-    char* path = "";
+    char path[PATH_MAX];
     int _write = FALSE;
 
 
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     if(value_return == 0) {
         while(value_return == 0 && !_write) {
             if(read(STDIN_FILENO, path, PATH_MAX) > 0) {
-                printf("%d: %s\n", part, path);
+                printf("Q: %s Arrivato\n", path);
                 if(strcmp(path, "///") == 0){
                     _write = TRUE;
                 } else {

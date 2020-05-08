@@ -70,6 +70,9 @@ int main(int argc, char const *argv[]) {
         if(unlock_pipes(fd, size_pipe) == -1) { //Set nonblocking pipes
             value_return = err_fcntl();
         }
+        if(fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+            value_return = err_fcntl();
+        }
     }
 
 
@@ -108,8 +111,9 @@ int main(int argc, char const *argv[]) {
                     }
                     if(count == nfiles) { //Ha passato tutti i path ai figli
                         _write = TRUE;
+                        strcpy(path, "///");
                         for(j = 0; j < n; j++) { //Manda a tutti i processi P la fine della scrittura
-                            if(write(fd[j*4 + 3], "///", PATH_MAX) == -1) {
+                            if(write(fd[j*4 + 3], path, PATH_MAX) == -1) {
                                 value_return = err_write(); //VA IN ERRORE QUA, SE COMMENTATE NON DA PIU' ERRORE, Q RICEVE COMUNQUE LE STRINGHE
                             }
                         }
@@ -137,7 +141,7 @@ int main(int argc, char const *argv[]) {
             dup2(fd[id*4 + 2], STDIN_FILENO);
             //dup2(fd[id*4 + 1], STDOUT_FILENO); DA ATTIVARE
             close_pipes(fd, size_pipe);
-
+            
             if(execvp(args[0], args) == -1) { //Test exec
                 value_return = err_exec(errno); //Set value return
             }

@@ -54,6 +54,9 @@ int main(int argc, char *argv[])
         if(unlock_pipes(fd, size_pipe) == -1) { //Set unblocking pipes
             value_return = err_fcntl();
         }
+        if(fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+            value_return = err_fcntl();
+        }
     }
 
 
@@ -73,7 +76,6 @@ int main(int argc, char *argv[])
 
 
     //----------------------------------------------------------------------
-
     if(value_return == 0) {
         if(f > 0) { //PARENT SIDE
             while(value_return == 0 && (/*1_read ||*/ !_write)) {
@@ -81,16 +83,16 @@ int main(int argc, char *argv[])
                 //Write
                 if(!_write) {
                     if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //Prova a leggere dalla pipe
-                    printf("P: %s arrivato\n",path);
                         if(strcmp(path, "///") == 0) {
                             _write = TRUE;
                             for(i = 0; i < m; i++) { //Manda a tutti i processi Q la fine della scrittura
-                                if(write(fd[i*4 + 3], "///", PATH_MAX) == -1) {
+                                if(write(fd[i*4 + 3], path, PATH_MAX) == -1) {
                                     value_return = err_write();
                                 }
                             }
                         } 
                         else {
+                            //printf("P: %s arrivato\n",path);
                             for(i = 0; i < m; i++) { //Cicla su tutti i processi m
                                 if(write(fd[i*4 + 3], path, PATH_MAX) == -1) { //Test Write
                                     value_return = err_write();
