@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
                     if(fp == NULL) {
                         value_return = err_file_open();
                     } else {
-                        //getfrequencies;
+                        get_frequencies(fp,v,part,m);
                         createCsv(v,resp);
                         if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
                             value_return = err_write();

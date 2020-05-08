@@ -11,7 +11,7 @@ int main(int argc, char const *argv[]) {
     //printStat_Cluster(strdup(test));
     //printStat(strdup(test));
     //printInfoCluster();
-    printf("%d\n",lenghtCsv(max_v));
+    
     char tmp[DIM_RESP];
     createCsv(max_v,tmp);
     printf("%s\n",tmp);
