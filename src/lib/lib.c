@@ -229,6 +229,18 @@ int countDigit(int n)
     return count; 
 } 
 
+void createCsv(int * v, char *res){
+    int i;
+    char str[12];
+
+    sprintf(str, "%d", lenghtCsv(v));
+    strcat(res,str);
+    for (i = 0; i<DIM_V; i++){
+       strcat(res,","); 
+       sprintf(str, "%d", v[i]);
+       strcat(res,str); 
+    }
+}
 
 ///src/R.c
 void printStat(char *char_count)
