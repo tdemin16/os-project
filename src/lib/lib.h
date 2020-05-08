@@ -74,7 +74,7 @@ char* reverse(char*, int, int);
 char* itoa(int, char*, int);
 char* arrayToCsv(int *);
 char* integer_to_string(int);
-int countDigit(long long);
+int countDigit(int);
 int lenghtCsv(int *);
 //int err_args_P(); used here
 //int err_file_open(); used here
