@@ -106,18 +106,18 @@ int main(int argc, char *argv[])
 
                 //Read
                 if(!_read) {
-                    for(i = 0; i < m; i++) {
-                        if(read(fd[i*4 + 0], resp, DIM_RESP) > 0) {
-                            if(strcmp(resp, "///") == 0) {
-                                count++;
-                                if(count == m) {
-                                    _read = TRUE;
-                                    if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
+                    for(i = 0; i < m; i++) { //Cicla tra tutti i figli
+                        if(read(fd[i*4 + 0], resp, DIM_RESP) > 0) { //Legge la pipe del figlio i
+                            if(strcmp(resp, "///") == 0) { //Controlla se e` la fine del messaggio
+                                count++; //Conta quanti terminatori sono arrivati
+                                if(count == m) { //Quando tutti i figli hanno terminato
+                                    _read = TRUE; //Ha finito di leggere
+                                    if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Scrive il carattere di teminazione
                                         value_return = err_write();
                                     }
                                 }
-                            } else {
-                                if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
+                            } else { //Se non e` la fine del messaggio
+                                if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Invia la stringa resp
                                     value_return = err_write();
                                 }
                             }
@@ -125,6 +125,7 @@ int main(int argc, char *argv[])
                     }
                 }
             }
+            close_pipes(fd, size_pipe);
         }
     }
 

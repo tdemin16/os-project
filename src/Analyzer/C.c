@@ -9,6 +9,9 @@ int main(int argc, char const *argv[]) {
     int i;
     int j;
     char path[PATH_MAX];
+    char resp[DIM_RESP];
+    int v[DIM_V];
+    int part_received = 0;
     int count = 0; //Maintain the current amount of files sended
     
     //IPC Variables
@@ -18,7 +21,7 @@ int main(int argc, char const *argv[]) {
     int size_pipe; //Size of pipes
     char array[2][4];
     char* args[3];
-    //int _read = FALSE; //Indica se ha finito di leggere dai figli
+    int _read = FALSE; //Indica se ha finito di leggere dai figli
     int _write = FALSE; //Indica se ha finito di scrivere
     
     //Parsing arguments------------------------------------------------------------------------------------------
@@ -95,7 +98,7 @@ int main(int argc, char const *argv[]) {
     if(value_return == 0) {
         i = 0;
         if(f > 0) { //PARENT SIDE
-            while(value_return == 0 && (/*!_read ||*/ !_write)) {
+            while(value_return == 0 && (!_read || !_write)) {
 
                 //Write
                 if(!_write) {
@@ -121,11 +124,25 @@ int main(int argc, char const *argv[]) {
                 }
 
                 //Read
-                /*if(!_read) {
-
-                }*/
+                if(!_read) {
+                    for(j = 0; j < n; j++) {
+                        if(read(fd[i*4 + 0], resp, DIM_RESP) > 0) {
+                            if(strcmp(resp, "///") == 0) {//Lascia questo blocco
+                                part_received++;
+                                if(part_received == n) {
+                                    _read = TRUE;
+                                }
+                            } else { //Qua devi fare il parsing
+                                //if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
+                                //    value_return = err_write();
+                                //}
+                                printf("%s\n", resp);
+                            }
+                        }
+                    }
+                }
             }
-            wait(NULL);
+            close_pipes(fd, size_pipe);
         }
     }
 
@@ -139,7 +156,7 @@ int main(int argc, char const *argv[]) {
             args[2] = NULL;
 
             dup2(fd[id*4 + 2], STDIN_FILENO);
-            //dup2(fd[id*4 + 1], STDOUT_FILENO); DA ATTIVARE
+            //dup2(fd[id*4 + 1], STDOUT_FILENO);
             close_pipes(fd, size_pipe);
             
             if(execvp(args[0], args) == -1) { //Test exec

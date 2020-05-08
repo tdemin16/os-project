@@ -32,6 +32,10 @@ int main(int argc, char *argv[])
         if(part >= m) value_return = err_part_not_valid();
     }
 
+    if(fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+        value_return = err_fcntl();
+    }
+
     if(value_return == 0) {
         while(value_return == 0 && !_write) {
             if(read(STDIN_FILENO, path, PATH_MAX) > 0) {

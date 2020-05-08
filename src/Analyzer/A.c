@@ -189,8 +189,10 @@ int main(int argc, char *argv[])
                 }
                 */
             }
+            close(fd_1[READ]);
             close(fd_1[WRITE]);
             close(fd_2[READ]);
+            close(fd_2[WRITE]);
             wait(NULL);
         }
     }
