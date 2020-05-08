@@ -3,6 +3,74 @@
 #include <limits.h>
 #include "lib.h"
 
+array *createPathList(int size)
+{
+    array *st = (array *)malloc(sizeof(array));
+    st->size = size;
+    st->pathList = malloc(sizeof(char **) * size);
+    st->count = 0;
+    int i;
+    for (i = 0; i < size; i++)
+    {
+        st->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX + 1));
+    }
+    return st;
+}
+
+char insertPathList(array *tmp, char *c)
+{
+    int i;
+    char present = FALSE;
+    char ret = FALSE;
+
+    for (i = 0; i<tmp->count; i++){
+        if (!strcmp(tmp->pathList[i], c)){
+            present = TRUE;
+        }
+    }
+    if (present == FALSE){
+        //printf("Provo a inserire %s, size: %d, count:%d\n", c, tmp->size, tmp->count);
+        if (tmp->count == tmp->size)
+        {
+            //printf("Raddoppio la size\n");
+            tmp->size *= 2;
+            tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
+            for (i = tmp->count; i < tmp->size; i++)
+            {
+                tmp->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX + 1));
+            }
+        }
+        //printf("Stringa inserita\n");
+            strcpy(tmp->pathList[tmp->count], c);
+            tmp->count++;
+            ret = TRUE;
+    } else { ret = FALSE;}
+    return ret;
+}
+
+void printPathList(array *tmp)
+{
+    int i;
+    for (i = 0; i < tmp->count; i++)
+    {
+        printf("%d: %s\n", i, tmp->pathList[i]);
+    }
+}
+int dimPathList(array *tmp){
+    return tmp->count;
+}
+
+void freePathList(array *tmp)
+{
+    int i;
+    for (i = 0; i < tmp->size; i++)
+    {
+        free(tmp->pathList[i]);
+    }
+    free(tmp->pathList);
+    free(tmp);
+}
+
 node insert_first(char *p, node l)
 {
     //if l is null, it will produce the same result as initList
