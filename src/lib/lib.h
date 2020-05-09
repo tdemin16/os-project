@@ -77,6 +77,7 @@ char* integer_to_string(int);
 int countDigit(int);
 int lenghtCsv(int *);
 void createCsv(int *, char *);
+void addCsvToArray(char *, int *);
 //int err_args_P(); used here
 //int err_file_open(); used here
 

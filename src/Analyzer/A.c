@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     else {
         
         for(i = 1; i < argc && value_return == 0; i++) {
-            printf("Argv: %s\n",argv[i]);
+            //printf("Argv: %s\n",argv[i]);
             if(!strcmp(argv[i], "-setn")) {//----ERRORI -setn
                 if (i+1<argc){ //controlla che ci sia effettivamente un argomento dopo il -setn
                     n = atoi(argv[i + 1]);
@@ -101,7 +101,11 @@ int main(int argc, char *argv[])
                         //memset( resolved_path, '\0', sizeof(resolved_path));
                         realpath(riga, resolved_path);  //risalgo al percorso assoluto
                         resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo                             
-                        if (insertPathList(lista, resolved_path))count++;
+                        if (insertPathList(lista, resolved_path)){
+                            count++;
+                            //printf("%s\n", resolved_path);
+                        }
+                        
                         
                     } else { //Intercetta l'errore riguardante file o cartelle non esistenti
                         errdir = TRUE; //Metto il flag errore file/directory sbagliati

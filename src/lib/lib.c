@@ -230,22 +230,39 @@ int countDigit(int n)
 void createCsv(int * v, char *res){
     int i;
     char str[12];
-
-    sprintf(str, "%d", lenghtCsv(v));
-    strcpy(res,str);
-    for (i = 0; i<DIM_V; i++){
+    for (i = 0; i<DIM_RESP; i++){
+        res[i]='\0';
+    }
+    sprintf(str, "%d", v[0]);
+    strcat(res,str);
+    for (i = 1; i<DIM_V; i++){
         strcat(res,","); 
         sprintf(str, "%d", v[i]);
         strcat(res,str);
     }
     strcat(res,"#");
-    
-    for (i=(int)(strchr(res, '#') - res)+1; i<DIM_RESP; i++){
-        res[i]='\0';
-    }
-    
-    
 }
+
+///src/C.c
+void addCsvToArray(char * tmp, int *v){
+    int i = 0;
+    char *Analyze = strtok(tmp, "#");
+    char *token = strtok(tmp, ",");
+    while (token != NULL)
+    { //loop through token
+        if (i < DIM_V)
+        {
+            v[i] += atoi(token);
+            i++;
+            token = strtok(NULL, ",");
+        }
+        else
+        {
+            printf("Errore nella creazione della stringa contatore");
+        }
+    }
+}
+
 
 ///src/R.c
 void printStat(char *char_count)
