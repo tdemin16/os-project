@@ -97,12 +97,10 @@ int main(int argc, char *argv[])
                     while (fgets(riga, sizeof(riga), fp) != NULL && errdir == FALSE) //Legge riga per riga e aggiunge alla lista
                 {
                     if (strcmp(riga,"-[ERROR]\n")){
-                        
+                        //memset( resolved_path, '\0', sizeof(resolved_path));
                         realpath(riga, resolved_path);  //risalgo al percorso assoluto
-                        resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo      
-                        tmp = &resolved_path[0];
-                                                   
-                        if (insertPathList(lista, tmp))count++;
+                        resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo                             
+                        if (insertPathList(lista, resolved_path))count++;
                         
                     } else { //Intercetta l'errore riguardante file o cartelle non esistenti
                         errdir = TRUE; //Metto il flag errore file/directory sbagliati

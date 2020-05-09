@@ -12,7 +12,8 @@ array *createPathList(int size)
     int i;
     for (i = 0; i < size; i++)
     {
-        st->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX+1));
+        st->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX));
+        memset( st->pathList[i], '\0', sizeof(char*) * PATH_MAX);
     }
     return st;
 }
@@ -37,7 +38,7 @@ char insertPathList(array *tmp, char *c)
             tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
             for (i = tmp->count; i < tmp->size; i++)
             {
-                tmp->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX + 1));
+                tmp->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX));
             }
         }
         //printf("Stringa inserita\n");
