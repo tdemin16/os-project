@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
     int i; //Variabile usata per ciclare gli argomenti (argv[i])
     int value_return = 0; //Valore di ritorno
     int count = 0; //numero di file univoci da analizzare
+    int perc = 0;
     
 
     array *lista = createPathList(10); //Nuova lista dei path
@@ -126,12 +127,12 @@ int main(int argc, char *argv[])
     
     //IPC
     if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
-        if(pipe(fd_1) == -1) { //Controllo se nella creazione della pipe ci sono errori
+        if(pipe(fd_1) != 0) { //Controllo se nella creazione della pipe ci sono errori
             value_return = err_pipe(); //in caso di git errore setta il valore di ritorno a ERR_PIPE
         }
     }
     if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
-        if(pipe(fd_2) == -1) { //Controllo se nella creazione della pipe ci sono errori
+        if(pipe(fd_2) != 0) { //Controllo se nella creazione della pipe ci sono errori
             value_return = err_pipe(); //in caso di errore setta il valore di ritorno a ERR_PIPE
         }
     }
@@ -158,7 +159,6 @@ int main(int argc, char *argv[])
 
     if(value_return == 0) { //same
         if(f > 0) { //PARENT SIDE
-            //msg = filePath; //copia il riferimento alla lista cosi' da poterla scorrere senza perdere i riferimanti effettivi
             
             i = 0;
             while(value_return == 0 && (/*!_read || */!_write)) { //cicla finche` non ha finito di leggere e scrivere
@@ -167,10 +167,10 @@ int main(int argc, char *argv[])
                 if(!_write) {
                     for (i=0; i<count; i++){
                         if(write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) { //Prova a scrivere sulla pipe
-                        value_return = err_write(); //Se fallisce da` errore
-                        //ADD SIGNAL HANDLING
+                            value_return = err_write(); //Se fallisce da` errore
+                            //ADD SIGNAL HANDLING
                         } else {
-                          //printf("A: %s inviato\n",lista->pathList[i]);  
+                            //printf("A: %s inviato\n",lista->pathList[i]);  
                         }
                     }
                     _write = TRUE;
@@ -193,7 +193,6 @@ int main(int argc, char *argv[])
             close(fd_1[WRITE]);
             close(fd_2[READ]);
             close(fd_2[WRITE]);
-            wait(NULL);
         }
     }
 
