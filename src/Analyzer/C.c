@@ -11,6 +11,7 @@ int main(int argc, char const *argv[]) {
     int k;
     char path[PATH_MAX];
     char resp[DIM_RESP];
+    char sum[DIM_RESP];
     int v[DIM_V];
     int part_received = 0;
     int count = 0; //Maintain the current amount of files sended
@@ -50,6 +51,7 @@ int main(int argc, char const *argv[]) {
         if(nfiles == 0 && value_return == 0) value_return = err_args_C(); //Check if nfiles is setted, if not gives an error (value_return used to avoid double messages)
     }
 
+    initialize_vector(v);
 
     //Generating pipes-------------------------------------------------------
     if(value_return == 0) {
@@ -128,13 +130,16 @@ int main(int argc, char const *argv[]) {
                 //Read
                 if(!_read) {
                     if(read(fd[k*4 + 0], resp, DIM_RESP) > 0) {
-                        printf("HO FINITO\n");
+                        
                         if(strcmp(resp, "///") == 0) {//Lascia questo blocco
                             part_received++;
                             if(part_received == n) {
                                 _read = TRUE;
                             }
-                        } else { //Qua devi fare il parsing
+                        } else { 
+                            //printf("[+] - %s\n",strtok(resp, "#"));
+                            addCsvToArray(resp,v);
+                            //Qua devi fare il parsing
                             //if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
                             //    value_return = err_write();
                             //}
@@ -145,6 +150,9 @@ int main(int argc, char const *argv[]) {
                 }
             }
             close_pipes(fd, size_pipe);
+            createCsv(v,sum);
+            printf("%s\n",sum);
+            
         }
     }
 
