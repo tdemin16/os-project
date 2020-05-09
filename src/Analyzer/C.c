@@ -128,6 +128,7 @@ int main(int argc, char const *argv[]) {
                 //Read
                 if(!_read) {
                     if(read(fd[k*4 + 0], resp, DIM_RESP) > 0) {
+                        printf("HO FINITO\n");
                         if(strcmp(resp, "///") == 0) {//Lascia questo blocco
                             part_received++;
                             if(part_received == n) {
@@ -157,7 +158,7 @@ int main(int argc, char const *argv[]) {
             args[2] = NULL;
 
             dup2(fd[id*4 + 2], STDIN_FILENO);
-            //dup2(fd[id*4 + 1], STDOUT_FILENO);
+            dup2(fd[id*4 + 1], STDOUT_FILENO);
             close_pipes(fd, size_pipe);
             
             if(execvp(args[0], args) == -1) { //Test exec
