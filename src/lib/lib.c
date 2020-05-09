@@ -167,7 +167,7 @@ void get_subset(FILE *fp, int* v, int b, int e)
 void get_frequencies(FILE *fp, int *freq, int part, int m) //Prima di commentarlo bene testiamo
 {
     //int *freq = malloc(sizeof(int*) * DIM_V); //where frequencies will be stored
-    //initialize_vector(freq);
+    initialize_vector(freq);
     int i = 0;
     int file_length = file_len(fp);
     int char_parts = file_length / m;
@@ -234,12 +234,19 @@ void createCsv(int * v, char *res){
     char str[12];
 
     sprintf(str, "%d", lenghtCsv(v));
-    strcat(res,str);
+    strcpy(res,str);
     for (i = 0; i<DIM_V; i++){
-       strcat(res,","); 
-       sprintf(str, "%d", v[i]);
-       strcat(res,str); 
+        strcat(res,","); 
+        sprintf(str, "%d", v[i]);
+        strcat(res,str);
     }
+    strcat(res,"#");
+    
+    for (i=(int)(strchr(res, '#') - res)+1; i<DIM_RESP; i++){
+        res[i]='\0';
+    }
+    
+    
 }
 
 ///src/R.c
