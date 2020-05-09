@@ -10,16 +10,18 @@ int main(int argc, char *argv[])
     int value_return = 0;
     int i;
     char path[PATH_MAX];
+    char resp[DIM_RESP];
 
     //IPC Variables
     int* fd;
     int size_pipe;
     int f = getpid();
     int id; //Identifica il numero del figlio generato
-    //int _read = FALSE;
+    int _read = FALSE;
     int _write = FALSE;
     char array[4][4];
     char* args[4];
+    int count = 0;
 
 
     //Parsing arguments-------------------------------------------------------
@@ -54,6 +56,9 @@ int main(int argc, char *argv[])
         if(unlock_pipes(fd, size_pipe) == -1) { //Set unblocking pipes
             value_return = err_fcntl();
         }
+        if(fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+            value_return = err_fcntl();
+        }
     }
 
 
@@ -73,10 +78,9 @@ int main(int argc, char *argv[])
 
 
     //----------------------------------------------------------------------
-
     if(value_return == 0) {
         if(f > 0) { //PARENT SIDE
-            while(value_return == 0 && (/*1_read ||*/ !_write)) {
+            while(value_return == 0 && (!_read || !_write)) {
 
                 //Write
                 if(!_write) {
@@ -84,12 +88,13 @@ int main(int argc, char *argv[])
                         if(strcmp(path, "///") == 0) {
                             _write = TRUE;
                             for(i = 0; i < m; i++) { //Manda a tutti i processi Q la fine della scrittura
-                                if(write(fd[i*4 + 3], "///", PATH_MAX) == -1) {
+                                if(write(fd[i*4 + 3], path, PATH_MAX) == -1) {
                                     value_return = err_write();
                                 }
                             }
                         } 
                         else {
+                            //printf("P: %s arrivato\n",path);
                             for(i = 0; i < m; i++) { //Cicla su tutti i processi m
                                 if(write(fd[i*4 + 3], path, PATH_MAX) == -1) { //Test Write
                                     value_return = err_write();
@@ -100,11 +105,27 @@ int main(int argc, char *argv[])
                 }
 
                 //Read
-                /*if(!_read) {
-
-                }*/
+                if(!_read) {
+                    for(i = 0; i < m; i++) { //Cicla tra tutti i figli
+                        if(read(fd[i*4 + 0], resp, DIM_RESP) > 0) { //Legge la pipe del figlio i
+                            if(strcmp(resp, "///") == 0) { //Controlla se e` la fine del messaggio
+                                count++; //Conta quanti terminatori sono arrivati
+                                if(count == m) { //Quando tutti i figli hanno terminato
+                                    _read = TRUE; //Ha finito di leggere
+                                    if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Scrive il carattere di teminazione
+                                        value_return = err_write();
+                                    }
+                                }
+                            } else { //Se non e` la fine del messaggio
+                                if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Invia la stringa resp
+                                    value_return = err_write();
+                                }
+                            }
+                        }
+                    }
+                }
             }
-            wait(NULL);
+            close_pipes(fd, size_pipe);
         }
     }
 
@@ -120,7 +141,7 @@ int main(int argc, char *argv[])
             args[3] = NULL;
 
             dup2(fd[id*4 + 2], STDIN_FILENO);
-            //dup2(fd[id*4 + 1], STDOUT_FILENO);
+            dup2(fd[id*4 + 1], STDOUT_FILENO);
             close_pipes(fd, size_pipe);
 
             if(execvp(args[0], args) == -1) {

@@ -9,12 +9,13 @@ int main(int argc, char *argv[])
     //ATTENZIONE: args puo' essere sostituita da filePath qualora questa non sia piu' utile dopo il fork
     //Rimuovere questi commenti alla fine del progetto :)
     //node msg; //list used to pass path's to child
-    
+    //node filePath = NULL; //list of path's strings
     //parser variables
     int i; //Variabile usata per ciclare gli argomenti (argv[i])
     int value_return = 0; //Valore di ritorno
     int count = 0; //numero di file univoci da analizzare
-    //node filePath = NULL; //list of path's strings
+    int perc = 0;
+    
 
     array *lista = createPathList(10); //Nuova lista dei path
 
@@ -28,12 +29,12 @@ int main(int argc, char *argv[])
     char riga[1035];
 
     //Variables for IPC
-    //int fd_1[2]; //Pipe
-    //int fd_2[2];
-    //pid_t f; //fork return value
-    //char array[7][20]; //Matrice di appoggio
-    //char* args[8]; //String og arguments to pass to child
-    //int _write = FALSE; //true when finish writing the pipe
+    int fd_1[2]; //Pipe
+    int fd_2[2];
+    pid_t f; //fork return value
+    char array[7][20]; //Matrice di appoggio
+    char* args[8]; //String og arguments to pass to child
+    int _write = FALSE; //true when finish writing the pipe
     //int _read = FALSE; //true when fisnish reading from pipe
 
     if(argc < 1) { //if number of arguments is even or less than 1, surely it's a wrong input
@@ -97,12 +98,10 @@ int main(int argc, char *argv[])
                     while (fgets(riga, sizeof(riga), fp) != NULL && errdir == FALSE) //Legge riga per riga e aggiunge alla lista
                 {
                     if (strcmp(riga,"-[ERROR]\n")){
-                        
+                        //memset( resolved_path, '\0', sizeof(resolved_path));
                         realpath(riga, resolved_path);  //risalgo al percorso assoluto
-                        resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo      
-                        tmp = &resolved_path[0];
-                                                   
-                        if (insertPathList(lista, tmp))count++;
+                        resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo                             
+                        if (insertPathList(lista, resolved_path))count++;
                         
                     } else { //Intercetta l'errore riguardante file o cartelle non esistenti
                         errdir = TRUE; //Metto il flag errore file/directory sbagliati
@@ -120,19 +119,18 @@ int main(int argc, char *argv[])
     
     if (value_return == 0){ //Esecuzione corretta
         printf("Numero file: %d,n=%d m=%d\n",count,n,m);
-        printPathList(lista);
-        freePathList(lista);
+        //printPathList(lista);
     }
     
-    /*
+    
     //IPC
     if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
-        if(pipe(fd_1) == -1) { //Controllo se nella creazione della pipe ci sono errori
+        if(pipe(fd_1) != 0) { //Controllo se nella creazione della pipe ci sono errori
             value_return = err_pipe(); //in caso di git errore setta il valore di ritorno a ERR_PIPE
         }
     }
     if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
-        if(pipe(fd_2) == -1) { //Controllo se nella creazione della pipe ci sono errori
+        if(pipe(fd_2) != 0) { //Controllo se nella creazione della pipe ci sono errori
             value_return = err_pipe(); //in caso di errore setta il valore di ritorno a ERR_PIPE
         }
     }
@@ -141,6 +139,9 @@ int main(int argc, char *argv[])
     if(value_return == 0) {
         if(fcntl(fd_2[READ], F_SETFL, O_NONBLOCK)) { //Prova a sbloccare la pipe 2 in lettura
             value_return = err_fcntl(); //Se errore riporta il messaggio di errore
+        }
+        if(fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+            value_return = err_fcntl();
         }
     }
     
@@ -156,22 +157,26 @@ int main(int argc, char *argv[])
 
     if(value_return == 0) { //same
         if(f > 0) { //PARENT SIDE
-            msg = filePath; //copia il riferimento alla lista cosi' da poterla scorrere senza perdere i riferimanti effettivi
             
             i = 0;
-            while(value_return == 0 && (!_read || !_write)) { //cicla finche` non ha finito di leggere e scrivere
+            while(value_return == 0 && (/*!_read || */!_write)) { //cicla finche` non ha finito di leggere e scrivere
                 
                 //Write
                 if(!_write) {
-                    if(write(fd_1[WRITE], msg->path, PATH_MAX) == -1) { //Prova a scrivere sulla pipe
-                        value_return = err_write(); //Se fallisce da` errore
-                        //ADD SIGNAL HANDLING
+                    for (i=0; i<count; i++){
+                        if(write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) { //Prova a scrivere sulla pipe
+                            value_return = err_write(); //Se fallisce da` errore
+                            //ADD SIGNAL HANDLING
+                        } else {
+                            //printf("A: %s inviato\n",lista->pathList[i]);  
+                        }
                     }
-                    msg = msg->next; //Passa al messaggio successivo
-                    if(msg == NULL) _write = TRUE; //Set _write a true quando a finito di scrivere
+                    _write = TRUE;
+                    freePathList(lista);
                 }
 
                 //Read
+                /*
                 if(!_read) { //Non necessario presente solo per correttezza formale
                     if(read(fd_2[READ], char_count, 255) == 0) {
                         parse_string(char_count, v);
@@ -180,10 +185,12 @@ int main(int argc, char *argv[])
                         if(i == count) _read = TRUE;
                     }
                 }
+                */
             }
+            close(fd_1[READ]);
             close(fd_1[WRITE]);
             close(fd_2[READ]);
-            wait(NULL);
+            close(fd_2[WRITE]);
         }
     }
 
@@ -217,6 +224,6 @@ int main(int argc, char *argv[])
             }
         }
     } 
-    */
+    
     return value_return;
 }

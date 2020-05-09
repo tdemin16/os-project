@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
 #include "lib.h"
 
 array *createPathList(int size)
@@ -12,7 +9,8 @@ array *createPathList(int size)
     int i;
     for (i = 0; i < size; i++)
     {
-        st->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX + 1));
+        st->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX));
+        memset( st->pathList[i], '\0', sizeof(char*) * PATH_MAX);
     }
     return st;
 }
@@ -37,7 +35,7 @@ char insertPathList(array *tmp, char *c)
             tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
             for (i = tmp->count; i < tmp->size; i++)
             {
-                tmp->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX + 1));
+                tmp->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX));
             }
         }
         //printf("Stringa inserita\n");
@@ -56,6 +54,7 @@ void printPathList(array *tmp)
         printf("%d: %s\n", i, tmp->pathList[i]);
     }
 }
+
 int dimPathList(array *tmp){
     return tmp->count;
 }
@@ -69,72 +68,6 @@ void freePathList(array *tmp)
     }
     free(tmp->pathList);
     free(tmp);
-}
-
-node insert_first(char *p, node l)
-{
-    //if l is null, it will produce the same result as initList
-    //so it doesn't require a test
-    node tmp = (node)malloc(sizeof(node) * sizeof(tmp));
-
-    tmp->path = malloc(PATH_MAX * sizeof(char));
-    strcpy(tmp->path, p);
-    tmp->next = l;
-
-    return tmp;
-}
-
-//Boolean result
-char is_present(char *p, node l)
-{
-    char ret = FALSE;
-    node tmp = l;
-
-    if (tmp != NULL)
-    {
-        //printf(": %s con %s ",p,tmp->path );
-        while (tmp != NULL && !ret)
-        {
-            //printf("    #COMPARO: %s con %s -> ",p,tmp->path );
-            //printf(": %s con %s ",p,tmp->path );
-            if (!strcmp(p, tmp->path))
-            {
-                //printf("UGUALI\n");
-                ret = TRUE;
-            }
-            else
-            {
-                //printf("DIVERSI\n");
-            }
-            tmp = tmp->next;
-        }
-    }
-
-    return ret;
-}
-
-int count_list_elements(node l)
-{
-    int val = 0;
-    node tmp = l;
-
-    while (tmp != NULL)
-    {
-        val++;
-        tmp = tmp->next;
-    }
-
-    return val;
-}
-
-void print_list(node list)
-{
-    node tmp = list;
-    while (tmp != NULL)
-    {
-        printf("%s\n", tmp->path);
-        tmp = tmp->next;
-    }
 }
 
 int unlock_pipes(int *fd, int size)
@@ -186,7 +119,7 @@ int parse_string(char *string, int v[DIM_V])
 
 ///src/Analyzer/Q.c
 //Initialize frequence vector all to 0
-void initialize_vector(int v[])
+void initialize_vector(int* v)
 {
     int i;
     for (i = 0; i < DIM_V; i++)
@@ -196,17 +129,43 @@ void initialize_vector(int v[])
 }
 
 //Increase frequence of the global vector in the position val_ascii
-void set_add(int v[], char c)
+void set_add(int* v, char c)
 {
     int val_ascii;
     val_ascii = ((int)c) - 32; //casting char to int and difference 32 (in order to save space on the vector) //Se vogliamo togliere lo spazio basta fare -33
     v[val_ascii]++;
 }
 
-char * get_frequencies(FILE *fp, int part, int m) //Prima di commentarlo bene testiamo
+//get the chars from the .txt files from the begin (b) to the end (e)
+void get_subset(FILE *fp, int* v, int b, int e)
 {
-    int v[DIM_V];
-    initialize_vector(v);
+    int i;
+    char c;
+    fseek(fp, b, SEEK_SET); //setting initial position of SEEK cursor
+    for (i = b; i < e; i++) //P.S.: il primo carattere non è compreso, l'ultimo si
+    {
+        if (feof(fp))
+        {
+            printf("[!] Errore feof\n");
+            //err_end_file();
+            break;
+        }
+        else
+        {
+            fscanf(fp, "%c", &c); //gets char
+            //printf("%c", c);      //display what you asked the process to analyze (uncomment to use)
+            if (c != '\n')
+            {
+                set_add(v, c); //aggiunge al vettore delle frequenze il carattere c
+            }
+        }
+    }
+}
+
+void get_frequencies(FILE *fp, int *freq, int part, int m) //Prima di commentarlo bene testiamo
+{
+    //int *freq = malloc(sizeof(int*) * DIM_V); //where frequencies will be stored
+    initialize_vector(freq);
     int i = 0;
     int file_length = file_len(fp);
     int char_parts = file_length / m;
@@ -225,32 +184,9 @@ char * get_frequencies(FILE *fp, int part, int m) //Prima di commentarlo bene te
     {
         end++;
     }
-    return "a";
-}
+    get_subset(fp, freq, begin, end);
 
-//get the chars from the .txt files from the begin (b) to the end (e)
-void get_subset(FILE *fp, int v[], int b, int e)
-{
-    int i;
-    char c;
-    fseek(fp, b, SEEK_SET); //setting initial position of SEEK cursor
-    for (i = b; i < e; i++) //P.S.: il primo carattere non è compreso, l'ultimo si
-    {
-        if (feof(fp))
-        {
-            err_end_file();
-            break;
-        }
-        else
-        {
-            fscanf(fp, "%c", &c); //gets char
-            //printf("%c", c);      //display what you asked the process to analyze (uncomment to use)
-            if (c != '\n')
-            {
-                set_add(v, c); //aggiunge al vettore delle frequenze il carattere c
-            }
-        }
-    }
+    //return &freq[0];
 }
 
 //display how meny times chars are in the text (display only visited chars)
@@ -278,16 +214,38 @@ int lenghtCsv(int v[DIM_V]){
 }
 
 
-int countDigit(long long n) 
+int countDigit(int n) 
 { 
-    int count = 0; 
+    int count = 0;
+    if (n == 0){
+        count++;
+    } else {
     while (n != 0) { 
         n = n / 10; 
         ++count; 
-    } 
+    } }
     return count; 
 } 
 
+void createCsv(int * v, char *res){
+    int i;
+    char str[12];
+
+    sprintf(str, "%d", lenghtCsv(v));
+    strcpy(res,str);
+    for (i = 0; i<DIM_V; i++){
+        strcat(res,","); 
+        sprintf(str, "%d", v[i]);
+        strcat(res,str);
+    }
+    strcat(res,"#");
+    
+    for (i=(int)(strchr(res, '#') - res)+1; i<DIM_RESP; i++){
+        res[i]='\0';
+    }
+    
+    
+}
 
 ///src/R.c
 void printStat(char *char_count)

@@ -9,15 +9,16 @@ int main(int argc, char *argv[])
     //Arguments passed
     int part;
     int m;
-    //int v[DIM_V];
-
+    int v[DIM_V];
     int value_return = 0;
     FILE* fp;
+    char* freq;
 
     //IPC Arguments
-    char* path = "";
+    char path[PATH_MAX];
     int _write = FALSE;
 
+    char resp[DIM_RESP] = "1044,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647";
 
     //Parsing Arguments--------------------------------------------------------------------
     if(argc != 3) {
@@ -31,21 +32,29 @@ int main(int argc, char *argv[])
         if(part >= m) value_return = err_part_not_valid();
     }
 
+    if(fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+        value_return = err_fcntl();
+    }
+
     if(value_return == 0) {
         while(value_return == 0 && !_write) {
             if(read(STDIN_FILENO, path, PATH_MAX) > 0) {
-                printf("%d: %s\n", part, path);
-                if(strcmp(path, "///") == 0) {
+                //printf("Q: %s Arrivato\n", path);
+                if(strcmp(path, "///") == 0){
                     _write = TRUE;
+                    if(write(STDOUT_FILENO, path, PATH_MAX) == -1) {
+                        value_return = err_write();
+                    }
                 } else {
                     fp = fopen(path, "r");
                     if(fp == NULL) {
                         value_return = err_file_open();
                     } else {
-                        //getfrequencies;
-                    }
-                    if(value_return == 0) {
-                        //write
+                        get_frequencies(fp, v, part, m);
+                        createCsv(v,resp);
+                        if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
+                            value_return = err_write();
+                        }
                     }
                 }
             }
