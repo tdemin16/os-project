@@ -126,6 +126,7 @@ int main(int argc, char *argv[])
                 }
             }
             close_pipes(fd, size_pipe);
+            free(fd);
         }
     }
 
@@ -143,6 +144,7 @@ int main(int argc, char *argv[])
             dup2(fd[id*4 + 2], STDIN_FILENO);
             dup2(fd[id*4 + 1], STDOUT_FILENO);
             close_pipes(fd, size_pipe);
+            free(fd);
 
             if(execvp(args[0], args) == -1) {
                 value_return = err_exec(errno);
