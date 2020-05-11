@@ -1,4 +1,6 @@
+#define _GNU_SOURCE
 #include "../lib/lib.h"
+#include <sys/ioctl.h>
 
 int main(int argc, char *argv[])
 {
@@ -157,6 +159,9 @@ int main(int argc, char *argv[])
         }
     }
 
+    int cap = 0;
+    int sz = 0;
+
     //------------------------------------------------------------------------------
 
     if(value_return == 0) { //same
@@ -164,16 +169,22 @@ int main(int argc, char *argv[])
             
             i = 0;
             while(value_return == 0 && (/*!_read || */!_write)) { //cicla finche` non ha finito di leggere e scrivere
-                sleep(2);
+                cap = fcntl(fd_1[WRITE], F_GETPIPE_SZ); // prende grandezza pipe
                 //Write
                 if(!_write) {
                     for (i=0; i<count; i++){
-                        if(write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) { //Prova a scrivere sulla pipe
+                        ioctl(fd_1[WRITE], FIONREAD, &sz); //mette in sz lo spazio occupato
+                        if ((cap - sz)>PATH_MAX){ // se lo spazio rimanente è abbastanza grande per un path_max allora scrive
+                            if(write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) { //Prova a scrivere sulla pipe
                             value_return = err_write(); //Se fallisce da` errore
                             //ADD SIGNAL HANDLING
-                        } else {
-                            usleep(1000);
+                            }
+                        } else { //sennò aspetta
+                            usleep(1);
+                            i-=1;
                         }
+                        
+                        
                     }
                     _write = TRUE;
                     
