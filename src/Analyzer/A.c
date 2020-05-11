@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
             
             i = 0;
             while(value_return == 0 && (/*!_read || */!_write)) { //cicla finche` non ha finito di leggere e scrivere
-                
+                sleep(2);
                 //Write
                 if(!_write) {
                     for (i=0; i<count; i++){
@@ -172,10 +172,11 @@ int main(int argc, char *argv[])
                             value_return = err_write(); //Se fallisce da` errore
                             //ADD SIGNAL HANDLING
                         } else {
-                            //printf("A: %s inviato\n",lista->pathList[i]);  
+                            usleep(1000);
                         }
                     }
                     _write = TRUE;
+                    
                     freePathList(lista);
                 }
 
