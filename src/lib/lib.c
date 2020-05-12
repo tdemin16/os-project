@@ -120,6 +120,10 @@ void handle_sigint(int sig)
     printf("\nProcesso terminato volontariamente!\n"); 
 } 
 
+int anyone_active(processes* p){ //DA IMPLEMENTARE
+    return 0;
+}
+
 void add_process_to_v(pid_t f, int* v){
     int i = 0;
     while (v[i] != 0)

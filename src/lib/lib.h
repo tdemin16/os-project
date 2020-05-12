@@ -66,6 +66,7 @@ void handle_sigint(int);
 int parse_string(char*, int* v); 
 int parser(int, char**, array*, int*, int*, int*);
 void add_process_to_v(pid_t, int*);
+int anyone_active(processes*);
 
 // /src/Analyzer/Q.c
 void initialize_vector(int*);
