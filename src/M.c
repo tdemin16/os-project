@@ -1,34 +1,49 @@
 #include "./lib/lib.h"
+#include <unistd.h>
 
-#define DIMCOM 40
 
-char com[DIMCOM];   //comando inserito dall'utente
-
-int main(int argc, char const *argv[]) {
-	printf("---------------- MAIN ----------------\n"); 
-	char tmp;  // variabile temporanea per ottenere il primo carattere
-	do {	//------------------------------------------------------------------------------- ciclo eseguito fino al comando "quit"
-		printf(" > "); fflush(stdin); scanf("%s",com);	//------------------------------- input da tastiera del comando da eseguire
-		tmp = com[0];
-		switch(tmp) { 	//--------------------------------------------------------------- switch temporaneo | da rimuovere e sostituire con vari else-if 
-			case 'a':
-				system("echo \"\033[30;1mViene fatto partire A(?)\033[0m\"");  // comando bash con system per cambiare colore al font, non necessario
-				//printf("Viene fatto partire A(?)");  //------------------------ printf sostitutivo senza colore (si può cambiare in C?)
-				break;
-			case 'r':
-				system("echo \"\033[30;1mRisultati stampati con R\033[0m\"");  // vedi sopra ...
-				//printf("Risultati stampati con R");
-				break;
-			case 'h':
-				system("echo \"\033[30;1mComandi:\nanalyze - to start the analyzer\nresults - to show here results\nhelp - to view this message\nquit\033[0m\"");
-				//printf("Comandi:\nanalyze - to start the analyzer\nresults - to show here results\nhelp - to view this message\nquit");
-				break;
-			case 'q':
-				break;
-			default:
-				system("echo \"\033[30;1mComando non riconosciuto, type 'help' to view commands\033[0m\"");  // qui andrà l'errore da definire dentro lib
-				//printf("Comando non riconosciuto, type 'help' to view commands");
+int main(int argc, char *argv[]) {
+	//------------------------------ DEFINIZIONE VARIABILI
+	int ret_val = 0;
+	int n,m;
+	int pidA, stateA, pidG;		//G è il processo che si occupa di stampare i punti "."
+	int running_A = TRUE;		//[da rimuovere] serve solo per la prova dei punti "."
+	
+	if(argc==1) {			//[da rimuovere] (solo un promemoria di come eseguire, per me - Benedetta)
+		printf("Try command: ./M ./../src/Analyzer\n");	//[da rimuovere]
+		return -1; 		//[da rimuovere]
+	} 
+	
+	//------------------------------ LANCIO DI A COME FIGLIO
+	pidA = fork();
+	if(pidA == -1) {
+		//[errore] can't fork
+	}
+	if(pidA == 0) { 		//mi trovo nel figlio
+		sleep(3);		//come prova del funzionamento dei punti di caricamento "."
+		printf("\n\n");
+		execv("./A",argv); 	//lancio effettivo di A in un processo che avrà pid=pidA
+	}
+	
+	//--------------------------------------------------------------- DA QUI IN POI SOLO PADRE
+	
+	//------------------------------ PROCESSO G CHE STAMPA I PUNTINI "."
+	pidG = fork();
+	if (pidG == -1) {
+		//[errore] can't fork
+	} 
+	if (pidG == 0) {
+		while(running_A) {	//[da rimuovere] giusto per non mettere while(1) per ora 
+			printf("."); fflush(stdout);
+			sleep(1);	//in modo che stampi un "." ogni secondo, cambiabile
 		}
-	} while (tmp!='q');
-	return 0; 
+	} else {
+
+	//------------------------------ SOLO PADRE - Attesa A e chiusura G
+		pidA = wait(&stateA);	//[da rimuovere] so che non va usato, è solo di prova per "."
+		running_A = FALSE;
+		kill(pidG,SIGKILL);	//chiude il processo G di grafica pallini
+		printf("\nFine esecuzione A. Value_return = %d\n",WEXITSTATUS(stateA));
+	}	
+	return ret_val;
 }
