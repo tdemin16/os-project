@@ -1,6 +1,15 @@
 #include "./lib/lib.h"
-#include <unistd.h>
 
+//ret_val -> value_return (standard progetto)
+//usa pid_t al posto di int per i pid (stessa roba ma sarebbe da usare quello)
+//Dichiara una variabile char* args[]
+//args[0] = "./A";
+//args[i] argomenti
+//execv -> execvp(args[0], args)
+//aggiungi il controllo sulla value_return ogni volta che un blocco viene eseguito subito dopo un possibile errore
+//G non serve. Non e` da progetto
+//pidA = wait(&stateA); aspetta all'infinito perche` G e` in un ciclo infinito
+//valuta possibili errori sulla call "kill"
 
 int main(int argc, char *argv[]) {
 	//------------------------------ DEFINIZIONE VARIABILI
