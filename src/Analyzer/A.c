@@ -2,9 +2,9 @@
 
 int main(int argc, char *argv[])
 {
+    //Interrupt initialize
     signal(SIGINT,handle_sigint);
     processes proc;
-    //int* processes;
 
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
@@ -50,8 +50,6 @@ int main(int argc, char *argv[])
     
     if (value_return == 0){ //Esecuzione corretta
         printf("Numero file: %d,n=%d m=%d\n",count,n,m);
-        //processes = malloc(n);
-        //initialize_processes(processes,n);
     }
     
     //IPC
@@ -80,8 +78,7 @@ int main(int argc, char *argv[])
         f = fork(); //Fork dei processi
         if(f == -1) { //Controllo che non ci siano stati errori durante il fork
             value_return = err_fork(); //in caso di errore setta il valore di ritorno a ERR_FORK
-        }else{
-            //add_process_to_v(f,processes);
+        }else{//insert process in list of OPEN processes
             proc.pid=f;
             proc.is_open="TRUE";
         }
@@ -130,8 +127,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    //free(processes);
-
     if(value_return == 0) {
         if(f == 0) { //SON SIDE
 
@@ -162,8 +157,15 @@ int main(int argc, char *argv[])
             }
         }
     }
-
-    //DA IMPLEMENTARE: se il pid di C è ancora attivo allora va chiuso (in teoria non dovrebbe essere così ma mai dire mai)
+    /*
+    CONTROLLO I VARI PROCESSI CHE SIANO CHIUSI DAVVERO
     
+    proc.is_open="FALSE";
+    //DA IMPLEMENTARE: se il pid di C è ancora attivo allora va chiuso (in teoria non dovrebbe essere così ma mai dire mai)
+    if (!strcmp(proc.is_open,"TRUE"))
+    {
+        printf("Attivo processo %d, va killato!!!",proc.pid);
+    }*/
+
     return value_return;
 }

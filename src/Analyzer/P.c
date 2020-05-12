@@ -4,9 +4,8 @@
 
 int main(int argc, char *argv[])
 {   
-
+    //Interrupt initialize
     signal(SIGINT,handle_sigint);
-    //int* processes;
     processes* proc;
 
     //Argument passed
@@ -66,8 +65,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    //processes = malloc(m);
-    //initialize_processes(processes,m);
+    //Allocation of proc and initialization of all m chars* is_open
     proc = malloc(m);
     initialize_processes(proc,m);
 
@@ -77,9 +75,8 @@ int main(int argc, char *argv[])
         for(i = 0; i < m && f > 0 && value_return == 0; i++) {
             f = fork();
             if(f == 0) { //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
-                //add_process_to_v(f,processes);
                 id = i;
-                insert_process(f,proc);
+                insert_process(f,proc); //insert process in list of OPEN processes
             }
             if(f == -1) {
                 value_return = err_fork();
@@ -142,13 +139,6 @@ int main(int argc, char *argv[])
         //free(processes);
     }
 
-    for (i = 0; i < m; i++)
-    {
-        free(proc[i].is_open);
-    }
-    
-    free(proc);
-
     if(value_return == 0) {
         if(f == 0) { //SON SIDE
             //Creates char args
@@ -170,6 +160,13 @@ int main(int argc, char *argv[])
             }
         }
     }
+
+    for (i = 0; i < m; i++) //deallocate the m-proc[]->is_open
+    {
+        free(proc[i].is_open);
+    }
+    
+    free(proc); //deallocate proc
 
     return value_return;
 }

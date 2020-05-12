@@ -2,8 +2,8 @@
 
 int main(int argc, char const *argv[]) {
 
+    //Interrupt initialize
     signal(SIGINT,handle_sigint);
-    //int* processes;
     processes* proc;
     
     int value_return = 0;
@@ -87,8 +87,7 @@ int main(int argc, char const *argv[]) {
         }
     }
 
-    //processes = malloc(n);
-    //initialize_processes(processes,n);
+    //Allocation of proc and initialization of all n chars* is_open
     proc = malloc(n);
     initialize_processes(proc,n);
 
@@ -98,9 +97,8 @@ int main(int argc, char const *argv[]) {
         for(i = 0; i < n && f > 0 && value_return == 0; i++) {
             f = fork();
             if(f == 0) { //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
-                //add_process_to_v(f,processes);
                 id = i;
-                insert_process(f,proc);
+                insert_process(f,proc); //insert process in list of OPEN processes
             }
             if(f == -1) { //Controllo che non ci siano stati errori durante il fork
                 value_return = err_fork(); //In caso di errore setta il valore di ritorno a ERR_FORK
@@ -189,12 +187,12 @@ int main(int argc, char const *argv[]) {
             }
         }
     }
-    for (i = 0; i < n; i++)
+    for (i = 0; i < n; i++) //deallocate the n-proc[]->is_open
     {
         free(proc[i].is_open);
     }
 
-    free(proc);
+    free(proc); //deallocate proc
 
     return value_return;
 }
