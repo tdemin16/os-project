@@ -2,7 +2,8 @@
 
 int main(int argc, char *argv[])
 {
-    //signal(SIGINT,handle_sigint);
+    signal(SIGINT,handle_sigint);
+    processes proc;
     //int* processes;
 
     //Parsing arguments------------------------------------------------------------------------------------------
@@ -77,21 +78,14 @@ int main(int argc, char *argv[])
     
     if(value_return == 0) { //same as before
         f = fork(); //Fork dei processi
-        
         if(f == -1) { //Controllo che non ci siano stati errori durante il fork
             value_return = err_fork(); //in caso di errore setta il valore di ritorno a ERR_FORK
-        }/*else{
-            add_process_to_v(f,processes);
-        }*/
+        }else{
+            //add_process_to_v(f,processes);
+            proc.pid=f;
+            proc.is_open="TRUE";
+        }
     }
-
-    /*i = 0;
-    while (processes[i] != 0)
-    {
-        printf("Processes in A: %d\n", processes[i]);
-        i++;
-    }*/
-    
 
     //------------------------------------------------------------------------------
 
@@ -168,6 +162,8 @@ int main(int argc, char *argv[])
             }
         }
     }
+
+    //DA IMPLEMENTARE: se il pid di C è ancora attivo allora va chiuso (in teoria non dovrebbe essere così ma mai dire mai)
     
     return value_return;
 }

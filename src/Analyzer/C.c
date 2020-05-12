@@ -2,8 +2,9 @@
 
 int main(int argc, char const *argv[]) {
 
-    //signal(SIGINT,handle_sigint);
+    signal(SIGINT,handle_sigint);
     //int* processes;
+    processes* proc;
     
     int value_return = 0;
     int nfiles = 0; //number of files to retreive from pipe
@@ -88,6 +89,8 @@ int main(int argc, char const *argv[]) {
 
     //processes = malloc(n);
     //initialize_processes(processes,n);
+    proc = malloc(n);
+    initialize_processes(proc,n);
 
     //Forking----------------------------------------------------------------
     if(value_return == 0) {
@@ -97,6 +100,7 @@ int main(int argc, char const *argv[]) {
             if(f == 0) { //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
                 //add_process_to_v(f,processes);
                 id = i;
+                insert_process(f,proc);
             }
             if(f == -1) { //Controllo che non ci siano stati errori durante il fork
                 value_return = err_fork(); //In caso di errore setta il valore di ritorno a ERR_FORK
@@ -185,6 +189,12 @@ int main(int argc, char const *argv[]) {
             }
         }
     }
+    for (i = 0; i < n; i++)
+    {
+        free(proc[i].is_open);
+    }
+
+    free(proc);
 
     return value_return;
 }

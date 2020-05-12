@@ -5,8 +5,9 @@
 int main(int argc, char *argv[])
 {   
 
-    //signal(SIGINT,handle_sigint);
+    signal(SIGINT,handle_sigint);
     //int* processes;
+    processes* proc;
 
     //Argument passed
     int m = 4;
@@ -67,6 +68,8 @@ int main(int argc, char *argv[])
 
     //processes = malloc(m);
     //initialize_processes(processes,m);
+    proc = malloc(m);
+    initialize_processes(proc,m);
 
     //Forking-----------------------------------------------------------
     if(value_return == 0) {
@@ -76,6 +79,7 @@ int main(int argc, char *argv[])
             if(f == 0) { //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
                 //add_process_to_v(f,processes);
                 id = i;
+                insert_process(f,proc);
             }
             if(f == -1) {
                 value_return = err_fork();
@@ -137,6 +141,13 @@ int main(int argc, char *argv[])
         }
         //free(processes);
     }
+
+    for (i = 0; i < m; i++)
+    {
+        free(proc[i].is_open);
+    }
+    
+    free(proc);
 
     if(value_return == 0) {
         if(f == 0) { //SON SIDE
