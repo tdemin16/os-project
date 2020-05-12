@@ -135,6 +135,7 @@ int main(int argc, char *argv[])
             close_pipes(fd, size_pipe);
             free(fd);
         }
+        free(processes);
     }
 
     if(value_return == 0) {
