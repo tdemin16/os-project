@@ -20,6 +20,9 @@ char insertPathList(array *tmp, char *c)
     int i;
     char present = FALSE;
     char ret = FALSE;
+    char str[12];
+    char path[PATH_MAX];
+    sprintf(str, "%d", tmp->count);
 
     for (i = 0; i<tmp->count; i++){
         if (!strcmp(tmp->pathList[i], c)){
@@ -39,7 +42,10 @@ char insertPathList(array *tmp, char *c)
             }
         }
         //printf("Stringa inserita\n");
-            strcpy(tmp->pathList[tmp->count], c);
+            strcpy(path, str);
+            strcat(path, "#");
+            strcat(path, c);
+            strcpy(tmp->pathList[tmp->count], path);
             tmp->count++;
             ret = TRUE;
     } else { ret = FALSE;}
@@ -227,12 +233,15 @@ int countDigit(int n)
     return count; 
 } 
 
-void createCsv(int * v, char *res){
+void createCsv(int * v, char *res,char * id){
     int i;
     char str[12];
     for (i = 0; i<DIM_RESP; i++){
         res[i]='\0';
     }
+    
+    strcat(res,id);
+    strcat(res,"#");
     sprintf(str, "%d", v[0]);
     strcat(res,str);
     for (i = 1; i<DIM_V; i++){

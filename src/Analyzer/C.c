@@ -153,7 +153,7 @@ int main(int argc, char const *argv[]) {
             }
             close_pipes(fd, size_pipe);
             free(fd);
-            createCsv(v,sum);
+            //createCsv(v,sum);
             //printStat_Cluster(sum);
             
         }

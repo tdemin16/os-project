@@ -124,10 +124,10 @@ int main(int argc, char *argv[])
     }
     
     if (value_return == 0){ //Esecuzione corretta
-        system("clear");
+        //system("clear");
         printf("Numero file: %d,n=%d m=%d\n",count,n,m);
-        printf("[..........]\n");
-        //printPathList(lista);
+        //printf("[..........]\n");
+        printPathList(lista);
     }
     
     
@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
             
             i = 0;
             while(value_return == 0 && (!_read || !_write)) { //cicla finche` non ha finito di leggere e scrivere
-                sleep(1);
+                //sleep(1);
                 //Write
                 if(!_write) {
                     if(write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) { //Prova a scrivere sulla pipe
@@ -191,19 +191,20 @@ int main(int argc, char *argv[])
                         if(perc == count) {
                             _read = TRUE;
                         }
-                        system("clear");
-                        printf("Numero file: %d,n=%d m=%d\n[",count,n,m);
-                        for(j = 0; j < perc*10/count; j++) {
-                            printf("#");
-                        }
-                        for(j += 1; j <= count; j++) {
-                            printf(".");
-                        }
-                        printf("]\n");
+                        //system("clear");
+                        //printf("Numero file: %d,n=%d m=%d\n[",count,n,m);
+                        //for(j = 0; j < perc*10/count; j++) {
+                        //    printf("#");
+                        //}
+                        //for(j += 1; j <= 10; j++) {
+                        //    printf(".");
+                        //}
+                        //printf("]\n");
                     }
                 }
                 
             }
+            
             close(fd_1[READ]);
             close(fd_1[WRITE]);
             close(fd_2[READ]);
