@@ -44,7 +44,7 @@ typedef struct m_process{
 }m_process;
 
 //Array struct functions -- sostituiscono lista (momentaneamente?)
-array * createPathList(int);
+array* createPathList(int);
 char insertPathList(array*, char*);
 void printPathList(array*);
 void freePathList(array*);
@@ -55,6 +55,7 @@ int unlock_pipes(int*, int);
 
 // /src/Analyzer/A.c
 int parse_string(char*, int* v); 
+int parser(int, char**, array*, int*, int*, int*);
 
 // /src/Analyzer/Q.c
 void initialize_vector(int*);
