@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 	if(pidA == 0) { 		//mi trovo nel figlio
 		sleep(3);		//come prova del funzionamento dei punti di caricamento "."
 		printf("\n\n");
-		execv("./A",argv); 	//lancio effettivo di A in un processo che avrà pid=pidA
+		execv("./A ",argv); 	//lancio effettivo di A in un processo che avrà pid=pidA
 	}
 	
 	//--------------------------------------------------------------- DA QUI IN POI SOLO PADRE
