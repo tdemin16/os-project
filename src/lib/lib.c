@@ -31,7 +31,7 @@ char insertPathList(array *tmp, char *c)
         if (tmp->count == tmp->size)
         {
             //printf("Raddoppio la size\n");
-            tmp->size *= 2;
+            tmp->size *= 1.3;
             tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
             for (i = tmp->count; i < tmp->size; i++)
             {
@@ -348,7 +348,7 @@ void printStat_Cluster(char *char_count)
             tot+=v[i];
             }
     }
-    printf("%d",tot);
+    
     printf("STAMPA STATISTICHE PER CLUSTER\n\n");
     printf("Lettere minuscole:\t %d\t%.4g%%\n", lettereMin, (float)lettereMin/(float)tot*100);
     printf("Lettere maiuscole:\t %d\t%.4g%%\n", lettereMai, (float)lettereMai/(float)tot*100);
@@ -357,6 +357,7 @@ void printStat_Cluster(char *char_count)
     printf("Segni di punteggiatura:\t %d\t%.4g%%\n", punt, (float)punt/(float)tot*100);
     printf("Caratteri speciali:\t %d\t%.4g%%\n", carSpec, (float)carSpec/(float)tot*100);
     printf("\n");
+    printf("Caratteri totali: %d\n",tot);
 }
 
 void printInfoCluster()

@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
                     } else {
                         get_frequencies(fp, v, part, m);
                         createCsv(v,resp);
+                        fclose(fp);
                         if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
                             value_return = err_write();
                         }
