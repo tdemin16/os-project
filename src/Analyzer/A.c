@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
             
             i = 0;
             while(value_return == 0 && (!_read || !_write)) { //cicla finche` non ha finito di leggere e scrivere
-                sleep(1);
+                //sleep(1);
                 //Write
                 if(!_write) {
                     if(write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) { //Prova a scrivere sulla pipe
@@ -112,6 +112,7 @@ int main(int argc, char *argv[])
                 }
                 
             }
+            
             close(fd_1[READ]);
             close(fd_1[WRITE]);
             close(fd_2[READ]);
