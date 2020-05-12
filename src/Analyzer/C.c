@@ -1,6 +1,9 @@
 #include "../lib/lib.h"
 
 int main(int argc, char const *argv[]) {
+
+    signal(SIGINT,handle_sigint);
+    int* processes;
     
     int value_return = 0;
     int nfiles = 0; //number of files to retreive from pipe
@@ -83,6 +86,8 @@ int main(int argc, char const *argv[]) {
         }
     }
 
+    processes = malloc(n);
+    initialize_processes(processes,n);
 
     //Forking----------------------------------------------------------------
     if(value_return == 0) {
@@ -90,6 +95,7 @@ int main(int argc, char const *argv[]) {
         for(i = 0; i < n && f > 0 && value_return == 0; i++) {
             f = fork();
             if(f == 0) { //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
+                add_process_to_v(f,processes);
                 id = i;
             }
             if(f == -1) { //Controllo che non ci siano stati errori durante il fork
@@ -97,7 +103,7 @@ int main(int argc, char const *argv[]) {
             }
         }
     }
-
+    
     //----------------------------------------------------------------------------------------
     
     if(value_return == 0) {
@@ -153,6 +159,7 @@ int main(int argc, char const *argv[]) {
             }
             close_pipes(fd, size_pipe);
             free(fd);
+            free(processes);
             //createCsv(v,sum);
             //printStat_Cluster(sum);
             

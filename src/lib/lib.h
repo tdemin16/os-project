@@ -54,7 +54,10 @@ void close_pipes(int*, int);
 int unlock_pipes(int*, int);
 
 // /src/Analyzer/A.c
+void initialize_processes(int*,int);
+void handle_sigint(int);
 int parse_string(char*, int* v); 
+void add_process_to_v(pid_t, int*);
 
 // /src/Analyzer/Q.c
 void initialize_vector(int*);

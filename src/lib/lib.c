@@ -100,6 +100,30 @@ void close_pipes(int *fd, int size)
 }
 
 // /src/Analyzer/A.c
+// Handler for SIGINT, caused by 
+// Ctrl-C at keyboard 
+void initialize_processes(int* v,int dim){
+    int i;
+    for (i = 0; i < dim; i++)
+    {
+        v[i] = 0;
+    }
+}
+
+void handle_sigint(int sig) 
+{ 
+    printf("Caught signal %d\n", sig); 
+} 
+
+void add_process_to_v(pid_t f, int* v){
+    int i = 0;
+    while (v[i] != 0)
+    {
+        i++;
+    }
+    v[i] = f;    
+}
+
 int parse_string(char *string, int v[DIM_V])
 {
     int i = 0;

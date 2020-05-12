@@ -4,6 +4,10 @@
 
 int main(int argc, char *argv[])
 {   
+
+    signal(SIGINT,handle_sigint);
+    int* processes;
+
     //Argument passed
     int m = 4;
 
@@ -61,6 +65,8 @@ int main(int argc, char *argv[])
         }
     }
 
+    processes = malloc(m);
+    initialize_processes(processes,m);
 
     //Forking-----------------------------------------------------------
     if(value_return == 0) {
@@ -68,6 +74,7 @@ int main(int argc, char *argv[])
         for(i = 0; i < m && f > 0 && value_return == 0; i++) {
             f = fork();
             if(f == 0) { //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
+                add_process_to_v(f,processes);
                 id = i;
             }
             if(f == -1) {

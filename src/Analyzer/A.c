@@ -2,6 +2,9 @@
 
 int main(int argc, char *argv[])
 {
+    signal(SIGINT,handle_sigint);
+    int* processes;
+
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
     int m = 4;
@@ -126,6 +129,8 @@ int main(int argc, char *argv[])
     if (value_return == 0){ //Esecuzione corretta
         //system("clear");
         printf("Numero file: %d,n=%d m=%d\n",count,n,m);
+        processes = malloc(n);
+        initialize_processes(processes,n);
         //printf("[..........]\n");
         printPathList(lista);
     }
@@ -153,13 +158,23 @@ int main(int argc, char *argv[])
         }
     }
     
-
     if(value_return == 0) { //same as before
         f = fork(); //Fork dei processi
+        
         if(f == -1) { //Controllo che non ci siano stati errori durante il fork
             value_return = err_fork(); //in caso di errore setta il valore di ritorno a ERR_FORK
+        }else{
+            add_process_to_v(f,processes);
         }
     }
+
+    i = 0;
+    while (processes[i] != 0)
+    {
+        printf("Processes in A: %d\n", processes[i]);
+        i++;
+    }
+    
 
     //------------------------------------------------------------------------------
 
@@ -212,6 +227,8 @@ int main(int argc, char *argv[])
             wait(NULL);
         }
     }
+
+    free(processes);
 
     if(value_return == 0) {
         if(f == 0) { //SON SIDE
