@@ -13,7 +13,7 @@ int main(int argc, char const *argv[]) {
     //printInfoCluster();
     
     char tmp[DIM_RESP];
-    createCsv(max_v,tmp);
-    printf("%s\n",tmp);
+    //createCsv(max_v,tmp);
+    //printf("%s\n",tmp);
     return value_return;
 }

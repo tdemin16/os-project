@@ -20,6 +20,9 @@ char insertPathList(array *tmp, char *c)
     int i;
     char present = FALSE;
     char ret = FALSE;
+    char str[12];
+    char path[PATH_MAX];
+    sprintf(str, "%d", tmp->count);
 
     for (i = 0; i<tmp->count; i++){
         if (!strcmp(tmp->pathList[i], c)){
@@ -39,7 +42,10 @@ char insertPathList(array *tmp, char *c)
             }
         }
         //printf("Stringa inserita\n");
-            strcpy(tmp->pathList[tmp->count], c);
+            strcpy(path, str);
+            strcat(path, "#");
+            strcat(path, c);
+            strcpy(tmp->pathList[tmp->count], path);
             tmp->count++;
             ret = TRUE;
     } else { ret = FALSE;}
@@ -94,6 +100,30 @@ void close_pipes(int *fd, int size)
 }
 
 // /src/Analyzer/A.c
+// Handler for SIGINT, caused by 
+// Ctrl-C at keyboard 
+void initialize_processes(int* v,int dim){
+    int i;
+    for (i = 0; i < dim; i++)
+    {
+        v[i] = 0;
+    }
+}
+
+void handle_sigint(int sig) 
+{ 
+    printf("Caught signal %d\n", sig); 
+} 
+
+void add_process_to_v(pid_t f, int* v){
+    int i = 0;
+    while (v[i] != 0)
+    {
+        i++;
+    }
+    v[i] = f;    
+}
+
 int parse_string(char *string, int v[DIM_V])
 {
     int i = 0;
@@ -126,6 +156,101 @@ void initialize_vector(int* v)
     {
         v[i] = 0;
     }
+}
+
+//Ritorna 0 se nessun erroe, altrimenti il codice dell'errore
+int parser(int argc, char* argv[], array* lista, int* count, int* n, int* m){
+    int value_return = 0;
+    int i;
+    char flag = FALSE; // se flag = true, non bisogna analizzare l'argomento. (l'argomento successivo è il numero o di n o di m)
+    char setn = FALSE; // se setn = true, n è stato cambiato
+    char setm = FALSE; // se setn = true, m è stato cambiato
+    char errdir = FALSE;
+    FILE *fp;
+    char riga[1035];
+    char resolved_path[PATH_MAX]; //contiene il percorso assoluto di un file
+
+    if(argc < 1) { //if number of arguments is even or less than 1, surely it's a wrong input
+        value_return = err_args_A();
+    } 
+    else {
+        for(i = 1; i < argc && value_return == 0; i++) {
+            
+            if(!strcmp(argv[i], "-setn")) {//----ERRORI -setn
+                if (i+1<argc){ //controlla che ci sia effettivamente un argomento dopo il -setn
+                    *n = atoi(argv[i + 1]);
+                    if(*n == 0) value_return = err_args_A(); //Il campo dopo -setn non è un numero
+                    if(setn == TRUE) value_return = err_args_A();   //n gia' settato
+                    flag = TRUE; //Salto prossimo argomento
+                    setn = TRUE; //n e' stato settato, serve a controllare che non venga settato due volte
+                    i++;
+                } else {
+                    value_return = err_args_A();
+                }
+                
+            } else if(!strcmp(argv[i], "-setm")) {//-----ERRORI -setm
+                if (i+1<argc){ //controlla che ci sia effettivamente un argomento dopo il -setn
+                    *m = atoi(argv[i+1]);
+                    if(*m == 0) value_return = err_args_A(); //Il campo dopo -setm non è un numero
+                    if(setm == TRUE) value_return = err_args_A(); //m gia' settato
+                    flag = TRUE;    //Salto il prossimo argomento
+                    setm = TRUE;    //m e' stato settato, serve a controllare che non venga settato due volte
+                    i++;
+                } else {
+                    value_return = err_args_A();
+                }
+
+
+            }//else if(strncmp(argv[i], "-", 1) == 0){//-----ERRORI input strani che iniziano con -
+            //    value_return = err_args_A();
+            //}
+
+            if (flag == FALSE && value_return == 0){ //------Vuol dire che argv[i] e' un file o una cartella
+                /*  Viene utilizzato il comando:  test -d [dir] && find [dir] -type f -follow -print || echo "-[ERROR]"
+                    Il comando test -d controlla l'esistenza del file/directory input. In caso di successo viene lanciato find
+                    In caso di successo viene lanciato find che restituisce la lista di tutti i file nella cartella e nelle sottocartelle
+                    Se l'input non esiste restituisce -[ERROR], in modo che possa essere intercettato dal parser
+                */
+               
+                char command[strlen("(test -f  || test -d ) && find ") + strlen(argv[i])*3 + strlen(" -type f -follow -print || echo \"-[ERROR]\"")+ 1]; //Creazione comando
+                strcpy(command, "(test -f ");
+                strcat(command, argv[i]);
+                strcat(command, " || test -d ");
+                strcat(command, argv[i]);
+                strcat(command, ") && find ");
+                strcat(command, argv[i]);
+                strcat(command, " -type f -follow -print || echo \"-[ERROR]\"");
+                //printf("%s\n",command);
+                fp = popen(command, "r"); //avvia il comando e in fp prende l'output
+                if (fp == NULL) //Se il comando non va a buon fine
+                {
+                    value_return = err_args_A();
+                } else { //Il comando va a buon fine
+                    while (fgets(riga, sizeof(riga), fp) != NULL && errdir == FALSE) //Legge riga per riga e aggiunge alla lista
+                    {
+                        if (strcmp(riga,"-[ERROR]\n")){
+                            //memset( resolved_path, '\0', sizeof(resolved_path));
+                            realpath(riga, resolved_path);  //risalgo al percorso assoluto
+                            resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo                             
+                            if (insertPathList(lista, resolved_path)){
+                                (*count)++;
+                                //printf("%s\n", resolved_path);
+                            }
+                        } else { //Intercetta l'errore riguardante file o cartelle non esistenti
+                            errdir = TRUE; //Metto il flag errore file/directory sbagliati
+                        }
+                    }
+                    pclose(fp); //chiudo fp
+                    if (errdir == TRUE) value_return = err_input_A(argv[i]); //Mando l'errore per la directory
+                }
+            } else {
+                flag = FALSE; //Analisi argomento saltata, rimetto flag a false
+            }
+        }
+        if(count == 0 && value_return == 0) value_return = err_args_A(); //counter is higher than zero, if not gives an error (value_return used to avoid double messages)
+    }
+
+    return value_return;
 }
 
 //Increase frequence of the global vector in the position val_ascii
@@ -227,12 +352,15 @@ int countDigit(int n)
     return count; 
 } 
 
-void createCsv(int * v, char *res){
+void createCsv(int * v, char *res,char * id){
     int i;
     char str[12];
     for (i = 0; i<DIM_RESP; i++){
         res[i]='\0';
     }
+    
+    strcat(res,id);
+    strcat(res,"#");
     sprintf(str, "%d", v[0]);
     strcat(res,str);
     for (i = 1; i<DIM_V; i++){
