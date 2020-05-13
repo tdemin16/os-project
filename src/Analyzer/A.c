@@ -2,6 +2,10 @@
 
 int main(int argc, char *argv[])
 {
+    //Interrupt initialize
+    signal(SIGINT,handle_sigint);
+    processes proc;
+
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
     int m = 4;
@@ -154,7 +158,11 @@ int main(int argc, char *argv[])
         f = fork(); //Fork dei processi
         if(f == -1) { //Controllo che non ci siano stati errori durante il fork
             value_return = err_fork(); //in caso di errore setta il valore di ritorno a ERR_FORK
+        }else{//insert process in list of OPEN processes
+            proc.pid=f;
+            proc.is_open="TRUE";
         }
+        
     }
 
     //------------------------------------------------------------------------------
@@ -229,6 +237,15 @@ int main(int argc, char *argv[])
             }
         }
     } 
+    /*
+    CONTROLLO I VARI PROCESSI CHE SIANO CHIUSI DAVVERO
+    
+    proc.is_open="FALSE";
+    //DA IMPLEMENTARE: se il pid di C è ancora attivo allora va chiuso (in teoria non dovrebbe essere così ma mai dire mai)
+    if (!strcmp(proc.is_open,"TRUE"))
+    {
+        printf("Attivo processo %d, va killato!!!",proc.pid);
+    }*/
     
     return value_return;
 }
