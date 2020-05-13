@@ -148,8 +148,8 @@ int main(int argc, char const *argv[]) {
                                 _read = TRUE;
                             }
                         } else { 
-                            //printf("[+] - %s\n",strtok(resp, "#"));
-                            addCsvToArray(resp,v);
+                            //addCsvToArray(resp,v);
+                            printf("%s\n",resp);
                             if(write(STDOUT_FILENO, ad, 2) == -1) {
                                 value_return = err_write();
                             }

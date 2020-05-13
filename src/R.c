@@ -4,7 +4,15 @@ int value_return = 0;
 
 int main(int argc, char const *argv[]) {
     
-    
+    char tmp[DIM_RESP];
+    char * prova = "0#/home/luigi/Scrivania/LABSO/os-project/src/Analyzer/P.c";
+    char * id = strtok(strdup(prova),"#");
+    char * analyze = strtok(NULL,"#");
+    //printf("%s\n",id);
+    //printf("%s\n",analyze);
+    // ottengo v
+    createCsv(v,tmp,id);
+    printf("%s\n",tmp);
 
     return value_return;
 }
@@ -17,7 +25,4 @@ int main(int argc, char const *argv[]) {
     //printStat_Cluster(strdup(test));
     //printStat(strdup(test));
     //printInfoCluster();
-    
     //char tmp[DIM_RESP];
-    //createCsv(max_v,tmp);
-    //printf("%s\n",tmp);
