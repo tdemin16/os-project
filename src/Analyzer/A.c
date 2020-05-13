@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
     //node filePath = NULL; //list of path's strings
     //parser variables
     int i; //Variabile usata per ciclare gli argomenti (argv[i])
-    int j;
     int value_return = 0; //Valore di ritorno
     int count = 0; //numero di file univoci da analizzare
     int perc = 0;
@@ -38,8 +37,7 @@ int main(int argc, char *argv[])
     char array[7][20]; //Matrice di appoggio
     char* args[8]; //String og arguments to pass to child
     int _write = FALSE; //true when finish writing the pipe
-    int _read = FALSE; //true when fisnish reading from pipe
-    char av[2];
+    //int _read = FALSE; //true when fisnish reading from pipe
 
     value_return = parser(argc, argv, lista, &count, &n, &m);
     printf("argc:%d\n", argc);
@@ -50,6 +48,10 @@ int main(int argc, char *argv[])
     
     if (value_return == 0){ //Esecuzione corretta
         printf("Numero file: %d,n=%d m=%d\n",count,n,m);
+<<<<<<< HEAD
+=======
+        //printPathList(lista);
+>>>>>>> parent of 2baa188... Feedback C
     }
     
     //IPC
@@ -90,40 +92,54 @@ int main(int argc, char *argv[])
         if(f > 0) { //PARENT SIDE
             
             i = 0;
+<<<<<<< HEAD
             while(value_return == 0 && (!_read || !_write)) { //cicla finche` non ha finito di leggere e scrivere
                 //sleep(1);
+=======
+            while(value_return == 0 && (/*!_read || */!_write)) { //cicla finche` non ha finito di leggere e scrivere
+                sleep(2);
+>>>>>>> parent of 2baa188... Feedback C
                 //Write
                 if(!_write) {
-                    if(write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) { //Prova a scrivere sulla pipe
-                        value_return = err_write(); //Se fallisce da` errore
-                        //ADD SIGNAL HANDLING
-                    } else {
-                        //usleep(1000);
-                        i++; //Passa al prossimo elemento della lista
-                        if(i == count) { //Quando li ha mandati tutti
-                            _write = TRUE; //Finisce di scrivere
-                            freePathList(lista); //Dealloca tutta la lista
+                    for (i=0; i<count; i++){
+                        if(write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) { //Prova a scrivere sulla pipe
+                            value_return = err_write(); //Se fallisce da` errore
+                            //ADD SIGNAL HANDLING
+                        } else {
+                            usleep(1000);
                         }
-                    } 
+                    }
+                    _write = TRUE;
+                    
+                    freePathList(lista);
                 }
 
                 //Read
+<<<<<<< HEAD
                 if(!_read) {
                     if(read(fd_2[READ], av, 2) > 1) {
                         perc++;
                         if(perc == count) {
                             _read = TRUE;
                         }
+=======
+                /*
+                if(!_read) { //Non necessario presente solo per correttezza formale
+                    if(read(fd_2[READ], char_count, 255) == 0) {
+                        parse_string(char_count, v);
+                        printf("%s\n",char_count);
+                        i++;
+                        if(i == count) _read = TRUE;
+>>>>>>> parent of 2baa188... Feedback C
                     }
                 }
-                
+                */
             }
             
             close(fd_1[READ]);
             close(fd_1[WRITE]);
             close(fd_2[READ]);
             close(fd_2[WRITE]);
-            wait(NULL);
         }
     }
 
@@ -146,7 +162,7 @@ int main(int argc, char *argv[])
 
             //Redirects pipes to STDIN and STDOUT
             dup2(fd_1[READ], STDIN_FILENO);
-            dup2(fd_2[WRITE], STDOUT_FILENO);
+            //dup2(fd_2[WRITE], STDOUT_FILENO); DA ATTIVARE
             //Closing pipes
             close(fd_1[READ]);
             close(fd_1[WRITE]);
