@@ -116,12 +116,11 @@ int main(int argc, char const *argv[]) {
         k = 0;
         if(f > 0) { //PARENT SIDE
             while(value_return == 0 && (!_read || !_write)) {
-
+                failedPath[0]='\0';
                 //Write
                 if(!_write) {
-                    if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //Prova a leggere dalla pipe
-                        //printf("C: %s arrivato\n",path);
-                        if(write(fd[i*4 + 3], path, PATH_MAX) == -1) { //Test write
+                    if (failedPath[0]!='\0'){
+                        if(write(fd[i*4 + 3], failedPath, PATH_MAX) == -1) { //Test write
                             if (errno != EAGAIN){
                                         value_return = err_write();
                                     } else {
@@ -131,8 +130,29 @@ int main(int argc, char const *argv[]) {
                         } else {
                             count++;
                             i = (i+1) % n;
+                            failedPath[0]='\0';
+                            fprintf(stderr,"C->P: scrivo\n");
+                        }
+                    }else{
+                        if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //Prova a leggere dalla pipe
+                        //printf("C: %s arrivato\n",path);
+                        if(write(fd[i*4 + 3], path, PATH_MAX) == -1) { //Test write
+                            if (errno != EAGAIN){
+                                        value_return = err_write();
+                                    } else {
+                                        fprintf(stderr,"C->P: Pipe piena\n");
+                                        strcpy(failedPath,path);
+                                    }
+                            //ADD SIGNAL HANDLING
+                        } else {
+                            count++;
+                            i = (i+1) % n;
+                            failedPath[0]='\0';
+                            fprintf(stderr,"C->P: scrivo\n");
                         }
                     }
+                    }
+                    
                     if(count == nfiles) { //Ha passato tutti i path ai figli
                         _write = TRUE;
                         strcpy(path, "///");

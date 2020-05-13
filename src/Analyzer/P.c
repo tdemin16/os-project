@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
     int value_return = 0;
     int i;
     char path[PATH_MAX];
+    char failedPath[PATH_MAX];
     char resp[DIM_RESP];
 
     //IPC Variables
@@ -90,7 +91,7 @@ int main(int argc, char *argv[])
     if(value_return == 0) {
         if(f > 0) { //PARENT SIDE
             while(value_return == 0 && (!_read || !_write)) {
-
+                failedPath[0]='\0';
                 //Write
                 if(!_write) {
                     if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //Prova a leggere dalla pipe
