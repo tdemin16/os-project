@@ -115,6 +115,15 @@ void handle_sigint(int sig)
 } 
 
 int anyone_active(processes* p){ //DA IMPLEMENTARE
+    
+    if(getpgid(p->pid) >= 0)
+    {
+        printf("Is active");
+        return 1;
+    }else
+    {
+        p->is_open="FALSE";
+    }
     return 0;
 }
 
