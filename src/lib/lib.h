@@ -36,11 +36,6 @@ typedef struct {
     int count;
 } array;
 
-typedef struct processes{
-    pid_t pid;
-    char* is_open;
-}processes;
-
 typedef struct m_process{
     int begin;
     int end;
@@ -48,10 +43,8 @@ typedef struct m_process{
     //char *DIR; //Da usare per dare il file(???)
 }m_process;
 
-void insert_processes(pid_t, processes*);
-
 //Array struct functions -- sostituiscono lista (momentaneamente?)
-array* createPathList(int);
+array * createPathList(int);
 char insertPathList(array*, char*);
 void printPathList(array*);
 void freePathList(array*);
@@ -61,12 +54,7 @@ void close_pipes(int*, int);
 int unlock_pipes(int*, int);
 
 // /src/Analyzer/A.c
-void initialize_processes(processes*,int);
-void handle_sigint(int);
 int parse_string(char*, int* v); 
-int parser(int, char**, array*, int*, int*, int*);
-void add_process_to_v(pid_t, int*);
-int anyone_active(processes*);
 
 // /src/Analyzer/Q.c
 void initialize_vector(int*);
@@ -88,7 +76,7 @@ char* arrayToCsv(int *);
 char* integer_to_string(int);
 int countDigit(int);
 int lenghtCsv(int *);
-void createCsv(int *, char *,char *);
+void createCsv(int *, char *);
 void addCsvToArray(char *, int *);
 //int err_args_P(); used here
 //int err_file_open(); used here

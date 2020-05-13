@@ -1,10 +1,6 @@
 #include "../lib/lib.h"
 
 int main(int argc, char const *argv[]) {
-
-    //Interrupt initialize
-    signal(SIGINT,handle_sigint);
-    processes* proc;
     
     int value_return = 0;
     int nfiles = 0; //number of files to retreive from pipe
@@ -85,9 +81,6 @@ int main(int argc, char const *argv[]) {
         }
     }
 
-    //Allocation of proc and initialization of all n chars* is_open
-    proc = malloc(n);
-    initialize_processes(proc,n);
 
     //Forking----------------------------------------------------------------
     if(value_return == 0) {
@@ -96,14 +89,13 @@ int main(int argc, char const *argv[]) {
             f = fork();
             if(f == 0) { //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
                 id = i;
-                insert_process(f,proc); //insert process in list of OPEN processes
             }
             if(f == -1) { //Controllo che non ci siano stati errori durante il fork
                 value_return = err_fork(); //In caso di errore setta il valore di ritorno a ERR_FORK
             }
         }
     }
-    
+
     //----------------------------------------------------------------------------------------
     
     if(value_return == 0) {
@@ -159,14 +151,8 @@ int main(int argc, char const *argv[]) {
             }
             close_pipes(fd, size_pipe);
             free(fd);
-<<<<<<< HEAD
-            //free(processes);
-            //createCsv(v,sum);
-            //printStat_Cluster(sum);
-=======
             createCsv(v,sum);
             printStat_Cluster(sum);
->>>>>>> parent of 2baa188... Feedback C
             
         }
     }
@@ -190,12 +176,6 @@ int main(int argc, char const *argv[]) {
             }
         }
     }
-    for (i = 0; i < n; i++) //deallocate the n-proc[]->is_open
-    {
-        free(proc[i].is_open);
-    }
-
-    free(proc); //deallocate proc
 
     return value_return;
 }

@@ -2,10 +2,6 @@
 
 int main(int argc, char *argv[])
 {
-    //Interrupt initialize
-    signal(SIGINT,handle_sigint);
-    processes proc;
-
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
     int m = 4;
@@ -20,15 +16,17 @@ int main(int argc, char *argv[])
     int count = 0; //numero di file univoci da analizzare
     int perc = 0;
     
+
     array *lista = createPathList(10); //Nuova lista dei path
 
+    char resolved_path[PATH_MAX]; //contiene il percorso assoluto di un file
+    char *tmp;
     char flag = FALSE; // se flag = true, non bisogna analizzare l'argomento. (l'argomento successivo è il numero o di n o di m)
     char setn = FALSE; // se setn = true, n è stato cambiato
     char setm = FALSE; // se setn = true, m è stato cambiato
     char errdir = FALSE;
     FILE *fp;
     char riga[1035];
-    char resolved_path[PATH_MAX]; //contiene il percorso assoluto di un file
 
     //Variables for IPC
     int fd_1[2]; //Pipe
@@ -39,20 +37,95 @@ int main(int argc, char *argv[])
     int _write = FALSE; //true when finish writing the pipe
     //int _read = FALSE; //true when fisnish reading from pipe
 
-    value_return = parser(argc, argv, lista, &count, &n, &m);
-    printf("argc:%d\n", argc);
-    for(i = 1; i < argc; i++) {
-        printf("%s\n", argv[i]);
+    if(argc < 1) { //if number of arguments is even or less than 1, surely it's a wrong input
+        value_return = err_args_A();
     }
-    printf("count:%d\nn:%d\nm:%d\n", count, n, m);
+    else {
+        
+        for(i = 1; i < argc && value_return == 0; i++) {
+            //printf("Argv: %s\n",argv[i]);
+            if(!strcmp(argv[i], "-setn")) {//----ERRORI -setn
+                if (i+1<argc){ //controlla che ci sia effettivamente un argomento dopo il -setn
+                    n = atoi(argv[i + 1]);
+                    if(n == 0) value_return = err_args_A(); //Il campo dopo -setn non è un numero
+                    if(setn == TRUE) value_return = err_args_A();   //n gia' settato
+                    flag = TRUE; //Salto prossimo argomento
+                    setn = TRUE; //n e' stato settato, serve a controllare che non venga settato due volte
+                    i++;
+                } else {
+                    value_return = err_args_A();
+                }
+                
+            }
+            else if(!strcmp(argv[i], "-setm")) {//-----ERRORI -setm
+                if (i+1<argc){ //controlla che ci sia effettivamente un argomento dopo il -setn
+                    m = atoi(argv[i+1]);
+                    if(m == 0) value_return = err_args_A(); //Il campo dopo -setm non è un numero
+                    if(setm == TRUE) value_return = err_args_A(); //m gia' settato
+                    flag = TRUE;    //Salto il prossimo argomento
+                    setm = TRUE;    //m e' stato settato, serve a controllare che non venga settato due volte
+                    i++;
+                } else {
+                    value_return = err_args_A();
+                }
+
+
+            }//else if(strncmp(argv[i], "-", 1) == 0){//-----ERRORI input strani che iniziano con -
+            //    value_return = err_args_A();
+            //}
+
+            if (flag == FALSE && value_return == 0){ //------Vuol dire che argv[i] e' un file o una cartella
+                /*  Viene utilizzato il comando:  test -d [dir] && find [dir] -type f -follow -print || echo "-[ERROR]"
+                    Il comando test -d controlla l'esistenza del file/directory input. In caso di successo viene lanciato find
+                    In caso di successo viene lanciato find che restituisce la lista di tutti i file nella cartella e nelle sottocartelle
+                    Se l'input non esiste restituisce -[ERROR], in modo che possa essere intercettato dal parser
+                */
+               
+                char command[strlen("(test -f  || test -d ) && find ") + strlen(argv[i])*3 + strlen(" -type f -follow -print || echo \"-[ERROR]\"")+ 1]; //Creazione comando
+                strcpy(command, "(test -f ");
+                strcat(command, argv[i]);
+                strcat(command, " || test -d ");
+                strcat(command, argv[i]);
+                strcat(command, ") && find ");
+                strcat(command, argv[i]);
+                strcat(command, " -type f -follow -print || echo \"-[ERROR]\"");
+                //printf("%s\n",command);
+                fp = popen(command, "r"); //avvia il comando e in fp prende l'output
+                if (fp == NULL) //Se il comando non va a buon fine
+                {
+                    value_return = err_args_A();
+                } else { //Il comando va a buon fine
+                    while (fgets(riga, sizeof(riga), fp) != NULL && errdir == FALSE) //Legge riga per riga e aggiunge alla lista
+                {
+                    if (strcmp(riga,"-[ERROR]\n")){
+                        //memset( resolved_path, '\0', sizeof(resolved_path));
+                        realpath(riga, resolved_path);  //risalgo al percorso assoluto
+                        resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo                             
+                        if (insertPathList(lista, resolved_path)){
+                            count++;
+                            //printf("%s\n", resolved_path);
+                        }
+                        
+                        
+                    } else { //Intercetta l'errore riguardante file o cartelle non esistenti
+                        errdir = TRUE; //Metto il flag errore file/directory sbagliati
+                    }
+                }
+                pclose(fp); //chiudo fp
+                if (errdir == TRUE) value_return = err_input_A(argv[i]); //Mando l'errore per la directory
+                }
+            } else {
+                flag = FALSE; //Analisi argomento saltata, rimetto flag a false
+            }
+        }
+        if(count == 0 && value_return == 0) value_return = err_args_A(); //counter is higher than zero, if not gives an error (value_return used to avoid double messages)
+    }
     
     if (value_return == 0){ //Esecuzione corretta
         printf("Numero file: %d,n=%d m=%d\n",count,n,m);
-<<<<<<< HEAD
-=======
         //printPathList(lista);
->>>>>>> parent of 2baa188... Feedback C
     }
+    
     
     //IPC
     if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
@@ -76,13 +149,11 @@ int main(int argc, char *argv[])
         }
     }
     
+
     if(value_return == 0) { //same as before
         f = fork(); //Fork dei processi
         if(f == -1) { //Controllo che non ci siano stati errori durante il fork
             value_return = err_fork(); //in caso di errore setta il valore di ritorno a ERR_FORK
-        }else{//insert process in list of OPEN processes
-            proc.pid=f;
-            proc.is_open="TRUE";
         }
     }
 
@@ -92,13 +163,8 @@ int main(int argc, char *argv[])
         if(f > 0) { //PARENT SIDE
             
             i = 0;
-<<<<<<< HEAD
-            while(value_return == 0 && (!_read || !_write)) { //cicla finche` non ha finito di leggere e scrivere
-                //sleep(1);
-=======
             while(value_return == 0 && (/*!_read || */!_write)) { //cicla finche` non ha finito di leggere e scrivere
                 sleep(2);
->>>>>>> parent of 2baa188... Feedback C
                 //Write
                 if(!_write) {
                     for (i=0; i<count; i++){
@@ -115,14 +181,6 @@ int main(int argc, char *argv[])
                 }
 
                 //Read
-<<<<<<< HEAD
-                if(!_read) {
-                    if(read(fd_2[READ], av, 2) > 1) {
-                        perc++;
-                        if(perc == count) {
-                            _read = TRUE;
-                        }
-=======
                 /*
                 if(!_read) { //Non necessario presente solo per correttezza formale
                     if(read(fd_2[READ], char_count, 255) == 0) {
@@ -130,12 +188,10 @@ int main(int argc, char *argv[])
                         printf("%s\n",char_count);
                         i++;
                         if(i == count) _read = TRUE;
->>>>>>> parent of 2baa188... Feedback C
                     }
                 }
                 */
             }
-            
             close(fd_1[READ]);
             close(fd_1[WRITE]);
             close(fd_2[READ]);
@@ -172,16 +228,7 @@ int main(int argc, char *argv[])
                 value_return = err_exec(errno); //Set value return
             }
         }
-    }
-    /*
-    CONTROLLO I VARI PROCESSI CHE SIANO CHIUSI DAVVERO
+    } 
     
-    proc.is_open="FALSE";
-    //DA IMPLEMENTARE: se il pid di C è ancora attivo allora va chiuso (in teoria non dovrebbe essere così ma mai dire mai)
-    if (!strcmp(proc.is_open,"TRUE"))
-    {
-        printf("Attivo processo %d, va killato!!!",proc.pid);
-    }*/
-
     return value_return;
 }
