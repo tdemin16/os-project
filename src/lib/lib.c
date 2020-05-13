@@ -42,10 +42,7 @@ char insertPathList(array *tmp, char *c)
             }
         }
         //printf("Stringa inserita\n");
-            strcpy(path, str);
-            strcat(path, "#");
-            strcat(path, c);
-            strcpy(tmp->pathList[tmp->count], path);
+            strcpy(tmp->pathList[tmp->count], c);
             tmp->count++;
             ret = TRUE;
     } else { ret = FALSE;}
@@ -177,7 +174,14 @@ int parser(int argc, char* argv[], array* lista, int* count, int* n, int* m) {
                         //memset( resolved_path, '\0', sizeof(resolved_path));
                         realpath(riga, resolved_path);  //risalgo al percorso assoluto
                         resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo                             
-                        if (insertPathList(lista, resolved_path)){
+                        char str[12];
+                        char path[PATH_MAX];
+                        sprintf(str, "%d", *count);
+                        strcpy(path, str);
+                        strcat(path, "#");
+                        strcat(path, resolved_path);
+                        //printf("%s\n",path);
+                        if (insertPathList(lista, path)){
                             (*count)++;
                             //printf("%s\n", resolved_path);
                         }
