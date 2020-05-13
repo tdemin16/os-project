@@ -35,7 +35,8 @@ int main(int argc, char *argv[])
     char array[7][20]; //Matrice di appoggio
     char* args[8]; //String og arguments to pass to child
     int _write = FALSE; //true when finish writing the pipe
-    //int _read = FALSE; //true when fisnish reading from pipe
+    int _read = FALSE; //true when fisnish reading from pipe
+    char ad[2];
 
     if(argc < 1) { //if number of arguments is even or less than 1, surely it's a wrong input
         value_return = err_args_A();
@@ -163,34 +164,33 @@ int main(int argc, char *argv[])
         if(f > 0) { //PARENT SIDE
             
             i = 0;
-            while(value_return == 0 && (/*!_read || */!_write)) { //cicla finche` non ha finito di leggere e scrivere
-                sleep(2);
+            while(value_return == 0 && (!_read || !_write)) { //cicla finche` non ha finito di leggere e scrivere
+                //sleep(2);
                 //Write
                 if(!_write) {
-                    for (i=0; i<count; i++){
-                        if(write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) { //Prova a scrivere sulla pipe
-                            value_return = err_write(); //Se fallisce da` errore
-                            //ADD SIGNAL HANDLING
-                        } else {
-                            usleep(1000);
+                    if(write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) { //Prova a scrivere sulla pipe
+                        value_return = err_write(); //Se fallisce da` errore
+                        //ADD SIGNAL HANDLING
+                    } else {
+                        i++;
+                        if(i == count) {
+                            _write = TRUE;
+                            freePathList(lista);
                         }
                     }
-                    _write = TRUE;
-                    
-                    freePathList(lista);
                 }
 
                 //Read
-                /*
-                if(!_read) { //Non necessario presente solo per correttezza formale
-                    if(read(fd_2[READ], char_count, 255) == 0) {
-                        parse_string(char_count, v);
-                        printf("%s\n",char_count);
-                        i++;
-                        if(i == count) _read = TRUE;
+                if(!_read) {
+                    if(read(fd_2[READ], ad, 2) > 1) {
+                        printf("%s", ad);
+                        perc++;
+                        if(perc == count) {
+                            _read = TRUE;
+                            printf("\n");
+                        }
                     }
                 }
-                */
             }
             close(fd_1[READ]);
             close(fd_1[WRITE]);
@@ -218,7 +218,7 @@ int main(int argc, char *argv[])
 
             //Redirects pipes to STDIN and STDOUT
             dup2(fd_1[READ], STDIN_FILENO);
-            //dup2(fd_2[WRITE], STDOUT_FILENO); DA ATTIVARE
+            dup2(fd_2[WRITE], STDOUT_FILENO);
             //Closing pipes
             close(fd_1[READ]);
             close(fd_1[WRITE]);

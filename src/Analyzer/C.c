@@ -25,6 +25,8 @@ int main(int argc, char const *argv[]) {
     char* args[3];
     int _read = FALSE; //Indica se ha finito di leggere dai figli
     int _write = FALSE; //Indica se ha finito di scrivere
+    char ad[2];
+    strcpy(ad, "$");
     
     //Parsing arguments------------------------------------------------------------------------------------------
     if(argc % 2 == 0 || argc < 2) { //if number of arguments is even or less than 1, surely it's a wrong input
@@ -139,11 +141,9 @@ int main(int argc, char const *argv[]) {
                         } else { 
                             //printf("[+] - %s\n",strtok(resp, "#"));
                             addCsvToArray(resp,v);
-                            //Qua devi fare il parsing
-                            //if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
-                            //    value_return = err_write();
-                            //}
-                            //printf("%s\n", resp);
+                            if(write(STDOUT_FILENO, ad, 2) == -1) {
+                                value_return = err_write();
+                            }
                         }
                     }
                     k = (k+1) % n;
@@ -151,9 +151,8 @@ int main(int argc, char const *argv[]) {
             }
             close_pipes(fd, size_pipe);
             free(fd);
-            createCsv(v,sum);
-            printStat_Cluster(sum);
-            
+            //createCsv(v,sum);
+            //printStat_Cluster(sum);
         }
     }
 
