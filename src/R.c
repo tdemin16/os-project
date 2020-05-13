@@ -11,7 +11,7 @@ int main(int argc, char const *argv[]) {
     //printf("%s\n",id);
     //printf("%s\n",analyze);
     // ottengo v
-    createCsv(v,tmp,id);
+    //createCsv(v,tmp,id);
     printf("%s\n",tmp);
 
     return value_return;

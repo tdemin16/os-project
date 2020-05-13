@@ -3,7 +3,7 @@
 int main(int argc, char *argv[])
 {
     //Interrupt initialize
-    signal(SIGINT,handle_sigint);
+    //signal(SIGINT,handle_sigint);
     processes proc;
 
     //Parsing arguments------------------------------------------------------------------------------------------
@@ -145,6 +145,13 @@ int main(int argc, char *argv[])
             }
         }
     } 
+
+    if (!strcmp(proc.is_open,"TRUE"))
+    {
+        value_return = err_process_open(proc.pid);
+    }
+    
+
     /*
     CONTROLLO I VARI PROCESSI CHE SIANO CHIUSI DAVVERO
     

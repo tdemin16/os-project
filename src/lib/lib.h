@@ -29,6 +29,7 @@
 #define ERR_FCNTL 8
 #define ERR_EXEC 9
 #define ERR_DATA 10
+#define ERR_OPEN_PROC 11
 
 typedef struct {
     int size; //size of array
@@ -114,6 +115,6 @@ int err_fcntl();
 int err_exec(int);
 int err_m_not_valid();
 int err_part_not_valid();
-
+int err_process_open(pid_t);
 
 #endif

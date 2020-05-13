@@ -3,7 +3,7 @@
 int main(int argc, char const *argv[]) {
     
     //Interrupt initialize
-    signal(SIGINT,handle_sigint);
+    //signal(SIGINT,handle_sigint);
     processes* proc;
 
     int value_return = 0;
