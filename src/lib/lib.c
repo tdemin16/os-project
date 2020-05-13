@@ -739,3 +739,11 @@ int err_part_not_valid() {
     printf("[!] Il valore di part non è valido, deve essere < m\n");
     return ERR_DATA;
 }
+
+int err_fifo() {
+    printf("Errore nella creazione della pipe fifo\n");
+}
+
+int err_unlink() {
+    printf("Errore nella eliminzazione della pipe fifo\n");
+}
