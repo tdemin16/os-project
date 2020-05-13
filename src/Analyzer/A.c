@@ -65,7 +65,16 @@ int main(int argc, char *argv[])
 
     //Set Non-blocking pipes
     if(value_return == 0) {
+        if(fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) { //Prova a sbloccare la pipe 2 in lettura
+            value_return = err_fcntl(); //Se errore riporta il messaggio di errore
+        }
+        if(fcntl(fd_1[WRITE], F_SETFL, O_NONBLOCK)) { //Prova a sbloccare la pipe 2 in lettura
+            value_return = err_fcntl(); //Se errore riporta il messaggio di errore
+        }
         if(fcntl(fd_2[READ], F_SETFL, O_NONBLOCK)) { //Prova a sbloccare la pipe 2 in lettura
+            value_return = err_fcntl(); //Se errore riporta il messaggio di errore
+        }
+        if(fcntl(fd_2[WRITE], F_SETFL, O_NONBLOCK)) { //Prova a sbloccare la pipe 2 in lettura
             value_return = err_fcntl(); //Se errore riporta il messaggio di errore
         }
         if(fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
@@ -96,10 +105,16 @@ int main(int argc, char *argv[])
                 //Write
                 if(!_write) {
                     if(write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) { //Prova a scrivere sulla pipe
-                        value_return = err_write(); //Se fallisce da` errore
+                        if (errno != EAGAIN){
+                            value_return = err_write();
+                        } else {
+                            fprintf(stderr,"A->C: Pipe piena\n");
+                        }
+                         //Se fallisce da` errore
                         //ADD SIGNAL HANDLING
                     } else {
                         i++;
+                            fprintf(stderr,"A->C: scrivo\n");
                         if(i == count) {
                             _write = TRUE;
                             freePathList(lista);
@@ -108,6 +123,7 @@ int main(int argc, char *argv[])
                 }
 
                 //Read
+                //fprintf(stderr,"A<-C: leggo\n");
                 if(!_read) {
                     if(read(fd_2[READ], ad, 2) > 1) {
                         printf("%s", ad);

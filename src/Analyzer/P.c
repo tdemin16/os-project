@@ -98,7 +98,11 @@ int main(int argc, char *argv[])
                             _write = TRUE;
                             for(i = 0; i < m; i++) { //Manda a tutti i processi Q la fine della scrittura
                                 if(write(fd[i*4 + 3], path, PATH_MAX) == -1) {
-                                    value_return = err_write();
+                                    if (errno != EAGAIN){
+                                        value_return = err_write();
+                                    } else {
+                                        fprintf(stderr,"P->Q: Pipe piena\n");
+                                    }
                                 }
                             }
                         } 
@@ -106,7 +110,11 @@ int main(int argc, char *argv[])
                             //printf("P: %s arrivato\n",path);
                             for(i = 0; i < m; i++) { //Cicla su tutti i processi m
                                 if(write(fd[i*4 + 3], path, PATH_MAX) == -1) { //Test Write
-                                    value_return = err_write();
+                                    if (errno != EAGAIN){
+                                        value_return = err_write();
+                                    } else {
+                                        fprintf(stderr,"P->Q: Pipe piena\n");
+                                    }
                                 }
                             }
                         }
@@ -122,12 +130,20 @@ int main(int argc, char *argv[])
                                 if(count == m) { //Quando tutti i figli hanno terminato
                                     _read = TRUE; //Ha finito di leggere
                                     if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Scrive il carattere di teminazione
+                                        if (errno != EAGAIN){
                                         value_return = err_write();
+                                    } else {
+                                        fprintf(stderr,"P->C: Pipe piena\n");
+                                    }
                                     }
                                 }
                             } else { //Se non e` la fine del messaggio
                                 if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Invia la stringa resp
-                                    value_return = err_write();
+                                    if (errno != EAGAIN){
+                                        value_return = err_write();
+                                    } else {
+                                        fprintf(stderr,"P->C: Pipe piena\n");
+                                    }
                                 }
                             }
                         }

@@ -14,6 +14,7 @@ int main(int argc, char const *argv[]) {
     int j;
     int k;
     char path[PATH_MAX];
+    char failedPath[PATH_MAX];
     array *retrive = createPathList(5);
     char resp[DIM_RESP];
     char sum[DIM_RESP];
@@ -121,7 +122,11 @@ int main(int argc, char const *argv[]) {
                     if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //Prova a leggere dalla pipe
                         //printf("C: %s arrivato\n",path);
                         if(write(fd[i*4 + 3], path, PATH_MAX) == -1) { //Test write
-                            value_return = err_write();
+                            if (errno != EAGAIN){
+                                        value_return = err_write();
+                                    } else {
+                                        fprintf(stderr,"C->P: Pipe piena\n");
+                                    }
                             //ADD SIGNAL HANDLING
                         } else {
                             count++;
@@ -133,7 +138,11 @@ int main(int argc, char const *argv[]) {
                         strcpy(path, "///");
                         for(j = 0; j < n; j++) { //Manda a tutti i processi P la fine della scrittura
                             if(write(fd[j*4 + 3], path, PATH_MAX) == -1) {
-                                value_return = err_write(); //VA IN ERRORE QUA, SE COMMENTATE NON DA PIU' ERRORE, Q RICEVE COMUNQUE LE STRINGHE
+                                if (errno != EAGAIN){
+                                        value_return = err_write();
+                                    } else {
+                                        fprintf(stderr,"C->P: Pipe piena\n");
+                                    }
                             }
                         }
                     }
@@ -153,7 +162,11 @@ int main(int argc, char const *argv[]) {
                                 //printf("%s\n",resp);
                                 insertAndSumPathList(retrive,resp);
                                 if(write(STDOUT_FILENO, ad, 2) == -1) {
-                                    value_return = err_write();
+                                    if (errno != EAGAIN){
+                                        value_return = err_write();
+                                    } else {
+                                        fprintf(stderr,"C->A: Pipe piena\n");
+                                    }
                                 }
                             }       
                             //addCsvToArray(resp,v);

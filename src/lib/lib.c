@@ -130,7 +130,7 @@ int unlock_pipes(int *fd, int size)
 {
     int i;
     int ret = 0;
-    for (i = 0; i < size && ret == 0; i += 2)
+    for (i = 0; i < size && ret == 0; i++)
     {
         if (fcntl(fd[i], F_SETFL, O_NONBLOCK))
         {
