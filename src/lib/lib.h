@@ -42,7 +42,7 @@ typedef struct {
 
 typedef struct processes{
     pid_t pid;
-    char* is_open;
+    char* folder;
 }processes;
 
 typedef struct m_process{
@@ -71,6 +71,9 @@ void handle_sigint(int);
 int parse_string(char*, int* v); 
 void add_process_to_v(pid_t, int*);
 int anyone_active(processes*);
+int check_proc(processes*);
+void insert_process(pid_t, processes*);
+void free_processes(processes*);
 
 // /src/Analyzer/Q.c
 void initialize_vector(int*);

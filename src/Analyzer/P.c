@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {  
     //Interrupt initialize
     //signal(SIGINT,handle_sigint);
-    processes* proc;
+    //processes* proc;
 
     //Argument passed
     int m = 4;
@@ -66,8 +66,8 @@ int main(int argc, char *argv[])
     }
 
     //Allocation of proc and initialization of all m chars* is_open
-    proc = malloc(m);
-    initialize_processes(proc,m);
+    //proc = malloc(m);
+    //initialize_processes(proc,m);
 
     //Forking-----------------------------------------------------------
     if(value_return == 0) {
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
             else if(f == -1) {
                 value_return = err_fork();
             }else{
-                insert_process(f,proc); //insert process in list of OPEN processes
+                //insert_process(f,proc); //insert process in list of OPEN processes
             }
         }
     }
@@ -161,12 +161,12 @@ int main(int argc, char *argv[])
         }
     }
     
-    for (i = 0; i < m; i++) //deallocate the m-proc[]->is_open
+    /*for (i = 0; i < m; i++) //deallocate the m-proc[]->is_open
     {
         free(proc[i].is_open);
     }
     
-    free(proc); //deallocate proc
+    free(proc); //deallocate proc*/
 
     return value_return;
 }

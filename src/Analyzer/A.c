@@ -3,8 +3,12 @@
 int main(int argc, char *argv[])
 {
     //Interrupt initialize
+    processes* proc = malloc(sizeof(int));
     //signal(SIGINT,handle_sigint);
-    processes proc;
+    struct stat sb;
+    initialize_processes(proc,4);
+    
+    //printf("Processo: %d, is %s\n",proc[0].pid,proc[0].folder);
 
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
@@ -43,7 +47,6 @@ int main(int argc, char *argv[])
         printPathList(lista);
     }
     
-    
     //IPC
     if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
         if(pipe(fd_1) != 0) { //Controllo se nella creazione della pipe ci sono errori
@@ -78,9 +81,6 @@ int main(int argc, char *argv[])
         f = fork(); //Fork dei processi
         if(f == -1) { //Controllo che non ci siano stati errori durante il fork
             value_return = err_fork(); //in caso di errore setta il valore di ritorno a ERR_FORK
-        }else{//insert process in list of OPEN processes
-            proc.pid=f;
-            proc.is_open="TRUE";
         }
         
     }
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 
     if(value_return == 0) { //same
         if(f > 0) { //PARENT SIDE
-            
+            insert_process(f,proc);
             i = 0;
             while(value_return == 0 && (!_read || !_write)) { //cicla finche` non ha finito di leggere e scrivere
                 //sleep(2);
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
                         }
                     }
                 }
-
+                
                 //Read
                 if(!_read) {
                     if(read(fd_2[READ], ad, 2) > 1) {
@@ -160,19 +160,7 @@ int main(int argc, char *argv[])
         }
     } 
 
-    /*if (!strcmp(proc.is_open,"TRUE"))
-    {
-        value_return = err_process_open(proc.pid);
-    }
-    
-    CONTROLLO I VARI PROCESSI CHE SIANO CHIUSI DAVVERO
-    
-    proc.is_open="FALSE";
-    //DA IMPLEMENTARE: se il pid di C è ancora attivo allora va chiuso (in teoria non dovrebbe essere così ma mai dire mai)
-    if (!strcmp(proc.is_open,"TRUE"))
-    {
-        printf("Attivo processo %d, va killato!!!",proc.pid);
-    }*/
+    free_processes(proc);
     
     return value_return;
 }

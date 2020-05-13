@@ -4,7 +4,7 @@ int main(int argc, char const *argv[]) {
     
     //Interrupt initialize
     //signal(SIGINT,handle_sigint);
-    processes* proc;
+    //processes* proc;
 
     int value_return = 0;
     int nfiles = 0; //number of files to retreive from pipe
@@ -89,8 +89,8 @@ int main(int argc, char const *argv[]) {
     }
 
     //Allocation of proc and initialization of all n chars* is_open
-    proc = malloc(n);
-    initialize_processes(proc,n);
+    //proc = malloc(n);
+    //initialize_processes(proc,n);
 
     //Forking----------------------------------------------------------------
     if(value_return == 0) {
@@ -103,7 +103,7 @@ int main(int argc, char const *argv[]) {
             else if(f == -1) { //Controllo che non ci siano stati errori durante il fork
                 value_return = err_fork(); //In caso di errore setta il valore di ritorno a ERR_FORK
             }else{
-                insert_process(f,proc); //insert process in list of OPEN processes
+                //insert_process(f,proc); //insert process in list of OPEN processes
             }
         }
     }
@@ -193,13 +193,13 @@ int main(int argc, char const *argv[]) {
         }
     }
 
-    for (i = 0; i < n; i++) //deallocate the n-proc[]->is_open
+    /*for (i = 0; i < n; i++) //deallocate the n-proc[]->is_open
     {
         free(proc[i].is_open);
     }
 
     free(proc); //deallocate proc
-
+    */
     return value_return;
 }
 
