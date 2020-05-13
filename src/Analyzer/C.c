@@ -2,6 +2,10 @@
 
 int main(int argc, char const *argv[]) {
     
+    //Interrupt initialize
+    signal(SIGINT,handle_sigint);
+    processes* proc;
+
     int value_return = 0;
     int nfiles = 0; //number of files to retreive from pipe
     int n = 3;
@@ -25,6 +29,8 @@ int main(int argc, char const *argv[]) {
     char* args[3];
     int _read = FALSE; //Indica se ha finito di leggere dai figli
     int _write = FALSE; //Indica se ha finito di scrivere
+    char ad[2];
+    strcpy(ad, "$");
     
     //Parsing arguments------------------------------------------------------------------------------------------
     if(argc % 2 == 0 || argc < 2) { //if number of arguments is even or less than 1, surely it's a wrong input
@@ -81,6 +87,9 @@ int main(int argc, char const *argv[]) {
         }
     }
 
+    //Allocation of proc and initialization of all n chars* is_open
+    proc = malloc(n);
+    initialize_processes(proc,n);
 
     //Forking----------------------------------------------------------------
     if(value_return == 0) {
@@ -90,8 +99,10 @@ int main(int argc, char const *argv[]) {
             if(f == 0) { //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
                 id = i;
             }
-            if(f == -1) { //Controllo che non ci siano stati errori durante il fork
+            else if(f == -1) { //Controllo che non ci siano stati errori durante il fork
                 value_return = err_fork(); //In caso di errore setta il valore di ritorno a ERR_FORK
+            }else{
+                insert_process(f,proc); //insert process in list of OPEN processes
             }
         }
     }
@@ -137,14 +148,11 @@ int main(int argc, char const *argv[]) {
                                 _read = TRUE;
                             }
                         } else { 
-                            //printf("[+] - %s\n",strtok(resp, "#"));
                             //addCsvToArray(resp,v);
                             printf("%s\n",resp);
-                            //Qua devi fare il parsing
-                            //if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
-                            //    value_return = err_write();
-                            //}
-                            //printf("%s\n", resp);
+                            if(write(STDOUT_FILENO, ad, 2) == -1) {
+                                value_return = err_write();
+                            }
                         }
                     }
                     k = (k+1) % n;
@@ -154,7 +162,6 @@ int main(int argc, char const *argv[]) {
             free(fd);
             //createCsv(v,sum);
             //printStat_Cluster(sum);
-            
         }
     }
 
@@ -177,6 +184,13 @@ int main(int argc, char const *argv[]) {
             }
         }
     }
+
+    for (i = 0; i < n; i++) //deallocate the n-proc[]->is_open
+    {
+        free(proc[i].is_open);
+    }
+
+    free(proc); //deallocate proc
 
     return value_return;
 }

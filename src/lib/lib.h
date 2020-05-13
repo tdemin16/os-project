@@ -36,6 +36,11 @@ typedef struct {
     int count;
 } array;
 
+typedef struct processes{
+    pid_t pid;
+    char* is_open;
+}processes;
+
 typedef struct m_process{
     int begin;
     int end;
@@ -54,7 +59,12 @@ void close_pipes(int*, int);
 int unlock_pipes(int*, int);
 
 // /src/Analyzer/A.c
+void initialize_processes(processes*,int);
+void handle_sigint(int);
 int parse_string(char*, int* v); 
+int parser(int, char**, array*, int*, int*, int*);
+void add_process_to_v(pid_t, int*);
+int anyone_active(processes*);
 
 // /src/Analyzer/Q.c
 void initialize_vector(int*);

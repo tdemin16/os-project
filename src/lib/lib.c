@@ -100,6 +100,39 @@ void close_pipes(int *fd, int size)
 }
 
 // /src/Analyzer/A.c
+// Handler for SIGINT, caused by 
+// Ctrl-C at keyboard 
+void initialize_processes(processes* p, int dim){ //Only for p->is_open
+    int i;
+    for (i = 0; i < dim; i++)
+    {
+        p->is_open = malloc(sizeof("FALSE") + 1);
+    }
+}
+
+void insert_process(pid_t _pid, processes* p){
+    p->pid = _pid;
+    p->is_open = "TRUE";
+}
+
+void handle_sigint(int sig) 
+{ 
+    printf("\nProcesso terminato volontariamente!\n"); 
+} 
+
+int anyone_active(processes* p){ //DA IMPLEMENTARE
+    return 0;
+}
+
+void add_process_to_v(pid_t f, int* v){
+    int i = 0;
+    while (v[i] != 0)
+    {
+        i++;
+    }
+    v[i] = f;    
+}
+
 int parse_string(char *string, int v[DIM_V])
 {
     int i = 0;
