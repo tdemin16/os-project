@@ -13,6 +13,8 @@ int main(int argc, char *argv[])
     int value_return = 0;
     FILE* fp;
     char* freq;
+    char * id;
+    char * analyze;
 
     //IPC Arguments
     char path[PATH_MAX];
@@ -46,12 +48,15 @@ int main(int argc, char *argv[])
                         value_return = err_write();
                     }
                 } else {
-                    fp = fopen(path, "r");
+                    id = strtok(strdup(path),"#");
+                    analyze = strtok(NULL,"#");
+                    fp = fopen(analyze, "r");
                     if(fp == NULL) {
                         value_return = err_file_open();
                     } else {
+                        
                         get_frequencies(fp, v, part, m);
-                        createCsv(v,resp);
+                        createCsv(v,resp,id);
                         fclose(fp);
                         if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
                             value_return = err_write();

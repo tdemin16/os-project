@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
     
     if (value_return == 0){ //Esecuzione corretta
         printf("Numero file: %d,n=%d m=%d\n",count,n,m);
-        //printPathList(lista);
+        printPathList(lista);
     }
     
     
@@ -164,7 +164,6 @@ int main(int argc, char *argv[])
             
             i = 0;
             while(value_return == 0 && (/*!_read || */!_write)) { //cicla finche` non ha finito di leggere e scrivere
-                sleep(2);
                 //Write
                 if(!_write) {
                     for (i=0; i<count; i++){
