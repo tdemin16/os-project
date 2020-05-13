@@ -29,6 +29,8 @@ char insertPathList(array *tmp, char *c)
             present = TRUE;
         }
     }
+
+
     if (present == FALSE){
         //printf("Provo a inserire %s, size: %d, count:%d\n", c, tmp->size, tmp->count);
         if (tmp->count == tmp->size)
@@ -49,6 +51,57 @@ char insertPathList(array *tmp, char *c)
     return ret;
 }
 
+char insertAndSumPathList(array *tmp, char *c){
+    int i;
+    char sum = FALSE;
+    char ret = FALSE;
+    char path[PATH_MAX];
+
+    for (i = 0; i<tmp->count; i++){
+        if (sumCsv(tmp->pathList[i],c)){
+            sum = TRUE;
+        }
+    }
+
+
+    if (sum == FALSE){
+        if (tmp->count == tmp->size)
+        {
+            //printf("Raddoppio la size\n");
+            tmp->size *= 1.3;
+            tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
+            for (i = tmp->count; i < tmp->size; i++)
+            {
+                tmp->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX));
+            }
+        }
+        //printf("Stringa inserita\n");
+            strcpy(tmp->pathList[tmp->count], c);
+            tmp->count++;
+            ret = TRUE;
+    } else { ret = FALSE;}
+    return ret;
+}
+
+void sortPathList(array *list){
+    array *tmp = createPathList(5);
+    int i;
+    int k;
+    char insert = FALSE;
+    for (i = 0; i<list->count; i++){
+       insertPathList(tmp,list->pathList[i]);
+    }
+    for (i = 0; (i<list->count) ; i++){
+        insert = FALSE;
+        for (k=0; (k<tmp->count) && (insert == FALSE);k++){
+            if (atoi(strtok(strdup(tmp->pathList[k]),"#"))== i){
+                strcpy(list->pathList[i],tmp->pathList[k]);
+                insert=TRUE;
+            }
+        }
+    }
+    freePathList(tmp);
+}
 void printPathList(array *tmp)
 {
     int i;
@@ -397,6 +450,25 @@ void createCsv(int * v, char *res,char * id){
 }
 
 ///src/C.c
+char sumCsv(char* str1, char*str2){
+    char ret = FALSE;
+    char *id1= strtok(strdup(str1),"#");
+    char * tmp1= strtok(NULL,"#");
+    
+    char *id2= strtok(strdup(str2),"#");
+    char * tmp2= strtok(NULL,"#");
+    int v[DIM_V];
+    initialize_vector(v);
+    
+    if (!strcmp(id1,id2)){
+        addCsvToArray(tmp1,v); 
+        addCsvToArray(tmp2,v); 
+        createCsv(v,str1,id1);
+        ret = TRUE;
+    }
+
+    return ret;
+}
 void addCsvToArray(char * tmp, int *v){
     int i = 0;
     char *Analyze = strtok(tmp, "#");

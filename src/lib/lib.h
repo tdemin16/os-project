@@ -51,6 +51,8 @@ typedef struct m_process{
 //Array struct functions -- sostituiscono lista (momentaneamente?)
 array * createPathList(int);
 char insertPathList(array*, char*);
+char insertAndSumPathList(array *, char *);
+void sortPathList(array*);
 void printPathList(array*);
 void freePathList(array*);
 int dimPathList(array*);
@@ -86,6 +88,7 @@ char* arrayToCsv(int *);
 char* integer_to_string(int);
 int countDigit(int);
 int lenghtCsv(int *);
+char sumCsv(char*, char*);
 void createCsv(int *, char *,char *);
 void addCsvToArray(char *, int *);
 //int err_args_P(); used here

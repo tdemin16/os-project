@@ -149,12 +149,15 @@ int main(int argc, char const *argv[]) {
                                 _read = TRUE;
                             }
                         } else { 
+                            if (strstr(resp, "#") != NULL) {
+                                //printf("%s\n",resp);
+                                insertAndSumPathList(retrive,resp);
+                                if(write(STDOUT_FILENO, ad, 2) == -1) {
+                                    value_return = err_write();
+                                }
+                            }       
                             //addCsvToArray(resp,v);
-                            printf("%s\n",resp);
-                            insertPathList(retrive,resp);
-                            if(write(STDOUT_FILENO, ad, 2) == -1) {
-                                value_return = err_write();
-                            }
+                            
                         }
                     }
                     k = (k+1) % n;
@@ -162,6 +165,7 @@ int main(int argc, char const *argv[]) {
             }
             close_pipes(fd, size_pipe);
             free(fd);
+            sortPathList(retrive);
             printPathList(retrive);
             freePathList(retrive);
             //createCsv(v,sum);
