@@ -257,17 +257,23 @@ int parser(int argc, char* argv[], array* lista, int* count, int* n, int* m) {
     return value_return;
 }
 
-void initialize_processes(processes* p, int dim){ //Only for p->is_open
+void initialize_processes(processes* p, int dim){
     int i;
     for (i = 0; i < dim; i++)
     {
-        p->is_open = malloc(sizeof("FALSE") + 1);
+        p[i].pid = -1;
+        p[i].is_open = malloc(sizeof("FALSE") + 1);
     }
 }
 
 void insert_process(pid_t _pid, processes* p){
-    p->pid = _pid;
-    p->is_open = "TRUE";
+    int i = 0;
+    while (p[i].pid >= 0)
+    {
+        i++;
+    }
+    p[i].pid = _pid;
+    p[i].is_open = "TRUE";
 }
 
 void handle_sigint(int sig) 
@@ -823,4 +829,15 @@ int err_m_not_valid()
 int err_part_not_valid() {
     printf("[!] Il valore di part non è valido, deve essere < m\n");
     return ERR_DATA;
+}
+int err_process_open(pid_t p){
+    printf("[!] Errore, il processo %d è ancora aperto!\n",p);
+    return ERR_OPEN_PROC;
+}
+int err_fifo() {
+    printf("Errore nella creazione della pipe fifo\n");
+}
+
+int err_unlink() {
+    printf("Errore nella eliminzazione della pipe fifo\n");
 }

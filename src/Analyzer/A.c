@@ -3,7 +3,7 @@
 int main(int argc, char *argv[])
 {
     //Interrupt initialize
-    signal(SIGINT,handle_sigint);
+    //signal(SIGINT,handle_sigint);
     processes proc;
 
     //Parsing arguments------------------------------------------------------------------------------------------
@@ -32,6 +32,10 @@ int main(int argc, char *argv[])
     int _read = FALSE; //true when fisnish reading from pipe
     char ad[2];
 
+    //COMMUNICATION WITH R
+    const char* fifo = "/tmp/A_R_Comm";
+    pid_t fd_fifo;
+
     value_return = parser(argc, argv, lista, &count, &n, &m);
     
     if (value_return == 0){ //Esecuzione corretta
@@ -49,6 +53,13 @@ int main(int argc, char *argv[])
     if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
         if(pipe(fd_2) != 0) { //Controllo se nella creazione della pipe ci sono errori
             value_return = err_pipe(); //in caso di errore setta il valore di ritorno a ERR_PIPE
+        }
+    }
+    if(value_return == 0) { //Test errori precedenti
+        if(mkfifo(fifo, 0666) == -1) { //Prova a creare la pipe
+            if(errno != EEXIST) { //In caso di errore controlla che la pipe non fosse gia` presente
+                value_return = err_fifo(); //Ritorna errore se l'operazione non va a buon fine
+            }
         }
     }
 
@@ -112,6 +123,9 @@ int main(int argc, char *argv[])
             close(fd_1[WRITE]);
             close(fd_2[READ]);
             close(fd_2[WRITE]);
+            if(unlink(fifo) == -1) {
+                value_return = err_unlink();
+            }
         }
     }
 
@@ -145,7 +159,12 @@ int main(int argc, char *argv[])
             }
         }
     } 
-    /*
+
+    /*if (!strcmp(proc.is_open,"TRUE"))
+    {
+        value_return = err_process_open(proc.pid);
+    }
+    
     CONTROLLO I VARI PROCESSI CHE SIANO CHIUSI DAVVERO
     
     proc.is_open="FALSE";

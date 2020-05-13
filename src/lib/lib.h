@@ -11,6 +11,7 @@
 #include<math.h>
 #include<fcntl.h>
 #include<sys/wait.h>
+#include<sys/stat.h>
 
 
 #define READ 0
@@ -29,6 +30,9 @@
 #define ERR_FCNTL 8
 #define ERR_EXEC 9
 #define ERR_DATA 10
+#define ERR_FIFO 11
+#define ERR_UNLINK 12
+#define ERR_OPEN_PROC 13
 
 typedef struct {
     int size; //size of array
@@ -117,6 +121,9 @@ int err_fcntl();
 int err_exec(int);
 int err_m_not_valid();
 int err_part_not_valid();
+int err_process_open(pid_t);
+int err_fifo();
+int err_unlink();
 
 
 #endif
