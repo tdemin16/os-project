@@ -14,6 +14,7 @@ int main(int argc, char const *argv[]) {
     int j;
     int k;
     char path[PATH_MAX];
+    array *retrive = createPathList(5);
     char resp[DIM_RESP];
     char sum[DIM_RESP];
     int v[DIM_V];
@@ -150,6 +151,7 @@ int main(int argc, char const *argv[]) {
                         } else { 
                             //addCsvToArray(resp,v);
                             printf("%s\n",resp);
+                            insertPathList(retrive,resp);
                             if(write(STDOUT_FILENO, ad, 2) == -1) {
                                 value_return = err_write();
                             }
@@ -160,6 +162,8 @@ int main(int argc, char const *argv[]) {
             }
             close_pipes(fd, size_pipe);
             free(fd);
+            printPathList(retrive);
+            freePathList(retrive);
             //createCsv(v,sum);
             //printStat_Cluster(sum);
         }

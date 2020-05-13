@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {  
     //Interrupt initialize
-    signal(SIGINT,handle_sigint);
+    //signal(SIGINT,handle_sigint);
     processes* proc;
 
     //Argument passed
