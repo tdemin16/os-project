@@ -160,13 +160,11 @@ int main(int argc, char *argv[])
         }
     } 
 
-    if (!strcmp(proc.is_open,"TRUE"))
+    /*if (!strcmp(proc.is_open,"TRUE"))
     {
         value_return = err_process_open(proc.pid);
     }
     
-
-    /*
     CONTROLLO I VARI PROCESSI CHE SIANO CHIUSI DAVVERO
     
     proc.is_open="FALSE";
