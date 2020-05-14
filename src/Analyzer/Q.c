@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     if(value_return == 0) {
         while(value_return == 0 && !_write) {
             if(read(STDIN_FILENO, path, PATH_MAX) > 0) {
-                //printf("Q: %s Arrivato\n", path);
+                //fprintf(stderr,"Q[%d]: ANALIZZO p:%d %s \n",getpid(),part,path);
                 if(strcmp(path, "///") == 0){
                     _write = TRUE;
                     if(write(STDOUT_FILENO, path, PATH_MAX) == -1) {

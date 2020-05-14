@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     
     if (value_return == 0){ //Esecuzione corretta
         printf("Numero file: %d,n=%d m=%d\n",count,n,m);
-        printPathList(lista);
+        //printPathList(lista);
     }
     
     
@@ -108,16 +108,17 @@ int main(int argc, char *argv[])
                         if (errno != EAGAIN){
                             value_return = err_write();
                         } else {
-                            fprintf(stderr,"A->C: Pipe piena\n");
+                            //fprintf(stderr,"A->C: Pipe piena\n");
                         }
                          //Se fallisce da` errore
                         //ADD SIGNAL HANDLING
                     } else {
                         i++;
-                            fprintf(stderr,"A->C: scrivo\n");
+                            //fprintf(stderr,"A->C: scrivo\n");
                         if(i == count) {
                             _write = TRUE;
                             freePathList(lista);
+                            //fprintf(stderr,"######## A->C: Scritto tutto\n");
                         }
                     }
                 }

@@ -111,63 +111,123 @@ int main(int argc, char const *argv[]) {
 
     //----------------------------------------------------------------------------------------
     
+    failedPath[0]='\0';
+    char stop = FALSE;
+    char end = FALSE;
+    int terminated[n];
+    for (i= 0; i<n; i++){
+        terminated[i] = FALSE;
+    }
     if(value_return == 0) {
         i = 0;
         k = 0;
         if(f > 0) { //PARENT SIDE
             while(value_return == 0 && (!_read || !_write)) {
-                failedPath[0]='\0';
+                //usleep(200000);
+                if(!_write) {
+                    if(count != nfiles){
+                        if (stop == FALSE){
+                            if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //provo a leggere
+                                //fprintf(stderr,"C[%d]: Leggo %s \n",getpid(),path);
+                                if(write(fd[i*4 + 3], path, PATH_MAX) == -1) { //Test write
+                                    if (errno != EAGAIN){
+                                        value_return = err_write();
+                                        //fprintf(stderr,"errore\n");
+                                            } else {
+                                                stop = TRUE;
+                                                strcpy(failedPath,path);
+                                                //fprintf(stderr,"C->P: Pipe per %d piena, %s aspetta\n",i,path);
+                                            }
+                                } else { //scritto con successo
+                                    //fprintf(stderr,"C->P: assegno a %d %s\n",i,path);
+                                    count++;
+                                    i = (i+1) % n;
+                                }
+                            } 
+                        } else {
+                        //fprintf(stderr,"STOP TRUE\n");
+                            if(write(fd[i*4 + 3], failedPath, PATH_MAX) == -1) { //Test write
+                                if (errno != EAGAIN){
+                                    value_return = err_write();
+                                } else {
+                                    //fprintf(stderr,"C->P: Pipe per %d ancora piena, %s aspetta\n",i,failedPath);
+                                }
+                                //ADD SIGNAL HANDLING
+                            } else {
+                                stop = FALSE;
+                                count++;
+                                i = (i+1) % n;                                
+                            }
+                        }
+                    } else {
+                        strcpy(path, "///");
+
+                        for(j = 0; j < n; j++) { //Manda a tutti i processi P la fine della scrittura
+                            end = TRUE;
+                            if (!terminated[j]){
+                                if(write(fd[j*4 + 3], path, PATH_MAX) == -1) {
+                                    if (errno != EAGAIN){
+                                        value_return = err_write();
+                                    } else {
+                                        end = FALSE;
+                                        //fprintf(stderr,"C->P: Pipe piena\n");
+                                    }
+                                } else {
+                                    //fprintf(stderr,"C->P: Invio /// a %d\n",j);
+                                    terminated[j] = TRUE;
+                                }
+                            }
+                            //for (i= 0; i<n; i++){
+                                //fprintf(stderr,"%d ",terminated[i]);
+                            //}
+                            //fprintf(stderr,"\n");
+                        }
+                        _write = TRUE;
+                    }
+                }
+                
+                /*
                 //Write
                 if(!_write) {
-                    if (failedPath[0]!='\0'){
+                    if (failedPath[0]!='\0'){ //se ultimo invio fallito
                         if(write(fd[i*4 + 3], failedPath, PATH_MAX) == -1) { //Test write
                             if (errno != EAGAIN){
                                         value_return = err_write();
                                     } else {
-                                        fprintf(stderr,"C->P: Pipe piena\n");
+                                        //fprintf(stderr,"C->P: Pipe per %d ancora piena, %s aspetta\n",i,failedPath);
                                     }
                             //ADD SIGNAL HANDLING
                         } else {
+                            //fprintf(stderr,"C->P: assegno a %d %s\n",i,failedPath);
                             count++;
                             i = (i+1) % n;
                             failedPath[0]='\0';
-                            fprintf(stderr,"C->P: scrivo\n");
+                            
                         }
                     }else{
                         if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //Prova a leggere dalla pipe
-                        //printf("C: %s arrivato\n",path);
+                        //fprintf(stderr,"C[%d]: Leggo %s \n",getpid(),path);
                         if(write(fd[i*4 + 3], path, PATH_MAX) == -1) { //Test write
                             if (errno != EAGAIN){
                                         value_return = err_write();
                                     } else {
-                                        fprintf(stderr,"C->P: Pipe piena\n");
+                                        //fprintf(stderr,"C->P: Pipe per %d piena, %s aspetta\n",i,path);
                                         strcpy(failedPath,path);
                                     }
                             //ADD SIGNAL HANDLING
                         } else {
+                            //fprintf(stderr,"C->P: assegno a %d %s\n",i,path);
                             count++;
                             i = (i+1) % n;
                             failedPath[0]='\0';
-                            fprintf(stderr,"C->P: scrivo\n");
+                            
                         }
-                    }
+                        }
                     }
                     
-                    if(count == nfiles) { //Ha passato tutti i path ai figli
-                        _write = TRUE;
-                        strcpy(path, "///");
-                        for(j = 0; j < n; j++) { //Manda a tutti i processi P la fine della scrittura
-                            if(write(fd[j*4 + 3], path, PATH_MAX) == -1) {
-                                if (errno != EAGAIN){
-                                        value_return = err_write();
-                                    } else {
-                                        fprintf(stderr,"C->P: Pipe piena\n");
-                                    }
-                            }
-                        }
-                    }
+                    
                 }
-
+                */
                 //Read
                 if(!_read) {
                     if(read(fd[k*4 + 0], resp, DIM_RESP) > 0) {
@@ -198,8 +258,8 @@ int main(int argc, char const *argv[]) {
             }
             close_pipes(fd, size_pipe);
             free(fd);
-            sortPathList(retrive);
-            printPathList(retrive);
+            //sortPathList(retrive);
+            //printPathList(retrive);
             freePathList(retrive);
             //createCsv(v,sum);
             //printStat_Cluster(sum);
