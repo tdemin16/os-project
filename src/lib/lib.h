@@ -12,6 +12,7 @@
 #include<fcntl.h>
 #include<sys/wait.h>
 #include<sys/stat.h>
+#include<signal.h>
 
 
 #define READ 0
@@ -40,10 +41,10 @@ typedef struct {
     int count;
 } array;
 
-typedef struct processes{
+typedef struct process{
     pid_t pid;
-    char* folder;
-}processes;
+    //char* folder;
+}process;
 
 typedef struct m_process{
     int begin;
@@ -66,14 +67,10 @@ int unlock_pipes(int*, int);
 
 // /src/Analyzer/A.c
 int parser(int, char**, array*, int*, int*, int*);
-void initialize_processes(processes*,int);
 void handle_sigint(int);
 int parse_string(char*, int* v); 
 void add_process_to_v(pid_t, int*);
-int anyone_active(processes*);
-int check_proc(processes*);
-void insert_process(pid_t, processes*);
-void free_processes(processes*);
+void initialize_processes(pid_t*, int);
 
 // /src/Analyzer/Q.c
 void initialize_vector(int*);

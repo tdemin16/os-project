@@ -1,10 +1,6 @@
 #include "../lib/lib.h"
 
 int main(int argc, char const *argv[]) {
-    
-    //Interrupt initialize
-    //signal(SIGINT,handle_sigint);
-    //processes* proc;
 
     int value_return = 0;
     int nfiles = 0; //number of files to retreive from pipe
@@ -103,9 +99,9 @@ int main(int argc, char const *argv[]) {
             }
             else if(f == -1) { //Controllo che non ci siano stati errori durante il fork
                 value_return = err_fork(); //In caso di errore setta il valore di ritorno a ERR_FORK
-            }else{
-                //insert_process(f,proc); //insert process in list of OPEN processes
-            }
+            }/*else{
+                //insert_process(f);
+            }*/
         }
     }
 

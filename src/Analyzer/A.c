@@ -1,14 +1,38 @@
 #include "../lib/lib.h"
 
+pid_t* proc; //This global variable is for the SIGINT handler, otherwise we cannot manage it 
+int p_dim = 0; //This global variable remembers what is the dimension of proc
+
+void handle_sigint(int sig){
+    printf("\n[!] Ricevuta terminazione, inizio terminazione processi ... \n");
+    int i = p_dim-1;
+    i = p_dim-1;
+    while (i != 0)
+    {
+        if (proc[i] > 0) //Processo padre
+        {
+            if (kill(proc[i],9) == 0){
+                printf("\tProcesso %d terminato con successo!\n",proc[i]);
+            }else{
+                printf("\t[!] Errore, non sono riuscito a chiudere il processo %d!",proc[i]);
+            }  
+        }/*else if(proc[i] == 0){
+            if (kill(proc[i],9))
+            {
+                printf("Ucciso processo figlio");
+            }  
+        }*/
+        i--;      
+    }
+    free(proc);
+    printf("[!] ... Chiusura processi terminata\n");
+    exit(-1);
+}
+
 int main(int argc, char *argv[])
-{
+{   
     //Interrupt initialize
-    processes* proc = malloc(sizeof(int));
-    //signal(SIGINT,handle_sigint);
-    struct stat sb;
-    initialize_processes(proc,4);
-    
-    //printf("Processo: %d, is %s\n",proc[0].pid,proc[0].folder);
+    signal(SIGINT,handle_sigint);
 
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
@@ -45,7 +69,13 @@ int main(int argc, char *argv[])
     if (value_return == 0){ //Esecuzione corretta
         printf("Numero file: %d,n=%d m=%d\n",count,n,m);
         printPathList(lista);
+
+        proc = malloc(2*(n*m) + 2); //malloc proc with n-P process and m-Q process doubled for son's + 2 for C (...)
+        initialize_processes(proc,((2*n*m) + 2));
     }
+
+    proc[p_dim] = getpid(); //Aggiungo PID del padre
+    p_dim++;                //Aumento dimensione
     
     //IPC
     if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
@@ -91,14 +121,14 @@ int main(int argc, char *argv[])
         if(f == -1) { //Controllo che non ci siano stati errori durante il fork
             value_return = err_fork(); //in caso di errore setta il valore di ritorno a ERR_FORK
         }
-        
     }
 
     //------------------------------------------------------------------------------
 
     if(value_return == 0) { //same
         if(f > 0) { //PARENT SIDE
-            insert_process(f,proc);
+        proc[p_dim] = f;//These 2 lines are adding fork() process 
+        p_dim++;        //Increase the dimension
             i = 0;
             while(value_return == 0 && (!_read || !_write)) { //cicla finche` non ha finito di leggere e scrivere
                 //sleep(2);
@@ -174,9 +204,7 @@ int main(int argc, char *argv[])
                 value_return = err_exec(errno); //Set value return
             }
         }
-    } 
-
-    free_processes(proc);
+    }
     
     return value_return;
 }
