@@ -87,38 +87,3 @@ int main(int argc, char *argv[])
 
     return value_return;
 }
-
-/* ANDREA L'HO RISCRITTO PER POTER INSERIRE LA COMUNICAZIONE. HO PERO' USATO QUELLO CHE HAI
-   SCRITTO TU PER L'ELABORAZIONE------------------------------------------------------------
-
-   if (argc != 3) {
-        value_return = err_args_Q();
-    }
-    else
-    {
-        char *DIR = "./README.md"; // setup the directory
-        int part = atoi(argv[1]);            //setup start of the process in the file
-        int m = atoi(argv[2]);              //setup end of the process in the file
-
-        if (m < part)
-        {
-            value_return = err_m_not_valid();
-        }
-        else
-        {
-            FILE *fp = fopen(DIR, "r"); //open in read mode the file in the directory
-
-            if (fp == NULL)
-            {
-                value_return = err_file_open();
-            }
-            else
-            {
-                //get_subset(fp, v, begin, end); //getting all the chars
-                get_frequencies(fp, part, m);
-                //print_vector(v); //U
-            }
-            fclose(fp);
-        }
-    }
-*/

@@ -11,7 +11,7 @@ int main(int argc, char const *argv[]) {
     int k;
     char path[PATH_MAX];
     char failedPath[PATH_MAX];
-    //array *retrive = createPathList(5);
+    
     
     char resp[DIM_RESP];
     char sum[DIM_RESP];
@@ -24,7 +24,8 @@ int main(int argc, char const *argv[]) {
     pid_t f = getpid();
     int id; //Indica il numero del figlio (necessario per calcolare quale pipe utilizzare)
     int size_pipe; //Size of pipes
-    char array[2][4];
+    
+    char arrayArgomenti[2][4];
     char* args[3];
     int _read = FALSE; //Indica se ha finito di leggere dai figli
     int _write = FALSE; //Indica se ha finito di scrivere
@@ -55,6 +56,8 @@ int main(int argc, char const *argv[]) {
         }
         if(nfiles == 0 && value_return == 0) value_return = err_args_C(); //Check if nfiles is setted, if not gives an error (value_return used to avoid double messages)
     }
+
+    array *retrive = createPathList(n);
 
     initialize_vector(v);
 
@@ -124,7 +127,7 @@ int main(int argc, char const *argv[]) {
                     if(count != nfiles){ //Se non sono ancora tutti arraivati
                         if (stop == FALSE){ //E non ci troviamo in uno stato di stop per rinvio dati
                             if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //provo a leggere
-                                //QUI BISOGNA AGGIUNGERE L'INSERIMENTO DEI PATH NELLA LISTA
+                                insertPathList(retrive, path, 0);
                                 if(write(fd[i*4 + 3], path, PATH_MAX) == -1) { //Provo a scrivere
                                     if (errno != EAGAIN){
                                         value_return = err_write();
@@ -181,6 +184,7 @@ int main(int argc, char const *argv[]) {
                         //end = TRUE;
                         if (end == TRUE){
                             _write = TRUE; //Finito di scrivere
+                            free(retrive);
                         } 
                         
                     }
@@ -223,10 +227,10 @@ int main(int argc, char const *argv[]) {
     if(value_return == 0) {
         if(f == 0) { //SON SIDE
             //Creates char args
-            strcpy(array[0], "./P");
-            sprintf(array[1], "%d", m);
-            args[0] = array[0];
-            args[1] = array[1];
+            strcpy(arrayArgomenti[0], "./P");
+            sprintf(arrayArgomenti[1], "%d", m);
+            args[0] = arrayArgomenti[0];
+            args[1] = arrayArgomenti[1];
             args[2] = NULL;
 
             dup2(fd[id*4 + 2], STDIN_FILENO);
