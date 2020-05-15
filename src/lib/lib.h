@@ -63,7 +63,7 @@ typedef struct m_process{
 //Array struct functions -- sostituiscono lista (momentaneamente?)
 array * createPathList(int);
 char insertPathList(array*, char*, int);
-char insertAndSumPathList(array *, char *);
+char insertAndSumPathList(array *, char *,int);
 void printPathList(array*);
 void freePathList(array*);
 int dimPathList(array*);

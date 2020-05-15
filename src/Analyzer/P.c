@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
     int id; //Identifica il numero del figlio generato
     int _read = FALSE;
     int _write = FALSE;
+    array *sum = createPathList(10);
     char array[4][4];
     char* args[4];
     int count = 0;
@@ -98,7 +99,6 @@ int main(int argc, char *argv[])
                 if(!_write) { //Se non ha finito di scrivere
                     if (sent){// se il file è stato mandato a tutti i q, leggo il prossimo 
                         if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //provo a leggere
-                            //QUI BISOGNA AGGIUNGERE IL SUM DEI Q DIVISI PER FILE
                             if ((!strncmp(path,"///",3))&& sent == TRUE){ //Se leggo una stringa di terminazione
                                 end = TRUE; //Setto end a true
                             }
@@ -140,37 +140,49 @@ int main(int argc, char *argv[])
                 }
                 
                 //Read
+                int u;
+                char sent = TRUE;
                 
                 if(!_read) {
-                    for(i = 0; i < m; i++) { //Cicla tra tutti i figli
-                        if(read(fd[i*4 + 0], resp, DIM_RESP) > 0) { //Legge la pipe del figlio i
-                            if(strcmp(resp, "///") == 0) { //Controlla se e` la fine del messaggio
-                                count++; //Conta quanti terminatori sono arrivati
-                                if(count == m) { //Quando tutti i figli hanno terminato
-                                    _read = TRUE; //Ha finito di leggere
-                                    if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Scrive il carattere di teminazione
-                                        if (errno != EAGAIN){
-                                            value_return = err_write();
-                                        } else {
-                                            fprintf(stderr,"P->C: Pipe piena\n");
+                    if (sent){
+                        for(i = 0; i < m; i++) { //Cicla tra tutti i figli
+                            if(read(fd[i*4 + 0], resp, DIM_RESP) > 0) {
+                                if(!strcmp(resp, "///")) { //Controlla se e` la fine del messaggio
+                                        count++; //Conta quanti terminatori sono arrivati
+                                        if(count == m) { //Quando tutti i figli hanno terminato
+                                            
+                                            if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Scrive il carattere di teminazione
+                                                if (errno != EAGAIN){
+                                                    value_return = err_write();
+                                                } else {
+                                                    sent = FALSE;
+                                                }
+                                            }
                                         }
-                                    }
-                                }
-                            } else { //Se non e` la fine del messaggio
-                                if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Invia la stringa resp
-                                    if (errno != EAGAIN){
-                                        value_return = err_write();
-                                    } else {
-                                        fprintf(stderr,"P->C: Pipe piena\n");
+                                } else {
+                                    if (insertAndSumPathList(sum,resp,m)){ //Qualcosa è arrivato a 0, 
+                                        for (u = 0; u<sum->count; u++){
+                                            if (sum->analyzed[u] == 0){
+                                                sum->analyzed[u] = -1;
+                                                strcpy(resp,sum->pathList[u]);
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
+                    } else { //resend
+                        if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Scrive il carattere di teminazione
+                            if (errno != EAGAIN) value_return = err_write();
+                        } else sent = TRUE;
                     }
+                    if ((count == m) && sent && (!strncmp(resp,"///",3))) _read = TRUE;
                 }
-            }
+                      
             close_pipes(fd, size_pipe);
-            free(fd);
+            //free(fd);
+            freePathList(sum);
+            }
         }
     }
 

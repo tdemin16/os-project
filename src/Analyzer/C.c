@@ -184,14 +184,14 @@ int main(int argc, char const *argv[]) {
                         }
                         //end = TRUE;
                         if (end == TRUE){
-                            _write = TRUE; //Finito di scrivere
-                            free(retrive);
+                            _write = TRUE; //Finito di scrivere        
                         } 
                         
                     }
                 }
                
                 //Read
+                
                 if(!_read) {
                     if(read(fd[k*4 + 0], resp, DIM_RESP) > 0) {
                         
@@ -202,8 +202,6 @@ int main(int argc, char const *argv[]) {
                             }
                         } else { 
                             if (strstr(resp, "#") != NULL) {
-                                //printf("%s\n",resp);
-                                //QUI BISOGNA AGGIORNARE IL TOTALE CON LA SOMMA
                                 if(write(STDOUT_FILENO, ad, 2) == -1) {
                                     if (errno != EAGAIN){
                                         value_return = err_write();
@@ -218,9 +216,10 @@ int main(int argc, char const *argv[]) {
                     }
                     k = (k+1) % n;
                 }
+                
             }
             close_pipes(fd, size_pipe);
-            free(fd);
+            //free(fd);
             freePathList(retrive);
         }
     }
