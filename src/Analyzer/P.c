@@ -98,6 +98,9 @@ int main(int argc, char *argv[])
                 if(!_write) {
                     if (sent){// se ilfile è stato mandato a tutti i q, leggo il prossimo 
                         if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //provo a leggere
+                            if ((!strncmp(path,"///",3))&& sent == TRUE){
+                                end = TRUE;
+                            }
                             for(i = 0; i < m; i++) {
                                 if(write(fd[i*4 + 3], path, PATH_MAX) == -1) {
                                         if (errno != EAGAIN){
@@ -127,10 +130,11 @@ int main(int argc, char *argv[])
                                 }
                             }
                         }
-                        if ((!strncmp(path,"///",3))&& sent == TRUE){
-                            fprintf(stderr,"C finito di scrivere, %s\n",path);
-                           _write = TRUE;
-                        }
+                        
+                    }
+                    if (end && sent == TRUE){
+                            //fprintf(stderr,"C finito di scrivere, %s\n",path);
+                        _write = TRUE;
                     }
                 }
                 
