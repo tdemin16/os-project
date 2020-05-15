@@ -1,10 +1,38 @@
 #include "../lib/lib.h"
 
+pid_t* proc; //This global variable is for the SIGINT handler, otherwise we cannot manage it 
+int p_dim = 0; //This global variable remembers what is the dimension of proc
+
+void handle_sigint(int sig){
+    printf("\n[!] Ricevuta terminazione, inizio terminazione processi ... \n");
+    int i = p_dim-1;
+    i = p_dim-1;
+    while (i != 0)
+    {
+        if (proc[i] > 0) //Processo padre
+        {
+            if (kill(proc[i],9) == 0){
+                printf("\tProcesso %d terminato con successo!\n",proc[i]);
+            }else{
+                printf("\t[!] Errore, non sono riuscito a chiudere il processo %d!",proc[i]);
+            }  
+        }/*else if(proc[i] == 0){
+            if (kill(proc[i],9))
+            {
+                printf("Ucciso processo figlio");
+            }  
+        }*/
+        i--;      
+    }
+    free(proc);
+    printf("[!] ... Chiusura processi terminata\n");
+    exit(-1);
+}
+
 int main(int argc, char *argv[])
-{
+{   
     //Interrupt initialize
-    //signal(SIGINT,handle_sigint);
-    processes proc;
+    signal(SIGINT,handle_sigint);
 
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
@@ -41,8 +69,15 @@ int main(int argc, char *argv[])
     if (value_return == 0){ //Esecuzione corretta
         printf("Numero file: %d,n=%d m=%d\n",count,n,m);
         //printPathList(lista);
+
+
+        proc = malloc(2*(n*m) + 2); //malloc proc with n-P process and m-Q process doubled for son's + 2 for C (...)
+        initialize_processes(proc,((2*n*m) + 2));
+
     }
-    
+
+    proc[p_dim] = getpid(); //Aggiungo PID del padre
+    p_dim++;                //Aumento dimensione
     
     //IPC
     if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
@@ -87,18 +122,15 @@ int main(int argc, char *argv[])
         f = fork(); //Fork dei processi
         if(f == -1) { //Controllo che non ci siano stati errori durante il fork
             value_return = err_fork(); //in caso di errore setta il valore di ritorno a ERR_FORK
-        }else{//insert process in list of OPEN processes
-            proc.pid=f;
-            proc.is_open="TRUE";
         }
-        
     }
 
     //------------------------------------------------------------------------------
 
     if(value_return == 0) { //same
         if(f > 0) { //PARENT SIDE
-            
+        proc[p_dim] = f;//These 2 lines are adding fork() process 
+        p_dim++;        //Increase the dimension
             i = 0;
             while(value_return == 0 && (!_read || !_write)) { //cicla finche` non ha finito di leggere e scrivere
                 //sleep(2);
@@ -122,7 +154,7 @@ int main(int argc, char *argv[])
                         }
                     }
                 }
-
+                
                 //Read
                 //fprintf(stderr,"A<-C: leggo\n");
                 if(!_read) {
@@ -175,21 +207,7 @@ int main(int argc, char *argv[])
                 value_return = err_exec(errno); //Set value return
             }
         }
-    } 
-
-    /*if (!strcmp(proc.is_open,"TRUE"))
-    {
-        value_return = err_process_open(proc.pid);
     }
-    
-    CONTROLLO I VARI PROCESSI CHE SIANO CHIUSI DAVVERO
-    
-    proc.is_open="FALSE";
-    //DA IMPLEMENTARE: se il pid di C è ancora attivo allora va chiuso (in teoria non dovrebbe essere così ma mai dire mai)
-    if (!strcmp(proc.is_open,"TRUE"))
-    {
-        printf("Attivo processo %d, va killato!!!",proc.pid);
-    }*/
     
     return value_return;
 }
