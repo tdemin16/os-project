@@ -147,6 +147,7 @@ int main(int argc, char *argv[])
                     if (sent){
                         for(i = 0; i < m; i++) { //Cicla tra tutti i figli
                             if(read(fd[i*4 + 0], resp, DIM_RESP) > 0) {
+                                //fprintf(stderr,"P read: %s\n",resp);
                                 if(!strcmp(resp, "///")) { //Controlla se e` la fine del messaggio
                                         count++; //Conta quanti terminatori sono arrivati
                                         if(count == m) { //Quando tutti i figli hanno terminato
@@ -163,6 +164,7 @@ int main(int argc, char *argv[])
                                     if (insertAndSumPathList(sum,resp,m)){ //Qualcosa è arrivato a 0, 
                                         for (u = 0; u<sum->count; u++){
                                             if (sum->analyzed[u] == 0){
+                                                fprintf(stderr,"Qualcosa e' arrivato a 0\n");
                                                 sum->analyzed[u] = -1;
                                                 strcpy(resp,sum->pathList[u]);
                                             }
@@ -178,11 +180,11 @@ int main(int argc, char *argv[])
                     }
                     if ((count == m) && sent && (!strncmp(resp,"///",3))) _read = TRUE;
                 }
-                      
+            }     
             close_pipes(fd, size_pipe);
-            //free(fd);
+            free(fd);
             freePathList(sum);
-            }
+            
         }
     }
 
