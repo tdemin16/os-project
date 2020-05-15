@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
                             //fprintf(stderr,"Send $\n");
                             }
                         }
-                    }
+                    
                 } else { //Senno' analizzo il path
                     id = strtok(strdup(path),"#");
                     analyze = strtok(NULL,"#");
