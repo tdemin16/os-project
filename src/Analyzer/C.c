@@ -57,7 +57,7 @@ int main(int argc, char const *argv[]) {
         if(nfiles == 0 && value_return == 0) value_return = err_args_C(); //Check if nfiles is setted, if not gives an error (value_return used to avoid double messages)
     }
 
-    array *retrive = createPathList(nfiles);
+    array *retrive = createPathList(5);
 
     initialize_vector(v);
 

@@ -22,35 +22,29 @@ char insertPathList(array *tmp, char *c, int val)
     int i;
     char present = FALSE;
     char ret = FALSE;
-    char str[12];
-    char path[PATH_MAX];
-    sprintf(str, "%d", tmp->count);
-
     for (i = 0; i<tmp->count; i++){
         if (!strcmp(tmp->pathList[i], c)){
             present = TRUE;
         }
     }
-
-
     if (present == FALSE){
         //printf("Provo a inserire %s, size: %d, count:%d\n", c, tmp->size, tmp->count);
         if (tmp->count == tmp->size)
         {
             //printf("Raddoppio la size\n");
-            tmp->size *= 1.3;
+            tmp->size *= 2;
             tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
             tmp->analyzed = (int*)realloc(tmp->analyzed, sizeof(int*) * tmp->size);
             for (i = tmp->count; i < tmp->size; i++)
             {
-                tmp->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX));
+                tmp->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX + 1));
             }
         }
         //printf("Stringa inserita\n");
-            strcpy(tmp->pathList[tmp->count], c);
-            tmp->analyzed[tmp->count] = val;
-            tmp->count++;
-            ret = TRUE;
+        strcpy(tmp->pathList[tmp->count], c);
+        tmp->analyzed[tmp->count] = val;
+        tmp->count++;
+        ret = TRUE;
     } else { ret = FALSE;}
     return ret;
 }
