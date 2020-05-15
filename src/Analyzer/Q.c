@@ -45,12 +45,18 @@ int main(int argc, char *argv[])
                 //fprintf(stderr,"Q[%d]: ANALIZZO p:%d %s \n",getpid(),part,path);
                 if(strcmp(path, "///") == 0){ //Se e' terminazione allora setta write a true e rimando indietro
                     _write = TRUE;
-                    if(write(STDOUT_FILENO, path, PATH_MAX) == -1) { //Prova a scrivere
-                        if (errno != EAGAIN){
+
+                    respSent = FALSE;
+                        while (!respSent){ //finchè la risposta non è stata inviata riprova
+                            if(write(STDOUT_FILENO, path, DIM_RESP) == -1) {
+                                if (errno != EAGAIN){
                                         value_return = err_write();
-                                    } else {
-                                        //fprintf(stderr,"Q: Pipe piena\n"); 
-                                    }
+                                }
+                            } else { 
+                            respSent = TRUE;
+                            //fprintf(stderr,"Send $\n");
+                            }
+                        }
                     }
                 } else { //Senno' analizzo il path
                     id = strtok(strdup(path),"#");
