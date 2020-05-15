@@ -855,3 +855,11 @@ int err_fifo() {
 int err_unlink() {
     printf("Errore nella eliminzazione della pipe fifo\n");
 }
+
+int err_signal() {
+    fprintf(stderr, "Errore, call signal non riuscita\n");
+}
+
+int err_close() {
+    fprintf(stderr, "Errore nella chiusura del file\n");
+}

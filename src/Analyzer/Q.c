@@ -47,10 +47,10 @@ int main(int argc, char *argv[])
                     _write = TRUE;
                     if(write(STDOUT_FILENO, path, PATH_MAX) == -1) {
                         if (errno != EAGAIN){
-                                        value_return = err_write();
-                                    } else {
-                                        fprintf(stderr,"Q: Pipe piena\n");
-                                    }
+                            value_return = err_write();
+                        } else {
+                            fprintf(stderr,"Q: Pipe piena\n");
+                        }
                     }
                 } else {
                     id = strtok(strdup(path),"#");
@@ -65,10 +65,10 @@ int main(int argc, char *argv[])
                         fclose(fp);
                         if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
                             if (errno != EAGAIN){
-                                        value_return = err_write();
-                                    } else {
-                                        fprintf(stderr,"P: Pipe piena\n");
-                                    }
+                                value_return = err_write();
+                            } else {
+                                fprintf(stderr,"P: Pipe piena\n");
+                            }
                         }
                     }
                 }

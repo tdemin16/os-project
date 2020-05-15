@@ -1,12 +1,22 @@
 #include "../lib/lib.h"
 
-int main(int argc, char *argv[])
-{
+int value_return = 0; //Valore di ritorno, globale per "send_to_R"
+
+//COMMUNICATION WITH R. MUST BE GLOBAL
+const char* fifo = "/tmp/A_R_Comm";
+pid_t fd_fifo;
+void send_to_R();
+
+int main(int argc, char *argv[]) {
+
     //Interrupt initialize
     processes* proc = malloc(sizeof(int));
     //signal(SIGINT,handle_sigint);
     struct stat sb;
     initialize_processes(proc,4);
+
+    //COMMUNICATION WITH R
+    signal(SIGUSR1, send_to_R);
     
     //printf("Processo: %d, is %s\n",proc[0].pid,proc[0].folder);
 
@@ -20,7 +30,6 @@ int main(int argc, char *argv[])
     //node filePath = NULL; //list of path's strings
     //parser variables
     int i; //Variabile usata per ciclare gli argomenti (argv[i])
-    int value_return = 0; //Valore di ritorno
     int count = 0; //numero di file univoci da analizzare
     int perc = 0;
 
@@ -36,14 +45,10 @@ int main(int argc, char *argv[])
     int _read = FALSE; //true when fisnish reading from pipe
     char ad[2];
 
-    //COMMUNICATION WITH R
-    const char* fifo = "/tmp/A_R_Comm";
-    pid_t fd_fifo;
-
     value_return = parser(argc, argv, lista, &count, &n, &m);
     
     if (value_return == 0){ //Esecuzione corretta
-        printf("Numero file: %d,n=%d m=%d\n",count,n,m);
+        printf("Numero file: %d,n=%d m=%d pid=%d\n", count, n, m, getpid());
         printPathList(lista);
     }
     
@@ -56,13 +61,6 @@ int main(int argc, char *argv[])
     if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
         if(pipe(fd_2) != 0) { //Controllo se nella creazione della pipe ci sono errori
             value_return = err_pipe(); //in caso di errore setta il valore di ritorno a ERR_PIPE
-        }
-    }
-    if(value_return == 0) { //Test errori precedenti
-        if(mkfifo(fifo, 0666) == -1) { //Prova a creare la pipe
-            if(errno != EEXIST) { //In caso di errore controlla che la pipe non fosse gia` presente
-                value_return = err_fifo(); //Ritorna errore se l'operazione non va a buon fine
-            }
         }
     }
 
@@ -110,11 +108,11 @@ int main(int argc, char *argv[])
                         } else {
                             fprintf(stderr,"A->C: Pipe piena\n");
                         }
-                         //Se fallisce da` errore
+                        //Se fallisce da` errore
                         //ADD SIGNAL HANDLING
                     } else {
                         i++;
-                            fprintf(stderr,"A->C: scrivo\n");
+                        fprintf(stderr,"A->C: scrivo\n");
                         if(i == count) {
                             _write = TRUE;
                             freePathList(lista);
@@ -139,9 +137,7 @@ int main(int argc, char *argv[])
             close(fd_1[WRITE]);
             close(fd_2[READ]);
             close(fd_2[WRITE]);
-            if(unlink(fifo) == -1) {
-                value_return = err_unlink();
-            }
+            while(1);
         }
     }
 
@@ -164,7 +160,7 @@ int main(int argc, char *argv[])
 
             //Redirects pipes to STDIN and STDOUT
             dup2(fd_1[READ], STDIN_FILENO);
-            //dup2(fd_2[WRITE], STDOUT_FILENO);
+            dup2(fd_2[WRITE], STDOUT_FILENO);
             //Closing pipes
             close(fd_1[READ]);
             close(fd_1[WRITE]);
@@ -179,4 +175,37 @@ int main(int argc, char *argv[])
     free_processes(proc);
     
     return value_return;
+}
+
+void send_to_R() {
+    fprintf(stderr, "HAlo\n");
+
+    if(value_return == 0) { //Test errori precedenti
+        if(mkfifo(fifo, 0666) == -1) { //Prova a creare la pipe
+            if(errno != EEXIST) { //In caso di errore controlla che la pipe non fosse gia` presente
+                value_return = err_fifo(); //Ritorna errore se l'operazione non va a buon fine
+            }
+        }
+    }
+
+    if(value_return == 0) {
+        fd_fifo = open(fifo, O_WRONLY);
+        if(fd_fifo == -1) {
+            value_return = err_file_open();
+        }
+    }
+
+    write(fd_fifo, "halo\0", 5);
+
+    if(value_return == 0) {
+        if(close(fd_fifo) == -1) {
+            value_return = err_close();
+        }
+    }
+
+    if(value_return == 0) {
+        if(unlink(fifo) == -1) {
+            value_return = err_unlink();
+        }
+    }
 }

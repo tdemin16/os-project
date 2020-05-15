@@ -12,6 +12,7 @@
 #include<fcntl.h>
 #include<sys/wait.h>
 #include<sys/stat.h>
+#include<signal.h>
 
 
 #define READ 0
@@ -20,6 +21,7 @@
 #define FALSE 0
 #define DIM_V 95
 #define DIM_RESP 1051
+
 #define ERR_ARGS_A 1
 #define ERR_ARGS_C 2
 #define ERR_ARGS_Q 3
@@ -33,6 +35,8 @@
 #define ERR_FIFO 11
 #define ERR_UNLINK 12
 #define ERR_OPEN_PROC 13
+#define ERR_SIGNAL 14
+#define ERR_CLOSE 15
 
 typedef struct {
     int size; //size of array
@@ -127,6 +131,9 @@ int err_part_not_valid();
 int err_process_open(pid_t);
 int err_fifo();
 int err_unlink();
+int err_signal();
+int err_close();
+
 
 
 #endif

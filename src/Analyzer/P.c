@@ -132,10 +132,10 @@ int main(int argc, char *argv[])
                                     _read = TRUE; //Ha finito di leggere
                                     if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Scrive il carattere di teminazione
                                         if (errno != EAGAIN){
-                                        value_return = err_write();
-                                    } else {
-                                        fprintf(stderr,"P->C: Pipe piena\n");
-                                    }
+                                            value_return = err_write();
+                                        } else {
+                                            fprintf(stderr,"P->C: Pipe piena\n");
+                                        }
                                     }
                                 }
                             } else { //Se non e` la fine del messaggio
