@@ -64,7 +64,6 @@ typedef struct m_process{
 array * createPathList(int);
 char insertPathList(array*, char*, int);
 char insertAndSumPathList(array *, char *);
-void sortPathList(array*);
 void printPathList(array*);
 void freePathList(array*);
 int dimPathList(array*);
