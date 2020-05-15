@@ -100,8 +100,9 @@ int main(int argc, char *argv[])
                 if(!_write) { //Se non ha finito di scrivere
                     if (sent){// se il file è stato mandato a tutti i q, leggo il prossimo 
                         if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //provo a leggere
-                            if ((!strncmp(path,"///",3))&& sent == TRUE){ //Se leggo una stringa di terminazione
+                            if (!strncmp(path,"///",3)){ //Se leggo una stringa di terminazione
                                 end = TRUE; //Setto end a true
+                                fprintf(stderr,"C finito di scrivere, %s\n",path);
                             }
                             for(i = 0; i < m; i++) { //Provo a inviare path a tutti i Q
                                 if(write(fd[i*4 + 3], path, PATH_MAX) == -1) {
@@ -141,8 +142,24 @@ int main(int argc, char *argv[])
                 }
                 
                 //Read
-                _read = TRUE;
+                //_read = TRUE;
+
                 if(!_read) {
+                    
+                    if(read(fd[i*4 + 0], resp, DIM_RESP) > 0) {
+                                fprintf(stderr,"P read: %s\n",resp);
+                                if(!strcmp(resp, "///")) { //Controlla se e` la fine del messaggio
+                                        count++; //Conta quanti terminatori sono arrivati
+                                        if(count == m) { //Quando tutti i figli hanno terminato
+                                            fprintf(stderr,"P: Chiudo %s\n",resp);
+                                            _read = TRUE;
+                                            
+                                        }
+                                }
+                    }
+
+                
+                    /*
                     if (sent){
                         for(i = 0; i < m; i++) { //Cicla tra tutti i figli
                             if(read(fd[i*4 + 0], resp, DIM_RESP) > 0) {
@@ -178,6 +195,7 @@ int main(int argc, char *argv[])
                         } else sent = TRUE;
                     }
                     if ((count == m) && sent && (!strncmp(resp,"///",3))) _read = TRUE;
+                    */
                 }
             }     
             close_pipes(fd, size_pipe);
