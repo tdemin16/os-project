@@ -43,17 +43,22 @@ int main(int argc, char *argv[])
         while(value_return == 0 && !_write) {
             
             if(read(STDIN_FILENO, path, PATH_MAX) > 0) {
+                
                 //fprintf(stderr,"Q[%d]: ANALIZZO p:%d %s \n",getpid(),part,path);
-                if(strcmp(path, "///") == 0){
+                if(!strcmp(path, "///")){
                     _write = TRUE;
+                    //fprintf(stderr,"Q /// arrivato, %s\n",path);
+                    /*
                     if(write(STDOUT_FILENO, path, PATH_MAX) == -1) {
                         if (errno != EAGAIN){
                                         value_return = err_write();
                                     } else {
                                         fprintf(stderr,"Q: Pipe piena\n");
                                     }
+                                    */
                     }
                 } else {
+                    /*
                     id = strtok(strdup(path),"#");
                     analyze = strtok(NULL,"#");
                     fp = fopen(analyze, "r");
@@ -77,8 +82,10 @@ int main(int argc, char *argv[])
                         }
                         
                     }
+                    
                 }
-            }
+            */
+           }
         }
     }
 

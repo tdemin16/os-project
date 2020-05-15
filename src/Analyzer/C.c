@@ -169,7 +169,7 @@ int main(int argc, char const *argv[]) {
                                         end = FALSE;
                                     }
                                 } else {
-                                    fprintf(stderr,"C->P: Invio /// a %d\n",j);
+                                    //fprintf(stderr,"C->P: Invio /// a %d\n",j);
                                     terminated[j] = TRUE;
                                 }
                             }
@@ -185,7 +185,7 @@ int main(int argc, char const *argv[]) {
                         
                     }
                 }
-                
+                _read = TRUE;
                 //Read
                 if(!_read) {
                     if(read(fd[k*4 + 0], resp, DIM_RESP) > 0) {

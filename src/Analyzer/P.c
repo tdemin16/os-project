@@ -86,6 +86,7 @@ int main(int argc, char *argv[])
     char sent = TRUE;
     char end= FALSE;
     int terminated[m];
+    int test=0;
     for (i= 0; i<m; i++){
         terminated[i] = FALSE;
     }
@@ -94,24 +95,24 @@ int main(int argc, char *argv[])
         if(f > 0) { //PARENT SIDE
             while(value_return == 0 && (!_read || !_write)) {
                 //Write
-                
                 if(!_write) {
                     if (sent){// se ilfile è stato mandato a tutti i q, leggo il prossimo 
                         if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //provo a leggere
-                        for(i = 0; i < m; i++) {
-                            if(write(fd[i*4 + 3], path, PATH_MAX) == -1) {
-                                    if (errno != EAGAIN){
-                                        value_return = err_write();
-                                    } else {
-                                        sent = FALSE;
-                                        terminated[i] = FALSE;
-                                    }
-                            } else {
-                                terminated[i] = TRUE;
+                            for(i = 0; i < m; i++) {
+                                if(write(fd[i*4 + 3], path, PATH_MAX) == -1) {
+                                        if (errno != EAGAIN){
+                                            value_return = err_write();
+                                        } else {
+                                            sent = FALSE;
+                                            terminated[i] = FALSE;
+                                        }
+                                } else {
+                                    terminated[i] = TRUE;
+                                }
                             }
                         }
-                        }
                     } else {
+                        //fprintf(stderr,"C[%d] provo ritrasmissione di %s\n",getpid(),path);
                         sent = TRUE;
                         for(i = 0; i < m; i++) {
                             if(!terminated[i]){
@@ -127,13 +128,14 @@ int main(int argc, char *argv[])
                             }
                         }
                         if ((!strncmp(path,"///",3))&& sent == TRUE){
-                            fprintf(stderr,"C finito di scrivere, _write true\n");
+                            fprintf(stderr,"C finito di scrivere, %s\n",path);
                            _write = TRUE;
                         }
                     }
                 }
                 
                 //Read
+                _read = TRUE;
                 if(!_read) {
                     for(i = 0; i < m; i++) { //Cicla tra tutti i figli
                         if(read(fd[i*4 + 0], resp, DIM_RESP) > 0) { //Legge la pipe del figlio i
