@@ -57,7 +57,7 @@ int main(int argc, char const *argv[]) {
         if(nfiles == 0 && value_return == 0) value_return = err_args_C(); //Check if nfiles is setted, if not gives an error (value_return used to avoid double messages)
     }
 
-    array *retrive = createPathList(5);
+    array *retrive = createPathList(nfiles);
 
     initialize_vector(v);
 
@@ -128,7 +128,7 @@ int main(int argc, char const *argv[]) {
                         if (stop == FALSE){ //E non ci troviamo in uno stato di stop per rinvio dati
                             if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //provo a leggere
                                 insertPathList(retrive, path, 0);
-                                fprintf(stderr,"Aggiunto %s\n",path);
+                                //fprintf(stderr,"Aggiunto %s\n",path);
                                 if(write(fd[i*4 + 3], path, PATH_MAX) == -1) { //Provo a scrivere
                                     if (errno != EAGAIN){
                                         value_return = err_write();
@@ -221,7 +221,7 @@ int main(int argc, char const *argv[]) {
             }
             close_pipes(fd, size_pipe);
             free(fd);
-            //freePathList(retrive);
+            freePathList(retrive);
         }
     }
 
