@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
                     if(read(fd_2[READ], ad, 2) > 1) {
                         printf("%s", ad);
                         perc++;
-                        if(perc == count) {
+                        if(perc == count*m) {
                             _read = TRUE;
                             printf("\n");
                         }

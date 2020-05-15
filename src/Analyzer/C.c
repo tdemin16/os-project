@@ -185,7 +185,7 @@ int main(int argc, char const *argv[]) {
                         
                     }
                 }
-                _read = TRUE;
+               
                 //Read
                 if(!_read) {
                     if(read(fd[k*4 + 0], resp, DIM_RESP) > 0) {
