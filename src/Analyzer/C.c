@@ -106,7 +106,7 @@ int main(int argc, char const *argv[]) {
     }
 
     //----------------------------------------------------------------------------------------
-    
+    int test = 0;
     failedPath[0]='\0';
     char stop = FALSE;
     char end = FALSE;
@@ -157,19 +157,19 @@ int main(int argc, char const *argv[]) {
                         }
                     } else {
                         strcpy(path, "///");
-
+                        end = TRUE;
                         for(j = 0; j < n; j++) { //Manda a tutti i processi P la fine della scrittura
-                            end = TRUE;
+                            
                             if (!terminated[j]){
                                 if(write(fd[j*4 + 3], path, PATH_MAX) == -1) {
                                     if (errno != EAGAIN){
                                         value_return = err_write();
                                     } else {
+                                        terminated[j] = FALSE;
                                         end = FALSE;
-                                        //fprintf(stderr,"C->P: Pipe piena\n");
                                     }
                                 } else {
-                                    //fprintf(stderr,"C->P: Invio /// a %d\n",j);
+                                    fprintf(stderr,"C->P: Invio /// a %d\n",j);
                                     terminated[j] = TRUE;
                                 }
                             }
@@ -178,52 +178,14 @@ int main(int argc, char const *argv[]) {
                             //}
                             //fprintf(stderr,"\n");
                         }
-                        _write = TRUE;
+                        //end = TRUE;
+                        if (end == TRUE){
+                            _write = TRUE;
+                        } 
+                        
                     }
                 }
                 
-                /*
-                //Write
-                if(!_write) {
-                    if (failedPath[0]!='\0'){ //se ultimo invio fallito
-                        if(write(fd[i*4 + 3], failedPath, PATH_MAX) == -1) { //Test write
-                            if (errno != EAGAIN){
-                                        value_return = err_write();
-                                    } else {
-                                        //fprintf(stderr,"C->P: Pipe per %d ancora piena, %s aspetta\n",i,failedPath);
-                                    }
-                            //ADD SIGNAL HANDLING
-                        } else {
-                            //fprintf(stderr,"C->P: assegno a %d %s\n",i,failedPath);
-                            count++;
-                            i = (i+1) % n;
-                            failedPath[0]='\0';
-                            
-                        }
-                    }else{
-                        if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //Prova a leggere dalla pipe
-                        //fprintf(stderr,"C[%d]: Leggo %s \n",getpid(),path);
-                        if(write(fd[i*4 + 3], path, PATH_MAX) == -1) { //Test write
-                            if (errno != EAGAIN){
-                                        value_return = err_write();
-                                    } else {
-                                        //fprintf(stderr,"C->P: Pipe per %d piena, %s aspetta\n",i,path);
-                                        strcpy(failedPath,path);
-                                    }
-                            //ADD SIGNAL HANDLING
-                        } else {
-                            //fprintf(stderr,"C->P: assegno a %d %s\n",i,path);
-                            count++;
-                            i = (i+1) % n;
-                            failedPath[0]='\0';
-                            
-                        }
-                        }
-                    }
-                    
-                    
-                }
-                */
                 //Read
                 if(!_read) {
                     if(read(fd[k*4 + 0], resp, DIM_RESP) > 0) {
@@ -254,11 +216,7 @@ int main(int argc, char const *argv[]) {
             }
             close_pipes(fd, size_pipe);
             free(fd);
-            //sortPathList(retrive);
-            //printPathList(retrive);
             freePathList(retrive);
-            //createCsv(v,sum);
-            //printStat_Cluster(sum);
         }
     }
 
