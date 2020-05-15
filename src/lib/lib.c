@@ -5,12 +5,14 @@ array *createPathList(int size)
     array *st = (array *)malloc(sizeof(array));
     st->size = size;
     st->pathList = malloc(sizeof(char **) * size);
+    st->analyzed =(int*) malloc(sizeof(int*) * size);
     st->count = 0;
     int i;
     for (i = 0; i < size; i++)
     {
         st->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX));
         memset( st->pathList[i], '\0', sizeof(char*) * PATH_MAX);
+        st->analyzed[i] = -1;
     }
     return st;
 }
@@ -38,6 +40,7 @@ char insertPathList(array *tmp, char *c)
             //printf("Raddoppio la size\n");
             tmp->size *= 1.3;
             tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
+            tmp->analyzed = (int*)realloc(tmp->analyzed, sizeof(int*) * tmp->size);
             for (i = tmp->count; i < tmp->size; i++)
             {
                 tmp->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX));
@@ -45,6 +48,7 @@ char insertPathList(array *tmp, char *c)
         }
         //printf("Stringa inserita\n");
             strcpy(tmp->pathList[tmp->count], c);
+            tmp->analyzed[tmp->count] = 0;
             tmp->count++;
             ret = TRUE;
     } else { ret = FALSE;}
@@ -107,7 +111,7 @@ void printPathList(array *tmp)
     int i;
     for (i = 0; i < tmp->count; i++)
     {
-        printf("%d: %s\n", i, tmp->pathList[i]);
+        printf("%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
     }
 }
 
@@ -123,7 +127,22 @@ void freePathList(array *tmp)
         free(tmp->pathList[i]);
     }
     free(tmp->pathList);
+    free(tmp->analyzed);
     free(tmp);
+}
+
+void setAnalyzed(array* tmp, int pos, int value) {
+    if(pos >= tmp->count) {
+        printf("Errore, il file da analizzare non e` presente in questa posizione\n");
+    } else if(value > -1 && value < 3){
+        tmp->analyzed[pos] = value;
+    } else {
+        printf("Errore, valore assegnato al percorso non valido\n");
+    }
+}
+
+int getAnalyzed(array* tmp, int pos) {
+    return tmp->analyzed[pos]; //-1 if not analyzed
 }
 
 int unlock_pipes(int *fd, int size)

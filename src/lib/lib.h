@@ -44,6 +44,7 @@
 typedef struct {
     int size; //size of array
     char **pathList;
+    int* analyzed;
     int count;
 } array;
 
@@ -67,6 +68,8 @@ void sortPathList(array*);
 void printPathList(array*);
 void freePathList(array*);
 int dimPathList(array*);
+void setAnalyzed(array*, int, int);
+int getAnalyzed(array*, int);
 
 void close_pipes(int*, int);
 int unlock_pipes(int*, int);
