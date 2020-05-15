@@ -39,9 +39,18 @@ int main(int argc, char *argv[])
         value_return = err_fcntl();
     }
 
-    if(value_return == 0) {
+    int count = 0;
+
         while(value_return == 0 && !_write) {
+            //usleep(200000);
             if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //Legge un percorso
+                if(!strncmp(path,"///",3)){
+                    fprintf(stderr,"%d\n",count);
+                    _write = TRUE;
+                }
+                    count ++;
+                }
+                /*
                 //fprintf(stderr,"Q[%d]: ANALIZZO p:%d %s \n",getpid(),part,path);
                 if(strcmp(path, "///") == 0){ //Se e' terminazione allora setta write a true e rimando indietro
                     _write = TRUE;
@@ -76,14 +85,15 @@ int main(int argc, char *argv[])
                                 }
                         } else { 
                             respSent = TRUE;
-                            //fprintf(stderr,"Send $\n");
+                            //fprintf(stderr,"Send %s\n",resp);
                             }
                         }  
                     }
                 }
             }
+            */
         }
-    }
+        
 
     return value_return;
 }

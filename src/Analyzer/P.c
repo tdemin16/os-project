@@ -84,6 +84,7 @@ int main(int argc, char *argv[])
         failedPath[i][0]='\0';
     }
     int cc = 0;
+    int u;
     char sent = TRUE;
     char end= FALSE;
     int terminated[m];
@@ -133,16 +134,14 @@ int main(int argc, char *argv[])
                         }
                         
                     }
-                    if (end && sent == TRUE){ //Se lo stato e' end, e tutto e' stato inviato, allora la write e' finita
+                    if (end && sent){ //Se lo stato e' end, e tutto e' stato inviato, allora la write e' finita
                             //fprintf(stderr,"C finito di scrivere, %s\n",path);
                         _write = TRUE;
                     }
                 }
                 
                 //Read
-                int u;
-                char sent = TRUE;
-                
+                _read = TRUE;
                 if(!_read) {
                     if (sent){
                         for(i = 0; i < m; i++) { //Cicla tra tutti i figli
