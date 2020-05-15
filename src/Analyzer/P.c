@@ -94,6 +94,7 @@ int main(int argc, char *argv[])
         if(f > 0) { //PARENT SIDE
             while(value_return == 0 && (!_read || !_write)) {
                 //Write
+                
                 if(!_write) {
                     if (sent){// se ilfile è stato mandato a tutti i q, leggo il prossimo 
                         if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //provo a leggere
@@ -124,6 +125,10 @@ int main(int argc, char *argv[])
                                     terminated[i] = TRUE;
                                 }
                             }
+                        }
+                        if ((!strncmp(path,"///",3))&& sent == TRUE){
+                            fprintf(stderr,"C finito di scrivere, _write true\n");
+                           _write = TRUE;
                         }
                     }
                 }
