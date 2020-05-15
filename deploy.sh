@@ -5,4 +5,4 @@ BUILD_DIR="bin/"
 $CLEAN
 $MAKE
 cd $BUILD_DIR
-./A ../../../testDir/test100
+./A ../../../../Desktop/testDir/test200

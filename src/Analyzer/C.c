@@ -120,7 +120,6 @@ int main(int argc, char const *argv[]) {
         k = 0;
         if(f > 0) { //PARENT SIDE
             while(value_return == 0 && (!_read || !_write)) {
-                //usleep(200000);
                 if(!_write) { //CICLO DI SCRITTURA
                     if(count != nfiles){ //Se non sono ancora tutti arraivati
                         if (stop == FALSE){ //E non ci troviamo in uno stato di stop per rinvio dati

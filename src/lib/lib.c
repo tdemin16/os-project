@@ -93,7 +93,7 @@ void sortPathList(array *list){
     int k;
     char insert = FALSE;
     for (i = 0; i<list->count; i++){
-       insertPathList(tmp,list->pathList[i]);
+       insertPathList(tmp,list->pathList[i], 0);
     }
     for (i = 0; (i<list->count) ; i++){
         insert = FALSE;
@@ -253,7 +253,7 @@ int parser(int argc, char* argv[], array* lista, int* count, int* n, int* m) {
                         strcat(path, "#");
                         strcat(path, resolved_path);
                         //printf("%s\n",path);
-                        if (insertPathList(lista, path)){
+                        if (insertPathList(lista, path, 0)){
                             (*count)++;
                             //printf("%s\n", resolved_path);
                         }
