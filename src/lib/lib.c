@@ -17,7 +17,7 @@ array *createPathList(int size)
     return st;
 }
 
-char insertPathList(array *tmp, char *c)
+char insertPathList(array *tmp, char *c, int val)
 {
     int i;
     char present = FALSE;
@@ -48,7 +48,7 @@ char insertPathList(array *tmp, char *c)
         }
         //printf("Stringa inserita\n");
             strcpy(tmp->pathList[tmp->count], c);
-            tmp->analyzed[tmp->count] = 0;
+            tmp->analyzed[tmp->count] = val;
             tmp->count++;
             ret = TRUE;
     } else { ret = FALSE;}
