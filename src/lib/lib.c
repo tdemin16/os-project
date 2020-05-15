@@ -745,7 +745,7 @@ int err_args_Q()
 int err_args_P()
 {
     printf("[!] Errore nella sintassi del comando\nusa: ./P m\n");
-    return ERR_ARGS_Q;
+    return ERR_ARGS_P;
 }
 
 int err_file()
@@ -811,4 +811,20 @@ int err_fifo() {
 
 int err_unlink() {
     printf("Errore nella eliminzazione della pipe fifo\n");
+}
+
+int err_signal() {
+    fprintf(stderr, "Errore, call signal non riuscita\n");
+}
+
+int err_close() {
+    fprintf(stderr, "Errore nella chiusura del file\n");
+}
+
+int err_args_R() {
+    fprintf(stderr, "Errore nella sintassi del comando. Usa:\n-c: Stampa per cluster\n");
+}
+
+int err_enxio() {
+    fprintf(stderr, "Errore, R e' stato avviato senza un processo A\n");
 }

@@ -1,38 +1,19 @@
 #include "../lib/lib.h"
 
-//pid_t* proc; //This global variable is for the SIGINT handler, otherwise we cannot manage it 
-//int p_dim = 0; //This global variable remembers what is the dimension of proc
+int main(int argc, char *argv[]) {
 
-/*void handle_sigint(int sig){
-    printf("\n[!] Ricevuta terminazione, inizio terminazione processi ... \n");
-    int i = p_dim-1;
-    i = p_dim-1;
-    while (i != 0)
-    {
-        if (proc[i] > 0) //Processo padre
-        {
-            if (kill(proc[i],9) == 0){
-                printf("\tProcesso %d terminato con successo!\n",proc[i]);
-            }else{
-                printf("\t[!] Errore, non sono riuscito a chiudere il processo %d!",proc[i]);
-            }  
-        }else if(proc[i] == 0){
-            if (kill(proc[i],9))
-            {
-                printf("Ucciso processo figlio");
-            }  
-        }
-        i--;      
-    }
-    free(proc);
-    printf("[!] ... Chiusura processi terminata\n");
-    exit(-1);
-}*/
+    int value_return = 0; //Valore di ritorno, globale per "send_to_R"
 
-int main(int argc, char *argv[])
-{   
     //Interrupt initialize
     //signal(SIGINT,handle_sigint);
+    struct stat sb;
+    //initialize_processes(proc,4);
+
+    //COMMUNICATION WITH R
+    const char* fifo = "/tmp/A_R_Comm";
+    pid_t fd_fifo;
+    
+    //printf("Processo: %d, is %s\n",proc[0].pid,proc[0].folder);
 
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
@@ -44,7 +25,6 @@ int main(int argc, char *argv[])
     //node filePath = NULL; //list of path's strings
     //parser variables
     int i; //Variabile usata per ciclare gli argomenti (argv[i])
-    int value_return = 0; //Valore di ritorno
     int count = 0; //numero di file univoci da analizzare
     int perc = 0;
 
@@ -60,10 +40,6 @@ int main(int argc, char *argv[])
     int _read = FALSE; //true when fisnish reading from pipe
     char ad[2];
 
-    //COMMUNICATION WITH R
-    const char* fifo = "/tmp/A_R_Comm";
-    pid_t fd_fifo;
-
     value_return = parser(argc, argv, lista, &count, &n, &m);
     
     if (value_return == 0){ //Esecuzione corretta
@@ -73,7 +49,6 @@ int main(int argc, char *argv[])
 
         //proc = malloc(2*(n*m) + 2); //malloc proc with n-P process and m-Q process doubled for son's + 2 for C (...)
         //initialize_processes(proc,((2*n*m) + 2));
-
     }
 
     //proc[p_dim] = getpid(); //Aggiungo PID del padre
@@ -90,7 +65,7 @@ int main(int argc, char *argv[])
             value_return = err_pipe(); //in caso di errore setta il valore di ritorno a ERR_PIPE
         }
     }
-    if(value_return == 0) { //Test errori precedenti
+    if(value_return == 0) {
         if(mkfifo(fifo, 0666) == -1) { //Prova a creare la pipe
             if(errno != EEXIST) { //In caso di errore controlla che la pipe non fosse gia` presente
                 value_return = err_fifo(); //Ritorna errore se l'operazione non va a buon fine
@@ -100,23 +75,30 @@ int main(int argc, char *argv[])
 
     //Set Non-blocking pipes
     if(value_return == 0) {
-        if(fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) { //Prova a sbloccare la pipe 2 in lettura
+        if(fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) { //Prova a sbloccare la pipe 1 in lettura
             value_return = err_fcntl(); //Se errore riporta il messaggio di errore
         }
-        if(fcntl(fd_1[WRITE], F_SETFL, O_NONBLOCK)) { //Prova a sbloccare la pipe 2 in lettura
+        if(fcntl(fd_1[WRITE], F_SETFL, O_NONBLOCK)) { //Prova a sbloccare la pipe 1 in scrittura
             value_return = err_fcntl(); //Se errore riporta il messaggio di errore
         }
         if(fcntl(fd_2[READ], F_SETFL, O_NONBLOCK)) { //Prova a sbloccare la pipe 2 in lettura
             value_return = err_fcntl(); //Se errore riporta il messaggio di errore
         }
-        if(fcntl(fd_2[WRITE], F_SETFL, O_NONBLOCK)) { //Prova a sbloccare la pipe 2 in lettura
+        if(fcntl(fd_2[WRITE], F_SETFL, O_NONBLOCK)) { //Prova a sbloccare la pipe 2 in scrittura
             value_return = err_fcntl(); //Se errore riporta il messaggio di errore
         }
-        if(fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+        if(fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) { //Prova a sbloccare lo stdin
             value_return = err_fcntl();
         }
     }
     
+    //Open fifo in nonblocking read mode
+    if(value_return == 0) {
+        fd_fifo = open(fifo, O_RDONLY | O_NONBLOCK); //Prova ad aprire la pipe in scrittura
+        if(fd_fifo == -1) { //Error handling
+            value_return = err_file_open(); //Errore nell'apertura del file
+        }
+    }
 
     if(value_return == 0) { //same as before
         f = fork(); //Fork dei processi
@@ -142,11 +124,11 @@ int main(int argc, char *argv[])
                         } else {
                             //fprintf(stderr,"A->C: Pipe piena\n");
                         }
-                         //Se fallisce da` errore
+                        //Se fallisce da` errore
                         //ADD SIGNAL HANDLING
                     } else {
                         i++;
-                            //fprintf(stderr,"A->C: scrivo\n");
+                        //fprintf(stderr,"A->C: scrivo\n");
                         if(i == count) {
                             _write = TRUE;
                             freePathList(lista);
@@ -172,8 +154,17 @@ int main(int argc, char *argv[])
             close(fd_1[WRITE]);
             close(fd_2[READ]);
             close(fd_2[WRITE]);
-            if(unlink(fifo) == -1) {
-                value_return = err_unlink();
+            
+            if(value_return == 0) {
+                if(close(fd_fifo) == -1) {
+                    value_return = err_close();
+                }
+            }
+
+            if(value_return == 0) {
+                if(unlink(fifo) == -1) {
+                    value_return = err_unlink();
+                }
             }
         }
     }
@@ -197,7 +188,7 @@ int main(int argc, char *argv[])
 
             //Redirects pipes to STDIN and STDOUT
             dup2(fd_1[READ], STDIN_FILENO);
-            //dup2(fd_2[WRITE], STDOUT_FILENO);
+            dup2(fd_2[WRITE], STDOUT_FILENO);
             //Closing pipes
             close(fd_1[READ]);
             close(fd_1[WRITE]);

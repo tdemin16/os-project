@@ -1,10 +1,20 @@
 #include "lib/lib.h"
 
 int main(int argc, char const *argv[]) {
+
     int value_return = 0;
     const char* fifo = "/tmp/A_R_Comm";
+    pid_t fd_fifo;
 
-    //Crating pipe fifo
+    if(value_return == 0 && argc != 2) { //Controlla che ci sia un argomento in input e, se c'e` controlla che sia corretto
+        value_return = err_args_R();
+    }
+
+    if(value_return == 0 && strcmp(argv[1], "-c")) { //Add other flags
+        value_return = err_args_R();
+    }
+
+    //IPC--------------------------------------------------------------------------------------------
     if(value_return == 0) { //Test errori precedenti
         if(mkfifo(fifo, 0666) == -1) { //Prova a creare la pipe
             if(errno != EEXIST) { //In caso di errore controlla che la pipe non fosse gia` presente
@@ -13,9 +23,30 @@ int main(int argc, char const *argv[]) {
         }
     }
 
-    if(unlink(fifo) == -1) {
-        value_return = err_unlink();
+    if(value_return == 0) {
+        fd_fifo = open(fifo, O_WRONLY | O_NONBLOCK); //Prova ad aprire la pipe in scrittura
+        if(fd_fifo == -1) { //Error handling
+            if(errno == ENXIO) { //Se errno == 6, il file A non e' stato ancora aperto
+                value_return = err_enxio();
+            } else {
+                value_return = err_file_open(); //Errore nell'apertura del file
+            }
+        }
     }
+
+    if(value_return == 0) {
+        if(close(fd_fifo) == -1) {
+            value_return = err_close();
+        }
+    }
+
+    if(value_return == 0) {
+        if(unlink(fifo) == -1) {
+            value_return = err_unlink();
+        }
+    }
+
+
     return value_return;
 }
 
