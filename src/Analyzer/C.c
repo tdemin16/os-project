@@ -11,7 +11,8 @@ int main(int argc, char const *argv[]) {
     int k;
     char path[PATH_MAX];
     char failedPath[PATH_MAX];
-    array *retrive = createPathList(5);
+    //array *retrive = createPathList(5);
+    
     char resp[DIM_RESP];
     char sum[DIM_RESP];
     int v[DIM_V];
@@ -120,24 +121,24 @@ int main(int argc, char const *argv[]) {
         if(f > 0) { //PARENT SIDE
             while(value_return == 0 && (!_read || !_write)) {
                 //usleep(200000);
-                if(!_write) {
-                    if(count != nfiles){
-                        if (stop == FALSE){
+                if(!_write) { //CICLO DI SCRITTURA
+                    if(count != nfiles){ //Se non sono ancora tutti arraivati
+                        if (stop == FALSE){ //E non ci troviamo in uno stato di stop per rinvio dati
                             if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //provo a leggere
-                                //fprintf(stderr,"C[%d]: Leggo %s \n",getpid(),path);
-                                if(write(fd[i*4 + 3], path, PATH_MAX) == -1) { //Test write
+                                //QUI BISOGNA AGGIUNGERE L'INSERIMENTO DEI PATH NELLA LISTA
+                                if(write(fd[i*4 + 3], path, PATH_MAX) == -1) { //Provo a scrivere
                                     if (errno != EAGAIN){
                                         value_return = err_write();
                                         //fprintf(stderr,"errore\n");
-                                            } else {
+                                            } else { //Se da errore in scrittura copio il path in failedPath e setto lo stato di stop (Retransmit)
                                                 stop = TRUE;
                                                 strcpy(failedPath,path);
                                                 //fprintf(stderr,"C->P: Pipe per %d piena, %s aspetta\n",i,path);
                                             }
                                 } else { //scritto con successo
                                     //fprintf(stderr,"C->P: assegno a %d %s\n",i,path);
-                                    count++;
-                                    i = (i+1) % n;
+                                    count++; //Tengo conto della scrittura
+                                    i = (i+1) % n; //Usato per ciclare su tutte le pipe in scrittura
                                 }
                             } 
                         } else {
@@ -150,27 +151,27 @@ int main(int argc, char const *argv[]) {
                                 }
                                 //ADD SIGNAL HANDLING
                             } else {
-                                stop = FALSE;
-                                count++;
+                                stop = FALSE; //Se la scrittura va a buon fine esco dallo stato di stop
+                                count++; //Tengo conto dell'invio
                                 i = (i+1) % n;                                
                             }
                         }
-                    } else {
+                    } else { //Se tutti i file sono stati ricevuti allora devo inviare una stringa di terminazione: ///
                         strcpy(path, "///");
-                        end = TRUE;
+                        end = TRUE; //Setto end = true, se non ci sono problemi rimarrà true
                         for(j = 0; j < n; j++) { //Manda a tutti i processi P la fine della scrittura
                             
-                            if (!terminated[j]){
+                            if (!terminated[j]){ //Se non è ancora stato mandato a quel processo
                                 if(write(fd[j*4 + 3], path, PATH_MAX) == -1) {
                                     if (errno != EAGAIN){
                                         value_return = err_write();
                                     } else {
-                                        terminated[j] = FALSE;
-                                        end = FALSE;
+                                        terminated[j] = FALSE; //Se non riesce a mandare
+                                        end = FALSE; 
                                     }
                                 } else {
                                     //fprintf(stderr,"C->P: Invio /// a %d\n",j);
-                                    terminated[j] = TRUE;
+                                    terminated[j] = TRUE; //Se riesce a mandare
                                 }
                             }
                             //for (i= 0; i<n; i++){
@@ -180,7 +181,7 @@ int main(int argc, char const *argv[]) {
                         }
                         //end = TRUE;
                         if (end == TRUE){
-                            _write = TRUE;
+                            _write = TRUE; //Finito di scrivere
                         } 
                         
                     }
@@ -198,7 +199,7 @@ int main(int argc, char const *argv[]) {
                         } else { 
                             if (strstr(resp, "#") != NULL) {
                                 //printf("%s\n",resp);
-                                insertAndSumPathList(retrive,resp);
+                                //QUI BISOGNA AGGIORNARE IL TOTALE CON LA SOMMA
                                 if(write(STDOUT_FILENO, ad, 2) == -1) {
                                     if (errno != EAGAIN){
                                         value_return = err_write();
@@ -216,7 +217,7 @@ int main(int argc, char const *argv[]) {
             }
             close_pipes(fd, size_pipe);
             free(fd);
-            freePathList(retrive);
+            //freePathList(retrive);
         }
     }
 

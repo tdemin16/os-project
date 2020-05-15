@@ -95,18 +95,19 @@ int main(int argc, char *argv[])
         if(f > 0) { //PARENT SIDE
             while(value_return == 0 && (!_read || !_write)) {
                 //Write
-                if(!_write) {
-                    if (sent){// se ilfile è stato mandato a tutti i q, leggo il prossimo 
+                if(!_write) { //Se non ha finito di scrivere
+                    if (sent){// se il file è stato mandato a tutti i q, leggo il prossimo 
                         if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //provo a leggere
-                            if ((!strncmp(path,"///",3))&& sent == TRUE){
-                                end = TRUE;
+                            //QUI BISOGNA AGGIUNGERE IL SUM DEI Q DIVISI PER FILE
+                            if ((!strncmp(path,"///",3))&& sent == TRUE){ //Se leggo una stringa di terminazione
+                                end = TRUE; //Setto end a true
                             }
-                            for(i = 0; i < m; i++) {
+                            for(i = 0; i < m; i++) { //Provo a inviare path a tutti i Q
                                 if(write(fd[i*4 + 3], path, PATH_MAX) == -1) {
                                         if (errno != EAGAIN){
                                             value_return = err_write();
                                         } else {
-                                            sent = FALSE;
+                                            sent = FALSE; //Se non ci riesce setta sent a false
                                             terminated[i] = FALSE;
                                         }
                                 } else {
@@ -118,12 +119,12 @@ int main(int argc, char *argv[])
                         //fprintf(stderr,"C[%d] provo ritrasmissione di %s\n",getpid(),path);
                         sent = TRUE;
                         for(i = 0; i < m; i++) {
-                            if(!terminated[i]){
+                            if(!terminated[i]){ //Per ogni path non inviato, riprova
                                 if(write(fd[i*4 + 3], path, PATH_MAX) == -1) {
                                     if (errno != EAGAIN){
                                         value_return = err_write();
                                     } else {
-                                        sent = FALSE;
+                                        sent = FALSE; //sent rimane TRUE se durante l'invio non ci sono stati problemi
                                     }
                                 } else {
                                     terminated[i] = TRUE;
@@ -132,7 +133,7 @@ int main(int argc, char *argv[])
                         }
                         
                     }
-                    if (end && sent == TRUE){
+                    if (end && sent == TRUE){ //Se lo stato e' end, e tutto e' stato inviato, allora la write e' finita
                             //fprintf(stderr,"C finito di scrivere, %s\n",path);
                         _write = TRUE;
                     }
