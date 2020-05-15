@@ -257,55 +257,12 @@ int parser(int argc, char* argv[], array* lista, int* count, int* n, int* m) {
     return value_return;
 }
 
-void handle_sigint(int sig){
-    printf("\n\n[!] Ricevuta terminazione, inizio terminazione processi ...\n");
-
-    //free_processes(p);
-}
-
-void initialize_processes(processes* p, int dim){
+void initialize_processes(pid_t* p, int dim){
     int i;
     for (i = 0; i < dim; i++)
     {
-        p[i].pid = -1;
-        p[i].folder = malloc(sizeof("/proc/") + 10);
+        p[i] = -1;
     }
-}
-
-void insert_process(pid_t _pid, processes* p){
-    int i = 0;
-    while (p[i].pid >= 0)
-    {
-        i++;
-    }
-    p[i].pid = _pid;
-    sprintf(p[i].folder, "/proc/%d", p[0].pid);
-}
-
-int check_proc(processes* p){
-    struct stat sb;
-    int i = 0;
-    while (p[i].pid >= 0)
-    {
-        if (stat(p[0].folder, &sb) == 0 && S_ISDIR(sb.st_mode)) {
-            printf("YES\n");
-            return 1;
-        }
-        i++;
-    }
-    printf("NO\n");
-    return 0;
-}
-
-void free_processes(processes* p){
-    int i;
-    //printf("Inizio: %d ", i);
-    while(p[i].folder != NULL)
-    {
-        //printf("%d\t",i);
-        free(p[i].folder);
-    }
-    free(p);
 }
 
 void add_process_to_v(pid_t f, int* v){
@@ -788,7 +745,7 @@ int err_args_Q()
 int err_args_P()
 {
     printf("[!] Errore nella sintassi del comando\nusa: ./P m\n");
-    return ERR_ARGS_Q;
+    return ERR_ARGS_P;
 }
 
 int err_file()
@@ -862,4 +819,12 @@ int err_signal() {
 
 int err_close() {
     fprintf(stderr, "Errore nella chiusura del file\n");
+}
+
+int err_args_R() {
+    fprintf(stderr, "Errore nella sintassi del comando. Usa:\n-c: Stampa per cluster\n");
+}
+
+int err_enxio() {
+    fprintf(stderr, "Errore, R e' stato avviato senza un processo A\n");
 }

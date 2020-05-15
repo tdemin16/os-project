@@ -37,6 +37,9 @@
 #define ERR_OPEN_PROC 13
 #define ERR_SIGNAL 14
 #define ERR_CLOSE 15
+#define ERR_ARGS_R 16
+#define ERR_ARGS_P 17
+#define ERR_ENXIO 18
 
 typedef struct {
     int size; //size of array
@@ -44,10 +47,10 @@ typedef struct {
     int count;
 } array;
 
-typedef struct processes{
+typedef struct process{
     pid_t pid;
-    char* folder;
-}processes;
+    //char* folder;
+}process;
 
 typedef struct m_process{
     int begin;
@@ -70,14 +73,10 @@ int unlock_pipes(int*, int);
 
 // /src/Analyzer/A.c
 int parser(int, char**, array*, int*, int*, int*);
-void initialize_processes(processes*,int);
 void handle_sigint(int);
 int parse_string(char*, int* v); 
 void add_process_to_v(pid_t, int*);
-int anyone_active(processes*);
-int check_proc(processes*);
-void insert_process(pid_t, processes*);
-void free_processes(processes*);
+void initialize_processes(pid_t*, int);
 
 // /src/Analyzer/Q.c
 void initialize_vector(int*);
@@ -133,7 +132,8 @@ int err_fifo();
 int err_unlink();
 int err_signal();
 int err_close();
-
+int err_args_R();
+int err_enxio();
 
 
 #endif

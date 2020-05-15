@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     char path[PATH_MAX];
     char failedPath[PATH_MAX];
     int _write = FALSE;
-
+    char respSent = FALSE;
     char resp[DIM_RESP] = "1044,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647";
 
     //Parsing Arguments--------------------------------------------------------------------
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     if(value_return == 0) {
         while(value_return == 0 && !_write) {
             if(read(STDIN_FILENO, path, PATH_MAX) > 0) {
-                //printf("Q: %s Arrivato\n", path);
+                //fprintf(stderr,"Q[%d]: ANALIZZO p:%d %s \n",getpid(),part,path);
                 if(strcmp(path, "///") == 0){
                     _write = TRUE;
                     if(write(STDOUT_FILENO, path, PATH_MAX) == -1) {
@@ -58,18 +58,23 @@ int main(int argc, char *argv[])
                     fp = fopen(analyze, "r");
                     if(fp == NULL) {
                         value_return = err_file_open();
-                    } else {
-                        
+                    } else {                        
                         get_frequencies(fp, v, part, m);
                         createCsv(v,resp,id);
                         fclose(fp);
-                        if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
+                        respSent = FALSE;
+                        while (!respSent){
+                            if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
                             if (errno != EAGAIN){
-                                value_return = err_write();
-                            } else {
-                                fprintf(stderr,"P: Pipe piena\n");
+                                        value_return = err_write();
+                                    } else {
+                                        
+                                    }
+                        } else { 
+                            respSent = TRUE;
                             }
                         }
+                        
                     }
                 }
             }

@@ -1,19 +1,20 @@
 #include "lib/lib.h"
 
-int value_return = 0;
-const char* fifo = "/tmp/A_R_Comm";
-pid_t fd_fifo;
-void receive_from_A();
-char prova[5];
-
 int main(int argc, char const *argv[]) {
 
-    while(1);
-    return value_return;
-}
+    int value_return = 0;
+    const char* fifo = "/tmp/A_R_Comm";
+    pid_t fd_fifo;
 
-void receive_from_A() {
-    //Crating pipe fifo
+    if(value_return == 0 && argc != 2) { //Controlla che ci sia un argomento in input e, se c'e` controlla che sia corretto
+        value_return = err_args_R();
+    }
+
+    if(value_return == 0 && strcmp(argv[1], "-c")) { //Add other flags
+        value_return = err_args_R();
+    }
+
+    //IPC--------------------------------------------------------------------------------------------
     if(value_return == 0) { //Test errori precedenti
         if(mkfifo(fifo, 0666) == -1) { //Prova a creare la pipe
             if(errno != EEXIST) { //In caso di errore controlla che la pipe non fosse gia` presente
@@ -23,14 +24,15 @@ void receive_from_A() {
     }
 
     if(value_return == 0) {
-        fd_fifo = open(fifo, O_RDONLY);
-        if(fd_fifo == -1) {
-            value_return = err_file_open();
+        fd_fifo = open(fifo, O_WRONLY | O_NONBLOCK); //Prova ad aprire la pipe in scrittura
+        if(fd_fifo == -1) { //Error handling
+            if(errno == ENXIO) { //Se errno == 6, il file A non e' stato ancora aperto
+                value_return = err_enxio();
+            } else {
+                value_return = err_file_open(); //Errore nell'apertura del file
+            }
         }
     }
-
-    read(fd_fifo, prova, 5);
-    printf("%s\n", prova);
 
     if(value_return == 0) {
         if(close(fd_fifo) == -1) {
@@ -38,9 +40,14 @@ void receive_from_A() {
         }
     }
 
-    if(unlink(fifo) == -1) {
-        value_return = err_unlink();
+    if(value_return == 0) {
+        if(unlink(fifo) == -1) {
+            value_return = err_unlink();
+        }
     }
+
+
+    return value_return;
 }
 
     //int v[DIM_V] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94};
