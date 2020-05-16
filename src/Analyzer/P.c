@@ -144,8 +144,6 @@ int main(int argc, char *argv[])
                 }
                 
                 //Read
-                //_read = TRUE;
-
                 if(!_read) {                
                     if (send_r){
                         for(i = 0; i < m; i++) { //Cicla tra tutti i figli
