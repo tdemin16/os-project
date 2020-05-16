@@ -38,8 +38,6 @@ int main(int argc, char *argv[]){
     //COMMUNICATION WITH R
     const char* fifo = "/tmp/A_R_Comm";
     pid_t fd_fifo;
-    
-    //printf("Processo: %d, is %s\n",proc[0].pid,proc[0].folder);
 
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
