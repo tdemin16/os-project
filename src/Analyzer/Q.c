@@ -41,7 +41,6 @@ int main(int argc, char *argv[])
         value_return = err_fcntl();
     }
 
-
         while(value_return == 0 && !_write) {
             //usleep(200000);
             if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //Legge un percorso
