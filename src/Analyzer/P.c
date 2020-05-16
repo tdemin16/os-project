@@ -166,7 +166,6 @@ int main(int argc, char *argv[])
                                     sum_value = insertAndSumPathList(sum, resp, m-1);
                                     if (sum_value > -1){ //Qualcosa è arrivato a 0, 
                                         strcpy(resp, sum->pathList[sum_value]);
-                                        fprintf(stderr, "%s\n", resp);
                                         if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Scrive il carattere di teminazione
                                             if (errno != EAGAIN){
                                                 value_return = err_write();
