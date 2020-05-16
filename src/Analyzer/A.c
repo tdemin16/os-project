@@ -1,18 +1,18 @@
 #include "../lib/lib.h"
 
-process *p;
+process *p; //Declaring p (it's global because hendle_sigint can't have parameters, only int sig)
 
 void handle_sigint(int sig){
     printf("\n[!] Ricevuta terminazione, inizio terminazione processi ... \n");
-    int i = p->count-1;
-    while (i != 0)
+    int i = p->count-1; //start from the end
+    while (i != 0) //while we haven't controlled every single process
     {
         if (p->pid[i] > 0) //Processo padre
         {
-            if (kill(p->pid[i],9) == 0){
-                printf("\tProcesso %d terminato con successo!\n",p->pid[i]);
+            if (kill(p->pid[i],9) == 0){ //Tries to kill process with pid saved in pid[i]
+                printf("\tProcesso %d terminato con successo!\n",p->pid[i]); //if it success you terminated it correctly
             }else{
-                printf("\t[!] Errore, non sono riuscito a chiudere il processo %d!",p->pid[i]);
+                printf("\t[!] Errore, non sono riuscito a chiudere il processo %d!",p->pid[i]); //if it fail something is wrong
             }  
         }/*else if(proc[i] == 0){
             if (kill(proc[i],9))
@@ -20,18 +20,18 @@ void handle_sigint(int sig){
                 printf("Ucciso processo figlio");
             }  
         }*/
-        i--;      
+        i--; //i-- otherwise it will go to infinity      
     }
-    freeList(p);
+    freeList(p); //free memory allocated for p 
     printf("[!] ... Chiusura processi terminata\n");
-    exit(-1);
+    exit(-1); //return exit with error -1
 }
 
 int main(int argc, char *argv[]){
 
-    signal(SIGINT,handle_sigint);
+    signal(SIGINT,handle_sigint); //Handler for SIGINT (Ctrl-C)
 
-    p = create_process(1);
+    p = create_process(1); //Allocate dynamically p with dimension 1
 
     int value_return = 0; //Valore di ritorno, globale per "send_to_R"
 
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]){
         //printPathList(lista);
     }
 
-    insertProcess(p,getpid());
+    insertProcess(p,getpid()); //Insert pid of A in process list
     
     //IPC
     if(value_return == 0) { //Testo che non si siano verificati errori in precedenza
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]){
 
     if(value_return == 0) { //same
         if(f > 0) { //PARENT SIDE
-            insertProcess(p,f);
+            insertProcess(p,f); //Insert process f in list p
             i = 0;
             while(value_return == 0 && (!_read || !_write)) { //cicla finche` non ha finito di leggere e scrivere
                 //sleep(2);
