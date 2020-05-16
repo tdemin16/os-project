@@ -160,8 +160,9 @@ int main(int argc, char *argv[]){
                 //Read
                 //fprintf(stderr,"A<-C: leggo\n");
                 if(!_read) {
-                    if(read(fd_2[READ], ad, 2) > 1) {
+                    if(read(fd_2[READ], ad, 2) > 0) {
                         printf("%s", ad);
+                        fflush(stdout);
                         perc++;
                         if(perc == count*m) {
                             _read = TRUE;
