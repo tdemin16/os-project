@@ -57,11 +57,12 @@ typedef struct m_process{
 }m_process;
 
 typedef struct process{
-    int size; //size of array
-    int* pid;
-    int count;
+    int size; //size of list process
+    int* pid; //vector containing all pids
+    int count;//counter to remember how many variables are inside the list
 }process;
 
+//functions for process to work
 process * create_process(int);
 void insertProcess(process*, pid_t);
 void printList(process*);
@@ -103,7 +104,7 @@ m_process* splitter(FILE*,int);
 inline void swap(char*, char*);
 char* reverse(char*, int, int);
 char* itoa(int, char*, int);
-char* arrayToCsv(int *);
+void arrayToCsv(int *,char *);
 char* integer_to_string(int);
 int countDigit(int);
 int lenghtCsv(int *);
