@@ -164,7 +164,7 @@ int main(int argc, char *argv[]){
                         printf("%s", ad);
                         fflush(stdout);
                         perc++;
-                        if(perc == count*m) {
+                        if(perc == count) {
                             _read = TRUE;
                             printf("\n");
                         }

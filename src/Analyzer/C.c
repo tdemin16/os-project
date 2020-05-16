@@ -31,6 +31,15 @@ int main(int argc, char const *argv[]) {
     int _write = FALSE; //Indica se ha finito di scrivere
     char ad[2];
     strcpy(ad, "$");
+
+    int test = 0;
+    failedPath[0]='\0';
+    char stop = FALSE;
+    char end = FALSE;
+    char send_r = TRUE;
+    int terminated[n];
+    int id_r;
+    for (i= 0; i<n; i++) terminated[i] = FALSE;
     
     //Parsing arguments------------------------------------------------------------------------------------------
     if(argc % 2 == 0 || argc < 2) { //if number of arguments is even or less than 1, surely it's a wrong input
@@ -110,15 +119,6 @@ int main(int argc, char const *argv[]) {
     }
 
     //----------------------------------------------------------------------------------------
-    int test = 0;
-    failedPath[0]='\0';
-    char stop = FALSE;
-    char end = FALSE;
-    int terminated[n];
-    int id_r;
-    for (i= 0; i<n; i++){
-        terminated[i] = FALSE;
-    }
     if(value_return == 0) {
         i = 0;
         k = 0;
@@ -193,38 +193,44 @@ int main(int argc, char const *argv[]) {
                
                 //Read
                 if(!_read) {
-                    if(read(fd[k*4 + 0], resp, DIM_RESP) > 0) {
-                        
-                        if(strcmp(resp, "///") == 0) {//Lascia questo blocco
-                            //fprintf(stderr,"Arrivata fine\n");
-                            part_received++;
-                            if(part_received == n) {
-                                _read = TRUE;
-                            }
-                        } else { 
-                            if (strstr(resp, "#") != NULL) {
-                                id_r = atoi(strtok(strdup(resp),"#"));
-                                //fprintf(stderr,"%s\n",strtok(strdup(resp),"#"));
-                                retrive->analyzed[id_r] = 1;
-                                if(write(STDOUT_FILENO, ad, 2) == -1) {
-                                    if (errno != EAGAIN){
-                                        value_return = err_write();
-                                    } else {
-                                        //fprintf(stderr,"C->A: Pipe piena\n");
-                                    }
+                    if(send_r) {
+                        if(read(fd[k*4 + 0], resp, DIM_RESP) > 0) {
+                            if(strcmp(resp, "///") == 0) {//Lascia questo blocco
+                                //fprintf(stderr,"Arrivata fine\n");
+                                part_received++;
+                                if(part_received == n) {
+                                    _read = TRUE;
                                 }
-                            }       
-                            //addCsvToArray(resp,v);
-                            
+                            } else { 
+                                if (strstr(resp, "#") != NULL) {
+                                    id_r = atoi(strtok(strdup(resp),"#"));
+                                    //fprintf(stderr,"%s\n",strtok(strdup(resp),"#"));
+                                    retrive->analyzed[id_r] = 1;
+                                    if(write(STDOUT_FILENO, ad, 2) == -1) {
+                                        if (errno != EAGAIN){
+                                            value_return = err_write();
+                                        } else {
+                                            send_r = FALSE;
+                                        }
+                                    } else {
+                                        k = (k+1) % n;
+                                    }
+                                }       
+                                //addCsvToArray(resp,v);
+
+                            }
                         }
+                    } else {
+                        if(write(STDOUT_FILENO, ad, 2) == -1) {
+                            if(errno != EAGAIN) value_return = err_write();
+                        } else send_r = TRUE;
                     }
-                    k = (k+1) % n;
                 }
                 
             }
             close_pipes(fd, size_pipe);
             free(fd);
-            printPathList(retrive);
+            //printPathList(retrive);
             freePathList(retrive);
         }
     }
