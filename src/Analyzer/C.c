@@ -211,13 +211,12 @@ int main(int argc, char const *argv[]) {
                                             value_return = err_write();
                                         } else {
                                             send_r = FALSE;
+                                            fprintf(stderr, "Errore\n");
                                         }
-                                    } else {
-                                        k = (k+1) % n;
                                     }
+                                    k = (k+1) % n;
                                 }       
                                 //addCsvToArray(resp,v);
-
                             }
                         }
                     } else {
