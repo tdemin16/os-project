@@ -191,11 +191,12 @@ int main(int argc, char const *argv[]) {
                 }
                
                 //Read
+                _read = TRUE;
                 if(!_read) {
                     if(read(fd[k*4 + 0], resp, DIM_RESP) > 0) {
                         
                         if(strcmp(resp, "///") == 0) {//Lascia questo blocco
-                            fprintf(stderr,"Arrivata fine\n");
+                            //fprintf(stderr,"Arrivata fine\n");
                             part_received++;
                             if(part_received == n) {
                                 _read = TRUE;
@@ -206,7 +207,7 @@ int main(int argc, char const *argv[]) {
                                     if (errno != EAGAIN){
                                         value_return = err_write();
                                     } else {
-                                        fprintf(stderr,"C->A: Pipe piena\n");
+                                        //fprintf(stderr,"C->A: Pipe piena\n");
                                     }
                                 }
                             }       
@@ -220,6 +221,7 @@ int main(int argc, char const *argv[]) {
             }
             close_pipes(fd, size_pipe);
             free(fd);
+            printPathList(retrive);
             freePathList(retrive);
         }
     }
