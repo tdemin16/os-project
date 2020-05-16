@@ -52,7 +52,7 @@ char insertPathList(array *tmp, char *c, int val)
 char insertAndSumPathList(array *tmp, char *c,int val){
     int i;
     char sum = FALSE;
-    char ret = FALSE;
+    char ret = -1;
     char path[PATH_MAX];
 
 
@@ -61,7 +61,7 @@ char insertAndSumPathList(array *tmp, char *c,int val){
             sum = TRUE;
             tmp->analyzed[i]--;
             if (tmp->analyzed[i] == 0){
-                ret = TRUE;
+                ret = i;
             }
         }
     }

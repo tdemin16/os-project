@@ -24,6 +24,21 @@ int main(int argc, char *argv[])
     char array[4][4];
     char* args[4];
     int count = 0;
+    char stop = FALSE;
+    for (i=0; i<m; i++){
+        failedPath[i][0]='\0';
+    }
+    int cc = 0;
+    int u;
+    char send_w = TRUE;
+    char send_r = TRUE;
+    char end = FALSE;
+    int terminated[m];
+    int test=0;
+    for (i= 0; i<m; i++){
+        terminated[i] = FALSE;
+    }
+    int sum_value;
 
 
     //Parsing arguments-------------------------------------------------------
@@ -79,26 +94,13 @@ int main(int argc, char *argv[])
         }
     }
 
-    char stop = FALSE;
-    for (i=0; i<m; i++){
-        failedPath[i][0]='\0';
-    }
-    int cc = 0;
-    int u;
-    char sent = TRUE;
-    char end= FALSE;
-    int terminated[m];
-    int test=0;
-    for (i= 0; i<m; i++){
-        terminated[i] = FALSE;
-    }
     //----------------------------------------------------------------------
     if(value_return == 0) {
         if(f > 0) { //PARENT SIDE
             while(value_return == 0 && (!_read || !_write)) {
                 //Write
                 if(!_write) { //Se non ha finito di scrivere
-                    if (sent){// se il file è stato mandato a tutti i q, leggo il prossimo 
+                    if (send_w){// se il file è stato mandato a tutti i q, leggo il prossimo 
                         if(read(STDIN_FILENO, path, PATH_MAX) > 0) { //provo a leggere
                             if (!strncmp(path,"///",3)){ //Se leggo una stringa di terminazione
                                 end = TRUE; //Setto end a true
@@ -109,7 +111,7 @@ int main(int argc, char *argv[])
                                         if (errno != EAGAIN){
                                             value_return = err_write();
                                         } else {
-                                            sent = FALSE; //Se non ci riesce setta sent a false
+                                            send_w = FALSE; //Se non ci riesce setta send a false
                                             terminated[i] = FALSE;
                                         }
                                 } else {
@@ -119,14 +121,14 @@ int main(int argc, char *argv[])
                         }
                     } else {
                         //fprintf(stderr,"C[%d] provo ritrasmissione di %s\n",getpid(),path);
-                        sent = TRUE;
+                        send_w = TRUE;
                         for(i = 0; i < m; i++) {
                             if(!terminated[i]){ //Per ogni path non inviato, riprova
                                 if(write(fd[i*4 + 3], path, PATH_MAX) == -1) {
                                     if (errno != EAGAIN){
                                         value_return = err_write();
                                     } else {
-                                        sent = FALSE; //sent rimane TRUE se durante l'invio non ci sono stati problemi
+                                        send_w = FALSE; //send rimane TRUE se durante l'invio non ci sono stati problemi
                                     }
                                 } else {
                                     terminated[i] = TRUE;
@@ -135,7 +137,7 @@ int main(int argc, char *argv[])
                         }
                         
                     }
-                    if (end && sent){ //Se lo stato e' end, e tutto e' stato inviato, allora la write e' finita
+                    if (end && send_w){ //Se lo stato e' end, e tutto e' stato inviato, allora la write e' finita
                             //fprintf(stderr,"C finito di scrivere, %s\n",path);
                         _write = TRUE;
                     }
@@ -144,26 +146,11 @@ int main(int argc, char *argv[])
                 //Read
                 //_read = TRUE;
 
-                if(!_read) {
-                    for(i = 0; i < m; i++) {
-                        if(read(fd[i*4 + 0], resp, DIM_RESP) > 0) {
-                            //fprintf(stderr,"P read: %s\n",resp);
-                            if(!strcmp(resp, "///")) { //Controlla se e` la fine del messaggio
-                                count++; //Conta quanti terminatori sono arrivati
-                                if(count == m) { //Quando tutti i figli hanno terminato
-                                    fprintf(stderr,"P: Chiudo %s\n",resp);
-                                    _read = TRUE;                            
-                                }
-                            }
-                        }
-                    }
-
-                
-                    /*
-                    if (sent){
+                if(!_read) {                
+                    if (send_r){
                         for(i = 0; i < m; i++) { //Cicla tra tutti i figli
                             if(read(fd[i*4 + 0], resp, DIM_RESP) > 0) {
-                                //fprintf(stderr,"P read: %s\n",resp);
+                                fprintf(stderr,"P read: %s\n",resp);
                                 if(!strcmp(resp, "///")) { //Controlla se e` la fine del messaggio
                                         count++; //Conta quanti terminatori sono arrivati
                                         if(count == m) { //Quando tutti i figli hanno terminato
@@ -172,17 +159,19 @@ int main(int argc, char *argv[])
                                                 if (errno != EAGAIN){
                                                     value_return = err_write();
                                                 } else {
-                                                    sent = FALSE;
+                                                    send_r = FALSE;
                                                 }
                                             }
                                         }
                                 } else {
-                                    if (insertAndSumPathList(sum,resp,m)){ //Qualcosa è arrivato a 0, 
-                                        for (u = 0; u<sum->count; u++){
-                                            if (sum->analyzed[u] == 0){
-                                                fprintf(stderr,"Qualcosa e' arrivato a 0\n");
-                                                sum->analyzed[u] = -1;
-                                                strcpy(resp,sum->pathList[u]);
+                                    sum_value = insertAndSumPathList(sum, resp, m);
+                                    if (sum_value > -1){ //Qualcosa è arrivato a 0, 
+                                        strcpy(resp, sum->pathList[sum_value]);
+                                        if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Scrive il carattere di teminazione
+                                            if (errno != EAGAIN){
+                                                value_return = err_write();
+                                            } else {
+                                                send_r = FALSE;
                                             }
                                         }
                                     }
@@ -192,10 +181,9 @@ int main(int argc, char *argv[])
                     } else { //resend
                         if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Scrive il carattere di teminazione
                             if (errno != EAGAIN) value_return = err_write();
-                        } else sent = TRUE;
+                        } else send_r = TRUE;
                     }
-                    if ((count == m) && sent && (!strncmp(resp,"///",3))) _read = TRUE;
-                    */
+                    if ((count == m) && send_r && (!strncmp(resp,"///",3))) _read = TRUE;
                 }
             }     
             close_pipes(fd, size_pipe);
@@ -236,3 +224,16 @@ int main(int argc, char *argv[])
 
     return value_return;
 }
+
+/*for(i = 0; i < m; i++) {
+    if(read(fd[i*4 + 0], resp, DIM_RESP) > 0) {
+        //fprintf(stderr,"P read: %s\n",resp);
+        if(!strcmp(resp, "///")) { //Controlla se e` la fine del messaggio
+            count++; //Conta quanti terminatori sono arrivati
+            if(count == m) { //Quando tutti i figli hanno terminato
+                fprintf(stderr,"P: Chiudo %s\n",resp);
+                _read = TRUE;                            
+            }
+        }
+    }
+}*/
