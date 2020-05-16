@@ -803,3 +803,8 @@ int err_args_R() {
 int err_enxio() {
     fprintf(stderr, "Errore, R e' stato avviato senza un processo A\n");
 }
+
+int err_args_M() {
+    printf("\nErrore nella sintassi del comando.\nUsa: /M nomeFile nomeCartella\nPuoi usare -setn e -setm per cambiare n e m\nes: /M A.c ../Analyzer/ -setn 3 -setm 4\n\n");
+    return ERR_ARGS_M;
+}

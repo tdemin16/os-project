@@ -21,6 +21,7 @@
 #define FALSE 0
 #define DIM_V 95
 #define DIM_RESP 1051
+#define DIM_CMD 4096
 
 #define ERR_ARGS_A 1
 #define ERR_ARGS_C 2
@@ -40,6 +41,7 @@
 #define ERR_ARGS_R 16
 #define ERR_ARGS_P 17
 #define ERR_ENXIO 18
+#define ERR_ARGS_M 19
 
 typedef struct {
     int size; //size of array
@@ -144,6 +146,7 @@ int err_signal();
 int err_close();
 int err_args_R();
 int err_enxio();
+int err_args_M();
 
 
 #endif

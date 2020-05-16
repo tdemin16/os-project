@@ -39,6 +39,10 @@ int main(int argc, char *argv[]){
     const char* fifo = "/tmp/A_R_Comm";
     pid_t fd_fifo;
 
+    //COMMUNICATION WITH M
+    char cmd[DIM_CMD];
+    int _close = FALSE;
+
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
     int m = 4;
@@ -132,7 +136,7 @@ int main(int argc, char *argv[]){
         if(f > 0) { //PARENT SIDE
             insertProcess(p,f); //Insert process f in list p
             i = 0;
-            while(value_return == 0 && (!_read || !_write)) { //cicla finche` non ha finito di leggere e scrivere
+            while(value_return == 0 && (!_read || !_write || !_close)) { //cicla finche` non ha finito di leggere e scrivere
                 //sleep(2);
                 //Write
                 if(!_write) {
@@ -159,13 +163,21 @@ int main(int argc, char *argv[]){
                 //fprintf(stderr,"A<-C: leggo\n");
                 if(!_read) {
                     if(read(fd_2[READ], ad, 2) > 0) {
-                        printf("%s", ad);
-                        fflush(stdout);
+                        //printf("%s", ad);
+                        //fflush(stdout);
                         perc++;
                         if(perc == count) {
                             _read = TRUE;
                             printf("\n");
                         }
+                    }
+                }
+
+                //M
+                _close = TRUE;
+                if(!_close) {
+                    if(read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
+                        printf("%s\n", cmd);
                     }
                 }
             }
