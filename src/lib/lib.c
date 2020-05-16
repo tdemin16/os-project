@@ -41,21 +41,21 @@ void freeList(process *tmp) // free the list tmp
     free(tmp);              // free the list tmp
 }                           //
 
-array *createPathList(int size)
+array *createPathList(int size) //allocate an array for the PathList
 {
-    array *st = (array *)malloc(sizeof(array));
-    st->size = size;
-    st->pathList = malloc(sizeof(char **) * size);
-    st->analyzed =(int*) malloc(sizeof(int*) * size);
-    st->count = 0;
-    int i;
-    for (i = 0; i < size; i++)
-    {
-        st->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX));
-        memset( st->pathList[i], '\0', sizeof(char*) * PATH_MAX);
-        st->analyzed[i] = -1;
-    }
-    return st;
+    array *st = (array *)malloc(sizeof(array));         //allocate list of paths
+    st->size = size;                                    //assign the size of the array
+    st->pathList = malloc(sizeof(char **) * size);      //allocate the array of path (strings / char*)
+    st->analyzed =(int*) malloc(sizeof(int*) * size);   //allocate the array of int analyzed
+    st->count = 0;                                      //set the counter to 0
+    int i;                                              //initialize variable i for the next cycle
+    for (i = 0; i < size; i++)                          //start the cycle from 0 to the size of the process
+    {                                                   //
+        st->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX));  //allocate the array of chars that compose the string
+        memset( st->pathList[i], '\0', sizeof(char*) * PATH_MAX);       //set the first character to '\0' (= end of string)
+        st->analyzed[i] = -1;                           //set analyzed to -1 (= not analyzed)
+    }                                                   //
+    return st;                                          //return the created list of paths
 }
 
 char insertPathList(array *tmp, char *c, int val)
