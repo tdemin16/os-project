@@ -203,8 +203,8 @@ int main(int argc, char const *argv[]) {
                             }
                         } else { 
                             if (strstr(resp, "#") != NULL) {
-                                id_r = atoi(strtok(strdup(path),"#"));
-                                fprintf(stderr,"%s\n",strtok(strdup(path),"#"));
+                                id_r = atoi(strtok(strdup(resp),"#"));
+                                //fprintf(stderr,"%s\n",strtok(strdup(resp),"#"));
                                 retrive->analyzed[id_r] = 1;
                                 if(write(STDOUT_FILENO, ad, 2) == -1) {
                                     if (errno != EAGAIN){
@@ -224,7 +224,7 @@ int main(int argc, char const *argv[]) {
             }
             close_pipes(fd, size_pipe);
             free(fd);
-            //printPathList(retrive);
+            printPathList(retrive);
             freePathList(retrive);
         }
     }
