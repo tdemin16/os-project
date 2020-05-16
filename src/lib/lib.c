@@ -129,7 +129,7 @@ char insertAndSumPathList(array *tmp, char *c, int val){
 void printPathList(array *tmp) {
     int i;
     for (i = 0; i < tmp->count; i++) {
-        printf("%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
+       fprintf(stderr,"%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
     }
 }
 

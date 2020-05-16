@@ -115,6 +115,7 @@ int main(int argc, char const *argv[]) {
     char stop = FALSE;
     char end = FALSE;
     int terminated[n];
+    int id_r;
     for (i= 0; i<n; i++){
         terminated[i] = FALSE;
     }
@@ -191,7 +192,7 @@ int main(int argc, char const *argv[]) {
                 }
                
                 //Read
-                _read = TRUE;
+                //_read = TRUE;
                 if(!_read) {
                     if(read(fd[k*4 + 0], resp, DIM_RESP) > 0) {
                         
@@ -203,6 +204,9 @@ int main(int argc, char const *argv[]) {
                             }
                         } else { 
                             if (strstr(resp, "#") != NULL) {
+                                id_r = atoi(strtok(strdup(path),"#"));
+                                fprintf(stderr,"%s\n",strtok(strdup(path),"#"));
+                                retrive->analyzed[id_r] = 1;
                                 if(write(STDOUT_FILENO, ad, 2) == -1) {
                                     if (errno != EAGAIN){
                                         value_return = err_write();
@@ -221,7 +225,7 @@ int main(int argc, char const *argv[]) {
             }
             close_pipes(fd, size_pipe);
             free(fd);
-            printPathList(retrive);
+            //printPathList(retrive);
             freePathList(retrive);
         }
     }
