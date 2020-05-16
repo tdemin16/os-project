@@ -1,5 +1,46 @@
 #include "lib.h"
 
+process *create_process(int size)
+{
+    process *st = (process *)malloc(sizeof(process));
+    st->size = size;
+    st->pid = (int *)malloc(sizeof(int *) * size);
+    st->count = 0;
+    int i;
+    for (i = 0; i < size; i++)
+    {
+        st->pid[i] = -1;
+    }
+    printf("Lista allocata\n");
+    return st;
+}
+
+void insertProcess(process *tmp, pid_t val)
+{
+    if (tmp->count == tmp->size)
+    {
+        tmp->size *= 2;
+        tmp->pid = (int *)realloc(tmp->pid, sizeof(int *) * tmp->size);
+    }
+    tmp->pid[tmp->count] = val;
+    tmp->count++;
+}
+
+void printList(process *tmp)
+{
+    int i;
+    for (i = 0; i < tmp->count; i++)
+    {
+        printf("%d: A=%d\n", i, tmp->pid[i]);
+    }
+}
+
+void freeList(process *tmp)
+{
+    free(tmp->pid);
+    free(tmp);
+}
+
 array *createPathList(int size)
 {
     array *st = (array *)malloc(sizeof(array));

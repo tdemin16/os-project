@@ -48,10 +48,6 @@ typedef struct {
     int count;
 } array;
 
-typedef struct process{
-    pid_t pid;
-    //char* folder;
-}process;
 
 typedef struct m_process{
     int begin;
@@ -59,6 +55,17 @@ typedef struct m_process{
     int part;
     //char *DIR; //Da usare per dare il file(???)
 }m_process;
+
+typedef struct process{
+    int size; //size of array
+    int* pid;
+    int count;
+}process;
+
+process * create_process(int);
+void insertProcess(process*, pid_t);
+void printList(process*);
+void freeList(process*);
 
 //Array struct functions -- sostituiscono lista (momentaneamente?)
 array * createPathList(int);
