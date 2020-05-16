@@ -196,6 +196,7 @@ int main(int argc, char const *argv[]) {
                     if(read(fd[k*4 + 0], resp, DIM_RESP) > 0) {
                         
                         if(strcmp(resp, "///") == 0) {//Lascia questo blocco
+                        fprintf(stderr,"Arrivata fine\n");
                             part_received++;
                             if(part_received == n) {
                                 _read = TRUE;
