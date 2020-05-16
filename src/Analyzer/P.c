@@ -163,10 +163,10 @@ int main(int argc, char *argv[])
                                         }
                                     }
                                 } else if(strstr(resp, "#") != NULL){
-                                    sum_value = insertAndSumPathList(sum, resp, m);
+                                    sum_value = insertAndSumPathList(sum, resp, m-1);
                                     if (sum_value > -1){ //Qualcosa è arrivato a 0, 
-                                        fprintf(stderr, "almeno uno plz\n");
                                         strcpy(resp, sum->pathList[sum_value]);
+                                        fprintf(stderr, "%s\n", resp);
                                         if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Scrive il carattere di teminazione
                                             if (errno != EAGAIN){
                                                 value_return = err_write();
