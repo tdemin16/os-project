@@ -103,7 +103,7 @@ m_process* splitter(FILE*,int);
 inline void swap(char*, char*);
 char* reverse(char*, int, int);
 char* itoa(int, char*, int);
-char* arrayToCsv(int *);
+void arrayToCsv(int *,char *);
 char* integer_to_string(int);
 int countDigit(int);
 int lenghtCsv(int *);

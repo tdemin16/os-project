@@ -684,6 +684,22 @@ char *itoa(int value, char *buffer, int base) {
     return reverse(buffer, 0, i - 1);
 }
 
+void arrayToCsv(int *v, char* res){
+    
+    int i;
+    char str[12];
+    for (i = 0; i<DIM_RESP; i++){
+        res[i]='\0';
+    }
+    sprintf(str, "%d", v[0]);
+    strcat(res,str);
+    for (i = 1; i<DIM_V; i++){
+        strcat(res,","); 
+        sprintf(str, "%d", v[i]);
+        strcat(res,str);
+    }
+}
+
 //Error handlers
 int err_pipe() {
     printf("Errore nella creazione della pipe\n");
