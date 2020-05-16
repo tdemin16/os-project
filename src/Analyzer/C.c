@@ -229,7 +229,7 @@ int main(int argc, char const *argv[]) {
             }
             close_pipes(fd, size_pipe);
             free(fd);
-            //printPathList(retrive);
+            printPathList(retrive);
             freePathList(retrive);
         }
     }
