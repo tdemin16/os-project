@@ -1,32 +1,32 @@
 #include "lib.h"
 
-process *create_process(int size)
+process *create_process(int size) //Allocate memory for process* and process->pid
 {
-    process *st = (process *)malloc(sizeof(process));
-    st->size = size;
-    st->pid = (int *)malloc(sizeof(int *) * size);
-    st->count = 0;
-    int i;
-    for (i = 0; i < size; i++)
-    {
-        st->pid[i] = -1;
-    }
-    printf("Lista allocata\n");
-    return st;
+    process *st = (process *)malloc(sizeof(process));   //Allocate process memory
+    st->size = size;                                    //Set process->size to size (end point) 
+    st->pid = (int *)malloc(sizeof(int *) * size);      //Allocate pid memory 
+    st->count = 0;                                      //Set count to 0 (start point)
+    int i;                                              //Declaring a new int
+    for (i = 0; i < size; i++)                          //for cycle from 0 to end point
+    {                                                   //
+        st->pid[i] = -1;                                //Set the default value (-1) to every pid in the list 
+    }                                                   //
+    //printf("Lista allocata\n");                           
+    return st;                                          //return process
 }
 
-void insertProcess(process *tmp, pid_t val)
+void insertProcess(process *tmp, pid_t val) //Insert process val in list tmp
 {
-    if (tmp->count == tmp->size)
-    {
-        tmp->size *= 2;
-        tmp->pid = (int *)realloc(tmp->pid, sizeof(int *) * tmp->size);
-    }
-    tmp->pid[tmp->count] = val;
-    tmp->count++;
+    if (tmp->count == tmp->size)            //If tmp->pid isn't enough big to contain another value 
+    {                                       //
+        tmp->size *= 2;                     //We doubled the size
+        tmp->pid = (int *)realloc(tmp->pid, sizeof(int *) * tmp->size); //We realloc it's memory to double it
+    }                                       //
+    tmp->pid[tmp->count] = val;             //Insert the pid "val" in position count of tmp
+    tmp->count++;                           //Increase the count of variables inside
 }
 
-void printList(process *tmp)
+void printList(process *tmp) //ONLY FOR TESTING -- NOT FOR PROJECT -- use it to print the process saved in tmp
 {
     int i;
     for (i = 0; i < tmp->count; i++)
@@ -35,11 +35,11 @@ void printList(process *tmp)
     }
 }
 
-void freeList(process *tmp)
-{
-    free(tmp->pid);
-    free(tmp);
-}
+void freeList(process *tmp) // free the list tmp
+{                           //
+    free(tmp->pid);         // free the array of pid
+    free(tmp);              // free the list tmp
+}                           //
 
 array *createPathList(int size)
 {
