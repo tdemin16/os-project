@@ -27,16 +27,16 @@ char insertPathList(array *tmp, char *c, int val)
             present = TRUE;
         }
     }
-    if (present == FALSE){
+    if (present == FALSE) {
         //printf("Provo a inserire %s, size: %d, count:%d\n", c, tmp->size, tmp->count);
-        if (tmp->count == tmp->size)
-        {
+        if (tmp->count == tmp->size) {
+
             //printf("Raddoppio la size\n");
             tmp->size *= 2;
             tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
             tmp->analyzed = (int*)realloc(tmp->analyzed, sizeof(int*) * tmp->size);
-            for (i = tmp->count; i < tmp->size; i++)
-            {
+            
+            for (i = tmp->count; i < tmp->size; i++) {
                 tmp->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX + 1));
             }
         }
@@ -49,12 +49,10 @@ char insertPathList(array *tmp, char *c, int val)
     return ret;
 }
 
-char insertAndSumPathList(array *tmp, char *c,int val){
+char insertAndSumPathList(array *tmp, char *c, int val){
     int i;
     char sum = FALSE;
     char ret = -1;
-    char path[PATH_MAX];
-
 
     for (i = 0; i<tmp->count; i++){
         if (sumCsv(tmp->pathList[i],c)){
@@ -68,25 +66,21 @@ char insertAndSumPathList(array *tmp, char *c,int val){
 
     if (sum == FALSE){
         //printf("Provo a inserire %s, size: %d, count:%d\n", c, tmp->size, tmp->count);
-        if (tmp->count == tmp->size)
-        {
+        if (tmp->count == tmp->size) {
             //printf("Raddoppio la size\n");
             tmp->size *= 2;
             tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
             tmp->analyzed = (int*)realloc(tmp->analyzed, sizeof(int*) * tmp->size);
-            for (i = tmp->count; i < tmp->size; i++)
-            {
-                tmp->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX + 1));
+            
+            for (i = tmp->count; i < tmp->size; i++) {
+                tmp->pathList[i] = (char *)malloc(sizeof(char *) * (DIM_RESP + 1));
             }
         }
         //printf("Stringa inserita\n");
         strcpy(tmp->pathList[tmp->count], c);
         tmp->analyzed[tmp->count] = val;
         tmp->count++;
-        
-    
     }
-    
     
     return ret;
 }
@@ -410,7 +404,7 @@ char sumCsv(char* str1, char*str2){
     
     char *id2= strtok(strdup(str2),"#");
     char * tmp2= strtok(NULL,"#");
-    int v[DIM_V];
+    int v[DIM_RESP];
     initialize_vector(v);
     
     if (!strcmp(id1,id2)) {
@@ -422,6 +416,7 @@ char sumCsv(char* str1, char*str2){
 
     return ret;
 }
+
 void addCsvToArray(char * tmp, int *v){
     int i = 0;
     char *Analyze = strtok(tmp, "#");

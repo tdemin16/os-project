@@ -150,22 +150,22 @@ int main(int argc, char *argv[])
                     if (send_r){
                         for(i = 0; i < m; i++) { //Cicla tra tutti i figli
                             if(read(fd[i*4 + 0], resp, DIM_RESP) > 0) {
-                                fprintf(stderr,"P read: %s\n",resp);
+                                //fprintf(stderr,"P read: %s\n",resp);
                                 if(!strcmp(resp, "///")) { //Controlla se e` la fine del messaggio
-                                        count++; //Conta quanti terminatori sono arrivati
-                                        if(count == m) { //Quando tutti i figli hanno terminato
-                                            
-                                            if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Scrive il carattere di teminazione
-                                                if (errno != EAGAIN){
-                                                    value_return = err_write();
-                                                } else {
-                                                    send_r = FALSE;
-                                                }
+                                    count++; //Conta quanti terminatori sono arrivati
+                                    if(count == m) { //Quando tutti i figli hanno terminato 
+                                        if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Scrive il carattere di teminazione
+                                            if (errno != EAGAIN){
+                                                value_return = err_write();
+                                            } else {
+                                                send_r = FALSE;
                                             }
                                         }
-                                } else {
+                                    }
+                                } else if(strstr(resp, "#") != NULL){
                                     sum_value = insertAndSumPathList(sum, resp, m);
                                     if (sum_value > -1){ //Qualcosa è arrivato a 0, 
+                                        fprintf(stderr, "almeno uno plz\n");
                                         strcpy(resp, sum->pathList[sum_value]);
                                         if(write(STDOUT_FILENO, resp, DIM_RESP) == -1) { //Scrive il carattere di teminazione
                                             if (errno != EAGAIN){
