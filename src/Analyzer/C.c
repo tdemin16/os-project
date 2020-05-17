@@ -117,6 +117,12 @@ int main(int argc, char const* argv[]) {
         i = 0;
         k = 0;
         if (f > 0) {  //PARENT SIDE
+            char str[12];
+            sprintf(str, "%d", getpid());
+            strcat(str, ".txt");
+            FILE* debug = fopen(str, "a");
+            fprintf(debug, "AVVIATO P - pid: %d, m=%d\n", getpid(), m);
+            fclose(debug);
             while (value_return == 0 && (!_read || !_write)) {
                 if (!_write) {                                             //CICLO DI SCRITTURA
                     if (count != nfiles) {                                 //Se non sono ancora tutti arraivati
@@ -188,8 +194,10 @@ int main(int argc, char const* argv[]) {
                 if (!_read) {
                     if (send_r) {
                         if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {
-                            fprintf(stderr, "C read: %s\n", resp);
-
+                            //fprintf(stderr, "C read: %s\n", resp);
+                            debug = fopen(str, "a");
+                            fprintf(debug, "RICEVUTO: %s \n", path);
+                            fclose(debug);
                             if (strcmp(resp, "///") == 0) {  //Lascia questo blocco
                                 //fprintf(stderr,"Arrivata fine\n");
                                 part_received++;
