@@ -15,8 +15,7 @@ process *create_process(int size) {
     return st;  //return process
 }
 
-void insertProcess(process *tmp, pid_t val)  //Insert process val in list tmp
-{
+void insertProcess(process *tmp, pid_t val) {                            //Insert process val in list tmp
     if (tmp->count == tmp->size)                                         //If tmp->pid isn't enough big to contain another value
     {                                                                    //
         int i;                                                           //Initialize i
@@ -30,22 +29,19 @@ void insertProcess(process *tmp, pid_t val)  //Insert process val in list tmp
     tmp->count++;                                                        //Increase the count of variables inside
 }
 
-void printList(process *tmp)  //ONLY FOR TESTING -- NOT FOR PROJECT -- use it to print the process saved in tmp
-{
+void printList(process *tmp) {  //ONLY FOR TESTING -- NOT FOR PROJECT -- use it to print the process saved in tmp
     int i;
     for (i = 0; i < tmp->count; i++) {
         printf("%d: A=%d\n", i, tmp->pid[i]);
     }
 }
 
-void freeList(process *tmp)  // free the list tmp
-{                            //
-    free(tmp->pid);          // free the array of pid
-    free(tmp);               // free the list tmp
+void freeList(process *tmp) {  // free the list tmp
+    free(tmp->pid);            // free the array of pid
+    free(tmp);                 // free the list tmp
 }  //
 
-array *createPathList(int size)  //allocate an array for the PathList
-{
+array *createPathList(int size) {                                       //allocate an array for the PathList
     array *st = (array *)malloc(sizeof(array));                         //allocate list of paths
     st->size = size;                                                    //assign the size of the array
     st->pathList = malloc(sizeof(char **) * size);                      //allocate the array of path (strings / char*)
@@ -130,16 +126,10 @@ char insertAndSumPathList(array *tmp, char *c, int val) {
 }
 
 void printPathList(array *tmp) {
-    FILE * fp = fopen("printList.txt","a");
     int i;
     for (i = 0; i < tmp->count; i++) {
-<<<<<<< HEAD
         fprintf(stderr, "%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
-=======
-       fprintf(fp,"%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
->>>>>>> d22cad4b45369dd40cd40a97deff7488f34a5f2b
     }
-    fclose(fp);
 }
 
 int dimPathList(array *tmp) {
