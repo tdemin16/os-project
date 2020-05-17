@@ -127,10 +127,12 @@ char insertAndSumPathList(array *tmp, char *c, int val){
 }
 
 void printPathList(array *tmp) {
+    FILE * fp = fopen("printList.txt","a");
     int i;
     for (i = 0; i < tmp->count; i++) {
-       fprintf(stderr,"%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
+       fprintf(fp,"%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
     }
+    fclose(fp);
 }
 
 int dimPathList(array *tmp ){
