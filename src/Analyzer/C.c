@@ -193,9 +193,9 @@ int main(int argc, char const* argv[]) {
                             if (strcmp(resp, "///") == 0) {  //Lascia questo blocco
                                 //fprintf(stderr,"Arrivata fine\n");
                                 part_received++;
-                                fprintf(stderr,"Arrivata fine\n");
+                                fprintf(stderr, "Arrivata fine\n");
                                 if (part_received == n) {
-                                    fprintf(stderr,"Termino\n");
+                                    fprintf(stderr, "Termino\n");
                                     _read = TRUE;
                                 }
                             } else {
