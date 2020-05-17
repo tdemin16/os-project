@@ -11,4 +11,35 @@ In principio era il verbo\
 \
 \
 \
-Almeno credo...
+Almeno credo...\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+L'importante è vincere la gara di comit :grin:
