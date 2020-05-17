@@ -1,82 +1,83 @@
 #include "lib.h"
 
-process *create_process(int size) //Allocate memory for process* and process->pid
-{
-    process *st = (process *)malloc(sizeof(process));   //Allocate process memory
-    st->size = size;                                    //Set process->size to size (end point) 
-    st->pid = (int *)malloc(sizeof(int *) * size);      //Allocate pid memory 
-    st->count = 0;                                      //Set count to 0 (start point)
-    int i;                                              //Declaring a new int
-    for (i = 0; i < size; i++)                          //for cycle from 0 to end point
-    {                                                   //
-        st->pid[i] = -1;                                //Set the default value (-1) to every pid in the list 
-    }                                                   //
-    //printf("Lista allocata\n");                           
-    return st;                                          //return process
+//Allocate memory for process* and process->pid
+process *create_process(int size) {
+    process *st = (process *)malloc(sizeof(process));  //Allocate process memory
+    st->size = size;                                   //Set process->size to size (end point)
+    st->pid = (int *)malloc(sizeof(int *) * size);     //Allocate pid memory
+    st->count = 0;                                     //Set count to 0 (start point)
+    int i;                                             //Declaring a new int
+    for (i = 0; i < size; i++)                         //for cycle from 0 to end point
+    {                                                  //
+        st->pid[i] = -1;                               //Set the default value (-1) to every pid in the list
+    }                                                  //
+    //printf("Lista allocata\n");
+    return st;  //return process
 }
 
-void insertProcess(process *tmp, pid_t val) //Insert process val in list tmp
+void insertProcess(process *tmp, pid_t val)  //Insert process val in list tmp
 {
-    if (tmp->count == tmp->size)            //If tmp->pid isn't enough big to contain another value 
-    {                                       //
-        tmp->size *= 2;                     //We doubled the size
-        tmp->pid = (int *)realloc(tmp->pid, sizeof(int *) * tmp->size); //We realloc it's memory to double it
-    }                                       //
-    tmp->pid[tmp->count] = val;             //Insert the pid "val" in position count of tmp
-    tmp->count++;                           //Increase the count of variables inside
+    if (tmp->count == tmp->size)                                         //If tmp->pid isn't enough big to contain another value
+    {                                                                    //
+        int i;                                                           //Initialize i
+        tmp->size *= 2;                                                  //We doubled the size
+        tmp->pid = (int *)realloc(tmp->pid, sizeof(int *) * tmp->size);  //We realloc it's memory to double it
+        for (i = tmp->count; i < tmp->size; i++) {                       //Cycle from old size to new size
+            tmp->pid[i] = -1;                                            //Set pid[i] to -1 (from old size to new size)
+        }                                                                //
+    }                                                                    //
+    tmp->pid[tmp->count] = val;                                          //Insert the pid "val" in position count of tmp
+    tmp->count++;                                                        //Increase the count of variables inside
 }
 
-void printList(process *tmp) //ONLY FOR TESTING -- NOT FOR PROJECT -- use it to print the process saved in tmp
+void printList(process *tmp)  //ONLY FOR TESTING -- NOT FOR PROJECT -- use it to print the process saved in tmp
 {
     int i;
-    for (i = 0; i < tmp->count; i++)
-    {
+    for (i = 0; i < tmp->count; i++) {
         printf("%d: A=%d\n", i, tmp->pid[i]);
     }
 }
 
-void freeList(process *tmp) // free the list tmp
-{                           //
-    free(tmp->pid);         // free the array of pid
-    free(tmp);              // free the list tmp
-}                           //
+void freeList(process *tmp)  // free the list tmp
+{                            //
+    free(tmp->pid);          // free the array of pid
+    free(tmp);               // free the list tmp
+}  //
 
-array *createPathList(int size) //allocate an array for the PathList
+array *createPathList(int size)  //allocate an array for the PathList
 {
-    array *st = (array *)malloc(sizeof(array));         //allocate list of paths
-    st->size = size;                                    //assign the size of the array
-    st->pathList = malloc(sizeof(char **) * size);      //allocate the array of path (strings / char*)
-    st->analyzed =(int*) malloc(sizeof(int*) * size);   //allocate the array of int analyzed
-    st->count = 0;                                      //set the counter to 0
-    int i;                                              //initialize variable i for the next cycle
-    for (i = 0; i < size; i++)                          //start the cycle from 0 to the size of the process
-    {                                                   //
+    array *st = (array *)malloc(sizeof(array));                         //allocate list of paths
+    st->size = size;                                                    //assign the size of the array
+    st->pathList = malloc(sizeof(char **) * size);                      //allocate the array of path (strings / char*)
+    st->analyzed = (int *)malloc(sizeof(int *) * size);                 //allocate the array of int analyzed
+    st->count = 0;                                                      //set the counter to 0
+    int i;                                                              //initialize variable i for the next cycle
+    for (i = 0; i < size; i++)                                          //start the cycle from 0 to the size of the process
+    {                                                                   //
         st->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX));  //allocate the array of chars that compose the string
-        memset( st->pathList[i], '\0', sizeof(char*) * PATH_MAX);       //set the first character to '\0' (= end of string)
-        st->analyzed[i] = -1;                           //set analyzed to -1 (= not analyzed)
-    }                                                   //
-    return st;                                          //return the created list of paths
+        memset(st->pathList[i], '\0', sizeof(char *) * PATH_MAX);       //set the first character to '\0' (= end of string)
+        st->analyzed[i] = -1;                                           //set analyzed to -1 (= not analyzed)
+    }                                                                   //
+    return st;                                                          //return the created list of paths
 }
 
-char insertPathList(array *tmp, char *c, int val)
-{
+char insertPathList(array *tmp, char *c, int val) {
     int i;
     char present = FALSE;
     char ret = FALSE;
-    for (i = 0; i<tmp->count; i++){
-        if (!strcmp(tmp->pathList[i], c)){
+    for (i = 0; i < tmp->count; i++) {
+        if (!strcmp(tmp->pathList[i], c)) {
             present = TRUE;
         }
     }
     if (present == FALSE) {
         //printf("Provo a inserire %s, size: %d, count:%d\n", c, tmp->size, tmp->count);
         if (tmp->count == tmp->size) {
-
             //printf("Raddoppio la size\n");
             tmp->size *= 2;
             tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
-            tmp->analyzed = (int*)realloc(tmp->analyzed, sizeof(int*) * tmp->size);
-            
+            tmp->analyzed = (int *)realloc(tmp->analyzed, sizeof(int *) * tmp->size);
+
             for (i = tmp->count; i < tmp->size; i++) {
                 tmp->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX + 1));
             }
@@ -86,33 +87,35 @@ char insertPathList(array *tmp, char *c, int val)
         tmp->analyzed[tmp->count] = val;
         tmp->count++;
         ret = TRUE;
-    } else { ret = FALSE;}
+    } else {
+        ret = FALSE;
+    }
     return ret;
 }
 
-char insertAndSumPathList(array *tmp, char *c, int val){
+char insertAndSumPathList(array *tmp, char *c, int val) {
     int i;
     char sum = FALSE;
     char ret = -1;
 
-    for (i = 0; i<tmp->count; i++){
-        if (sumCsv(tmp->pathList[i],c)){
+    for (i = 0; i < tmp->count; i++) {
+        if (sumCsv(tmp->pathList[i], c)) {
             sum = TRUE;
             tmp->analyzed[i]--;
-            if (tmp->analyzed[i] == 0){
+            if (tmp->analyzed[i] == 0) {
                 ret = i;
             }
         }
     }
 
-    if (sum == FALSE){
+    if (sum == FALSE) {
         //printf("Provo a inserire %s, size: %d, count:%d\n", c, tmp->size, tmp->count);
         if (tmp->count == tmp->size) {
             //printf("Raddoppio la size\n");
             tmp->size *= 2;
             tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
-            tmp->analyzed = (int*)realloc(tmp->analyzed, sizeof(int*) * tmp->size);
-            
+            tmp->analyzed = (int *)realloc(tmp->analyzed, sizeof(int *) * tmp->size);
+
             for (i = tmp->count; i < tmp->size; i++) {
                 tmp->pathList[i] = (char *)malloc(sizeof(char *) * (DIM_RESP + 1));
             }
@@ -122,18 +125,18 @@ char insertAndSumPathList(array *tmp, char *c, int val){
         tmp->analyzed[tmp->count] = val;
         tmp->count++;
     }
-    
+
     return ret;
 }
 
 void printPathList(array *tmp) {
     int i;
     for (i = 0; i < tmp->count; i++) {
-       fprintf(stderr,"%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
+        fprintf(stderr, "%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
     }
 }
 
-int dimPathList(array *tmp ){
+int dimPathList(array *tmp) {
     return tmp->count;
 }
 
@@ -147,22 +150,21 @@ void freePathList(array *tmp) {
     free(tmp);
 }
 
-void setAnalyzed(array* tmp, int pos, int value) {
-    if(pos >= tmp->count) {
+void setAnalyzed(array *tmp, int pos, int value) {
+    if (pos >= tmp->count) {
         printf("Errore, il file da analizzare non e` presente in questa posizione\n");
-    } else if(value > -1 && value < 3){
+    } else if (value > -1 && value < 3) {
         tmp->analyzed[pos] = value;
     } else {
         printf("Errore, valore assegnato al percorso non valido\n");
     }
 }
 
-int getAnalyzed(array* tmp, int pos) {
-    return tmp->analyzed[pos]; //-1 if not analyzed
+int getAnalyzed(array *tmp, int pos) {
+    return tmp->analyzed[pos];  //-1 if not analyzed
 }
 
-int unlock_pipes(int *fd, int size)
-{
+int unlock_pipes(int *fd, int size) {
     int i;
     int ret = 0;
     for (i = 0; i < size && ret == 0; i++) {
@@ -173,8 +175,7 @@ int unlock_pipes(int *fd, int size)
     return ret;
 }
 
-void close_pipes(int *fd, int size)
-{
+void close_pipes(int *fd, int size) {
     int i;
     for (i = 0; i < size; i++) {
         close(fd[i]);
@@ -182,64 +183,60 @@ void close_pipes(int *fd, int size)
 }
 
 // /src/Analyzer/A.c
-// Handler for SIGINT, caused by 
+// Handler for SIGINT, caused by
 // Ctrl-C at keyboard
-int parser(int argc, char* argv[], array* lista, int* count, int* n, int* m) {
+int parser(int argc, char *argv[], array *lista, int *count, int *n, int *m) {
     int value_return = 0;
     int i;
-    char resolved_path[PATH_MAX]; //contiene il percorso assoluto di un file
-    char flag = FALSE; // se flag = true, non bisogna analizzare l'argomento. (l'argomento successivo è il numero o di n o di m)
-    char setn = FALSE; // se setn = true, n è stato cambiato
-    char setm = FALSE; // se setn = true, m è stato cambiato
+    char resolved_path[PATH_MAX];  //contiene il percorso assoluto di un file
+    char flag = FALSE;             // se flag = true, non bisogna analizzare l'argomento. (l'argomento successivo è il numero o di n o di m)
+    char setn = FALSE;             // se setn = true, n è stato cambiato
+    char setm = FALSE;             // se setn = true, m è stato cambiato
     char errdir = FALSE;
     FILE *fp;
     char riga[1035];
 
-    if(argc < 1) { //if number of arguments is even or less than 1, surely it's a wrong input
+    if (argc < 1) {  //if number of arguments is even or less than 1, surely it's a wrong input
         value_return = err_args_A();
-    }
-    else {
-        
-        for(i = 1; i < argc && value_return == 0; i++) {
+    } else {
+        for (i = 1; i < argc && value_return == 0; i++) {
             //printf("Argv: %s\n",argv[i]);
-            if(!strcmp(argv[i], "-setn")) {//----ERRORI -setn
-                if (i+1<argc){ //controlla che ci sia effettivamente un argomento dopo il -setn
+            if (!strcmp(argv[i], "-setn")) {  //----ERRORI -setn
+                if (i + 1 < argc) {           //controlla che ci sia effettivamente un argomento dopo il -setn
                     *n = atoi(argv[i + 1]);
-                    if(*n == 0) value_return = err_args_A(); //Il campo dopo -setn non è un numero
-                    if(setn == TRUE) value_return = err_args_A();   //n gia' settato
-                    flag = TRUE; //Salto prossimo argomento
-                    setn = TRUE; //n e' stato settato, serve a controllare che non venga settato due volte
-                    i++;
-                } else {
-                    value_return = err_args_A();
-                }
-                
-            }
-            else if(!strcmp(argv[i], "-setm")) {//-----ERRORI -setm
-                if (i+1<argc){ //controlla che ci sia effettivamente un argomento dopo il -setn
-                    *m = atoi(argv[i+1]);
-                    if(*m == 0) value_return = err_args_A(); //Il campo dopo -setm non è un numero
-                    if(setm == TRUE) value_return = err_args_A(); //m gia' settato
-                    flag = TRUE;    //Salto il prossimo argomento
-                    setm = TRUE;    //m e' stato settato, serve a controllare che non venga settato due volte
+                    if (*n == 0) value_return = err_args_A();       //Il campo dopo -setn non è un numero
+                    if (setn == TRUE) value_return = err_args_A();  //n gia' settato
+                    flag = TRUE;                                    //Salto prossimo argomento
+                    setn = TRUE;                                    //n e' stato settato, serve a controllare che non venga settato due volte
                     i++;
                 } else {
                     value_return = err_args_A();
                 }
 
+            } else if (!strcmp(argv[i], "-setm")) {  //-----ERRORI -setm
+                if (i + 1 < argc) {                  //controlla che ci sia effettivamente un argomento dopo il -setn
+                    *m = atoi(argv[i + 1]);
+                    if (*m == 0) value_return = err_args_A();       //Il campo dopo -setm non è un numero
+                    if (setm == TRUE) value_return = err_args_A();  //m gia' settato
+                    flag = TRUE;                                    //Salto il prossimo argomento
+                    setm = TRUE;                                    //m e' stato settato, serve a controllare che non venga settato due volte
+                    i++;
+                } else {
+                    value_return = err_args_A();
+                }
 
-            }//else if(strncmp(argv[i], "-", 1) == 0){//-----ERRORI input strani che iniziano con -
+            }  //else if(strncmp(argv[i], "-", 1) == 0){//-----ERRORI input strani che iniziano con -
             //    value_return = err_args_A();
             //}
 
-            if (flag == FALSE && value_return == 0) { //------Vuol dire che argv[i] e' un file o una cartella
+            if (flag == FALSE && value_return == 0) {  //------Vuol dire che argv[i] e' un file o una cartella
                 /*  Viene utilizzato il comando:  test -d [dir] && find [dir] -type f -follow -print || echo "-[ERROR]"
                     Il comando test -d controlla l'esistenza del file/directory input. In caso di successo viene lanciato find
                     In caso di successo viene lanciato find che restituisce la lista di tutti i file nella cartella e nelle sottocartelle
                     Se l'input non esiste restituisce -[ERROR], in modo che possa essere intercettato dal parser
                 */
-               
-                char command[strlen("(test -f  || test -d ) && find ") + strlen(argv[i])*3 + strlen(" -type f -follow -print || echo \"-[ERROR]\"")+ 1]; //Creazione comando
+
+                char command[strlen("(test -f  || test -d ) && find ") + strlen(argv[i]) * 3 + strlen(" -type f -follow -print || echo \"-[ERROR]\"") + 1];  //Creazione comando
                 strcpy(command, "(test -f ");
                 strcat(command, argv[i]);
                 strcat(command, " || test -d ");
@@ -248,16 +245,16 @@ int parser(int argc, char* argv[], array* lista, int* count, int* n, int* m) {
                 strcat(command, argv[i]);
                 strcat(command, " -type f -follow -print || echo \"-[ERROR]\"");
                 //printf("%s\n",command);
-                fp = popen(command, "r"); //avvia il comando e in fp prende l'output
-                if (fp == NULL) //Se il comando non va a buon fine
+                fp = popen(command, "r");  //avvia il comando e in fp prende l'output
+                if (fp == NULL)            //Se il comando non va a buon fine
                 {
                     value_return = err_args_A();
-                } else { //Il comando va a buon fine
-                    while (fgets(riga, sizeof(riga), fp) != NULL && errdir == FALSE) { //Legge riga per riga e aggiunge alla lista 
-                        if (strcmp(riga,"-[ERROR]\n")){
+                } else {                                                                //Il comando va a buon fine
+                    while (fgets(riga, sizeof(riga), fp) != NULL && errdir == FALSE) {  //Legge riga per riga e aggiunge alla lista
+                        if (strcmp(riga, "-[ERROR]\n")) {
                             //memset( resolved_path, '\0', sizeof(resolved_path));
-                            realpath(riga, resolved_path);  //risalgo al percorso assoluto
-                            resolved_path[strlen(resolved_path)-1] = 0; //tolgo l'ultimo carattere che manderebbe a capo                             
+                            realpath(riga, resolved_path);                 //risalgo al percorso assoluto
+                            resolved_path[strlen(resolved_path) - 1] = 0;  //tolgo l'ultimo carattere che manderebbe a capo
                             char str[12];
                             char path[PATH_MAX];
                             sprintf(str, "%d", *count);
@@ -265,57 +262,55 @@ int parser(int argc, char* argv[], array* lista, int* count, int* n, int* m) {
                             strcat(path, "#");
                             strcat(path, resolved_path);
                             //printf("%s\n",path);
-                            if (insertPathList(lista, path, 0)){
+                            if (insertPathList(lista, path, 0)) {
                                 (*count)++;
                                 //printf("%s\n", resolved_path);
                             }
 
-
-                        } else { //Intercetta l'errore riguardante file o cartelle non esistenti
-                            errdir = TRUE; //Metto il flag errore file/directory sbagliati
+                        } else {            //Intercetta l'errore riguardante file o cartelle non esistenti
+                            errdir = TRUE;  //Metto il flag errore file/directory sbagliati
                         }
                     }
-                    pclose(fp); //chiudo fp
-                    if (errdir == TRUE) value_return = err_input_A(argv[i]); //Mando l'errore per la directory
+                    pclose(fp);                                               //chiudo fp
+                    if (errdir == TRUE) value_return = err_input_A(argv[i]);  //Mando l'errore per la directory
                 }
             } else {
-                flag = FALSE; //Analisi argomento saltata, rimetto flag a false
+                flag = FALSE;  //Analisi argomento saltata, rimetto flag a false
             }
         }
-        if(count == 0 && value_return == 0) value_return = err_args_A(); //counter is higher than zero, if not gives an error (value_return used to avoid double messages)
+        if (count == 0 && value_return == 0) value_return = err_args_A();  //counter is higher than zero, if not gives an error (value_return used to avoid double messages)
     }
 
     return value_return;
 }
 
-void initialize_processes(pid_t* p, int dim){
+void initialize_processes(pid_t *p, int dim) {
     int i;
     for (i = 0; i < dim; i++) {
         p[i] = -1;
     }
 }
 
-void add_process_to_v(pid_t f, int* v){
+void add_process_to_v(pid_t f, int *v) {
     int i = 0;
     while (v[i] != 0) {
         i++;
     }
-    v[i] = f;    
+    v[i] = f;
 }
 
 int parse_string(char *string, int v[DIM_V]) {
     int i = 0;
     int max = 0;
     char *token = strtok(string, ",");
-    while (token != NULL) { //loop through token
+    while (token != NULL) {  //loop through token
         if (i < DIM_V) {
             v[i] = atoi(token);
             if (v[i] > max)
                 max = v[i];
             i++;
             token = strtok(NULL, ",");
-        }
-        else {
+        } else {
             printf("Errore nella creazione della stringa contatore");
         }
     }
@@ -324,7 +319,7 @@ int parse_string(char *string, int v[DIM_V]) {
 
 ///src/Analyzer/Q.c
 //Initialize frequence vector all to 0
-void initialize_vector(int* v) {
+void initialize_vector(int *v) {
     int i;
     for (i = 0; i < DIM_V; i++) {
         v[i] = 0;
@@ -332,35 +327,34 @@ void initialize_vector(int* v) {
 }
 
 //Increase frequence of the global vector in the position val_ascii
-void set_add(int* v, char c) {
+void set_add(int *v, char c) {
     int val_ascii;
-    val_ascii = ((int)c) - 32; //casting char to int and difference 32 (in order to save space on the vector) //Se vogliamo togliere lo spazio basta fare -33
+    val_ascii = ((int)c) - 32;  //casting char to int and difference 32 (in order to save space on the vector) //Se vogliamo togliere lo spazio basta fare -33
     v[val_ascii]++;
 }
 
 //get the chars from the .txt files from the begin (b) to the end (e)
-void get_subset(FILE *fp, int* v, int b, int e) {
+void get_subset(FILE *fp, int *v, int b, int e) {
     int i;
     char c;
-    fseek(fp, b, SEEK_SET); //setting initial position of SEEK cursor
-    for (i = b; i < e; i++) { //P.S.: il primo carattere non è compreso, l'ultimo si
-    
+    fseek(fp, b, SEEK_SET);    //setting initial position of SEEK cursor
+    for (i = b; i < e; i++) {  //P.S.: il primo carattere non è compreso, l'ultimo si
+
         if (feof(fp)) {
             printf("[!] Errore feof\n");
             //err_end_file();
             break;
-        }
-        else {
-            fscanf(fp, "%c", &c); //gets char
+        } else {
+            fscanf(fp, "%c", &c);  //gets char
             //printf("%c", c);      //display what you asked the process to analyze (uncomment to use)
             if (c != '\n') {
-                set_add(v, c); //aggiunge al vettore delle frequenze il carattere c
+                set_add(v, c);  //aggiunge al vettore delle frequenze il carattere c
             }
         }
     }
 }
 
-void get_frequencies(FILE *fp, int *freq, int part, int m) {//Prima di commentarlo bene testiamo
+void get_frequencies(FILE *fp, int *freq, int part, int m) {  //Prima di commentarlo bene testiamo
     //int *freq = malloc(sizeof(int*) * DIM_V); //where frequencies will be stored
     initialize_vector(freq);
     int i = 0;
@@ -393,87 +387,83 @@ void print_vector(int v[]) {
     }
 }
 
-
-int lenghtCsv(int v[DIM_V]){
+int lenghtCsv(int v[DIM_V]) {
     int i;
     int dim = 0;
-    for (i = 0;i<DIM_V;i++) {
-        dim += countDigit(v[i]);  
+    for (i = 0; i < DIM_V; i++) {
+        dim += countDigit(v[i]);
     }
-    dim +=95;
+    dim += 95;
     return dim;
 }
 
-
-int countDigit(int n) { 
+int countDigit(int n) {
     int count = 0;
-    if (n == 0){
+    if (n == 0) {
         count++;
     } else {
-        while (n != 0) { 
-            n = n / 10; 
-            ++count; 
-        } 
+        while (n != 0) {
+            n = n / 10;
+            ++count;
+        }
     }
-    return count; 
-} 
+    return count;
+}
 
-void createCsv(int * v, char *res,char * id){
+void createCsv(int *v, char *res, char *id) {
     int i;
     char str[12];
-    for (i = 0; i<DIM_RESP; i++){
-        res[i]='\0';
+    for (i = 0; i < DIM_RESP; i++) {
+        res[i] = '\0';
     }
-    
-    strcat(res,id);
-    strcat(res,"#");
+
+    strcat(res, id);
+    strcat(res, "#");
     sprintf(str, "%d", v[0]);
-    strcat(res,str);
-    for (i = 1; i<DIM_V; i++){
-        strcat(res,","); 
+    strcat(res, str);
+    for (i = 1; i < DIM_V; i++) {
+        strcat(res, ",");
         sprintf(str, "%d", v[i]);
-        strcat(res,str);
+        strcat(res, str);
     }
-    strcat(res,"#");
+    strcat(res, "#");
 }
 
 ///src/C.c
-char sumCsv(char* str1, char*str2){
+char sumCsv(char *str1, char *str2) {
     char ret = FALSE;
-    char *id1= strtok(strdup(str1),"#");
-    char * tmp1= strtok(NULL,"#");
-    
-    char *id2= strtok(strdup(str2),"#");
-    char * tmp2= strtok(NULL,"#");
+    char *id1 = strtok(strdup(str1), "#");
+    char *tmp1 = strtok(NULL, "#");
+
+    char *id2 = strtok(strdup(str2), "#");
+    char *tmp2 = strtok(NULL, "#");
     int v[DIM_RESP];
     initialize_vector(v);
-    
-    if (!strcmp(id1,id2)) {
-        addCsvToArray(tmp1,v); 
-        addCsvToArray(tmp2,v); 
-        createCsv(v,str1,id1);
+
+    if (!strcmp(id1, id2)) {
+        addCsvToArray(tmp1, v);
+        addCsvToArray(tmp2, v);
+        createCsv(v, str1, id1);
         ret = TRUE;
     }
 
     return ret;
 }
 
-void addCsvToArray(char * tmp, int *v){
+void addCsvToArray(char *tmp, int *v) {
     int i = 0;
     char *Analyze = strtok(tmp, "#");
     char *token = strtok(tmp, ",");
-    while (token != NULL) { //loop through token
+    while (token != NULL) {  //loop through token
         if (i < DIM_V) {
             v[i] += atoi(token);
             i++;
             token = strtok(NULL, ",");
-        }
-        else {
+        } else {
             printf("Errore nella creazione della stringa contatore");
         }
     }
 }
-
 
 ///src/R.c
 void printStat(char *char_count) {
@@ -493,8 +483,7 @@ void printStat(char *char_count) {
             }
             printf("\n\n");
         }
-    }
-    else {
+    } else {
         column = 5;
         for (i = 0; i < DIM_V; i += column) {
             for (k = i; k < i + column && k < DIM_V; k++) {
@@ -522,41 +511,41 @@ void printStat_Cluster(char *char_count) {
     int tot = 0;
     parse_string(char_count, v);
     for (i = 0; i < DIM_V; i++) {
-        if (i == 0){
+        if (i == 0) {
             spazi += v[i];
-            tot+=v[i];
-            }
-        if (i == 1 || i == 2 || (i >= 7 && i <= 9) || (i >= 12 && i <= 15) || i == 26 || i == 27 || i == 31){
+            tot += v[i];
+        }
+        if (i == 1 || i == 2 || (i >= 7 && i <= 9) || (i >= 12 && i <= 15) || i == 26 || i == 27 || i == 31) {
             punt += v[i];
-            tot+=v[i];
-            }
-        if ((i >= 3 && i <= 6) || i == 10 || i == 11 || (i >= 28 && i <= 30) || i == 32 || (i >= 59 && i <= 64) || (i >= 91 && i <= 94)){
+            tot += v[i];
+        }
+        if ((i >= 3 && i <= 6) || i == 10 || i == 11 || (i >= 28 && i <= 30) || i == 32 || (i >= 59 && i <= 64) || (i >= 91 && i <= 94)) {
             carSpec += v[i];
-            tot+=v[i];
-            }
-        if (i >= 16 && i <= 25){
+            tot += v[i];
+        }
+        if (i >= 16 && i <= 25) {
             numeri += v[i];
-            tot+=v[i];
-            }
-        if (i >= 33 && i <= 58){
+            tot += v[i];
+        }
+        if (i >= 33 && i <= 58) {
             lettereMai += v[i];
-            tot+=v[i];
-            }
-        if (i >= 65 && i <= 90){
+            tot += v[i];
+        }
+        if (i >= 65 && i <= 90) {
             lettereMin += v[i];
-            tot+=v[i];
-            }
+            tot += v[i];
+        }
     }
-    
+
     printf("STAMPA STATISTICHE PER CLUSTER\n\n");
-    printf("Lettere minuscole:\t %d\t%.4g%%\n", lettereMin, (float)lettereMin/(float)tot*100);
-    printf("Lettere maiuscole:\t %d\t%.4g%%\n", lettereMai, (float)lettereMai/(float)tot*100);
-    printf("Spazi:\t\t\t %d\t%.4g%%\n", spazi, (float)spazi/(float)tot*100);
-    printf("Numeri:\t\t\t %d\t%.4g%%\n", numeri, (float)numeri/(float)tot*100);
-    printf("Segni di punteggiatura:\t %d\t%.4g%%\n", punt, (float)punt/(float)tot*100);
-    printf("Caratteri speciali:\t %d\t%.4g%%\n", carSpec, (float)carSpec/(float)tot*100);
+    printf("Lettere minuscole:\t %d\t%.4g%%\n", lettereMin, (float)lettereMin / (float)tot * 100);
+    printf("Lettere maiuscole:\t %d\t%.4g%%\n", lettereMai, (float)lettereMai / (float)tot * 100);
+    printf("Spazi:\t\t\t %d\t%.4g%%\n", spazi, (float)spazi / (float)tot * 100);
+    printf("Numeri:\t\t\t %d\t%.4g%%\n", numeri, (float)numeri / (float)tot * 100);
+    printf("Segni di punteggiatura:\t %d\t%.4g%%\n", punt, (float)punt / (float)tot * 100);
+    printf("Caratteri speciali:\t %d\t%.4g%%\n", carSpec, (float)carSpec / (float)tot * 100);
     printf("\n");
-    printf("Caratteri totali: %d\n",tot);
+    printf("Caratteri totali: %d\n", tot);
 }
 
 void printInfoCluster() {
@@ -610,17 +599,16 @@ int file_len(FILE *fp) {
 m_process *splitter(FILE *fp, int m) {
     //This is for splitting the parts
     m_process *div = malloc(m);
-    int file_length = file_len(fp);  //get the length of the file in terms of chars
-    int int_div = (file_length / m); //get the integer of the subdivision of the file
+    int file_length = file_len(fp);   //get the length of the file in terms of chars
+    int int_div = (file_length / m);  //get the integer of the subdivision of the file
     //double double_div = ((double)file_length / (double)m); //get the double of the subdivision of the file
-    int rest = file_length - (int_div * m); //get the number of chars that are out of consideration
+    int rest = file_length - (int_div * m);  //get the number of chars that are out of consideration
     int i;
 
     for (i = 0; i < m; i++) {
         if (i == 0) {
             div[i].begin = 0;
-        }
-        else {
+        } else {
             div[i].begin = div[i - 1].end;
         }
         div[i].end = div[i].begin + int_div;
@@ -664,8 +652,10 @@ char *itoa(int value, char *buffer, int base) {
     while (n) {
         int r = n % base;
 
-        if (r >= 10) buffer[i++] = 65 + (r - 10);
-        else buffer[i++] = 48 + r;
+        if (r >= 10)
+            buffer[i++] = 65 + (r - 10);
+        else
+            buffer[i++] = 48 + r;
 
         n = n / base;
     }
@@ -678,25 +668,24 @@ char *itoa(int value, char *buffer, int base) {
     // With any other base, value is always considered unsigned
     if (value < 0 && base == 10) buffer[i++] = '-';
 
-    buffer[i] = '\0'; // null terminate string
+    buffer[i] = '\0';  // null terminate string
 
     // reverse the string and return it
     return reverse(buffer, 0, i - 1);
 }
 
-void arrayToCsv(int *v, char* res){
-    
+void arrayToCsv(int *v, char *res) {
     int i;
     char str[12];
-    for (i = 0; i<DIM_RESP; i++){
-        res[i]='\0';
+    for (i = 0; i < DIM_RESP; i++) {
+        res[i] = '\0';
     }
     sprintf(str, "%d", v[0]);
-    strcat(res,str);
-    for (i = 1; i<DIM_V; i++){
-        strcat(res,","); 
+    strcat(res, str);
+    for (i = 1; i < DIM_V; i++) {
+        strcat(res, ",");
         sprintf(str, "%d", v[i]);
-        strcat(res,str);
+        strcat(res, str);
     }
 }
 
@@ -777,7 +766,7 @@ int err_part_not_valid() {
     return ERR_DATA;
 }
 int err_process_open(pid_t p) {
-    printf("[!] Errore, il processo %d è ancora aperto!\n",p);
+    printf("[!] Errore, il processo %d è ancora aperto!\n", p);
     return ERR_OPEN_PROC;
 }
 int err_fifo() {
