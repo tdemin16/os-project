@@ -3,9 +3,39 @@
 int check_command(char *str);	//controlla il comando un numero corrispondente: -1 comando non riconosciuto ecc
 //int report(); 		//potrebbe essere la funzione che si occupa di attivare/disattivare R
 
+process *p; //Declaring p (it's global because hendle_sigint can't have parameters, only int sig)
+
+void handle_sigint(int sig){
+    printf("\n[!] Ricevuta terminazione, inizio terminazione processi ... \n");
+    int i = p->count-1; //start from the end
+    while (i != 0) //while we haven't controlled every single process
+    {
+        if (p->pid[i] > 0) //Processo padre
+        {
+            if (kill(p->pid[i],9) == 0){ //Tries to kill process with pid saved in pid[i]
+                printf("\tProcesso %d terminato con successo!\n",p->pid[i]); //if it success you terminated it correctly
+            }else{
+                printf("\t[!] Errore, non sono riuscito a chiudere il processo %d!",p->pid[i]); //if it fail something is wrong
+            }  
+        }/*else if(proc[i] == 0){
+            if (kill(proc[i],9))
+            {
+                printf("Ucciso processo figlio");
+            }  
+        }*/
+        i--; //i-- otherwise it will go to infinity      
+    }
+    freeList(p); //free memory allocated for p 
+    printf("[!] ... Chiusura processi terminata\n");
+    exit(-1); //return exit with error -1
+}
 
 int main(int argc, char *argv[]) {
+
+	signal(SIGINT,handle_sigint); //Handler for SIGINT (Ctrl-C)
+
 	//------------------------------ DEFINIZIONE VARIABILI
+	p = create_process(1); //Allocate dynamically p with dimension 1
 	int value_return = 0;
 	int n,m;
 	pid_t f;			//al momento non necessarie
@@ -49,7 +79,9 @@ int main(int argc, char *argv[]) {
 
 	//--------------------------------------------------------------------------------
 	if(value_return == 0) {
+		insertProcess(p,getpid());
 		if(f > 0) { //PARENT SIDE
+			insertProcess(p,f);
 			while(!end && value_return == 0) {//--------- CICLO DI ATTESA COMANDI IN INPUT
             	strcpy(cmd,"");  //svuota la stringa per il prossimo comando
             	printf("\n"); printf("Analyzer> "); fflush(stdout); 
