@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
                         //fflush(stdout);
                         perc++;
                         if (perc == count) {
-                            _read = TRUE;
+                            //_read = TRUE;
                             printf("\n");
                         }
                     }
@@ -218,7 +218,7 @@ int main(int argc, char *argv[]) {
 
             //Redirects pipes to STDIN and STDOUT
             dup2(fd_1[READ], STDIN_FILENO);
-            //dup2(fd_2[WRITE], STDOUT_FILENO);
+            dup2(fd_2[WRITE], STDOUT_FILENO);
             //Closing pipes
             close(fd_1[READ]);
             close(fd_1[WRITE]);

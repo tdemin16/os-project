@@ -94,13 +94,6 @@ int main(int argc, char* argv[]) {
     //----------------------------------------------------------------------
     if (value_return == 0) {
         if (f > 0) {  //PARENT SIDE
-            char str[12];
-            sprintf(str, "%d", getpid());
-            strcat(str, ".txt");
-            FILE* debug = fopen(str, "a");
-            fprintf(debug, "AVVIATO P - pid: %d\n", getpid());
-            fclose(debug);
-
             while (value_return == 0 && (!_read || !_write)) {
                 //Write
                 if (!_write) {                                         //Se non ha finito di scrivere
@@ -153,7 +146,7 @@ int main(int argc, char* argv[]) {
                     if (send_r) {
                         for (i = 0; i < m; i++) {  //Cicla tra tutti i figli
                             if (read(fd[i * 4 + 0], resp, DIM_RESP) > 0) {
-                                if (!strcmp(resp, "///")) {                                //Controlla se e` la fine del messaggio
+                                if (!strncmp(resp, "///", 3)) {                                //Controlla se e` la fine del messaggio
                                     count++;                                               //Conta quanti terminatori sono arrivati
                                     if (count == m) {                                      //Quando tutti i figli hanno terminato
                                         if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {  //Scrive il carattere di teminazione
@@ -174,10 +167,6 @@ int main(int argc, char* argv[]) {
                                             } else {
                                                 send_r = FALSE;
                                             }
-                                        } else {
-                                            debug = fopen(str, "a");
-                                            fprintf(debug, "INVIATO: %s \n", resp);
-                                            fclose(debug);
                                         }
                                     }
                                 }
@@ -188,9 +177,6 @@ int main(int argc, char* argv[]) {
                             if (errno != EAGAIN) value_return = err_write();
                         } else {
                             send_r = TRUE;
-                            debug = fopen(str, "a");
-                            fprintf(debug, "INVIATO: %s \n", resp);
-                            fclose(debug);
                         }
                     }
                     if ((count == m) && send_r && (!strncmp(resp, "///", 3))) _read = TRUE;

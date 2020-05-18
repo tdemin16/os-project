@@ -46,10 +46,9 @@ int main(int argc, char* argv[]) {
             //fprintf(stderr,"Q[%d]: ANALIZZO p:%d %s \n",getpid(),part,path);
             if (!strncmp(path, "///", 3)) {  //Se e' terminazione allora setta write a true e rimando indietro
                 _write = TRUE;
-                strcpy(resp,path);
                 respSent = FALSE;
                 while (!respSent) {  //finchè la risposta non è stata inviata riprova
-                    if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
+                    if (write(STDOUT_FILENO, path, DIM_RESP) == -1) {
                         if (errno != EAGAIN) {
                             value_return = err_write();
                         }

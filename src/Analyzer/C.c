@@ -113,12 +113,6 @@ int main(int argc, char const* argv[]) {
         i = 0;
         k = 0;
         if (f > 0) {  //PARENT SIDE
-            char str[12];
-            sprintf(str, "%d", getpid());
-            strcat(str, ".txt");
-            FILE* debug = fopen(str, "a");
-            fprintf(debug, "AVVIATO C - pid: %d\n", getpid());
-            fclose(debug);
             while (value_return == 0 && (!_read || !_write)) {
                 if (!_write) {                                             //CICLO DI SCRITTURA
                     if (count != nfiles) {                                 //Se non sono ancora tutti arraivati
@@ -188,24 +182,10 @@ int main(int argc, char const* argv[]) {
 
                 //Read
                 if (!_read) {
-                    if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {
-                        debug = fopen(str, "a");
-                        fprintf(debug, "RICEVUTO %d: %s \n", (k * 4 + 0), resp);
-                        fclose(debug);
-                    }
-                    k = (k + 1) % n;
-
-                    /*
                     if (send_r) {
                         if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {
-                            //fprintf(stderr, "C read: %s\n", resp);
-                            debug = fopen(str, "a");
-                            fprintf(debug, "RICEVUTO: %s \n", path);
-                            fclose(debug);
-                            if (strcmp(resp, "///") == 0) {  //Lascia questo blocco
-                                //fprintf(stderr,"Arrivata fine\n");
+                            if (!strncmp(resp, "///", 3)) {  //Lascia questo blocco
                                 part_received++;
-                                fprintf(stderr, "Arrivata fine\n");
                                 if (part_received == n) {
                                     fprintf(stderr, "Termino\n");
                                     _read = TRUE;
@@ -213,19 +193,16 @@ int main(int argc, char const* argv[]) {
                             } else {
                                 if (strstr(resp, "#") != NULL) {
                                     id_r = atoi(strtok(strdup(resp), "#"));
-                                    //fprintf(stderr,"%s\n",strtok(strdup(resp),"#"));
                                     retrive->analyzed[id_r] = 1;
                                     if (write(STDOUT_FILENO, ad, 2) == -1) {
                                         if (errno != EAGAIN) {
                                             value_return = err_write();
                                         } else {
                                             send_r = FALSE;
-                                            fprintf(stderr, "Errore\n");
                                         }
                                     }
                                     k = (k + 1) % n;
                                 }
-                                //addCsvToArray(resp,v);
                             }
                         }
                     } else {
@@ -234,7 +211,6 @@ int main(int argc, char const* argv[]) {
                         } else
                             send_r = TRUE;
                     }
-                    */
                 }
             }
             close_pipes(fd, size_pipe);
