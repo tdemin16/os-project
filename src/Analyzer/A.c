@@ -163,7 +163,7 @@ int main(int argc, char *argv[]) {
                 if (!_read) {
                     if (read(fd_2[READ], resp, DIM_RESP) > 0) {
                         if (strstr(resp, "#") != NULL) {
-                            //printf("%s\n", resp);
+                            printf("%s\n", resp);
                             //fflush(stdout);
                             perc++;
                             if (perc == count) {
