@@ -94,13 +94,22 @@ int main(int argc, char* argv[]) {
     //----------------------------------------------------------------------
     if (value_return == 0) {
         if (f > 0) {  //PARENT SIDE
+            char str[12];
+            sprintf(str, "%d", getpid());
+            strcat(str, ".txt");
+            FILE* debug = fopen(str, "a");
+            fprintf(debug, "AVVIATO P - pid: %d\n", getpid());
+            fclose(debug);
+
             while (value_return == 0 && (!_read || !_write)) {
                 //Write
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
                         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere
                             if (!strncmp(path, "///", 3)) {            //Se leggo una stringa di terminazione
-                                end = TRUE;                            //Setto end a true
+
+                                strcat(path, "p");
+                                end = TRUE;  //Setto end a true
                                 //fprintf(stderr,"C finito di scrivere, %s\n",path);
                             }
                             for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q
@@ -144,7 +153,6 @@ int main(int argc, char* argv[]) {
                     if (send_r) {
                         for (i = 0; i < m; i++) {  //Cicla tra tutti i figli
                             if (read(fd[i * 4 + 0], resp, DIM_RESP) > 0) {
-                                //fprintf(stderr,"P read: %s\n",resp);
                                 if (!strcmp(resp, "///")) {                                //Controlla se e` la fine del messaggio
                                     count++;                                               //Conta quanti terminatori sono arrivati
                                     if (count == m) {                                      //Quando tutti i figli hanno terminato
@@ -166,6 +174,10 @@ int main(int argc, char* argv[]) {
                                             } else {
                                                 send_r = FALSE;
                                             }
+                                        } else {
+                                            debug = fopen(str, "a");
+                                            fprintf(debug, "INVIATO: %s \n", resp);
+                                            fclose(debug);
                                         }
                                     }
                                 }
@@ -174,8 +186,12 @@ int main(int argc, char* argv[]) {
                     } else {                                               //resend
                         if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {  //Scrive il carattere di teminazione
                             if (errno != EAGAIN) value_return = err_write();
-                        } else
+                        } else {
                             send_r = TRUE;
+                            debug = fopen(str, "a");
+                            fprintf(debug, "INVIATO: %s \n", resp);
+                            fclose(debug);
+                        }
                     }
                     if ((count == m) && send_r && (!strncmp(resp, "///", 3))) _read = TRUE;
                 }

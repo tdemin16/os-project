@@ -69,14 +69,7 @@ char insertPathList(array *tmp, char *c, int val) {
     if (present == FALSE) {
         //printf("Provo a inserire %s, size: %d, count:%d\n", c, tmp->size, tmp->count);
         if (tmp->count == tmp->size) {
-            //printf("Raddoppio la size\n");
-            tmp->size *= 2;
-            tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
-            tmp->analyzed = (int *)realloc(tmp->analyzed, sizeof(int *) * tmp->size);
-
-            for (i = tmp->count; i < tmp->size; i++) {
-                tmp->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX + 1));
-            }
+            reallocPathList(tmp,2);
         }
         //printf("Stringa inserita\n");
         strcpy(tmp->pathList[tmp->count], c);
@@ -89,40 +82,48 @@ char insertPathList(array *tmp, char *c, int val) {
     return ret;
 }
 
-char insertAndSumPathList(array *tmp, char *c, int val) {
+int insertAndSumPathList(array *tmp, char *c, int val) {
     int i;
     char sum = FALSE;
-    char ret = -1;
+    int ret = -1;
 
     for (i = 0; i < tmp->count; i++) {
-        if (sumCsv(tmp->pathList[i], c)) {
-            sum = TRUE;
-            tmp->analyzed[i]--;
-            if (tmp->analyzed[i] == 0) {
-                ret = i;
+        if (sameId(tmp->pathList[i], c)) {
+            if (sumCsv(tmp->pathList[i], c)) {
+                sum = TRUE;
+                tmp->analyzed[i]--;
+                if (tmp->analyzed[i] == 0) {
+                    ret = i;
+                }
             }
         }
     }
 
     if (sum == FALSE) {
         //printf("Provo a inserire %s, size: %d, count:%d\n", c, tmp->size, tmp->count);
-        if (tmp->count == tmp->size) {
-            //printf("Raddoppio la size\n");
-            tmp->size *= 2;
-            tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
-            tmp->analyzed = (int *)realloc(tmp->analyzed, sizeof(int *) * tmp->size);
-
-            for (i = tmp->count; i < tmp->size; i++) {
-                tmp->pathList[i] = (char *)malloc(sizeof(char *) * (DIM_RESP + 1));
-            }
+        if (tmp->count == tmp->size-1) {
+            reallocPathList(tmp,2);
         }
         //printf("Stringa inserita\n");
         strcpy(tmp->pathList[tmp->count], c);
         tmp->analyzed[tmp->count] = val;
         tmp->count++;
+        ret = -1;
     }
-
     return ret;
+}
+
+void reallocPathList(array *tmp, int newSize) {
+    int i;
+    tmp->size *= newSize;
+    tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
+    tmp->analyzed = (int *)realloc(tmp->analyzed, sizeof(int *) * tmp->size);
+
+    for (i = tmp->count; i < tmp->size; i++) {
+        tmp->pathList[i] = (char *)malloc(sizeof(char *) * (DIM_RESP + 1));
+        //memset(tmp->pathList[i], '\0', sizeof(char *) * PATH_MAX);  //set the first character to '\0' (= end of string)
+        tmp->analyzed[i] = -1;
+    }
 }
 
 void printPathList(array *tmp) {
@@ -176,6 +177,11 @@ void close_pipes(int *fd, int size) {
     for (i = 0; i < size; i++) {
         close(fd[i]);
     }
+}
+char sameId(char *a, char *b) {
+    char *id1 = strtok(strdup(a), "#");
+    char *id2 = strtok(strdup(b), "#");
+    return (!strcmp(id1, id2));
 }
 
 // /src/Analyzer/A.c

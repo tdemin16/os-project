@@ -10,8 +10,11 @@ bin/
 # Ignore .DS_Store
 .DS_Store
 
+# Ignore .txt
+.txt
+
 # Unignore all with extensions
-!*.*
+!.
 
 # Unignore all dirs
 !*/
