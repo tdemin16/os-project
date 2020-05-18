@@ -100,8 +100,6 @@ int main(int argc, char* argv[]) {
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
                         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere
                             if (!strncmp(path, "///", 3)) {            //Se leggo una stringa di terminazione
-
-                                strcat(path, "p");
                                 end = TRUE;  //Setto end a true
                                 //fprintf(stderr,"C finito di scrivere, %s\n",path);
                             }

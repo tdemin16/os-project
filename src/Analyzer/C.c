@@ -27,8 +27,6 @@ int main(int argc, char const* argv[]) {
     char* args[3];
     int _read = FALSE;   //Indica se ha finito di leggere dai figli
     int _write = FALSE;  //Indica se ha finito di scrivere
-    char ad[2];
-    strcpy(ad, "$");
 
     int test = 0;
     failedPath[0] = '\0';
@@ -151,7 +149,7 @@ int main(int argc, char const* argv[]) {
                             }
                         }
                     } else {  //Se tutti i file sono stati ricevuti allora devo inviare una stringa di terminazione: ///
-                        strcpy(path, "///c");
+                        strcpy(path, "///");
                         end = TRUE;                //Setto end = true, se non ci sono problemi rimarrà true
                         for (j = 0; j < n; j++) {  //Manda a tutti i processi P la fine della scrittura
 
@@ -194,7 +192,7 @@ int main(int argc, char const* argv[]) {
                                 if (strstr(resp, "#") != NULL) {
                                     id_r = atoi(strtok(strdup(resp), "#"));
                                     retrive->analyzed[id_r] = 1;
-                                    if (write(STDOUT_FILENO, ad, 2) == -1) {
+                                    if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
                                         if (errno != EAGAIN) {
                                             value_return = err_write();
                                         } else {
@@ -206,7 +204,7 @@ int main(int argc, char const* argv[]) {
                             }
                         }
                     } else {
-                        if (write(STDOUT_FILENO, ad, 2) == -1) {
+                        if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
                             if (errno != EAGAIN) value_return = err_write();
                         } else
                             send_r = TRUE;

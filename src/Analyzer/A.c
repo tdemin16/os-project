@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     char *args[8];       //String og arguments to pass to child
     int _write = FALSE;  //true when finish writing the pipe
     int _read = FALSE;   //true when fisnish reading from pipe
-    char ad[2];
+    char resp[DIM_RESP];
 
     value_return = parser(argc, argv, lista, &count, &n, &m);
 
@@ -161,13 +161,15 @@ int main(int argc, char *argv[]) {
                 //Read
                 //fprintf(stderr,"A<-C: leggo\n");
                 if (!_read) {
-                    if (read(fd_2[READ], ad, 2) > 0) {
-                        //printf("%s", ad);
-                        //fflush(stdout);
-                        perc++;
-                        if (perc == count) {
-                            //_read = TRUE;
-                            printf("\n");
+                    if (read(fd_2[READ], resp, DIM_RESP) > 0) {
+                        if (strstr(resp, "#") != NULL) {
+                            printf("%s\n", resp);
+                            //fflush(stdout);
+                            perc++;
+                            if (perc == count) {
+                                _read = TRUE;
+                                printf("\n");
+                            }
                         }
                     }
                 }
