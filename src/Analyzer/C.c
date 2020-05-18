@@ -111,12 +111,6 @@ int main(int argc, char const* argv[]) {
         i = 0;
         k = 0;
         if (f > 0) {  //PARENT SIDE
-            char str[12];
-            sprintf(str, "%d", getpid());
-            strcat(str, ".txt");
-            FILE* debug = fopen(str, "a");
-            fprintf(debug, "AVVIATO C - pid: %d\n", getpid());
-            fclose(debug);
             while (value_return == 0 && (!_read || !_write)) {
                 if (!_write) {                                             //CICLO DI SCRITTURA
                     if (count != nfiles) {                                 //Se non sono ancora tutti arraivati
@@ -188,16 +182,9 @@ int main(int argc, char const* argv[]) {
                 if (!_read) {
                     if (send_r) {
                         if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {
-                            debug = fopen(str, "a");
-                            fprintf(debug, "Read: %s\n", resp);
-                            fclose(debug);
                             if (!strncmp(resp, "///", 3)) {  //Lascia questo blocco
-                                debug = fopen(str, "a");
-                                fprintf(debug, "Read: %s\n", resp);
-                                fclose(debug);
                                 part_received++;
-                                if (part_received == n-1) {
-                                    fprintf(debug, "Termino\n");
+                                if (part_received == n) {
                                     _read = TRUE;
                                 }
                             } else {
@@ -211,7 +198,7 @@ int main(int argc, char const* argv[]) {
                                             send_r = FALSE;
                                         }
                                     }
-                                    k = (k + 1) % n;
+                                    
                                 }
                             }
                         }
@@ -221,6 +208,7 @@ int main(int argc, char const* argv[]) {
                         } else
                             send_r = TRUE;
                     }
+                    k = (k + 1) % n;
                 }
             }
             close_pipes(fd, size_pipe);
