@@ -93,10 +93,6 @@ int main(int argc, char const* argv[]) {
         }
     }
 
-    //Allocation of proc and initialization of all n chars* is_open
-    //proc = malloc(n);
-    //initialize_processes(proc,n);
-
     //Forking----------------------------------------------------------------
     if (value_return == 0) {
         //Ciclo n volte, controllando che f > 0 (padre) e non ci siano errori -> genera quindi n processi
@@ -161,7 +157,7 @@ int main(int argc, char const* argv[]) {
                             }
                         }
                     } else {  //Se tutti i file sono stati ricevuti allora devo inviare una stringa di terminazione: ///
-                        strcpy(path, "///");
+                        strcpy(path, "///c");
                         end = TRUE;                //Setto end = true, se non ci sono problemi rimarrà true
                         for (j = 0; j < n; j++) {  //Manda a tutti i processi P la fine della scrittura
 
@@ -194,13 +190,12 @@ int main(int argc, char const* argv[]) {
                 if (!_read) {
                     if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {
                         debug = fopen(str, "a");
-                        fprintf(debug, "RICEVUTO %d: %s \n", (k * 4 + 0),path);
+                        fprintf(debug, "RICEVUTO %d: %s \n", (k * 4 + 0), resp);
                         fclose(debug);
                     }
                     k = (k + 1) % n;
-                
 
-                        /*
+                    /*
                     if (send_r) {
                         if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {
                             //fprintf(stderr, "C read: %s\n", resp);
@@ -240,47 +235,47 @@ int main(int argc, char const* argv[]) {
                             send_r = TRUE;
                     }
                     */
-                    }
-                }
-                close_pipes(fd, size_pipe);
-                free(fd);
-                printPathList(retrive);
-                freePathList(retrive);
-            }
-        }
-
-        if (value_return == 0) {
-            if (f == 0) {  //SON SIDE
-                //Creates char args
-                strcpy(arrayArgomenti[0], "./P");
-                sprintf(arrayArgomenti[1], "%d", m);
-                args[0] = arrayArgomenti[0];
-                args[1] = arrayArgomenti[1];
-                args[2] = NULL;
-
-                dup2(fd[id * 4 + 2], STDIN_FILENO);
-                dup2(fd[id * 4 + 1], STDOUT_FILENO);
-                close_pipes(fd, size_pipe);
-                free(fd);
-
-                if (execvp(args[0], args) == -1) {   //Test exec
-                    value_return = err_exec(errno);  //Set value return
                 }
             }
+            close_pipes(fd, size_pipe);
+            free(fd);
+            //printPathList(retrive);
+            freePathList(retrive);
         }
+    }
 
-        /*for (i = 0; i < n; i++) //deallocate the n-proc[]->is_open
+    if (value_return == 0) {
+        if (f == 0) {  //SON SIDE
+            //Creates char args
+            strcpy(arrayArgomenti[0], "./P");
+            sprintf(arrayArgomenti[1], "%d", m);
+            args[0] = arrayArgomenti[0];
+            args[1] = arrayArgomenti[1];
+            args[2] = NULL;
+
+            dup2(fd[id * 4 + 2], STDIN_FILENO);
+            dup2(fd[id * 4 + 1], STDOUT_FILENO);
+            close_pipes(fd, size_pipe);
+            free(fd);
+
+            if (execvp(args[0], args) == -1) {   //Test exec
+                value_return = err_exec(errno);  //Set value return
+            }
+        }
+    }
+
+    /*for (i = 0; i < n; i++) //deallocate the n-proc[]->is_open
     {
         free(proc[i].is_open);
     }
 
     free(proc); //deallocate proc
     */
-        return value_return;
-    }
+    return value_return;
+}
 
-    //NON NECESSARIO, MANTENUTO PER SICUREZZA---------------------------------------------------
-    /*if(value_return == 0) {
+//NON NECESSARIO, MANTENUTO PER SICUREZZA---------------------------------------------------
+/*if(value_return == 0) {
     if(f > 0) { //PARENT SIDE
         fileLeft = nfiles;
         processLeft = n;

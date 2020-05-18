@@ -100,14 +100,16 @@ int main(int argc, char* argv[]) {
             FILE* debug = fopen(str, "a");
             fprintf(debug, "AVVIATO P - pid: %d\n", getpid());
             fclose(debug);
-            
+
             while (value_return == 0 && (!_read || !_write)) {
                 //Write
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
                         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere
                             if (!strncmp(path, "///", 3)) {            //Se leggo una stringa di terminazione
-                                end = TRUE;                            //Setto end a true
+
+                                strcat(path, "p");
+                                end = TRUE;  //Setto end a true
                                 //fprintf(stderr,"C finito di scrivere, %s\n",path);
                             }
                             for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q
