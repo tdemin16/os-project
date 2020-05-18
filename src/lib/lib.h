@@ -72,8 +72,9 @@ void freeList(process*);
 
 //Array struct functions -- sostituiscono lista (momentaneamente?)
 array * createPathList(int);
+void reallocPathList(array *, int);
 char insertPathList(array*, char*, int);
-char insertAndSumPathList(array *, char *,int);
+int insertAndSumPathList(array *, char *,int);
 void printPathList(array*);
 void freePathList(array*);
 int dimPathList(array*);
@@ -113,6 +114,7 @@ int lenghtCsv(int *);
 char sumCsv(char*, char*);
 void createCsv(int *, char *,char *);
 void addCsvToArray(char *, int *);
+char sameId(char *,char *);
 //int err_args_P(); used here
 //int err_file_open(); used here
 
