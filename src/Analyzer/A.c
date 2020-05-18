@@ -54,6 +54,7 @@ int main(int argc, char *argv[]) {
     int i;          //Variabile usata per ciclare gli argomenti (argv[i])
     int count = 0;  //numero di file univoci da analizzare
     int perc = 0;
+    int oldperc = 0;
 
     array *lista = createPathList(10);  //Nuova lista dei path
 
@@ -66,11 +67,16 @@ int main(int argc, char *argv[]) {
     int _write = FALSE;  //true when finish writing the pipe
     int _read = FALSE;   //true when fisnish reading from pipe
     char resp[DIM_RESP];
+    int id_r;
+    char *resp_val;
+    char sum[DIM_RESP];
+    int v[DIM_V];
+    initialize_vector(v);
 
     value_return = parser(argc, argv, lista, &count, &n, &m);
 
     if (value_return == 0) {  //Esecuzione corretta
-        printf("Numero file: %d,n=%d m=%d\n", count, n, m);
+        //printf("Numero file: %d,n=%d m=%d\n", count, n, m);
         //printPathList(lista);
     }
 
@@ -163,12 +169,25 @@ int main(int argc, char *argv[]) {
                 if (!_read) {
                     if (read(fd_2[READ], resp, DIM_RESP) > 0) {
                         if (strstr(resp, "#") != NULL) {
-                            printf("%s\n", resp);
+                            id_r = atoi(strtok(strdup(resp), "#"));
+                            lista->analyzed[id_r] = 1;
+                            resp_val = strtok(NULL, "#");
+                            if (addCsvToArray(resp_val, v)) value_return = err_overflow();
+
                             //fflush(stdout);
                             perc++;
+                            if ((int)((float)perc * 10 / (float)count) > oldperc) {
+                                oldperc = (int)((float)perc * 10 / (float)count);
+                                system("clear");
+                                percAvanzamento(perc, count);
+                            }
+
                             if (perc == count) {
                                 _read = TRUE;
-                                printf("\n");
+                                system("clear");
+                                printf("Numero file analizzati: %d\nProcessi:%d\nSezioni:%d\n\n", count, n, m);
+                                arrayToCsv(v, sum);
+                                printStat_Cluster(sum);
                             }
                         }
                     }

@@ -113,7 +113,7 @@ int countDigit(int);
 int lenghtCsv(int *);
 char sumCsv(char*, char*);
 void createCsv(int *, char *,char *);
-void addCsvToArray(char *, int *);
+char addCsvToArray(char *, int *);
 char sameId(char *,char *);
 //int err_args_P(); used here
 //int err_file_open(); used here
@@ -123,6 +123,7 @@ void printStat(char *);
 void printStat_Cluster(char *);
 void printInfoCluster();
 float roundValue(float, int);
+void percAvanzamento(int,int);
 
 
 //Error handlers
@@ -130,6 +131,7 @@ int err_file_open();
 int err_pipe();
 int err_end_file();
 int err_args_A();
+int err_overflow();
 int err_input_A(char*);
 int err_args_C();
 int err_args_P();

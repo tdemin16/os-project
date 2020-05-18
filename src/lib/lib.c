@@ -69,7 +69,7 @@ char insertPathList(array *tmp, char *c, int val) {
     if (present == FALSE) {
         //printf("Provo a inserire %s, size: %d, count:%d\n", c, tmp->size, tmp->count);
         if (tmp->count == tmp->size) {
-            reallocPathList(tmp,2);
+            reallocPathList(tmp, 2);
         }
         //printf("Stringa inserita\n");
         strcpy(tmp->pathList[tmp->count], c);
@@ -101,8 +101,8 @@ int insertAndSumPathList(array *tmp, char *c, int val) {
 
     if (sum == FALSE) {
         //printf("Provo a inserire %s, size: %d, count:%d\n", c, tmp->size, tmp->count);
-        if (tmp->count == tmp->size-1) {
-            reallocPathList(tmp,2);
+        if (tmp->count == tmp->size - 1) {
+            reallocPathList(tmp, 2);
         }
         //printf("Stringa inserita\n");
         strcpy(tmp->pathList[tmp->count], c);
@@ -452,19 +452,23 @@ char sumCsv(char *str1, char *str2) {
     return ret;
 }
 
-void addCsvToArray(char *tmp, int *v) {
+char addCsvToArray(char *tmp, int *v) {
+    char ret = FALSE;
     int i = 0;
     char *Analyze = strtok(tmp, "#");
+    //fprintf(stderr,"%s\n",Analyze);
     char *token = strtok(tmp, ",");
     while (token != NULL) {  //loop through token
         if (i < DIM_V) {
             v[i] += atoi(token);
+            if (v[i] < 0) ret = TRUE;
             i++;
             token = strtok(NULL, ",");
         } else {
             printf("Errore nella creazione della stringa contatore");
         }
     }
+    return ret;
 }
 
 ///src/R.c
@@ -585,6 +589,17 @@ void printInfoCluster() {
     printf("\n");
 }
 
+void percAvanzamento(int n, int tot) {
+    int hashtag = (int)((float)n*10/(float)tot);
+    int i;
+    printf("[");
+    for (i=0;i<10;i++){
+        if (i<hashtag)printf("#");
+        else printf(".");
+    }
+    printf("]\n");
+}
+
 ///src/Analyzer/P.c
 //return file length in terms of chars
 int file_len(FILE *fp) {
@@ -699,6 +714,11 @@ int err_pipe() {
 
 int err_args_A() {
     printf("\nErrore nella sintassi del comando.\nUsa: /A nomeFile nomeCartella\nPuoi usare -setn e -setm per cambiare n e m\nes: /A A.c ../Analyzer/ -setn 3 -setm 4\n\n");
+    return ERR_ARGS_A;
+}
+
+int err_overflow() {
+    printf("\nErrore overflow\nI risultati delle analisi sono troppo grandi\nProva con meno file o con file meno pesanti\n\n");
     return ERR_ARGS_A;
 }
 
