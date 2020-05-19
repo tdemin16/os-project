@@ -42,6 +42,12 @@
 #define ERR_ENXIO 18
 #define ERR_ARGS_M 19
 
+#define REMOVED -2
+#define INEXISTENCE -1
+#define TO_BE_ANALIZED 0
+#define ANALIZED 1
+#define ANALIZED_INEXISTENCE 2
+
 /*
 L'array analized contiene lo stato di ogni percorso:
     0   da analizzare
