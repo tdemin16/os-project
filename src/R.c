@@ -3,8 +3,12 @@
 int main(int argc, char const* argv[]) {
     int value_return = 0;
     const char* fifo = "/tmp/A_R_Comm";
-    pid_t fd_fifo;
+    int fd_fifo;
     int _close = FALSE;
+    char cmd[DIM_CMD];
+    int retrieve = FALSE;
+    int _write_val = -1;
+    char resp[DIM_RESP];
 
     printf("Start R\n");
 
@@ -29,8 +33,61 @@ int main(int argc, char const* argv[]) {
     }
 
     while (value_return == 0 && !_close) {
-        printf("Yeah, ciclo");
-        _close = TRUE;
+        if (!retrieve) {
+            if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
+                if (!strcmp(cmd, "close")) {
+                    _close = TRUE;
+                } else {
+                    if (!strcmp(cmd, "-c") /*&& altri flags*/) {
+                        do {
+                            _write_val = write(fd_fifo, cmd, DIM_CMD);
+                            if (_write_val = -1) {
+                                if (errno == EAGAIN)
+                                    _write_val = EAGAIN;
+                                else
+                                    value_return = err_write();
+                            }
+                        } while (value_return == 0 && _write_val == EAGAIN);
+                        if (value_return == 0) {
+                            retrieve = TRUE;
+                            if (close(fd_fifo) == -1) {
+                                value_return = err_close();
+                            }
+                            //Open fifo in nonblocking read mode
+                            if (value_return == 0) {
+                                fd_fifo = open(fifo, O_RDONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
+                                if (fd_fifo == -1) {                          //Error handling
+                                    value_return = err_file_open();           //Errore nell'apertura del file
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            while (retrieve) {
+                if (read(fd_fifo, resp, DIM_RESP) == -1) {
+                    if (!strncmp(resp, "///", 3)) {
+                        //print values according to cmd
+                        if (value_return == 0) {
+                            retrieve = FALSE;
+                            if (close(fd_fifo) == -1) {
+                                value_return = err_close();
+                            }
+                            //Open fifo in nonblocking read mode
+                            if (value_return == 0) {
+                                fd_fifo = open(fifo, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
+                                if (fd_fifo == -1) {                          //Error handling
+                                    value_return = err_file_open();           //Errore nell'apertura del file
+                                }
+                            }
+                        }
+                    } else {
+                        //store values
+                    }
+                }
+            }
+        }
     }
 
     if (value_return == 0) {

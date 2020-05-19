@@ -136,12 +136,11 @@ int main(int argc, char *argv[]) {
                 _close = TRUE;
                 if (!_close) {
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
-                        
                     }
                 }
 
                 //Write
-                if (!_write && value_return == 0) {                                                     //Esegue il blocco finche` non ha finito di scrivere
+                if (!_write && value_return == 0) {                                //Esegue il blocco finche` non ha finito di scrivere
                     if (write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
                         if (errno != EAGAIN) {                                     //Se avviene un errore e non e` causato dalla dimensione della pipe
                             value_return = err_write();                            //Ritorna l'errore sulla scrittura
@@ -155,20 +154,20 @@ int main(int argc, char *argv[]) {
                 }
 
                 //Read
-                if (!_read && value_return == 0) {                                        //Esegue il blocco fiche` non c'e` piu` nulla nella pipe
-                    if (read(fd_2[READ], resp, DIM_RESP) > 0) {      //Pero` potremmo vedere se sto controllo serve realmente
-                        if (strstr(resp, "#") != NULL) {             //Controlla che ci sia almeno un # nel messaggio
-                            char * tmp;
+                if (!_read && value_return == 0) {               //Esegue il blocco fiche` non c'e` piu` nulla nella pipe
+                    if (read(fd_2[READ], resp, DIM_RESP) > 0) {  //Pero` potremmo vedere se sto controllo serve realmente
+                        if (strstr(resp, "#") != NULL) {         //Controlla che ci sia almeno un # nel messaggio
+                            char *tmp;
                             tmp = strdup(resp);
                             id_r = atoi(strtok(tmp, "#"));  //id del file da valutare
-                            resp_val = strtok(NULL, "#");                       //valori
-                            char * tmpResp;
+                            resp_val = strtok(NULL, "#");   //valori
+                            char *tmpResp;
                             tmpResp = strdup(resp_val);
-                            firstVal = atoi(strtok(tmpResp, ","));     //primo valore
+                            firstVal = atoi(strtok(tmpResp, ","));  //primo valore
                             char *tmpPercorso;
                             tmpPercorso = strdup(lista->pathList[id_r]);
                             file = strtok(tmpPercorso, "#");  //Recupera path corrispondente nella lista
-                            file = strtok(NULL, "#");                           //percorso
+                            file = strtok(NULL, "#");         //percorso
                             if (firstVal != -1) {
                                 if (fileExist(file)) {                                              // File esistente
                                     lista->analyzed[id_r] = 1;                                      //Setta il flag ad Analizzato
@@ -202,7 +201,6 @@ int main(int argc, char *argv[]) {
                             free(tmpPercorso);
                             free(tmp);
                             free(tmpResp);
-                            
                         }
                     }
                 }
