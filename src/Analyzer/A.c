@@ -35,53 +35,44 @@ int main(int argc, char *argv[]) {
     int value_return = 0;  //Valore di ritorno, globale per "send_to_R"
 
     //COMMUNICATION WITH R
-    const char *fifo = "/tmp/A_R_Comm";
-    pid_t fd_fifo;
+    const char *fifo = "/tmp/A_R_Comm";  //Nome fifo con R
+    int fd_fifo;                         //pipe fifo con R
 
     //COMMUNICATION WITH M
-    char cmd[DIM_CMD];
+    char cmd[DIM_CMD];  //Comando rivevuto da M
     int _close = FALSE;
 
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
     int m = 4;
 
-    //ATTENZIONE: args puo' essere sostituita da filePath qualora questa non sia piu' utile dopo il fork
-    //Rimuovere questi commenti alla fine del progetto :)
-    //node msg; //list used to pass path's to child
-    //node filePath = NULL; //list of path's strings
-    //parser variables
-    int i;          //Variabile usata per ciclare gli argomenti (argv[i])
-    int count = 0;  //numero di file univoci da analizzare
-    int perc = 0;
-    int oldperc = 0;
+    //Utility
+    int i;            //Variabile usata per ciclare gli argomenti (argv[i])
+    int count = 0;    //numero di file univoci da analizzare
+    int perc = 0;     //Ricevimento parziale file
+    int oldperc = 0;  //Parziale precedente
 
     array *lista = createPathList(10);  //Nuova lista dei path
 
     //Variables for IPC
-    int fd_1[2];  //Pipe
+    int fd_1[2];  //Pipes
     int fd_2[2];
-    pid_t f;             //fork return value
-    char array[7][20];   //Matrice di appoggio
-    char *args[8];       //String og arguments to pass to child
-    int _write = FALSE;  //true when finish writing the pipe
-    int _read = FALSE;   //true when fisnish reading from pipe
-    char resp[DIM_RESP];
-    int id_r;
-    char *resp_val;
-    char *file;
-    int firstVal = 0;
+    pid_t f;              //fork return value
+    char array[7][20];    //Matrice di appoggio
+    char *args[8];        //String og arguments to pass to child
+    int _write = FALSE;   //true when finish writing the pipe
+    int _read = FALSE;    //true when fisnish reading from pipe
+    char resp[DIM_RESP];  //Stringa in cui salvare i messaggi ottenuti dal figlio
+    int id_r;             //Id file ricevuto
+    char *resp_val;       //Messaggio senza Id
+    char *file;           //Messaggio senza Id e identificatori (#)
+    int firstVal = 0;     //Controllo sulla validita' di un messaggio
     char sum[DIM_RESP];
-    int v[DIM_V];
-    int notAnalyzed = 0;
-    initialize_vector(v);
+    int v[DIM_V];          //Array con valori totali
+    int notAnalyzed = 0;   //Flag indicante se e` avvenuta o meno la lettura della pipe
+    initialize_vector(v);  //Inizializzazione vettore dei valori totali
 
-    value_return = parser(argc, argv, lista, &count, &n, &m);
-
-    if (value_return == 0) {  //Esecuzione corretta
-        //printf("Numero file: %d,n=%d m=%d\n", count, n, m);
-        //printPathList(lista);
-    }
+    value_return = parser(argc, argv, lista, &count, &n, &m);  //Controlla i parametri passati ad A
 
     insertProcess(p, getpid());  //Insert pid of A in process list
 
@@ -131,7 +122,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (value_return == 0) {            //same as before
+    if (value_return == 0) {
         f = fork();                     //Fork dei processi
         if (f == -1) {                  //Controllo che non ci siano stati errori durante il fork
             value_return = err_fork();  //in caso di errore setta il valore di ritorno a ERR_FORK
@@ -140,62 +131,61 @@ int main(int argc, char *argv[]) {
 
     //------------------------------------------------------------------------------
 
-    if (value_return == 0) {      //same
+    if (value_return == 0) {
         if (f > 0) {              //PARENT SIDE
-            insertProcess(p, f);  //Insert process f in list p
+            insertProcess(p, f);  //Insert child process in list p
             i = 0;
-            while (value_return == 0 && (!_read || !_write || !_close)) {  //cicla finche` non ha finito di leggere e scrivere
-                //sleep(1);
+            while (value_return == 0 && (!_read || !_write || !_close)) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
+
+                //M Work in progress
+                _close = TRUE;
+                if (!_close) {
+                    if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
+                        printf("%s\n", cmd);
+                    }
+                }
+
                 //Write
-                if (!_write) {
-                    
+                if (!_write) {                                                     //Esegue il blocco finche` non ha finito di scrivere
                     if (write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
-                        if (errno != EAGAIN) {
-                            value_return = err_write();
-                        } else {
-                            //fprintf(stderr,"A->C: Pipe piena\n");
+                        if (errno != EAGAIN) {                                     //Se avviene un errore e non e` causato dalla dimensione della pipe
+                            value_return = err_write();                            //Ritorna l'errore sulla scrittura
                         }
-                        //Se fallisce da` errore
-                        //ADD SIGNAL HANDLING
                     } else {
-                        i++;
-                        //fprintf(stderr,"A->C: scrivo\n");
-                        if (i == count) {
-                            _write = TRUE;
-                            //printPathList(lista);
-                            //fprintf(stderr,"######## A->C: Scritto tutto\n");
+                        i++;                //passa al prossimo elemento della lista
+                        if (i == count) {   //Qunado ha finito di inviare
+                            _write = TRUE;  //Setta il flag a true
                         }
                     }
                 }
 
                 //Read
-                //fprintf(stderr,"A<-C: leggo\n");
-                if (!_read) {
-                    if (read(fd_2[READ], resp, DIM_RESP) > 0) {
-                        if (strstr(resp, "#") != NULL) {
-                            id_r = atoi(strtok(strdup(resp), "#"));  //id
+                if (!_read) {                                        //Esegue il blocco fiche` non c'e` piu` nulla nella pipe
+                    if (read(fd_2[READ], resp, DIM_RESP) > 0) {      //Pero` potremmo vedere se sto controllo serve realmente
+                        if (strstr(resp, "#") != NULL) {             //Controlla che ci sia almeno un # nel messaggio
+                            id_r = atoi(strtok(strdup(resp), "#"));  //id del file da valutare
 
-                            resp_val = strtok(NULL, "#");                    //valori
-                            firstVal = atoi(strtok(strdup(resp_val), ","));  //primo valore
-                            file = strtok(strdup(lista->pathList[id_r]), "#");
-                            file = strtok(NULL, "#");  //percorso
-                            //printf("%d\n",firstVal);
+                            resp_val = strtok(NULL, "#");                       //valori
+                            firstVal = atoi(strtok(strdup(resp_val), ","));     //primo valore
+                            file = strtok(strdup(lista->pathList[id_r]), "#");  //Recupera path corrispondente nella lista
+                            file = strtok(NULL, "#");                           //percorso
                             if (firstVal != -1) {
                                 if (fileExist(file)) {  // File esistente
-                                    lista->analyzed[id_r] = 1;
-                                    if (addCsvToArray(resp_val, v)) value_return = err_overflow();
-                                    perc++;
+                                    lista->analyzed[id_r] = 1; //Setta il flag ad Analizzato
+                                    if (addCsvToArray(resp_val, v)) value_return = err_overflow(); //Aggiunge il file al vettore delle somme
+                                    perc++; //Aumenta l'avanzamento della barretta
                                 } else {
-                                    if (addCsvToArray(resp_val, v)) value_return = err_overflow();
-                                    lista->analyzed[id_r] = 2;
-                                    perc++;
+                                    if (addCsvToArray(resp_val, v)) value_return = err_overflow(); //Aggiunge il file al vettore delle somme
+                                    lista->analyzed[id_r] = 2; //Setta il flag ad analizzato ma non piu` esistente
+                                    perc++; //Aumenta l'avanzamento della barretta
                                 }
-                            } else {
+                            } else { //Caso in cui il file non e` piu' esistente
                                 notAnalyzed++;
                                 lista->analyzed[id_r] = -1;
                                 perc++;
                             }
 
+                            //Barretta
                             if ((int)((float)perc * 10 / (float)count) > oldperc) {
                                 oldperc = (int)((float)perc * 10 / (float)count);
                                 system("clear");
@@ -212,33 +202,27 @@ int main(int argc, char *argv[]) {
                         }
                     }
                 }
-
-                //M
-                _close = TRUE;
-                if (!_close) {
-                    if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
-                        printf("%s\n", cmd);
-                    }
-                }
             }
 
+            //Chiusura pipe
             close(fd_1[READ]);
             close(fd_1[WRITE]);
             close(fd_2[READ]);
             close(fd_2[WRITE]);
 
+            //Chiusura fifo
             if (value_return == 0) {
                 if (close(fd_fifo) == -1) {
                     value_return = err_close();
                 }
             }
 
+            //Elimina la fifo
             if (value_return == 0) {
                 if (unlink(fifo) == -1) {
                     value_return = err_unlink();
                 }
             }
-            //printPathList(lista);
             freePathList(lista);
         }
     }

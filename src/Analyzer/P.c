@@ -86,15 +86,14 @@ int main(int argc, char* argv[]) {
     //----------------------------------------------------------------------
     if (value_return == 0) {
         if (f > 0) {  //PARENT SIDE
-
             while (value_return == 0 && (!_read || !_write)) {
+                
                 //Write
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
                         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere
                             if (!strncmp(path, "///", 3)) {            //Se leggo una stringa di terminazione
                                 end = TRUE;                            //Setto end a true
-                                //fprintf(stderr,"C finito di scrivere, %s\n",path);
                             }
                             for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q
                                 if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {
@@ -110,7 +109,6 @@ int main(int argc, char* argv[]) {
                             }
                         }
                     } else {
-                        //fprintf(stderr,"C[%d] provo ritrasmissione di %s\n",getpid(),path);
                         send_w = TRUE;
                         for (i = 0; i < m; i++) {
                             if (!terminated[i]) {  //Per ogni path non inviato, riprova
@@ -127,7 +125,6 @@ int main(int argc, char* argv[]) {
                         }
                     }
                     if (end && send_w) {  //Se lo stato e' end, e tutto e' stato inviato, allora la write e' finita
-                        //fprintf(stderr,"C finito di scrivere, %s\n",path);
                         _write = TRUE;
                     }
                 }
@@ -210,16 +207,3 @@ int main(int argc, char* argv[]) {
 
     return value_return;
 }
-
-/*for(i = 0; i < m; i++) {
-    if(read(fd[i*4 + 0], resp, DIM_RESP) > 0) {
-        //fprintf(stderr,"P read: %s\n",resp);
-        if(!strcmp(resp, "///")) { //Controlla se e` la fine del messaggio
-            count++; //Conta quanti terminatori sono arrivati
-            if(count == m) { //Quando tutti i figli hanno terminato
-                fprintf(stderr,"P: Chiudo %s\n",resp);
-                _read = TRUE;                            
-            }
-        }
-    }
-}*/

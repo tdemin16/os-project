@@ -111,31 +111,23 @@ int main(int argc, char const* argv[]) {
                     if (count != nfiles) {                                 //Se non sono ancora tutti arraivati
                         if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
                             if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere
-                                //fprintf(stderr,"Aggiunto %s\n",path);
                                 if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {  //Provo a scrivere
                                     if (errno != EAGAIN) {
                                         value_return = err_write();
-                                        //fprintf(stderr,"errore\n");
                                     } else {  //Se da errore in scrittura copio il path in failedPath e setto lo stato di stop (Retransmit)
                                         stop = TRUE;
                                         strcpy(failedPath, path);
-                                        //fprintf(stderr,"C->P: Pipe per %d piena, %s aspetta\n",i,path);
                                     }
                                 } else {  //scritto con successo
-                                    //fprintf(stderr,"C->P: assegno a %d %s\n",i,path);
                                     count++;          //Tengo conto della scrittura
                                     i = (i + 1) % n;  //Usato per ciclare su tutte le pipe in scrittura
                                 }
                             }
                         } else {
-                            //fprintf(stderr,"STOP TRUE\n");
                             if (write(fd[i * 4 + 3], failedPath, PATH_MAX) == -1) {  //Test write
                                 if (errno != EAGAIN) {
                                     value_return = err_write();
-                                } else {
-                                    //fprintf(stderr,"C->P: Pipe per %d ancora piena, %s aspetta\n",i,failedPath);
                                 }
-                                //ADD SIGNAL HANDLING
                             } else {
                                 stop = FALSE;  //Se la scrittura va a buon fine esco dallo stato di stop
                                 count++;       //Tengo conto dell'invio
@@ -156,16 +148,10 @@ int main(int argc, char const* argv[]) {
                                         end = FALSE;
                                     }
                                 } else {
-                                    //fprintf(stderr,"C->P: Invio /// a %d\n",j);
                                     terminated[j] = TRUE;  //Se riesce a mandare
                                 }
                             }
-                            //for (i= 0; i<n; i++){
-                            //fprintf(stderr,"%d ",terminated[i]);
-                            //}
-                            //fprintf(stderr,"\n");
                         }
-                        //end = TRUE;
                         if (end == TRUE) {
                             _write = TRUE;  //Finito di scrivere
                         }
@@ -236,26 +222,3 @@ int main(int argc, char const* argv[]) {
     */
     return value_return;
 }
-
-//NON NECESSARIO, MANTENUTO PER SICUREZZA---------------------------------------------------
-/*if(value_return == 0) {
-    if(f > 0) { //PARENT SIDE
-        fileLeft = nfiles;
-        processLeft = n;
-        tmpFiles = 0;
-
-        while (processLeft >0){ //Ciclo fino a che non ho assegnato i file a ogni processo
-            printf("Process %d: %d files\n",n-processLeft+1,(int)((float)fileLeft/(float)processLeft));
-
-            tmpFiles = (int)((float)fileLeft/(float)processLeft); //Divido i file rimanenti per i processi rimanenti e tengo il numero troncato
-            for (i = 0; i<tmpFiles; i++){ //Leggo il numero di file assegnato al processo
-                if(read(STDIN_FILENO, path, PATH_MAX) == 0) {
-
-                }
-            }
-
-            fileLeft-=tmpFiles;
-            processLeft-=1;
-        }
-    }
-}*/
