@@ -213,12 +213,5 @@ int main(int argc, char const* argv[]) {
         }
     }
 
-    /*for (i = 0; i < n; i++) //deallocate the n-proc[]->is_open
-    {
-        free(proc[i].is_open);
-    }
-
-    free(proc); //deallocate proc
-    */
     return value_return;
 }
