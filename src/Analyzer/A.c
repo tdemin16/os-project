@@ -14,12 +14,7 @@ void handle_sigint(int sig) {
             } else {
                 printf("\t[!] Errore, non sono riuscito a chiudere il processo %d!", p->pid[i]);  //if it fail something is wrong
             }
-        }     /*else if(proc[i] == 0){
-            if (kill(proc[i],9))
-            {
-                printf("Ucciso processo figlio");
-            }  
-        }*/
+        }
         i--;  //i-- otherwise it will go to infinity
     }
     freeList(p);  //free memory allocated for p
@@ -257,6 +252,8 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+
+    freeList(p);
 
     return value_return;
 }

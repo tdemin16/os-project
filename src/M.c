@@ -138,6 +138,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    freeList(p);
+
     return value_return;
 }
 
