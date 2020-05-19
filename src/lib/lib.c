@@ -726,96 +726,96 @@ void arrayToCsv(int *v, char *res) {
 
 //Error handlers
 int err_pipe() {
-    printf("Errore nella creazione della pipe\n");
+    fprintf(stderr, "Errore nella creazione della pipe\n");
     return ERR_PIPE;
 }
 
 int err_args_A() {
-    printf("\nErrore nella sintassi del comando.\nUsa: /A nomeFile nomeCartella\nPuoi usare -setn e -setm per cambiare n e m\nes: /A A.c ../Analyzer/ -setn 3 -setm 4\n\n");
+    fprintf(stderr, "\nErrore nella sintassi del comando.\nUsa: /A nomeFile nomeCartella\nPuoi usare -setn e -setm per cambiare n e m\nes: /A A.c ../Analyzer/ -setn 3 -setm 4\n\n");
     return ERR_ARGS_A;
 }
 
 int err_overflow() {
-    printf("\nErrore overflow\nI risultati delle analisi sono troppo grandi\nProva con meno file o con file meno pesanti\n\n");
+    fprintf(stderr, "\nErrore overflow\nI risultati delle analisi sono troppo grandi\nProva con meno file o con file meno pesanti\n\n");
     return ERR_ARGS_A;
 }
 
 int err_input_A(char *file) {
-    printf("\nErrore input\nFile/Directory non esistente: %s\n\n", file);
+    fprintf(stderr, "\nErrore input\nFile/Directory non esistente: %s\n\n", file);
     return ERR_ARGS_A;
 }
 
 int err_args_C() {
-    printf("\nErrore nella sintassi del comando.Usa:\n-nfiles <int> per indicare il numero di files (necessario)\n-setn <int> per settare n\n-setm <int> per settare m.\n\n");
+    fprintf(stderr, "\nErrore nella sintassi del comando.Usa:\n-nfiles <int> per indicare il numero di files (necessario)\n-setn <int> per settare n\n-setm <int> per settare m.\n\n");
     return ERR_ARGS_C;
 }
 
 int err_args_Q() {
-    printf("[!] Errore nella sintassi del comando\nusa: ./Q inizio_analisi fine_analisi\n");
+    fprintf(stderr, "[!] Errore nella sintassi del comando\nusa: ./Q inizio_analisi fine_analisi\n");
     return ERR_ARGS_Q;
 }
 
 int err_args_P() {
-    printf("[!] Errore nella sintassi del comando\nusa: ./P m\n");
+    fprintf(stderr, "[!] Errore nella sintassi del comando\nusa: ./P m\n");
     return ERR_ARGS_P;
 }
 
 int err_file() {
-    printf("Errore, nessun file inserito\n");
+    fprintf(stderr, "Errore, nessun file inserito\n");
     return ERR_FILE;
 }
 //Error if 3 arguments are inserted //Refers to Q.c
 int err_fork() {
-    printf("Errore, fork non riuscito\n");
+    fprintf(stderr, "Errore, fork non riuscito\n");
     return ERR_FORK;
 }
 
 int err_write() {
-    printf("Errore, write non riuscita\n");
+    fprintf(stderr, "Errore, write non riuscita\n");
     return ERR_WRITE;
 }
 //Error if fopen has failed //Refers to Q.c
 int err_file_open() {
-    printf("[!] Errore nell'apertura del file\n");
+    fprintf(stderr, "[!] Errore nell'apertura del file\n");
     return ERR_FILE;
 }
 
 //Error if end point is over EOF //Refers to Q.c
 int err_end_file() {
-    printf("\n[!] Errore, sei andato oltre la fine del file\n");
+    fprintf(stderr, "\n[!] Errore, sei andato oltre la fine del file\n");
     return ERR_FILE;
 }
 
 int err_fcntl() {
-    printf("Errore, sblocco pipe non riuscito\n");
+    fprintf(stderr, "Errore, sblocco pipe non riuscito\n");
     return ERR_FCNTL;
 }
 
 int err_exec(int err) {
-    printf("Errore nell'esecuzione di exec(%d) in: %d\n", err, getpid());
+    fprintf(stderr, "Errore nell'esecuzione di exec(%d) in: %d\n", err, getpid());
     return ERR_EXEC;
 }
 
 int err_m_not_valid() {
-    printf("[!] Il valore di m non è valido, deve essere m > 0\n");
+    fprintf(stderr, "[!] Il valore di m non è valido, deve essere m > 0\n");
     return ERR_DATA;
 }
 
 int err_part_not_valid() {
-    printf("[!] Il valore di part non è valido, deve essere < m\n");
+    fprintf(stderr, "[!] Il valore di part non è valido, deve essere < m\n");
     return ERR_DATA;
 }
 int err_process_open(pid_t p) {
-    printf("[!] Errore, il processo %d è ancora aperto!\n", p);
+    fprintf(stderr, "[!] Errore, il processo %d è ancora aperto!\n", p);
     return ERR_OPEN_PROC;
 }
 int err_fifo() {
-    printf("Errore nella creazione della pipe fifo\n");
+    fprintf(stderr, "Errore nella creazione della pipe fifo\n");
     return ERR_FIFO;
 }
 
 int err_unlink() {
-    printf("Errore nella eliminzazione della pipe fifo\n");
+    fprintf(stderr, "Errore nella eliminzazione della pipe fifo\n");
     return ERR_UNLINK;
 }
 
@@ -840,6 +840,6 @@ int err_enxio() {
 }
 
 int err_args_M() {
-    printf("\nErrore nella sintassi del comando.\nUsa: /M nomeFile nomeCartella\nPuoi usare -setn e -setm per cambiare n e m\nes: /M A.c ../Analyzer/ -setn 3 -setm 4\n\n");
+    fprintf(stderr, "\nErrore nella sintassi del comando.\nUsa: /M nomeFile nomeCartella\nPuoi usare -setn e -setm per cambiare n e m\nes: /M A.c ../Analyzer/ -setn 3 -setm 4\n\n");
     return ERR_ARGS_M;
 }
