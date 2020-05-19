@@ -158,11 +158,16 @@ int main(int argc, char *argv[]) {
                 if (!_read) {                                        //Esegue il blocco fiche` non c'e` piu` nulla nella pipe
                     if (read(fd_2[READ], resp, DIM_RESP) > 0) {      //Pero` potremmo vedere se sto controllo serve realmente
                         if (strstr(resp, "#") != NULL) {             //Controlla che ci sia almeno un # nel messaggio
-                            id_r = atoi(strtok(strdup(resp), "#"));  //id del file da valutare
-
+                            char * tmp;
+                            tmp = strdup(resp);
+                            id_r = atoi(strtok(tmp, "#"));  //id del file da valutare
                             resp_val = strtok(NULL, "#");                       //valori
-                            firstVal = atoi(strtok(strdup(resp_val), ","));     //primo valore
-                            file = strtok(strdup(lista->pathList[id_r]), "#");  //Recupera path corrispondente nella lista
+                            char * tmpResp;
+                            tmpResp = strdup(resp_val);
+                            firstVal = atoi(strtok(tmpResp, ","));     //primo valore
+                            char *tmpPercorso;
+                            tmpPercorso = strdup(lista->pathList[id_r]);
+                            file = strtok(tmpPercorso, "#");  //Recupera path corrispondente nella lista
                             file = strtok(NULL, "#");                           //percorso
                             if (firstVal != -1) {
                                 if (fileExist(file)) {                                              // File esistente
@@ -194,6 +199,10 @@ int main(int argc, char *argv[]) {
                                 arrayToCsv(v, sum);
                                 printStat_Cluster(sum);
                             }
+                            free(tmpPercorso);
+                            free(tmp);
+                            free(tmpResp);
+                            
                         }
                     }
                 }
