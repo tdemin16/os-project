@@ -46,6 +46,9 @@ int main(int argc, char *argv[]) {
     int count = 0;    //numero di file univoci da analizzare
     int perc = 0;     //Ricevimento parziale file
     int oldperc = 0;  //Parziale precedente
+    char *tmp = NULL;
+    char *tmpResp = NULL;
+    char *tmpPercorso = NULL;
 
     array *lista = createPathList(10);  //Nuova lista dei path
 
@@ -154,17 +157,14 @@ int main(int argc, char *argv[]) {
                 }
 
                 //Read
-                if (!_read && value_return == 0) {               //Esegue il blocco fiche` non c'e` piu` nulla nella pipe
+                if (!_read) {                                    //Esegue il blocco fiche` non c'e` piu` nulla nella pipe
                     if (read(fd_2[READ], resp, DIM_RESP) > 0) {  //Pero` potremmo vedere se sto controllo serve realmente
                         if (strstr(resp, "#") != NULL) {         //Controlla che ci sia almeno un # nel messaggio
-                            char *tmp;
                             tmp = strdup(resp);
                             id_r = atoi(strtok(tmp, "#"));  //id del file da valutare
                             resp_val = strtok(NULL, "#");   //valori
-                            char *tmpResp;
                             tmpResp = strdup(resp_val);
                             firstVal = atoi(strtok(tmpResp, ","));  //primo valore
-                            char *tmpPercorso;
                             tmpPercorso = strdup(lista->pathList[id_r]);
                             file = strtok(tmpPercorso, "#");  //Recupera path corrispondente nella lista
                             file = strtok(NULL, "#");         //percorso

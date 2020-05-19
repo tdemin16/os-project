@@ -182,9 +182,19 @@ void close_pipes(int *fd, int size) {
     }
 }
 char sameId(char *a, char *b) {
-    char *id1 = strtok(strdup(a), "#");
-    char *id2 = strtok(strdup(b), "#");
-    return (!strcmp(id1, id2));
+    char ret = FALSE;
+    char *dup1 = NULL;
+    char *dup2 = NULL;
+    dup1 = strdup(a);
+    dup2 = strdup(b);
+    char *id1 = strtok(dup1, "#");
+    char *id2 = strtok(dup2, "#");
+    if (!strcmp(id1, id2)) {
+        ret = TRUE;
+    }
+    free(dup1);
+    free(dup2);
+    return ret;
 }
 
 // /src/Analyzer/A.c
@@ -442,10 +452,14 @@ void createCsv(int *v, char *res, char *id) {
 char sumCsv(char *str1, char *str2) {
     char ret = FALSE;
     int i;
-    char *id1 = strtok(strdup(str1), "#");
+    char *dup1 = NULL;
+    char *dup2 = NULL;
+    dup1 = strdup(str1);
+    dup2 = strdup(str2);
+    char *id1 = strtok(dup1, "#");
     char *tmp1 = strtok(NULL, "#");
 
-    char *id2 = strtok(strdup(str2), "#");
+    char *id2 = strtok(dup2, "#");
     char *tmp2 = strtok(NULL, "#");
     int v[DIM_RESP];
     initialize_vector(v);
@@ -465,7 +479,8 @@ char sumCsv(char *str1, char *str2) {
         createCsv(v, str1, id1);
         ret = TRUE;
     }
-
+    free(dup1);
+    free(dup2);
     return ret;
 }
 

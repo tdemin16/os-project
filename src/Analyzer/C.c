@@ -188,8 +188,8 @@ int main(int argc, char const* argv[]) {
                     k = (k + 1) % n;  //Cicla tra le pipes
                 }
             }
-            close_pipes(fd, size_pipe); //Chiude tutte le pipes
-            free(fd); //Libera la memoria delle pipes
+            close_pipes(fd, size_pipe);  //Chiude tutte le pipes
+            free(fd);                    //Libera la memoria delle pipes
         }
     }
 

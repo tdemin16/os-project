@@ -41,7 +41,7 @@ int main(int argc, char const* argv[]) {
                     if (!strcmp(cmd, "-c") /*&& altri flags*/) {
                         do {
                             _write_val = write(fd_fifo, cmd, DIM_CMD);
-                            if (_write_val = -1) {
+                            if (_write_val == -1) {
                                 if (errno == EAGAIN)
                                     _write_val = EAGAIN;
                                 else
