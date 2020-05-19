@@ -42,6 +42,8 @@
 #define ERR_ENXIO 18
 #define ERR_ARGS_M 19
 
+#define SIGTERM_MSG "SIGTERM received.\n"
+
 #define REMOVED -2
 #define INEXISTENCE -1
 #define TO_BE_ANALIZED 0
@@ -74,6 +76,9 @@ process *create_process(int);
 void insertProcess(process *, pid_t);
 void printList(process *);
 void freeList(process *);
+
+void sig_term_handler(int signum, siginfo_t *info, void *ptr);
+void catch_sigterm();
 
 //Array struct functions -- sostituiscono lista (momentaneamente?)
 array *createPathList(int);
