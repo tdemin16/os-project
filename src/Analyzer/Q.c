@@ -14,6 +14,7 @@ int main(int argc, char* argv[]) {
     char* id;
     char* analyze;
     int i;
+    char* tmpDup = NULL;
 
     //IPC Arguments
     char path[PATH_MAX];
@@ -41,7 +42,7 @@ int main(int argc, char* argv[]) {
     }
     while (value_return == 0 && !_write) {
         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //Legge un percorso
-            if (!strncmp(path, "///", 3)) {  //Se e' terminazione allora setta write a true e rimando indietro
+            if (!strncmp(path, "///", 3)) {            //Se e' terminazione allora setta write a true e rimando indietro
                 _write = TRUE;
                 respSent = FALSE;
                 while (!respSent) {  //finchè la risposta non è stata inviata riprova
@@ -55,7 +56,8 @@ int main(int argc, char* argv[]) {
                 }
 
             } else {  //Senno' analizzo il path
-                id = strtok(strdup(path), "#");
+                tmpDup = strdup(path);
+                id = strtok(tmpDup, "#");
                 analyze = strtok(NULL, "#");
                 fp = fopen(analyze, "r");
                 if (fp == NULL) {
@@ -78,6 +80,7 @@ int main(int argc, char* argv[]) {
                         respSent = TRUE;
                     }
                 }
+                free(tmpDup);
             }
         }
     }
