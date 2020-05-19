@@ -197,12 +197,5 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    /*for (i = 0; i < m; i++) //deallocate the m-proc[]->is_open
-    {
-        free(proc[i].is_open);
-    }
-    
-    free(proc); //deallocate proc*/
-
     return value_return;
 }
