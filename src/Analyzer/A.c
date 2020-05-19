@@ -14,12 +14,7 @@ void handle_sigint(int sig) {
             } else {
                 printf("\t[!] Errore, non sono riuscito a chiudere il processo %d!", p->pid[i]);  //if it fail something is wrong
             }
-        }     /*else if(proc[i] == 0){
-            if (kill(proc[i],9))
-            {
-                printf("Ucciso processo figlio");
-            }  
-        }*/
+        }
         i--;  //i-- otherwise it will go to infinity
     }
     freeList(p);  //free memory allocated for p
@@ -170,16 +165,16 @@ int main(int argc, char *argv[]) {
                             file = strtok(strdup(lista->pathList[id_r]), "#");  //Recupera path corrispondente nella lista
                             file = strtok(NULL, "#");                           //percorso
                             if (firstVal != -1) {
-                                if (fileExist(file)) {  // File esistente
-                                    lista->analyzed[id_r] = 1; //Setta il flag ad Analizzato
-                                    if (addCsvToArray(resp_val, v)) value_return = err_overflow(); //Aggiunge il file al vettore delle somme
-                                    perc++; //Aumenta l'avanzamento della barretta
+                                if (fileExist(file)) {                                              // File esistente
+                                    lista->analyzed[id_r] = 1;                                      //Setta il flag ad Analizzato
+                                    if (addCsvToArray(resp_val, v)) value_return = err_overflow();  //Aggiunge il file al vettore delle somme
+                                    perc++;                                                         //Aumenta l'avanzamento della barretta
                                 } else {
-                                    if (addCsvToArray(resp_val, v)) value_return = err_overflow(); //Aggiunge il file al vettore delle somme
-                                    lista->analyzed[id_r] = 2; //Setta il flag ad analizzato ma non piu` esistente
-                                    perc++; //Aumenta l'avanzamento della barretta
+                                    if (addCsvToArray(resp_val, v)) value_return = err_overflow();  //Aggiunge il file al vettore delle somme
+                                    lista->analyzed[id_r] = 2;                                      //Setta il flag ad analizzato ma non piu` esistente
+                                    perc++;                                                         //Aumenta l'avanzamento della barretta
                                 }
-                            } else { //Caso in cui il file non e` piu' esistente
+                            } else {  //Caso in cui il file non e` piu' esistente
                                 notAnalyzed++;
                                 lista->analyzed[id_r] = -1;
                                 perc++;
@@ -257,6 +252,8 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+
+    freeList(p);
 
     return value_return;
 }
