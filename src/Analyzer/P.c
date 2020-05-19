@@ -86,6 +86,7 @@ int main(int argc, char* argv[]) {
     //----------------------------------------------------------------------
     if (value_return == 0) {
         if (f > 0) {  //PARENT SIDE
+
             while (value_return == 0 && (!_read || !_write)) {
                 //Write
                 if (!_write) {                                         //Se non ha finito di scrivere

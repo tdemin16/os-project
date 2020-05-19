@@ -69,8 +69,11 @@ int main(int argc, char *argv[]) {
     char resp[DIM_RESP];
     int id_r;
     char *resp_val;
+    char *file;
+    int firstVal = 0;
     char sum[DIM_RESP];
     int v[DIM_V];
+    int notAnalyzed = 0;
     initialize_vector(v);
 
     value_return = parser(argc, argv, lista, &count, &n, &m);
@@ -142,9 +145,10 @@ int main(int argc, char *argv[]) {
             insertProcess(p, f);  //Insert process f in list p
             i = 0;
             while (value_return == 0 && (!_read || !_write || !_close)) {  //cicla finche` non ha finito di leggere e scrivere
-                //sleep(2);
+                //sleep(1);
                 //Write
                 if (!_write) {
+                    
                     if (write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
                         if (errno != EAGAIN) {
                             value_return = err_write();
@@ -158,7 +162,7 @@ int main(int argc, char *argv[]) {
                         //fprintf(stderr,"A->C: scrivo\n");
                         if (i == count) {
                             _write = TRUE;
-                            freePathList(lista);
+                            //printPathList(lista);
                             //fprintf(stderr,"######## A->C: Scritto tutto\n");
                         }
                     }
@@ -169,13 +173,29 @@ int main(int argc, char *argv[]) {
                 if (!_read) {
                     if (read(fd_2[READ], resp, DIM_RESP) > 0) {
                         if (strstr(resp, "#") != NULL) {
-                            id_r = atoi(strtok(strdup(resp), "#"));
-                            lista->analyzed[id_r] = 1;
-                            resp_val = strtok(NULL, "#");
-                            if (addCsvToArray(resp_val, v)) value_return = err_overflow();
+                            id_r = atoi(strtok(strdup(resp), "#"));  //id
 
-                            //fflush(stdout);
-                            perc++;
+                            resp_val = strtok(NULL, "#");                    //valori
+                            firstVal = atoi(strtok(strdup(resp_val), ","));  //primo valore
+                            file = strtok(strdup(lista->pathList[id_r]), "#");
+                            file = strtok(NULL, "#");  //percorso
+                            //printf("%d\n",firstVal);
+                            if (firstVal != -1) {
+                                if (fileExist(file)) {  // File esistente
+                                    lista->analyzed[id_r] = 1;
+                                    if (addCsvToArray(resp_val, v)) value_return = err_overflow();
+                                    perc++;
+                                } else {
+                                    if (addCsvToArray(resp_val, v)) value_return = err_overflow();
+                                    lista->analyzed[id_r] = 2;
+                                    perc++;
+                                }
+                            } else {
+                                notAnalyzed++;
+                                lista->analyzed[id_r] = -1;
+                                perc++;
+                            }
+
                             if ((int)((float)perc * 10 / (float)count) > oldperc) {
                                 oldperc = (int)((float)perc * 10 / (float)count);
                                 system("clear");
@@ -201,6 +221,7 @@ int main(int argc, char *argv[]) {
                     }
                 }
             }
+
             close(fd_1[READ]);
             close(fd_1[WRITE]);
             close(fd_2[READ]);
@@ -217,6 +238,8 @@ int main(int argc, char *argv[]) {
                     value_return = err_unlink();
                 }
             }
+            //printPathList(lista);
+            freePathList(lista);
         }
     }
 

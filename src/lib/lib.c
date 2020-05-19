@@ -109,6 +109,7 @@ int insertAndSumPathList(array *tmp, char *c, int val) {
         tmp->analyzed[tmp->count] = val;
         tmp->count++;
         ret = -1;
+        if (val == 0) ret = tmp->count - 1;
     }
     return ret;
 }
@@ -129,7 +130,9 @@ void reallocPathList(array *tmp, int newSize) {
 void printPathList(array *tmp) {
     int i;
     for (i = 0; i < tmp->count; i++) {
-        fprintf(stderr, "%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
+        usleep(10000);
+        printf("%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
+        //fprintf(stderr, "%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
     }
 }
 
@@ -282,7 +285,6 @@ int parser(int argc, char *argv[], array *lista, int *count, int *n, int *m) {
         }
         if (count == 0 && value_return == 0) value_return = err_args_A();  //counter is higher than zero, if not gives an error (value_return used to avoid double messages)
     }
-
     return value_return;
 }
 
@@ -291,6 +293,11 @@ void initialize_processes(pid_t *p, int dim) {
     for (i = 0; i < dim; i++) {
         p[i] = -1;
     }
+}
+char fileExist(char *fname) {
+    char ret = FALSE;
+    if (access(fname, F_OK) != -1) ret = TRUE;
+    return ret;
 }
 
 void add_process_to_v(pid_t f, int *v) {
@@ -434,6 +441,7 @@ void createCsv(int *v, char *res, char *id) {
 ///src/C.c
 char sumCsv(char *str1, char *str2) {
     char ret = FALSE;
+    int i;
     char *id1 = strtok(strdup(str1), "#");
     char *tmp1 = strtok(NULL, "#");
 
@@ -441,10 +449,19 @@ char sumCsv(char *str1, char *str2) {
     char *tmp2 = strtok(NULL, "#");
     int v[DIM_RESP];
     initialize_vector(v);
-
+    char deleteCheck = FALSE;
+    int firstVal = 0;
     if (!strcmp(id1, id2)) {
         addCsvToArray(tmp1, v);
+        firstVal = v[0];
+        if (v[0] < 0) deleteCheck = TRUE;
         addCsvToArray(tmp2, v);
+        if (v[0] - firstVal < 0) deleteCheck = TRUE;
+        if (deleteCheck) {
+            for (i = 0; i < DIM_V; i++) {
+                v[i] = -1;
+            }
+        }
         createCsv(v, str1, id1);
         ret = TRUE;
     }

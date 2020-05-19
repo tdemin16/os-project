@@ -13,6 +13,7 @@ int main(int argc, char* argv[]) {
     FILE* fp;
     char* id;
     char* analyze;
+    int i;
 
     //IPC Arguments
     char path[PATH_MAX];
@@ -38,7 +39,6 @@ int main(int argc, char* argv[]) {
     if (fcntl(STDOUT_FILENO, F_SETFL, O_NONBLOCK)) {
         value_return = err_fcntl();
     }
-
     while (value_return == 0 && !_write) {
         //usleep(200000);
         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //Legge un percorso
@@ -53,7 +53,6 @@ int main(int argc, char* argv[]) {
                         }
                     } else {
                         respSent = TRUE;
-                        //fprintf(stderr,"Q: Send %s\n",path);
                     }
                 }
 
@@ -62,21 +61,23 @@ int main(int argc, char* argv[]) {
                 analyze = strtok(NULL, "#");
                 fp = fopen(analyze, "r");
                 if (fp == NULL) {
-                    value_return = err_file_open();
+                    //value_return = err_file_open();
+                    for (i = 0; i < DIM_V; i++) {
+                        v[i] = -1;
+                    }
                 } else {
                     get_frequencies(fp, v, part, m);
-                    createCsv(v, resp, id);
                     fclose(fp);
-                    respSent = FALSE;
-                    while (!respSent) {  //finchè la risposta non è stata inviata riprova
-                        if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
-                            if (errno != EAGAIN) {
-                                value_return = err_write();
-                            }
-                        } else {
-                            respSent = TRUE;
-                            //fprintf(stderr,"Q: Send %s\n",resp);
+                }
+                createCsv(v, resp, id);
+                respSent = FALSE;
+                while (!respSent) {  //finchè la risposta non è stata inviata riprova
+                    if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
+                        if (errno != EAGAIN) {
+                            value_return = err_write();
                         }
+                    } else {
+                        respSent = TRUE;
                     }
                 }
             }

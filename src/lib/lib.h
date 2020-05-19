@@ -42,6 +42,15 @@
 #define ERR_ENXIO 18
 #define ERR_ARGS_M 19
 
+/*
+L'array analized contiene lo stato di ogni percorso:
+    0   da analizzare
+    1   analizzato
+    2   analizzato ma non più esistente
+    -1  non più esistente
+    -2  removed
+*/
+
 typedef struct {
     int size;  //size of array
     char **pathList;
@@ -88,6 +97,7 @@ void handle_sigint(int);
 int parse_string(char *, int *v);
 void add_process_to_v(pid_t, int *);
 void initialize_processes(pid_t *, int);
+char fileExist(char *);
 
 // /src/Analyzer/Q.c
 void initialize_vector(int *);
