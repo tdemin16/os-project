@@ -455,9 +455,8 @@ char sumCsv(char *str1, char *str2) {
 char addCsvToArray(char *tmp, int *v) {
     char ret = FALSE;
     int i = 0;
-    char *Analyze = strtok(tmp, "#");
-    //fprintf(stderr,"%s\n",Analyze);
-    char *token = strtok(tmp, ",");
+    char *token = strtok(tmp, "#");
+    token = strtok(tmp, ",");
     while (token != NULL) {  //loop through token
         if (i < DIM_V) {
             v[i] += atoi(token);
@@ -590,12 +589,14 @@ void printInfoCluster() {
 }
 
 void percAvanzamento(int n, int tot) {
-    int hashtag = (int)((float)n*10/(float)tot);
+    int hashtag = (int)((float)n * 10 / (float)tot);
     int i;
     printf("[");
-    for (i=0;i<10;i++){
-        if (i<hashtag)printf("#");
-        else printf(".");
+    for (i = 0; i < 10; i++) {
+        if (i < hashtag)
+            printf("#");
+        else
+            printf(".");
     }
     printf("]\n");
 }
@@ -793,26 +794,32 @@ int err_process_open(pid_t p) {
 }
 int err_fifo() {
     printf("Errore nella creazione della pipe fifo\n");
+    return ERR_FIFO;
 }
 
 int err_unlink() {
     printf("Errore nella eliminzazione della pipe fifo\n");
+    return ERR_UNLINK;
 }
 
 int err_signal() {
     fprintf(stderr, "Errore, call signal non riuscita\n");
+    return ERR_SIGNAL;
 }
 
 int err_close() {
     fprintf(stderr, "Errore nella chiusura del file\n");
+    return ERR_CLOSE;
 }
 
 int err_args_R() {
     fprintf(stderr, "Errore nella sintassi del comando. Usa:\n-c: Stampa per cluster\n");
+    return ERR_ARGS_R;
 }
 
 int err_enxio() {
     fprintf(stderr, "Errore, R e' stato avviato senza un processo A\n");
+    return ERR_ENXIO;
 }
 
 int err_args_M() {

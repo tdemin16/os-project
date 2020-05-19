@@ -9,7 +9,6 @@ int main(int argc, char* argv[]) {
     int value_return = 0;
     int i;
     char path[PATH_MAX];
-    char failedPath[m][PATH_MAX];
     char resp[DIM_RESP];
 
     //IPC Variables
@@ -23,17 +22,10 @@ int main(int argc, char* argv[]) {
     char array[4][4];
     char* args[4];
     int count = 0;
-    char stop = FALSE;
-    for (i = 0; i < m; i++) {
-        failedPath[i][0] = '\0';
-    }
-    int cc = 0;
-    int u;
     char send_w = TRUE;
     char send_r = TRUE;
     char end = FALSE;
     int terminated[m];
-    int test = 0;
     for (i = 0; i < m; i++) {
         terminated[i] = FALSE;
     }
@@ -145,7 +137,7 @@ int main(int argc, char* argv[]) {
                         for (i = 0; i < m; i++) {  //Cicla tra tutti i figli
                             if (read(fd[i * 4 + 0], resp, DIM_RESP) > 0) {
                                 if (!strncmp(resp, "///", 3)) {                            //Controlla se e` la fine del messaggio
-                                    count++;                                              //Conta quanti terminatori sono arrivati
+                                    count++;                                               //Conta quanti terminatori sono arrivati
                                     if (count == m) {                                      //Quando tutti i figli hanno terminato
                                         if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {  //Scrive il carattere di teminazione
                                             if (errno != EAGAIN) {

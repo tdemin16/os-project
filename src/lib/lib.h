@@ -1,19 +1,18 @@
 #ifndef __LIB_H__
 #define __LIB_H__
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#include<limits.h>
-#include<sys/types.h>
-#include<unistd.h>
-#include<errno.h>
-#include<math.h>
-#include<fcntl.h>
-#include<sys/wait.h>
-#include<sys/stat.h>
-#include<signal.h>
-
+#include <errno.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <math.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #define READ 0
 #define WRITE 1
@@ -44,77 +43,76 @@
 #define ERR_ARGS_M 19
 
 typedef struct {
-    int size; //size of array
+    int size;  //size of array
     char **pathList;
-    int* analyzed;
+    int *analyzed;
     int count;
 } array;
 
-
-typedef struct m_process{
+typedef struct m_process {
     int begin;
     int end;
     int part;
     //char *DIR; //Da usare per dare il file(???)
-}m_process;
+} m_process;
 
-typedef struct process{
-    int size; //size of list process
-    int* pid; //vector containing all pids
-    int count;//counter to remember how many variables are inside the list
-}process;
+typedef struct process {
+    int size;   //size of list process
+    int *pid;   //vector containing all pids
+    int count;  //counter to remember how many variables are inside the list
+} process;
 
 //functions for process to work
-process * create_process(int);
-void insertProcess(process*, pid_t);
-void printList(process*);
-void freeList(process*);
+process *create_process(int);
+void insertProcess(process *, pid_t);
+void printList(process *);
+void freeList(process *);
 
 //Array struct functions -- sostituiscono lista (momentaneamente?)
-array * createPathList(int);
+array *createPathList(int);
 void reallocPathList(array *, int);
-char insertPathList(array*, char*, int);
-int insertAndSumPathList(array *, char *,int);
-void printPathList(array*);
-void freePathList(array*);
-int dimPathList(array*);
-void setAnalyzed(array*, int, int);
-int getAnalyzed(array*, int);
+char insertPathList(array *, char *, int);
+int insertAndSumPathList(array *, char *, int);
+void printPathList(array *);
+void freePathList(array *);
+int dimPathList(array *);
+void setAnalyzed(array *, int, int);
+int getAnalyzed(array *, int);
 
-void close_pipes(int*, int);
-int unlock_pipes(int*, int);
+void close_pipes(int *, int);
+int unlock_pipes(int *, int);
 
 // /src/Analyzer/A.c
-int parser(int, char**, array*, int*, int*, int*);
+int parser(int, char **, array *, int *, int *, int *);
 void handle_sigint(int);
-int parse_string(char*, int* v); 
-void add_process_to_v(pid_t, int*);
-void initialize_processes(pid_t*, int);
+int parse_string(char *, int *v);
+void add_process_to_v(pid_t, int *);
+void initialize_processes(pid_t *, int);
 
 // /src/Analyzer/Q.c
-void initialize_vector(int*);
-void set_add(int*, char);
-void get_subset(FILE*, int*, int, int);
-void print_vector(int*);
-void get_frequencies(FILE*, int*, int, int);
+void initialize_vector(int *);
+void set_add(int *, char);
+void get_subset(FILE *, int *, int, int);
+void print_vector(int *);
+void get_frequencies(FILE *, int *, int, int);
 //int err_end_file(); used here
 //int err_args_Q(); used here
 //int err_file_open(); used here
 
 // /src/Analyzer/P.c
-int file_len(FILE*);
-m_process* splitter(FILE*,int);
-inline void swap(char*, char*);
-char* reverse(char*, int, int);
-char* itoa(int, char*, int);
-void arrayToCsv(int *,char *);
-char* integer_to_string(int);
+int file_len(FILE *);
+m_process *splitter(FILE *, int);
+inline void swap(char *, char *);
+char *reverse(char *, int, int);
+char *itoa(int, char *, int);
+void arrayToCsv(int *, char *);
+char *integer_to_string(int);
 int countDigit(int);
 int lenghtCsv(int *);
-char sumCsv(char*, char*);
-void createCsv(int *, char *,char *);
+char sumCsv(char *, char *);
+void createCsv(int *, char *, char *);
 char addCsvToArray(char *, int *);
-char sameId(char *,char *);
+char sameId(char *, char *);
 //int err_args_P(); used here
 //int err_file_open(); used here
 
@@ -123,8 +121,7 @@ void printStat(char *);
 void printStat_Cluster(char *);
 void printInfoCluster();
 float roundValue(float, int);
-void percAvanzamento(int,int);
-
+void percAvanzamento(int, int);
 
 //Error handlers
 int err_file_open();
@@ -132,7 +129,7 @@ int err_pipe();
 int err_end_file();
 int err_args_A();
 int err_overflow();
-int err_input_A(char*);
+int err_input_A(char *);
 int err_args_C();
 int err_args_P();
 int err_args_Q();
@@ -151,6 +148,5 @@ int err_close();
 int err_args_R();
 int err_enxio();
 int err_args_M();
-
 
 #endif

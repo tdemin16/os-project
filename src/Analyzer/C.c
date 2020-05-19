@@ -12,7 +12,6 @@ int main(int argc, char const* argv[]) {
     char failedPath[PATH_MAX];
 
     char resp[DIM_RESP];
-    char sum[DIM_RESP];
     int v[DIM_V];
     int part_received = 0;
     int count = 0;  //Maintain the current amount of files sended
@@ -28,13 +27,11 @@ int main(int argc, char const* argv[]) {
     int _read = FALSE;   //Indica se ha finito di leggere dai figli
     int _write = FALSE;  //Indica se ha finito di scrivere
 
-    int test = 0;
     failedPath[0] = '\0';
     char stop = FALSE;
     char end = FALSE;
     char send_r = TRUE;
     int terminated[n];
-    int id_r;
     for (i = 0; i < n; i++) terminated[i] = FALSE;
 
     //Parsing arguments------------------------------------------------------------------------------------------
@@ -57,8 +54,6 @@ int main(int argc, char const* argv[]) {
         }
         if (nfiles == 0 && value_return == 0) value_return = err_args_C();  //Check if nfiles is setted, if not gives an error (value_return used to avoid double messages)
     }
-
-    array* retrive = createPathList(nfiles);
 
     initialize_vector(v);
 
@@ -116,7 +111,6 @@ int main(int argc, char const* argv[]) {
                     if (count != nfiles) {                                 //Se non sono ancora tutti arraivati
                         if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
                             if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere
-                                insertPathList(retrive, path, 0);
                                 //fprintf(stderr,"Aggiunto %s\n",path);
                                 if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {  //Provo a scrivere
                                     if (errno != EAGAIN) {
@@ -189,8 +183,6 @@ int main(int argc, char const* argv[]) {
                                 }
                             } else {
                                 if (strstr(resp, "#") != NULL) {
-                                    id_r = atoi(strtok(strdup(resp), "#"));
-                                    retrive->analyzed[id_r] = 1;
                                     if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
                                         if (errno != EAGAIN) {
                                             value_return = err_write();
@@ -198,7 +190,6 @@ int main(int argc, char const* argv[]) {
                                             send_r = FALSE;
                                         }
                                     }
-                                    
                                 }
                             }
                         }
@@ -213,8 +204,6 @@ int main(int argc, char const* argv[]) {
             }
             close_pipes(fd, size_pipe);
             free(fd);
-            //printPathList(retrive);
-            freePathList(retrive);
         }
     }
 

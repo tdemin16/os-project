@@ -11,7 +11,6 @@ int main(int argc, char* argv[]) {
     int v[DIM_V];
     int value_return = 0;
     FILE* fp;
-    char* freq;
     char* id;
     char* analyze;
 
