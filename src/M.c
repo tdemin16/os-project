@@ -1,7 +1,6 @@
 #include "./lib/lib.h"
 
 int check_command(char *str);  //controlla il comando un numero corrispondente: -1 comando non riconosciuto ecc
-//int report(); 		//potrebbe essere la funzione che si occupa di attivare/disattivare R
 
 process *p;  //Declaring p (it's global because hendle_sigint can't have parameters, only int sig)
 
@@ -77,8 +76,7 @@ int main(int argc, char *argv[]) {
             insertProcess(p, f);
             while (!end && value_return == 0) {  //--------- CICLO DI ATTESA COMANDI IN INPUT
                 strcpy(cmd, "");                 //svuota la stringa per il prossimo comando
-                printf("\n");
-                printf("Analyzer> ");
+                //printf("> ");
                 fflush(stdout);
                 ch = '\0';
                 while (ch != '\n') {  //fino al "lancio" (invio, '\n') del comando continua a leggere caratteri
@@ -91,7 +89,6 @@ int main(int argc, char *argv[]) {
                     //richiama la funzione help() coi comandi
                     printf("Comando inserito non corretto\n");
                 }
-                printf("\n");
                 if (res_cmd == 0) end = TRUE;  //con il comando close interrompe il ciclo
                 if (res_cmd == 2) {
                     while (value_return == 0 && _write) {
@@ -108,7 +105,7 @@ int main(int argc, char *argv[]) {
             }
             close(fd[WRITE]);
             close(fd[READ]);
-            printf("HO FINITO\n");
+            printf("Closing...\n");
         }
     }
 
@@ -127,9 +124,9 @@ int main(int argc, char *argv[]) {
             close(fd[READ]);
 
             //Change code with A
-            //if(execvp(argv[0], argv) == -1) {
-            //	value_return = err_exec(errno);
-            //}
+            if(execvp(argv[0], argv) == -1) {
+            	value_return = err_exec(errno);
+            }
         }
     }
 

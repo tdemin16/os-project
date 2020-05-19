@@ -132,16 +132,16 @@ int main(int argc, char *argv[]) {
             i = 0;
             while (value_return == 0 && (!_read || !_write || !_close)) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
 
-                //M Work in progress
+                //M
                 _close = TRUE;
                 if (!_close) {
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
-                        printf("%s\n", cmd);
+                        
                     }
                 }
 
                 //Write
-                if (!_write) {                                                     //Esegue il blocco finche` non ha finito di scrivere
+                if (!_write && value_return == 0) {                                                     //Esegue il blocco finche` non ha finito di scrivere
                     if (write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
                         if (errno != EAGAIN) {                                     //Se avviene un errore e non e` causato dalla dimensione della pipe
                             value_return = err_write();                            //Ritorna l'errore sulla scrittura
@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
                 }
 
                 //Read
-                if (!_read) {                                        //Esegue il blocco fiche` non c'e` piu` nulla nella pipe
+                if (!_read && value_return == 0) {                                        //Esegue il blocco fiche` non c'e` piu` nulla nella pipe
                     if (read(fd_2[READ], resp, DIM_RESP) > 0) {      //Pero` potremmo vedere se sto controllo serve realmente
                         if (strstr(resp, "#") != NULL) {             //Controlla che ci sia almeno un # nel messaggio
                             id_r = atoi(strtok(strdup(resp), "#"));  //id del file da valutare
@@ -181,13 +181,13 @@ int main(int argc, char *argv[]) {
                             }
 
                             //Barretta
-                            if ((int)((float)perc * 10 / (float)count) > oldperc) {
+                            if ((int)((float)perc * 10 / (float)count) > oldperc && value_return == 0) {
                                 oldperc = (int)((float)perc * 10 / (float)count);
                                 system("clear");
                                 percAvanzamento(perc, count);
                             }
 
-                            if (perc == count) {
+                            if (perc == count && value_return == 0) {
                                 _read = TRUE;
                                 system("clear");
                                 printf("Numero file analizzati: %d\nProcessi:%d\nSezioni:%d\n\n", count, n, m);
