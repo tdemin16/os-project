@@ -48,14 +48,6 @@
 #define ANALIZED 1
 #define ANALIZED_INEXISTENCE 2
 
-/*
-L'array analized contiene lo stato di ogni percorso:
-    0   da analizzare
-    1   analizzato
-    2   analizzato ma non più esistente
-    -1  non più esistente
-    -2  removed
-*/
 
 typedef struct {
     int size;  //size of array
