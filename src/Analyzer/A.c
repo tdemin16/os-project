@@ -139,6 +139,7 @@ int main(int argc, char *argv[]) {
             while (value_return == 0 && (!_read || !_write || !_close)) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
 
                 //M
+                _close = TRUE;
                 if (!_close) {
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
                         printf("Comando ricevuto\n");
@@ -146,6 +147,7 @@ int main(int argc, char *argv[]) {
                 }
 
                 //R
+                _close = TRUE;
                 if (retrieve) {
                     if (!_close) {
                         if (read(fd_fifo, print_method, DIM_CMD) > 0) {
@@ -221,7 +223,7 @@ int main(int argc, char *argv[]) {
                             if (perc == count && value_return == 0) {
                                 _read = TRUE;
                                 //system("clear");
-                                //printf("Numero file analizzati: %d\nProcessi:%d\nSezioni:%d\n\n", count, n, m);
+                                printf("Numero file analizzati: %d\nProcessi:%d\nSezioni:%d\n\n", count, n, m);
                                 arrayToCsv(v, sum);
                                 //printStat_Cluster(sum);
                             }
