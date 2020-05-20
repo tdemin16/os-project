@@ -111,9 +111,9 @@ int main(int argc, char const* argv[]) {
                     if (count != nfiles) {                                         //Se non sono ancora tutti arraivati
                         if (stop == FALSE) {                                       //E non ci troviamo in uno stato di stop per rinvio dati
                             if (read(STDIN_FILENO, path, PATH_MAX) > 0) {          //provo a leggere
-                            if (!strncmp(path,"#",1)){
-                                fprintf(stderr,"letto comando\n");
-                            }else fprintf(stderr,"letto percorso\n");
+                            //if (!strncmp(path,"#",1)){
+                            //    fprintf(stderr,"letto comando\n");
+                            // }else fprintf(stderr,"letto percorso\n");
                                 if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {  //Provo a scrivere
                                     if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
                                         value_return = err_write();                //Setta il valore di ritorno
