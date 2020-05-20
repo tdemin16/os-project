@@ -13,7 +13,7 @@ int main() {
     printf("Start R\n");
 
     //IPC--------------------------------------------------------------------------------------------
-    if (value_return == 0) {                //Test errori precedenti
+    if (value_return == 0) {
         if (mkfifo(fifo, 0666) == -1) {     //Prova a creare la pipe
             if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
                 value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
@@ -23,18 +23,19 @@ int main() {
 
     if (value_return == 0) {
         do {
+            sleep(1);
             fd_fifo = open(fifo, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
             if (fd_fifo == -1) {                          //Error handling
                 if (errno != ENXIO) {                     //Se errno == 6, il file A non e' stato ancora aperto
                     value_return = err_file_open();       //Errore nell'apertura del file
-                    perror("R: ");
+                    perror("A");
                 }
             }
         } while (value_return == 0 && fd_fifo == -1);
     }
 
-    if(value_return == 0) {
-        if(fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+    if (value_return == 0) {
+        if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
             value_return = err_fcntl();
         }
     }
@@ -46,14 +47,16 @@ int main() {
                     _close = TRUE;
                     printf("Closing...");
                 } else {
-                    if (!strcmp(cmd, "-c") /*&& altri flags*/) {
+                    if (!strncmp(cmd, "-c", 2) /*&& altri flags*/) {
                         do {
                             _write_val = write(fd_fifo, cmd, DIM_CMD);
                             if (_write_val == -1) {
-                                if (errno == EAGAIN)
+                                if (errno == EAGAIN) {
                                     _write_val = EAGAIN;
-                                else
+                                } else {
                                     value_return = err_write();
+                                    perror("R");
+                                }
                             }
                         } while (value_return == 0 && _write_val == EAGAIN);
                         if (value_return == 0) {
@@ -73,26 +76,24 @@ int main() {
                 }
             }
         } else {
-            while (retrieve) {
-                if (read(fd_fifo, resp, DIM_RESP) > 0) {
-                    if (!strncmp(resp, "///", 3)) {
-                        //print values according to cmd
-                        if (value_return == 0) {
-                            retrieve = FALSE;
-                            if (close(fd_fifo) == -1) {
-                                value_return = err_close();
-                            }
-                            //Open fifo in nonblocking write mode
-                            if (value_return == 0) {
-                                fd_fifo = open(fifo, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
-                                if (fd_fifo == -1) {                          //Error handling
-                                    value_return = err_file_open();           //Errore nell'apertura del file
-                                }
+            //Ciclare sulla read
+            //Scrivere in output il risultato
+            if (read(fd_fifo, resp, DIM_RESP) > 0) {
+                retrieve = FALSE;
+                printf("%s\n", resp);
+                if (close(fd_fifo) == -1) {
+                    value_return = err_close();
+                }
+                //Open fifo in nonblocking write mode
+                if (value_return == 0) {
+                    do {
+                        fd_fifo = open(fifo, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
+                        if (fd_fifo == -1) {                          //Error handling
+                            if (errno != ENXIO) {                     //Se errno == 6, il file A non e' stato ancora aperto
+                                value_return = err_file_open();       //Errore nell'apertura del file
                             }
                         }
-                    } else {
-                        //store values
-                    }
+                    } while (value_return == 0 && fd_fifo == -1);
                 }
             }
         }
@@ -105,6 +106,7 @@ int main() {
     }
 
     if (value_return == 0) {
+        printf("R: Unlink\n");
         if (unlink(fifo) == -1) {
             value_return = err_unlink();
         }

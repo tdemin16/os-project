@@ -95,9 +95,21 @@ int main(int argc, char *argv[]) {
                     printf("Comando inserito non corretto\n");
                 }
                 if (res_cmd == 0) end = TRUE;  //con il comando close interrompe il ciclo
+                if (res_cmd == 1) {
+                    while (value_return == 0 && _write) {
+                        if (write(fd[R * 2 + WRITE], cmd, DIM_CMD) == -1) {
+                            if (errno != EAGAIN) {
+                                value_return = err_write();
+                            }
+                        } else {
+                            _write = FALSE;
+                        }
+                    }
+                    _write = TRUE;
+                }
                 if (res_cmd == 2) {
                     while (value_return == 0 && _write) {
-                        if (write(fd[A*2+WRITE], cmd, DIM_CMD) == -1) {
+                        if (write(fd[A * 2 + WRITE], cmd, DIM_CMD) == -1) {
                             if (errno != EAGAIN) {
                                 value_return = err_write();
                             }
@@ -170,20 +182,16 @@ help			[da modificare
 //COdice per identificare un comando che deve essere mandato ad A. Per il momento io uso '2'
 int check_command(char *cmd) {
     int res = -1;           //errore input comando
-    if (strlen(cmd) > 3) {  //possibile che sia un comando accettabile
-        if (strstr(cmd, "help") != NULL) {
-            //mostra help comandi
-            printf("Ci sarà una funzione help comandi\n");
-            res = 1;
-        } else if (strstr(cmd, "close") != NULL) {
-            res = 0;
-        } else if (strstr(cmd, "info") != NULL) {
-            //apre processo R
-            printf("\nAperta comunicazione con R\n");  //[da eliminare]
-            res = 1;
-        } else {  //Provvisorio per testare A in quanto manca il branch per i comandi da mandargli
-            res = 2;
-        }
+    if (strstr(cmd, "help") != NULL) {
+        //mostra help comandi
+        printf("Ci sarà una funzione help comandi\n");
+        res = 1;
+    } else if (strstr(cmd, "close") != NULL) {
+        res = 0;
+    } else if (strstr(cmd, "-c") != NULL) {
+        res = 1;
+    } else {  //Provvisorio per testare A in quanto manca il branch per i comandi da mandargli
+        res = 2;
     }
     return res;
 }
