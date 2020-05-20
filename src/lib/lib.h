@@ -101,6 +101,7 @@ int parse_string(char *, int *v);
 void add_process_to_v(pid_t, int *);
 void initialize_processes(pid_t *, int);
 char fileExist(char *);
+void setOnFly(int,int,int*);
 
 // /src/Analyzer/Q.c
 void initialize_vector(int *);

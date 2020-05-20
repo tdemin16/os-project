@@ -1,12 +1,10 @@
 #include "lib.h"
 
-void sig_term_handler(int signum, siginfo_t *info, void *ptr)
-{
+void sig_term_handler(int signum, siginfo_t *info, void *ptr) {
     write(STDERR_FILENO, SIGTERM_MSG, sizeof(SIGTERM_MSG));
 }
 
-void catch_sigterm()
-{
+void catch_sigterm() {
     static struct sigaction _sigact;
 
     memset(&_sigact, 0, sizeof(_sigact));
@@ -324,6 +322,20 @@ char fileExist(char *fname) {
     char ret = FALSE;
     if (access(fname, F_OK) != -1) ret = TRUE;
     return ret;
+}
+
+void setOnFly(int n, int m, int * fd_1) {
+    char resp[DIM_RESP];
+    while (read(fd_1[READ], resp, DIM_RESP) > 0) {
+    }
+    char onFly[PATH_MAX];
+    sprintf(onFly,"#setn %d#setm %d",n,m);
+    if (write(fd_1[WRITE], onFly, PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
+        if (errno != EAGAIN) {                        //Se avviene un errore e non e` causato dalla dimensione della pipe
+            //value_return = err_write();               //Ritorna l'errore sulla scrittura
+        } else
+            fprintf(stderr, "errore set on-fly, pipe piena");
+    }
 }
 
 void add_process_to_v(pid_t f, int *v) {
