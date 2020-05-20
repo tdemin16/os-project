@@ -330,7 +330,7 @@ void setOnFly(int n, int m, int * fd_1) {
     while (read(fd_1[READ], resp, DIM_RESP) > 0) {
     }
     char onFly[PATH_MAX];
-    sprintf(onFly,"#setn %d#setm %d",n,m);
+    sprintf(onFly,"#SET#%d#%d#",n,m);
     if (write(fd_1[WRITE], onFly, PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
         if (errno != EAGAIN) {                        //Se avviene un errore e non e` causato dalla dimensione della pipe
             //value_return = err_write();               //Ritorna l'errore sulla scrittura

@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //Legge un percorso
             if (!strncmp(path, "#CLOSE", 6)) {         //Se leggo una stringa di terminazione
                 _close = TRUE;                         //Setto end a true
-            } else {  //Senno' analizzo il path
+            } else {                                   //Senno' analizzo il path
                 tmpDup = strdup(path);
                 id = strtok(tmpDup, "#");
                 analyze = strtok(NULL, "#");

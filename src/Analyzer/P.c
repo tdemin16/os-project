@@ -88,6 +88,11 @@ int main(int argc, char* argv[]) {
     //----------------------------------------------------------------------
     if (value_return == 0) {
         if (f > 0) {  //PARENT SIDE
+            char str[15];
+            sprintf(str, "%d.txt", getpid());
+            FILE* debug = fopen(str, "a");
+            fprintf(debug, "AVVIATO P con m = %d\n",m);
+            fclose(debug);
             while (value_return == 0 && (!_close)) {
                 //Write
                 if (!_write) {                                         //Se non ha finito di scrivere

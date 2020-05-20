@@ -23,7 +23,7 @@ void handle_sigint(int sig) {
 }
 
 int main(int argc, char *argv[]) {
-    printf("Start A\n");
+    //printf("Start A\n");
     signal(SIGINT, handle_sigint);  //Handler for SIGINT (Ctrl-C)
 
     p = create_process(1);  //Allocate dynamically p with dimension 1
@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
             while (value_return == 0 && (!_close)) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
 
                 //M
-                _close = TRUE;
+                /*_close = TRUE;
                 if (!_close) {
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
                         printf("Comando ricevuto\n");
@@ -169,24 +169,29 @@ int main(int argc, char *argv[]) {
                         }
                     }
                 }
+                */
 
                 //Quando WRITE e' in funzione inizia a mandare tutti i file con flag 0 di pathList
                 if (!_write && value_return == 0) {  //Esegue il blocco finche` non ha finito di scrivere
                     analyzing = TRUE;
-                    if (!lista->analyzed[i]) {
+                    if (lista->analyzed[i] == 0) {
                         if (write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
                             if (errno != EAGAIN) {                                     //Se avviene un errore e non e` causato dalla dimensione della pipe
                                 value_return = err_write();                            //Ritorna l'errore sulla scrittura
+                            } else {
+                                printf("pipe piena\n");
                             }
                         } else {
+                            printf("count: %d, path:%s\n", lista->count, lista->pathList[i]);
                             i++;
                             pathSent++;
-                            if (i == lista->count) {  //Qunado ha finito di inviare
-                                _write = TRUE;        //Setta il flag a true
-                            }
                         }
                     } else {
                         i++;
+                    }
+                    if (i == lista->count) {  //Qunado ha finito di inviare
+                        _write = TRUE;  //Setta il flag a true
+                        i = 0;
                     }
                 }
 
@@ -232,8 +237,8 @@ int main(int argc, char *argv[]) {
                                 printf("Numero file analizzati: %d\nProcessi:%d\nSezioni:%d\n\n", pathSent, n, m);
                                 arrayToCsv(v, sum);
                                 //printStat_Cluster(sum);
+                                setOnFly(2,3,fd_1);
                                 pathSent = 0;
-                                setOnFly(1,1,fd_1);
                             }
 
                             free(tmpPercorso);

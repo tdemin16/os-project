@@ -106,6 +106,9 @@ void initialize_processes(pid_t *, int);
 char fileExist(char *);
 void setOnFly(int,int,int*);
 
+
+// /src/Analyzer/C.c
+
 // /src/Analyzer/Q.c
 void initialize_vector(int *);
 void set_add(int *, char);

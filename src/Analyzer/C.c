@@ -6,7 +6,7 @@ int main(int argc, char const* argv[]) {
     int nfiles = 0;  //number of files to retreive from pipe
     int n = 3;
     int m = 4;
-
+    int oldn;
     int i;
     int j;
     int k;
@@ -29,6 +29,8 @@ int main(int argc, char const* argv[]) {
     int _read = FALSE;          //Indica se ha finito di leggere dai figli
     int _write = FALSE;         //Indica se ha finito di scrivere
     int _close = FALSE;
+    char* dupPath = NULL;
+    char* token;
     failedPath[0] = '\0';                           //Inizializza la stringa failed path
     char stop = FALSE;                              //Bloccano la ricezione di nuovi dati dai figli
     char end = FALSE;                               //per rinviare dati precedenti
@@ -105,16 +107,37 @@ int main(int argc, char const* argv[]) {
     if (value_return == 0) {
         i = 0;
         k = 0;
-        if (f > 0) {                                                   //PARENT SIDE
-            while (value_return == 0 && (!_close)) {                   //Cicla finche` non ha finito di leggere o scrivere o va in errore
+        if (f > 0) {  //PARENT SIDE
+            char str[15];
+            sprintf(str, "%d.txt", getpid());
+            FILE* debug = fopen(str, "a");
+            fprintf(debug, "AVVIATO C\n");
+            fclose(debug);
+            while (value_return == 0 && (!_close)) {  //Cicla finche` non ha finito di leggere o scrivere o va in errore
                 //write
                 if (!_write) {                                         //CICLO DI SCRITTURA
                     if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
                         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere
+                            debug = fopen(str, "a");
+                            fprintf(debug, "C: LEGGO %s\n", path);
+                            fclose(debug);
                             if (!strncmp(path, "#", 1)) {
-                                //ADD PARSING OF COMMAND
-                                for (i = 0; i < n; i++) {
+                                if (!strncmp(path, "#SET", 4)) {
+                                    dupPath = strdup(path);
+                                    token = strtok(path, "#");
+                                    token = strtok(NULL, "#");
+                                    oldn = n;
+                                    n = atoi(token);
+                                    token = strtok(NULL, "#");
+                                    m = atoi(token);
+                                    free(dupPath);
+                                }
+
+                                for (i = 0; i < oldn; i++) {
                                     while (read(fd[i * 4 + 3], path, PATH_MAX) > 0) {
+                                        debug = fopen(str, "a");
+                                        fprintf(debug, "C: Svuoto pipe: %s\n", path);
+                                        fclose(debug);
                                     }
                                     terminated[i] = FALSE;
                                 }
@@ -122,7 +145,7 @@ int main(int argc, char const* argv[]) {
                                 strcpy(path, "#CLOSE");
                                 while (!sentClose) {
                                     sentClose = TRUE;
-                                    for (i = 0; i < n; i++) {  //Provo a inviare path a tutti i Q
+                                    for (i = 0; i < oldn; i++) {  //Provo a inviare path a tutti i Q
                                         if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {
                                             if (errno != EAGAIN) {
                                                 value_return = err_write();
@@ -132,8 +155,23 @@ int main(int argc, char const* argv[]) {
                                             }
                                         } else {
                                             terminated[i] = TRUE;
+                                            debug = fopen(str, "a");
+                                            fprintf(debug, "C: Inviato a %d: %s\n", i, path);
+                                            fclose(debug);
                                         }
                                     }
+                                }
+                                for (i = 0; i < n && f > 0 && value_return == 0; i++) {
+                                    f = fork();
+                                    if (f == 0) {
+                                        id = i;                     //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
+                                    } else if (f == -1) {           //Controllo che non ci siano stati errori durante il fork
+                                        value_return = err_fork();  //In caso di errore setta il valore di ritorno a ERR_FORK
+                                    }
+                                }
+                                if (f == 0){ //Se il processo e' figlio salta la read e vai di close 
+                                    _read = TRUE;
+                                    _close = TRUE;
                                 }
 
                             } else {
@@ -147,6 +185,9 @@ int main(int argc, char const* argv[]) {
                                 } else {              //scritto con successo
                                     count++;          //Tengo conto della scrittura
                                     i = (i + 1) % n;  //Usato per ciclare su tutte le pipe in scrittura
+                                    debug = fopen(str, "a");
+                                    fprintf(debug, "C: Inviato a %d: %s\n", i, path);
+                                    fclose(debug);
                                 }
                             }
                         }
@@ -156,6 +197,9 @@ int main(int argc, char const* argv[]) {
                                 value_return = err_write();                      //Setta il valore di ritorno
                             }
                         } else {
+                            debug = fopen(str, "a");
+                            fprintf(debug, "C: Inviato a %d: %s\n", i, failedPath);
+                            fclose(debug);
                             stop = FALSE;     //Se la scrittura va a buon fine esco dallo stato di stop
                             count++;          //Tengo conto dell'invio
                             i = (i + 1) % n;  //Incremento i in maniera ciclica
@@ -186,9 +230,10 @@ int main(int argc, char const* argv[]) {
                     k = (k + 1) % n;  //Cicla tra le pipes
                 }
             }
-
+            if (f>0){ //Se e' un processo figlio,non deve liberare le pipe
             close_pipes(fd, size_pipe);  //Chiude tutte le pipes
             free(fd);                    //Libera la memoria delle pipes
+            }
         }
     }
 
