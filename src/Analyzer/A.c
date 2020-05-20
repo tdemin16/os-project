@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
                         i++;                //passa al prossimo elemento della lista
                         if (i == count) {   //Qunado ha finito di inviare
                             _write = TRUE;  //Setta il flag a true
-                            setOnFly(1,1,fd_1);
+                            //setOnFly(1,1,fd_1);
                         }
                     }
                 }
@@ -187,21 +187,23 @@ int main(int argc, char *argv[]) {
                                 lista->analyzed[id_r] = -1;
                                 perc++;
                             }
-
+                            
+                            
                             //Barretta
                             if ((int)((float)perc * 10 / (float)count) > oldperc && value_return == 0) {
                                 oldperc = (int)((float)perc * 10 / (float)count);
-                                system("clear");
-                                percAvanzamento(perc, count);
+                                //system("clear");
+                                //percAvanzamento(perc, count);
                             }
 
                             if (perc == count && value_return == 0) {
                                 _read = TRUE;
-                                system("clear");
-                                printf("Numero file analizzati: %d\nProcessi:%d\nSezioni:%d\n\n", count, n, m);
+                                //system("clear");
+                                //printf("Numero file analizzati: %d\nProcessi:%d\nSezioni:%d\n\n", count, n, m);
                                 arrayToCsv(v, sum);
-                                printStat_Cluster(sum);
+                                //printStat_Cluster(sum);
                             }
+                            
                             free(tmpPercorso);
                             free(tmp);
                             free(tmpResp);

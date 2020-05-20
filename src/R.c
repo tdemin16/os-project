@@ -66,7 +66,7 @@ int main(int argc, char const* argv[]) {
             }
         } else {
             while (retrieve) {
-                if (read(fd_fifo, resp, DIM_RESP) == -1) {
+                if (read(fd_fifo, resp, DIM_RESP) > 0) {
                     if (!strncmp(resp, "///", 3)) {
                         //print values according to cmd
                         if (value_return == 0) {
