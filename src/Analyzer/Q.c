@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 
     //IPC Arguments
     char path[PATH_MAX];
-    int _write = FALSE;
+    int _close = FALSE;
     char respSent = FALSE;
     char resp[DIM_RESP];  // = "1044,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647";
 
@@ -40,21 +40,10 @@ int main(int argc, char* argv[]) {
     if (fcntl(STDOUT_FILENO, F_SETFL, O_NONBLOCK)) {
         value_return = err_fcntl();
     }
-    while (value_return == 0 && !_write) {
+    while (value_return == 0 && !_close) {
         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //Legge un percorso
-            if (!strncmp(path, "///", 3)) {            //Se e' terminazione allora setta write a true e rimando indietro
-                _write = TRUE;
-                respSent = FALSE;
-                while (!respSent) {  //finchè la risposta non è stata inviata riprova
-                    if (write(STDOUT_FILENO, path, DIM_RESP) == -1) {
-                        if (errno != EAGAIN) {
-                            value_return = err_write();
-                        }
-                    } else {
-                        respSent = TRUE;
-                    }
-                }
-
+            if (!strncmp(path, "#CLOSE", 6)) {         //Se leggo una stringa di terminazione
+                _close = TRUE;                         //Setto end a true
             } else {  //Senno' analizzo il path
                 tmpDup = strdup(path);
                 id = strtok(tmpDup, "#");

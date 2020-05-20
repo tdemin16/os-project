@@ -18,6 +18,8 @@ int main(int argc, char* argv[]) {
     int id;  //Identifica il numero del figlio generato
     int _read = FALSE;
     int _write = FALSE;
+    int _close = FALSE;
+    char sentClose = FALSE;
     array* sum = createPathList(10);
     char array[4][4];
     char* args[4];
@@ -86,24 +88,25 @@ int main(int argc, char* argv[]) {
     //----------------------------------------------------------------------
     if (value_return == 0) {
         if (f > 0) {  //PARENT SIDE
-            while (value_return == 0 && (!_read || !_write)) {
-                                //Write
+            while (value_return == 0 && (!_close)) {
+                //Write
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
                         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere
-                            if (!strncmp(path, "///", 3)) {            //Se leggo una stringa di terminazione
-                                end = TRUE;                            //Setto end a true
-                            }
-                            for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q
-                                if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {
-                                    if (errno != EAGAIN) {
-                                        value_return = err_write();
+                            if (!strncmp(path, "#CLOSE", 6)) {         //Se leggo una stringa di terminazione
+                                _close = TRUE;                         //Setto end a true
+                            } else {
+                                for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q
+                                    if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {
+                                        if (errno != EAGAIN) {
+                                            value_return = err_write();
+                                        } else {
+                                            send_w = FALSE;  //Se non ci riesce setta send a false
+                                            terminated[i] = FALSE;
+                                        }
                                     } else {
-                                        send_w = FALSE;  //Se non ci riesce setta send a false
-                                        terminated[i] = FALSE;
+                                        terminated[i] = TRUE;
                                     }
-                                } else {
-                                    terminated[i] = TRUE;
                                 }
                             }
                         }
@@ -122,9 +125,6 @@ int main(int argc, char* argv[]) {
                                 }
                             }
                         }
-                    }
-                    if (end && send_w) {  //Se lo stato e' end, e tutto e' stato inviato, allora la write e' finita
-                        _write = TRUE;
                     }
                 }
 
@@ -166,9 +166,32 @@ int main(int argc, char* argv[]) {
                             send_r = TRUE;
                         }
                     }
-                    if ((count == m) && send_r) _read = TRUE;
                 }
             }
+
+            for (i = 0; i < m; i++) {
+                while (read(fd[i * 4 + 3], path, PATH_MAX) > 0) {
+                }
+                terminated[i] = FALSE;
+            }
+            sentClose = FALSE;
+            strcpy(path, "#CLOSE");
+            while (!sentClose) {
+                sentClose = TRUE;
+                for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q
+                    if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {
+                        if (errno != EAGAIN) {
+                            value_return = err_write();
+                        } else {
+                            sentClose = FALSE;  //Se non ci riesce setta send a false
+                            terminated[i] = FALSE;
+                        }
+                    } else {
+                        terminated[i] = TRUE;
+                    }
+                }
+            }
+
             close_pipes(fd, size_pipe);
             free(fd);
             freePathList(sum);

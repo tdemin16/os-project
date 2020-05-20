@@ -49,6 +49,9 @@ int main(int argc, char *argv[]) {
     int count = 0;    //numero di file univoci da analizzare
     int perc = 0;     //Ricevimento parziale file
     int oldperc = 0;  //Parziale precedente
+
+    char analyzing = FALSE;
+    int pathSent = 0;
     char *tmp = NULL;
     char *tmpResp = NULL;
     char *tmpPercorso = NULL;
@@ -136,7 +139,7 @@ int main(int argc, char *argv[]) {
         if (f > 0) {              //PARENT SIDE
             insertProcess(p, f);  //Insert child process in list p
             i = 0;
-            while (value_return == 0 && (!_read || !_write || !_close)) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
+            while (value_return == 0 && (!_close)) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
 
                 //M
                 _close = TRUE;
@@ -167,26 +170,29 @@ int main(int argc, char *argv[]) {
                     }
                 }
 
-                //Write
-                if (!_write && value_return == 0) {                                //Esegue il blocco finche` non ha finito di scrivere
-                    if (write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
-                        if (errno != EAGAIN) {                                     //Se avviene un errore e non e` causato dalla dimensione della pipe
-                            value_return = err_write();                            //Ritorna l'errore sulla scrittura
+                //Quando WRITE e' in funzione inizia a mandare tutti i file con flag 0 di pathList
+                if (!_write && value_return == 0) {  //Esegue il blocco finche` non ha finito di scrivere
+                    analyzing = TRUE;
+                    if (!lista->analyzed[i]) {
+                        if (write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
+                            if (errno != EAGAIN) {                                     //Se avviene un errore e non e` causato dalla dimensione della pipe
+                                value_return = err_write();                            //Ritorna l'errore sulla scrittura
+                            }
+                        } else {
+                            i++;
+                            pathSent++;
+                            if (i == lista->count) {  //Qunado ha finito di inviare
+                                _write = TRUE;        //Setta il flag a true
+                            }
                         }
                     } else {
-                        i++;                //passa al prossimo elemento della lista
-                        if (i == count) {   //Qunado ha finito di inviare
-                            _write = TRUE;  //Setta il flag a true
-                            //setOnFly(1,1,fd_1);
-                        }
+                        i++;
                     }
                 }
 
-                if (_write) {
-                }
-
                 //Read
-                if (!_read) {                                    //Esegue il blocco fiche` non c'e` piu` nulla nella pipe
+
+                if (!_read && value_return == 0) {               //Esegue il blocco fiche` non c'e` piu` nulla nella pipe
                     if (read(fd_2[READ], resp, DIM_RESP) > 0) {  //Pero` potremmo vedere se sto controllo serve realmente
                         if (strstr(resp, "#") != NULL) {         //Controlla che ci sia almeno un # nel messaggio
                             tmp = strdup(resp);
@@ -214,18 +220,20 @@ int main(int argc, char *argv[]) {
                             }
 
                             //Barretta
-                            if ((int)((float)perc * 10 / (float)count) > oldperc && value_return == 0) {
+                            if ((int)((float)perc * 10 / (float)pathSent) > oldperc && value_return == 0) {
                                 oldperc = (int)((float)perc * 10 / (float)count);
                                 //system("clear");
                                 //percAvanzamento(perc, count);
                             }
 
-                            if (perc == count && value_return == 0) {
-                                _read = TRUE;
+                            if (perc == pathSent && value_return == 0) {
+                                analyzing = FALSE;
                                 //system("clear");
-                                printf("Numero file analizzati: %d\nProcessi:%d\nSezioni:%d\n\n", count, n, m);
+                                printf("Numero file analizzati: %d\nProcessi:%d\nSezioni:%d\n\n", pathSent, n, m);
                                 arrayToCsv(v, sum);
                                 //printStat_Cluster(sum);
+                                pathSent = 0;
+                                setOnFly(1,1,fd_1);
                             }
 
                             free(tmpPercorso);
