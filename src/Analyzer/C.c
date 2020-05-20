@@ -107,14 +107,14 @@ int main(int argc, char const* argv[]) {
         k = 0;
         if (f > 0) {                                                               //PARENT SIDE
             while (value_return == 0 && (!_read || !_write)) {                     //Cicla finche` non ha finito di leggere o scrivere o va in errore
-                sleep(5);
+                //sleep(5);
                 if (!_write) {                                                     //CICLO DI SCRITTURA
                     if (count != nfiles) {                                         //Se non sono ancora tutti arraivati
                         if (stop == FALSE) {                                       //E non ci troviamo in uno stato di stop per rinvio dati
                             if (read(STDIN_FILENO, path, PATH_MAX) > 0) {          //provo a leggere
-                            if (!strncmp(path,"#",1)){
-                                fprintf(stderr,"letto comando\n");
-                            }else fprintf(stderr,"letto percorso\n");
+                            //if (!strncmp(path,"#",1)){
+                            //    fprintf(stderr,"letto comando\n");
+                            // }else fprintf(stderr,"letto percorso\n");
                                 if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {  //Provo a scrivere
                                     if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
                                         value_return = err_write();                //Setta il valore di ritorno

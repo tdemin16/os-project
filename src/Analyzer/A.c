@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
                         i++;                //passa al prossimo elemento della lista
                         if (i == count) {   //Qunado ha finito di inviare
                             _write = TRUE;  //Setta il flag a true
-                            setOnFly(1,1,fd_1);
+                            //setOnFly(1,1,fd_1);
                         }
                     }
                 }
