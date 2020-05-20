@@ -178,6 +178,7 @@ int getAnalyzed(array *tmp, int pos) {
     return tmp->analyzed[pos];  //-1 if not analyzed
 }
 
+//Returns -1 if fails
 int unlock_pipes(int *fd, int size) {
     int i;
     int ret = 0;

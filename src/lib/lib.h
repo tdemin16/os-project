@@ -50,6 +50,9 @@
 #define ANALIZED 1
 #define ANALIZED_INEXISTENCE 2
 
+#define A 0
+#define R 1
+
 
 typedef struct {
     int size;  //size of array

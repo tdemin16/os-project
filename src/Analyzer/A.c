@@ -23,6 +23,7 @@ void handle_sigint(int sig) {
 }
 
 int main(int argc, char *argv[]) {
+    printf("Start A\n");
     signal(SIGINT, handle_sigint);  //Handler for SIGINT (Ctrl-C)
 
     p = create_process(1);  //Allocate dynamically p with dimension 1
@@ -32,6 +33,8 @@ int main(int argc, char *argv[]) {
     //COMMUNICATION WITH R
     const char *fifo = "/tmp/A_R_Comm";  //Nome fifo con R
     int fd_fifo;                         //pipe fifo con R
+    char print_method[DIM_CMD];
+    int retrieve = TRUE;
 
     //COMMUNICATION WITH M
     char cmd[DIM_CMD];  //Comando rivevuto da M
@@ -136,9 +139,29 @@ int main(int argc, char *argv[]) {
             while (value_return == 0 && (!_read || !_write || !_close)) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
 
                 //M
-                _close = TRUE;
                 if (!_close) {
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
+                        printf("Comando ricevuto\n");
+                    }
+                }
+
+                //R
+                if (retrieve) {
+                    if (!_close) {
+                        if (read(fd_fifo, print_method, DIM_CMD) > 0) {
+                            retrieve = FALSE;
+                            printf("Ciola\n");
+                            if (close(fd_fifo) == -1) {
+                                value_return = err_close();
+                            }
+                            //Open fifo in nonblocking write mode
+                            if (value_return == 0) {
+                                fd_fifo = open(fifo, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
+                                if (fd_fifo == -1) {                          //Error handling
+                                    value_return = err_file_open();           //Errore nell'apertura del file
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -187,8 +210,7 @@ int main(int argc, char *argv[]) {
                                 lista->analyzed[id_r] = -1;
                                 perc++;
                             }
-                            
-                            
+
                             //Barretta
                             if ((int)((float)perc * 10 / (float)count) > oldperc && value_return == 0) {
                                 oldperc = (int)((float)perc * 10 / (float)count);
@@ -203,7 +225,7 @@ int main(int argc, char *argv[]) {
                                 arrayToCsv(v, sum);
                                 //printStat_Cluster(sum);
                             }
-                            
+
                             free(tmpPercorso);
                             free(tmp);
                             free(tmpResp);

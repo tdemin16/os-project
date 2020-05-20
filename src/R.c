@@ -1,6 +1,6 @@
 #include "lib/lib.h"
 
-int main(int argc, char const* argv[]) {
+int main() {
     int value_return = 0;
     const char* fifo = "/tmp/A_R_Comm";
     int fd_fifo;
@@ -27,16 +27,24 @@ int main(int argc, char const* argv[]) {
             if (fd_fifo == -1) {                          //Error handling
                 if (errno != ENXIO) {                     //Se errno == 6, il file A non e' stato ancora aperto
                     value_return = err_file_open();       //Errore nell'apertura del file
+                    perror("R: ");
                 }
             }
-        } while (value_return == 0 && errno == ENXIO);
+        } while (value_return == 0 && fd_fifo == -1);
+    }
+
+    if(value_return == 0) {
+        if(fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+            value_return = err_fcntl();
+        }
     }
 
     while (value_return == 0 && !_close) {
         if (!retrieve) {
             if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
-                if (!strcmp(cmd, "close")) {
+                if (!strncmp(cmd, "close", 5)) {
                     _close = TRUE;
+                    printf("Closing...");
                 } else {
                     if (!strcmp(cmd, "-c") /*&& altri flags*/) {
                         do {
@@ -74,7 +82,7 @@ int main(int argc, char const* argv[]) {
                             if (close(fd_fifo) == -1) {
                                 value_return = err_close();
                             }
-                            //Open fifo in nonblocking read mode
+                            //Open fifo in nonblocking write mode
                             if (value_return == 0) {
                                 fd_fifo = open(fifo, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
                                 if (fd_fifo == -1) {                          //Error handling

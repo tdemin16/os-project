@@ -30,17 +30,17 @@ int main(int argc, char *argv[]) {
     //------------------------------ DEFINIZIONE VARIABILI
     p = create_process(1);  //Allocate dynamically p with dimension 1
     int value_return = 0;
-    pid_t fA;  //al momento non necessarie
-    pid_t fR;
+    pid_t f = getpid();
     char cmd[DIM_CMD];  //contiente il comando lanciato
     char ch = '0';      //per leggere un carattere per volta
     int end = FALSE;    //TRUE se lanciato il comando "close"
     int res_cmd;
     int _write = TRUE;
+    int i;
+    int id;
 
     //IPC Variables--------------------------------------------------
-    int fd_A[2];
-    int fd_R[2];
+    int fd[4];
     char array_args[4];
 
     if (argc == 1) {
@@ -49,48 +49,36 @@ int main(int argc, char *argv[]) {
 
     //IPC
     if (value_return == 0) {
-        if (pipe(fd_A) != 0) {
-            value_return = err_pipe();
-        }
-        if (pipe(fd_R) != 0) {
-            value_return = err_pipe();
+        for (i = 0; i < 3; i += 2) {
+            if (pipe(fd + i) == -1) {       //Controlla se ci sono errori nella creazione della pipe
+                value_return = err_pipe();  //In caso di errore setta il valore di ritorno
+            }
         }
     }
 
     //Set Non-blocking pipes (Shouldn't block anyway, just to be sure)
     if (value_return == 0) {
-        if (fcntl(fd_A[WRITE], F_SETFL, O_NONBLOCK)) {
-            value_return = err_fcntl();
-        }
-        if (fcntl(fd_A[READ], F_SETFL, O_NONBLOCK)) {
-            value_return = err_fcntl();
-        }
-        if (fcntl(fd_R[WRITE], F_SETFL, O_NONBLOCK)) {
-            value_return = err_fcntl();
-        }
-        if (fcntl(fd_R[READ], F_SETFL, O_NONBLOCK)) {
+        if (unlock_pipes(fd, 4) == -1) {
             value_return = err_fcntl();
         }
     }
 
     if (value_return == 0) {
-        fA = fork();
-        if (fA == -1) {
-            value_return = err_fork();
-        }
-        if (fA > 0) {
-            fR = fork();
-            if (fR == -1) {
+        for (i = 0; i < 2 && f > 0 && value_return == 0; i++) {
+            f = fork();
+            if (f == 0)
+                id = i;
+            else if (f == -1)
                 value_return = err_fork();
-            }
+            else
+                insertProcess(p, f);
         }
     }
 
     //--------------------------------------------------------------------------------
     if (value_return == 0) {
         insertProcess(p, getpid());
-        if (fA > 0) {  //PARENT SIDE
-            insertProcess(p, fA);
+        if (f > 0) {                             //PARENT SIDE
             while (!end && value_return == 0) {  //--------- CICLO DI ATTESA COMANDI IN INPUT
                 strcpy(cmd, "");                 //svuota la stringa per il prossimo comando
                 //printf("> ");
@@ -109,7 +97,7 @@ int main(int argc, char *argv[]) {
                 if (res_cmd == 0) end = TRUE;  //con il comando close interrompe il ciclo
                 if (res_cmd == 2) {
                     while (value_return == 0 && _write) {
-                        if (write(fd_A[WRITE], cmd, DIM_CMD) == -1) {
+                        if (write(fd[A*2+WRITE], cmd, DIM_CMD) == -1) {
                             if (errno != EAGAIN) {
                                 value_return = err_write();
                             }
@@ -120,27 +108,27 @@ int main(int argc, char *argv[]) {
                     _write = TRUE;
                 }
             }
-            close(fd_R[WRITE]);
-            close(fd_R[READ]);
-            close(fd_A[WRITE]);
-            close(fd_A[READ]);
+            close(fd[R * 2 + WRITE]);
+            close(fd[R * 2 + READ]);
+            close(fd[A * 2 + WRITE]);
+            close(fd[A * 2 + READ]);
             printf("Closing...\n");
         }
     }
 
     if (value_return == 0) {
-        if (fA == 0) {  //A SIDE
+        if (id == A && f == 0) {  //A SIDE
 
             //Change binary file
             strcpy(array_args, "./A");
             argv[0] = array_args;
 
             //Redirects pipes
-            dup2(fd_A[READ], STDIN_FILENO);
+            dup2(fd[A * 2 + READ], STDIN_FILENO);
 
             //Close pipes
-            close(fd_A[WRITE]);
-            close(fd_A[READ]);
+            close(fd[A * 2 + WRITE]);
+            close(fd[A * 2 + READ]);
 
             //Change code with A
             if (execvp(argv[0], argv) == -1) {
@@ -150,13 +138,16 @@ int main(int argc, char *argv[]) {
     }
 
     if (value_return == 0) {
-        if (fR == 0) {  //R SIDE
-            dup2(fd_R[READ], STDIN_FILENO);
+        if (id == R && f == 0) {  //R SIDE
+            strcpy(array_args, "./R");
+            argv[0] = array_args;
+            argv[1] = NULL;
+            dup2(fd[R * 2 + READ], STDIN_FILENO);
 
-            close(fd_R[READ]);
-            close(fd_R[WRITE]);
+            close(fd[R * 2 + READ]);
+            close(fd[R * 2 + WRITE]);
 
-            if (execl("./R", "./R", NULL) == -1) {
+            if (execvp(argv[0], argv) == -1) {
                 value_return = err_exec(errno);
             }
         }
