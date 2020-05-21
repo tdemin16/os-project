@@ -891,6 +891,11 @@ int err_args_M() {
     return ERR_ARGS_M;
 }
 
+int err_kill_process_R() {
+    fprintf(stderr, "\n[!] Errore, il processo R è stato killato al di fuori del programma!\n");
+    return ERR_KILL_PROC;
+}
+
 int err_kill_process_A() {
     fprintf(stderr, "\n[!] Errore, il processo A è stato killato al di fuori del programma!\n");
     return ERR_KILL_PROC;

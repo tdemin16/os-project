@@ -43,8 +43,6 @@
 #define ERR_ARGS_M 19
 #define ERR_KILL_PROC 20
 
-//#define SIGTERM_MSG_Q "Process Q Killed\n"
-
 #define REMOVED -2
 #define INEXISTENCE -1
 #define TO_BE_ANALIZED 0
@@ -80,9 +78,6 @@ process *create_process(int);
 void insertProcess(process *, pid_t);
 void printList(process *);
 void freeList(process *);
-
-void sig_term_handler(int signum, siginfo_t *info, void *ptr);
-void catch_sigterm();
 
 //Array struct functions -- sostituiscono lista (momentaneamente?)
 array *createPathList(int);
@@ -166,6 +161,7 @@ int err_close();
 int err_args_R();
 int err_enxio();
 int err_args_M();
+int err_kill_process_R();
 int err_kill_process_A();
 int err_kill_process_C();
 int err_kill_process_P();
