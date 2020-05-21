@@ -32,6 +32,7 @@ int main(int argc, char* argv[]) {
         terminated[i] = FALSE;
     }
     int sum_value;
+    int oldfl;
     int pendingPath = 0;
 
     //Parsing arguments-------------------------------------------------------
@@ -66,9 +67,6 @@ int main(int argc, char* argv[]) {
         if (unlock_pipes(fd, size_pipe) == -1) {  //Set unblocking pipes
             value_return = err_fcntl();
         }
-        if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
-            value_return = err_fcntl();
-        }
     }
 
     //Forking-----------------------------------------------------------
@@ -100,6 +98,11 @@ int main(int argc, char* argv[]) {
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
                         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere
                             pendingPath++;
+                            if (pendingPath == 1) {
+                                if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+                                    value_return = err_fcntl();
+                                }
+                            }
                             debug = fopen(str, "a");
                             fprintf(debug, "P: LEGGO %s PENDING: %d\n", path, pendingPath);
                             fclose(debug);
@@ -186,6 +189,14 @@ int main(int argc, char* argv[]) {
                             fclose(debug);
                         }
                     }
+                }
+                if (pendingPath == 0) {
+                    
+                    oldfl = fcntl(STDIN_FILENO, F_GETFL);
+                    if (oldfl == -1) {
+                        /* handle error */
+                    }
+                    fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
                 }
             }
 
