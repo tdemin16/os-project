@@ -1,15 +1,29 @@
 //Updated to 2020.05.02
 #include "../lib/lib.h"
+int value_return = 0;
 
-//IMPORTANTE DA RICORDARE: una volta ottenuto il char viene convertito in ASCII ed il suo valore diminuito di 32 per evitare di lasciare 32 spazi vuoti nel vettore in cui lo salvo, quindi per stampare nuovamente il dato bisogna aggiungere 32
-//Ove presente, 'U' sta ad indicare che quella funzione/parte di codice serve solamente se si vuole verificarne il funzionamento nel processo singolo, NON va utilizzato al di fuori di questo programma, nella release finale li toglieremo
+void sig_term_handler(int signum, siginfo_t *info, void *ptr) {
+    value_return = err_kill_process_Q();
+}
+
+void catch_sigterm() {
+    static struct sigaction _sigact;
+
+    memset(&_sigact, 0, sizeof(_sigact));
+    _sigact.sa_sigaction = sig_term_handler;
+    _sigact.sa_flags = SA_SIGINFO;
+
+    sigaction(SIGTERM, &_sigact, NULL);
+}
 
 int main(int argc, char* argv[]) {
+    catch_sigterm();
+    sleep(10);
     //Arguments passed
     int part;
     int m;
     int v[DIM_V];
-    int value_return = 0;
+    
     FILE* fp;
     char* id;
     char* analyze;

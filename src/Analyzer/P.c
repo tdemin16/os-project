@@ -1,12 +1,25 @@
-//Version updated to 2020.05.02
-//P si occupano di gestire ciascuno un sottoinsieme degli input (partizionato in “n” sottogruppi) creando a sua volta “m” figli
 #include "../lib/lib.h"
+int value_return = 0;
+
+void sig_term_handler(int signum, siginfo_t* info, void* ptr) {
+    value_return = err_kill_process_P();
+}
+
+void catch_sigterm() {
+    static struct sigaction _sigact;
+
+    memset(&_sigact, 0, sizeof(_sigact));
+    _sigact.sa_sigaction = sig_term_handler;
+    _sigact.sa_flags = SA_SIGINFO;
+
+    sigaction(SIGTERM, &_sigact, NULL);
+}
 
 int main(int argc, char* argv[]) {
+    catch_sigterm();
     //Argument passed
     int m = 4;
 
-    int value_return = 0;
     int i;
     char path[PATH_MAX];
     char resp[DIM_RESP];
@@ -87,7 +100,7 @@ int main(int argc, char* argv[]) {
     if (value_return == 0) {
         if (f > 0) {  //PARENT SIDE
             while (value_return == 0 && (!_read || !_write)) {
-                                //Write
+                //Write
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
                         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere

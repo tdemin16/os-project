@@ -41,8 +41,9 @@
 #define ERR_ARGS_P 17
 #define ERR_ENXIO 18
 #define ERR_ARGS_M 19
+#define ERR_KILL_PROC 20
 
-#define SIGTERM_MSG "SIGTERM received.\n"
+//#define SIGTERM_MSG_Q "Process Q Killed\n"
 
 #define REMOVED -2
 #define INEXISTENCE -1
@@ -165,5 +166,9 @@ int err_close();
 int err_args_R();
 int err_enxio();
 int err_args_M();
+int err_kill_process_A();
+int err_kill_process_C();
+int err_kill_process_P();
+int err_kill_process_Q();
 
 #endif

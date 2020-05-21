@@ -1,8 +1,22 @@
 #include "../lib/lib.h"
 
-int main(int argc, char const* argv[]) {
-    int value_return = 0;
+int value_return = 0;
+void sig_term_handler(int signum, siginfo_t* info, void* ptr) {
+    value_return = err_kill_process_C();
+}
 
+void catch_sigterm() {
+    static struct sigaction _sigact;
+
+    memset(&_sigact, 0, sizeof(_sigact));
+    _sigact.sa_sigaction = sig_term_handler;
+    _sigact.sa_flags = SA_SIGINFO;
+
+    sigaction(SIGTERM, &_sigact, NULL);
+}
+
+int main(int argc, char* argv[]) {
+    catch_sigterm();
     int nfiles = 0;  //number of files to retreive from pipe
     int n = 3;
     int m = 4;
@@ -111,9 +125,9 @@ int main(int argc, char const* argv[]) {
                     if (count != nfiles) {                                         //Se non sono ancora tutti arraivati
                         if (stop == FALSE) {                                       //E non ci troviamo in uno stato di stop per rinvio dati
                             if (read(STDIN_FILENO, path, PATH_MAX) > 0) {          //provo a leggere
-                            //if (!strncmp(path,"#",1)){
-                            //    fprintf(stderr,"letto comando\n");
-                            // }else fprintf(stderr,"letto percorso\n");
+                                                                                   //if (!strncmp(path,"#",1)){
+                                                                                   //    fprintf(stderr,"letto comando\n");
+                                                                                   // }else fprintf(stderr,"letto percorso\n");
                                 if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {  //Provo a scrivere
                                     if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
                                         value_return = err_write();                //Setta il valore di ritorno
@@ -160,7 +174,7 @@ int main(int argc, char const* argv[]) {
                         }
                     }
                 }
-                
+
                 //Read
                 if (!_read) {
                     if (send_r) {                                       //Coontrolla se non ci sonon valori non inviati

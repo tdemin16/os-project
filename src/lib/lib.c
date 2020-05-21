@@ -1,7 +1,9 @@
 #include "lib.h"
 
+/*
 void sig_term_handler(int signum, siginfo_t *info, void *ptr) {
     write(STDERR_FILENO, SIGTERM_MSG, sizeof(SIGTERM_MSG));
+    printf("CIao\n");
 }
 
 void catch_sigterm() {
@@ -13,6 +15,7 @@ void catch_sigterm() {
 
     sigaction(SIGTERM, &_sigact, NULL);
 }
+*/
 
 //Allocate memory for process* and process->pid
 process *create_process(int size) {
@@ -886,4 +889,24 @@ int err_enxio() {
 int err_args_M() {
     fprintf(stderr, "\nErrore nella sintassi del comando.\nUsa: /M nomeFile nomeCartella\nPuoi usare -setn e -setm per cambiare n e m\nes: /M A.c ../Analyzer/ -setn 3 -setm 4\n\n");
     return ERR_ARGS_M;
+}
+
+int err_kill_process_A() {
+    fprintf(stderr, "\n[!] Errore, il processo A è stato killato al di fuori del programma!\n");
+    return ERR_KILL_PROC;
+}
+
+int err_kill_process_C() {
+    fprintf(stderr, "\n[!] Errore, il processo C è stato killato al di fuori del programma!\n");
+    return ERR_KILL_PROC;
+}
+
+int err_kill_process_P() {
+    fprintf(stderr, "\n[!] Errore, il processo P è stato killato al di fuori del programma!\n");
+    return ERR_KILL_PROC;
+}
+
+int err_kill_process_Q() {
+    fprintf(stderr, "\n[!] Errore, il processo Q è stato killato al di fuori del programma!\n");
+    return ERR_KILL_PROC;
 }
