@@ -18,7 +18,7 @@ void catch_sigterm() {
 
 int main(int argc, char* argv[]) {
     catch_sigterm();
-    sleep(10);
+    
     //Arguments passed
     int part;
     int m;

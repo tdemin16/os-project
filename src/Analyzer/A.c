@@ -5,7 +5,7 @@ process *p;            //Declaring p (it's global because hendle_sigint can't ha
 int fd_fifo;           //pipe fifo con R
 
 void handle_sigint(int sig) {
-    printf("\n[!] Ricevuta terminazione da A, inizio terminazione processi C,P,Q ... \n");
+    printf("\n[!] Ricevuta terminazione per A, inizio terminazione processi C,P,Q ... \n");
     int i = p->count - 1;  //start from the end
     if (i > 0) {
         while (i != 0)  //while we haven't controlled every single process
@@ -202,10 +202,7 @@ int main(int argc, char *argv[]) {
                         }
                         //Aggiungere flags
 
-<<<<<<< HEAD
                         retrieve = TRUE;
-=======
->>>>>>> bbe314ab45d32cbc8ffeae09955e69390824160a
                         do {
                             _write_val = write(fd_fifo, tmp_resp, DIM_RESP);
                             if (_write_val == -1) {
