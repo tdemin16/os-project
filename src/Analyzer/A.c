@@ -142,14 +142,14 @@ int main(int argc, char *argv[]) {
             insertProcess(p, f);  //Insert child process in list p
             i = 0;
             //j = 0;
-            while (value_return == 0 && (!_read || !_write || !_close)) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
+            while (value_return == 0 && (/*!_read || !_write ||*/ !_close)) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
 
                 //M
-                //_close = TRUE;
                 if (!_close) {
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
-                        if(!strncmp(cmd, "close", 5)) {
+                        if (!strncmp(cmd, "close", 5)) {
                             _close = TRUE;
+                            printf("A: Closing...\n");
                         }
                     }
                 }
@@ -180,27 +180,30 @@ int main(int argc, char *argv[]) {
                             //Settare l'output
                         }
                         //Aggiungere flags
-                        
-                        retrieve = TRUE;
+
                         do {
                             _write_val = write(fd_fifo, tmp_resp, DIM_RESP);
                             if (_write_val == -1) {
                                 if (errno != EAGAIN) {
-                                    _write_val = EAGAIN;
-                                } else {
                                     value_return = err_write();
                                 }
                             }
-                        } while (value_return == 0 && errno == EAGAIN);
+                        } while (value_return == 0 && errno == EAGAIN && _write_val == -1);
 
-                        if (close(fd_fifo) == -1) {
-                            value_return = err_close();
-                        }
-                        //Open fifo in nonblocking read mode
                         if (value_return == 0) {
-                            fd_fifo = open(fifo, O_RDONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
-                            if (fd_fifo == -1) {                          //Error handling
-                                value_return = err_file_open();           //Errore nell'apertura del file
+                            FILE* debug = fopen("log.txt", "a");
+                            fprintf(debug, "A CLOSE FIFO\n");
+                            fclose(debug);
+                            retrieve = TRUE;
+                            if (close(fd_fifo) == -1) {
+                                value_return = err_close();
+                            }
+                            //Open fifo in nonblocking read mode
+                            if (value_return == 0) {
+                                fd_fifo = open(fifo, O_RDONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
+                                if (fd_fifo == -1) {                          //Error handling
+                                    value_return = err_file_open();           //Errore nell'apertura del file
+                                }
                             }
                         }
                     }
@@ -290,10 +293,11 @@ int main(int argc, char *argv[]) {
 
             //Elimina la fifo
             if (value_return == 0) {
-                printf("A: Unlink\n");
-                if (unlink(fifo) == -1) {
-                    value_return = err_unlink();
-                }
+                //if (unlink(fifo) == -1) {
+                //    value_return = err_unlink();
+                //    fprintf(stderr, "errno: %d\n", errno);
+                //    perror("A");
+                //}
             }
             freePathList(lista);
         }
