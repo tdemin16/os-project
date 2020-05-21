@@ -55,10 +55,10 @@ int main() {
                                     _write_val = EAGAIN;
                                 } else {
                                     value_return = err_write();
-                                    perror("R");
                                 }
                             }
                         } while (value_return == 0 && _write_val == EAGAIN);
+
                         if (value_return == 0) {
                             retrieve = TRUE;
                             if (close(fd_fifo) == -1) {

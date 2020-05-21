@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
             while (value_return == 0 && (!_read || !_write || !_close)) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
 
                 //M
-                _close = TRUE;
+                //_close = TRUE;
                 if (!_close) {
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
                         if(!strncmp(cmd, "close", 5)) {
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
                             //Open fifo in nonblocking write mode
                             if (value_return == 0) {
                                 do {
-                                    fd_fifo = open(fifo, O_WRONLY);  //Prova ad aprire la pipe in scrittura
+                                    fd_fifo = open(fifo, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
                                     if (fd_fifo == -1) {                          //Error handling
                                         if (errno != ENXIO) {                     //Se errno == 6, il file A non e' stato ancora aperto
                                             value_return = err_file_open();       //Errore nell'apertura del file
@@ -180,18 +180,19 @@ int main(int argc, char *argv[]) {
                             //Settare l'output
                         }
                         //Aggiungere flags
-
+                        
+                        retrieve = TRUE;
                         do {
                             _write_val = write(fd_fifo, tmp_resp, DIM_RESP);
                             if (_write_val == -1) {
-                                if (errno == EAGAIN) {
+                                if (errno != EAGAIN) {
                                     _write_val = EAGAIN;
                                 } else {
                                     value_return = err_write();
-                                    perror("A");
                                 }
                             }
-                        } while (value_return == 0 && _write_val == EAGAIN);
+                        } while (value_return == 0 && errno == EAGAIN);
+
                         if (close(fd_fifo) == -1) {
                             value_return = err_close();
                         }
