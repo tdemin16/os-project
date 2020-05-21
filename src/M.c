@@ -93,7 +93,29 @@ int main(int argc, char *argv[]) {
                     //richiama la funzione help() coi comandi
                     printf("Comando inserito non corretto\n");
                 }
-                if (res_cmd == 0) end = TRUE;  //con il comando close interrompe il ciclo
+                if (res_cmd == 0) {
+                    end = TRUE;
+                    while (value_return == 0 && _write) {
+                        if (write(fd[A * 2 + WRITE], cmd, DIM_CMD) == -1) {
+                            if (errno != EAGAIN) {
+                                value_return = err_write();
+                            }
+                        } else {
+                            _write = FALSE;
+                        }
+                    }
+                    _write = TRUE;
+                    while (value_return == 0 && _write) {
+                        if (write(fd[R * 2 + WRITE], cmd, DIM_CMD) == -1) {
+                            if (errno != EAGAIN) {
+                                value_return = err_write();
+                            }
+                        } else {
+                            _write = FALSE;
+                        }
+                    }
+                    _write = TRUE;
+                }
                 if (res_cmd == 1) {
                     while (value_return == 0 && _write) {
                         if (write(fd[R * 2 + WRITE], cmd, DIM_CMD) == -1) {

@@ -23,12 +23,10 @@ int main() {
 
     if (value_return == 0) {
         do {
-            sleep(1);
             fd_fifo = open(fifo, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
             if (fd_fifo == -1) {                          //Error handling
                 if (errno != ENXIO) {                     //Se errno == 6, il file A non e' stato ancora aperto
                     value_return = err_file_open();       //Errore nell'apertura del file
-                    perror("A");
                 }
             }
         } while (value_return == 0 && fd_fifo == -1);
@@ -45,7 +43,7 @@ int main() {
             if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
                 if (!strncmp(cmd, "close", 5)) {
                     _close = TRUE;
-                    printf("Closing...");
+                    printf("R: Closing...\n");
                 } else {
                     if (!strncmp(cmd, "-c", 2) /*&& altri flags*/) {
                         do {
@@ -57,7 +55,7 @@ int main() {
                                     value_return = err_write();
                                 }
                             }
-                        } while (value_return == 0 && _write_val == EAGAIN);
+                        } while (value_return == 0 && errno == EAGAIN && _write_val == -1);
 
                         if (value_return == 0) {
                             retrieve = TRUE;
@@ -91,6 +89,8 @@ int main() {
                         if (fd_fifo == -1) {                          //Error handling
                             if (errno != ENXIO) {                     //Se errno == 6, il file A non e' stato ancora aperto
                                 value_return = err_file_open();       //Errore nell'apertura del file
+                            } else {
+                                //fprintf(stderr, "ENXIO");
                             }
                         }
                     } while (value_return == 0 && fd_fifo == -1);
@@ -106,10 +106,9 @@ int main() {
     }
 
     if (value_return == 0) {
-        printf("R: Unlink\n");
-        if (unlink(fifo) == -1) {
-            value_return = err_unlink();
-        }
+        //if (unlink(fifo) == -1) {
+        //    value_return = err_unlink();
+        //}
     }
 
     return value_return;
