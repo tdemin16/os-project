@@ -32,6 +32,7 @@ int main(int argc, char* argv[]) {
         terminated[i] = FALSE;
     }
     int sum_value;
+    int pendingPath = 0;
 
     //Parsing arguments-------------------------------------------------------
     if (argc != 2) {
@@ -98,8 +99,9 @@ int main(int argc, char* argv[]) {
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
                         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere
+                            pendingPath++;
                             debug = fopen(str, "a");
-                            fprintf(debug, "P: LEGGO %s\n", path);
+                            fprintf(debug, "P: LEGGO %s PENDING: %d\n", path, pendingPath);
                             fclose(debug);
                             if (!strncmp(path, "#CLOSE", 6)) {  //Se leggo una stringa di terminazione
                                 _close = TRUE;
@@ -150,18 +152,10 @@ int main(int argc, char* argv[]) {
                     if (send_r) {
                         for (i = 0; i < m; i++) {  //Cicla tra tutti i figli
                             if (read(fd[i * 4 + 0], resp, DIM_RESP) > 0) {
-                                if (!strncmp(resp, "///", 3)) {                            //Controlla se e` la fine del messaggio
-                                    count++;                                               //Conta quanti terminatori sono arrivati
-                                    if (count == m) {                                      //Quando tutti i figli hanno terminato
-                                        if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {  //Scrive il carattere di teminazione
-                                            if (errno != EAGAIN) {
-                                                value_return = err_write();
-                                            } else {
-                                                send_r = FALSE;
-                                            }
-                                        }
-                                    }
-                                } else if (strstr(resp, "#") != NULL) {
+                                debug = fopen(str, "a");
+                                fprintf(debug, "P: (<) LEGGO  %s\n", resp);
+                                fclose(debug);
+                                if (strstr(resp, "#") != NULL) {
                                     sum_value = insertAndSumPathList(sum, resp, m - 1);
                                     if (sum_value > -1) {  //Qualcosa è arrivato a 0,
                                         strcpy(resp, sum->pathList[sum_value]);
@@ -171,6 +165,11 @@ int main(int argc, char* argv[]) {
                                             } else {
                                                 send_r = FALSE;
                                             }
+                                        } else {
+                                            pendingPath--;
+                                            debug = fopen(str, "a");
+                                            fprintf(debug, "P: RITORNO %s PENDING: %d\n", resp, pendingPath);
+                                            fclose(debug);
                                         }
                                     }
                                 }
@@ -181,6 +180,10 @@ int main(int argc, char* argv[]) {
                             if (errno != EAGAIN) value_return = err_write();
                         } else {
                             send_r = TRUE;
+                            pendingPath--;
+                            debug = fopen(str, "a");
+                            fprintf(debug, "P: RITORNO %s PENDING: %d\n", resp, pendingPath);
+                            fclose(debug);
                         }
                     }
                 }

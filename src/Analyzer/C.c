@@ -154,11 +154,12 @@ int main(int argc, char const* argv[]) {
                                         strcpy(failedPath, path);
                                     }
                                 } else {              //scritto con successo
-                                    count++;          //Tengo conto della scrittura
-                                    i = (i + 1) % n;  //Usato per ciclare su tutte le pipe in scrittura
                                     debug = fopen(str, "a");
                                     fprintf(debug, "C: Inviato a %d: %s\n", i, path);
                                     fclose(debug);
+                                    count++;          //Tengo conto della scrittura
+                                    i = (i + 1) % n;  //Usato per ciclare su tutte le pipe in scrittura
+                                    
                                 }
                             }
                         }

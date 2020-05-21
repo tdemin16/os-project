@@ -40,11 +40,20 @@ int main(int argc, char* argv[]) {
     if (fcntl(STDOUT_FILENO, F_SETFL, O_NONBLOCK)) {
         value_return = err_fcntl();
     }
+    char str[15];
+    sprintf(str, "%d.txt", getpid());
+    FILE* debug = fopen(str, "a");
+    fprintf(debug, "AVVIATO Q con m = %d part = %d\n", m, part);
+    fclose(debug);
+
     while (value_return == 0 && !_close) {
         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //Legge un percorso
-            if (!strncmp(path, "#CLOSE", 6)) {         //Se leggo una stringa di terminazione
-                _close = TRUE;                         //Setto end a true
-            } else {                                   //Senno' analizzo il path
+            debug = fopen(str, "a");
+            fprintf(debug, "Q: LEGGO %s\n", path);
+            fclose(debug);
+            if (!strncmp(path, "#CLOSE", 6)) {  //Se leggo una stringa di terminazione
+                _close = TRUE;                  //Setto end a true
+            } else {                            //Senno' analizzo il path
                 tmpDup = strdup(path);
                 id = strtok(tmpDup, "#");
                 analyze = strtok(NULL, "#");
@@ -67,6 +76,9 @@ int main(int argc, char* argv[]) {
                         }
                     } else {
                         respSent = TRUE;
+                        debug = fopen(str, "a");
+                        fprintf(debug, "Q: RISCRIVO %s \n", resp);
+                        fclose(debug);
                     }
                 }
                 free(tmpDup);
