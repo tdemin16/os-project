@@ -68,6 +68,9 @@ int main(int argc, char* argv[]) {
                     fclose(fp);
                 }
                 createCsv(v, resp, id);
+                debug = fopen(str, "a");
+                fprintf(debug, "Q: ANALIZZATO %s \n", resp);
+                fclose(debug);
                 respSent = FALSE;
                 while (!respSent) {  //finchè la risposta non è stata inviata riprova
                     if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
