@@ -167,7 +167,7 @@ int check_command(char *cmd) {
     if (strlen(cmd) > 3) {  //possibile che sia un comando accettabile
         if (strstr(cmd, "help") != NULL) {
             //mostra help comandi
-            printf("Ci sarà una funzione help comandi\n");
+            printf("Ci sara' una funzione help comandi\n");
             res = 1;
         } else if (strstr(cmd, "close") != NULL) {
             res = 0;
