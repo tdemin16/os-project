@@ -403,17 +403,15 @@ void forkC(int *n, int *f, int *id, int *value_return) {
 }
 
 void execC(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) {
-    char *args[3];
-    char * cmd = "./P";
-    strcpy(args[0], cmd);
-    sprintf(args[1], "%d", *m);
-    args[2] = NULL;
+    char str[12];
+    sprintf(str, "%d", *m);
+    char *args[3] = {"./P", str, NULL};  
     dup2(fd[*id * 4 + 2], STDIN_FILENO);
     dup2(fd[*id * 4 + 1], STDOUT_FILENO);
     close_pipes(fd, *size_pipe);
     free(fd);
-
-    if (execvp(cmd, args) == -1) {    //Test exec
+    if (execvp(args[0], args) == -1) {  //Test exec
+        //fprintf(stderr, "%d", errno);
         *value_return = err_exec(errno);  //Set value return
     }
 }

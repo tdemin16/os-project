@@ -237,10 +237,10 @@ int main(int argc, char *argv[]) {
                                 printf("Numero file analizzati: %d\nProcessi:%d\nSezioni:%d\n", pathSent, n, m);
                                 arrayToCsv(v, sum);
                                 //printStat_Cluster(sum);
-                                setOnFly(2,1,fd_1);
+                                //setOnFly(2,1,fd_1);
                                 //sleep(1);
-                                //closeAll(fd_1);
-                                //_close = TRUE;
+                                closeAll(fd_1);
+                                _close = TRUE;
                                 pathSent = 0;
                             }
 

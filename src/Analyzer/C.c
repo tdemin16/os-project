@@ -197,23 +197,6 @@ int main(int argc, char const* argv[]) {
     if (value_return == 0) {
         if (f == 0) {  //SON SIDE
             execC(&m, &f, &id, fd, &value_return, &size_pipe);
-            /*
-            //Creates char args
-            strcpy(arrayArgomenti[0], "./P");
-            sprintf(arrayArgomenti[1], "%d", m);
-            args[0] = arrayArgomenti[0];
-            args[1] = arrayArgomenti[1];
-            args[2] = NULL;
-
-            dup2(fd[id * 4 + 2], STDIN_FILENO);
-            dup2(fd[id * 4 + 1], STDOUT_FILENO);
-            close_pipes(fd, size_pipe);
-            free(fd);
-
-            if (execvp(args[0], args) == -1) {   //Test exec
-                value_return = err_exec(errno);  //Set value return
-            }
-            */
         }
     }
 
