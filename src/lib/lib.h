@@ -53,7 +53,6 @@
 #define A 0
 #define R 1
 
-
 typedef struct {
     int size;  //size of array
     char **pathList;
@@ -104,10 +103,14 @@ int parse_string(char *, int *v);
 void add_process_to_v(pid_t, int *);
 void initialize_processes(pid_t *, int);
 char fileExist(char *);
-void setOnFly(int,int,int*);
-
+void setOnFly(int, int, int *);
+void closeAll(int *);
 
 // /src/Analyzer/C.c
+void parseOnFly(char *, int *, int *);
+void nClearAndClose(int *, int);
+void forkC(int *, int *, int *, int *);
+void execC(int *, int *, int *, int *, int *, int *);
 
 // /src/Analyzer/Q.c
 void initialize_vector(int *);

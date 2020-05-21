@@ -24,12 +24,12 @@ int main(int argc, char const* argv[]) {
     int id;              //Indica il numero del figlio (necessario per calcolare quale pipe utilizzare)
     int size_pipe;       //Numero pipe * 4 (2 READ 2 WRITE)
 
+    char needFork = FALSE;
     char arrayArgomenti[2][4];  //Array di stringhe d'appoggio per la creazione degli args
     char* args[3];              //Argomenti da passare ai figli
     int _read = FALSE;          //Indica se ha finito di leggere dai figli
     int _write = FALSE;         //Indica se ha finito di scrivere
     int _close = FALSE;
-    char* dupPath = NULL;
     char* token;
     failedPath[0] = '\0';                           //Inizializza la stringa failed path
     char stop = FALSE;                              //Bloccano la ricezione di nuovi dati dai figli
@@ -122,56 +122,13 @@ int main(int argc, char const* argv[]) {
                             fprintf(debug, "C: LEGGO %s\n", path);
                             fclose(debug);
                             if (!strncmp(path, "#", 1)) {
-                                if (!strncmp(path, "#SET", 4)) {
-                                    dupPath = strdup(path);
-                                    token = strtok(path, "#");
-                                    token = strtok(NULL, "#");
-                                    oldn = n;
-                                    n = atoi(token);
-                                    token = strtok(NULL, "#");
-                                    m = atoi(token);
-                                    free(dupPath);
-                                }
-
-                                for (i = 0; i < oldn; i++) {
-                                    while (read(fd[i * 4 + 3], path, PATH_MAX) > 0) {
-                                        debug = fopen(str, "a");
-                                        fprintf(debug, "C: Svuoto pipe: %s\n", path);
-                                        fclose(debug);
-                                    }
-                                    terminated[i] = FALSE;
-                                }
-                                sentClose = FALSE;
-                                strcpy(path, "#CLOSE");
-                                while (!sentClose) {
-                                    sentClose = TRUE;
-                                    for (i = 0; i < oldn; i++) {  //Provo a inviare path a tutti i Q
-                                        if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {
-                                            if (errno != EAGAIN) {
-                                                value_return = err_write();
-                                            } else {
-                                                sentClose = FALSE;  //Se non ci riesce setta send a false
-                                                terminated[i] = FALSE;
-                                            }
-                                        } else {
-                                            terminated[i] = TRUE;
-                                            debug = fopen(str, "a");
-                                            fprintf(debug, "C: Inviato a %d: %s\n", i, path);
-                                            fclose(debug);
-                                        }
-                                    }
-                                }
-                                for (i = 0; i < n && f > 0 && value_return == 0; i++) {
-                                    f = fork();
-                                    if (f == 0) {
-                                        id = i;                     //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
-                                    } else if (f == -1) {           //Controllo che non ci siano stati errori durante il fork
-                                        value_return = err_fork();  //In caso di errore setta il valore di ritorno a ERR_FORK
-                                    }
-                                }
-                                if (f == 0){ //Se il processo e' figlio salta la read e vai di close 
-                                    _read = TRUE;
-                                    _close = TRUE;
+                                nClearAndClose(fd, n);              //Svuota le pipe in discesa e manda #CLOSE
+                                if (!strncmp(path, "#CLOSE", 6)) {  //Se leggo una stringa di terminazione
+                                    _close = TRUE;                  //Setto end a true
+                                } else if (!strncmp(path, "#SET", 4)) {
+                                    parseOnFly(path, &n, &m);  //Estrae n e m dalla stringa #SET#N#M#
+                                    forkC(&n, &f, &id, &value_return);
+                                    if (f == 0) execC(&m, &f, &id, fd, &value_return, &size_pipe);
                                 }
 
                             } else {
@@ -230,15 +187,17 @@ int main(int argc, char const* argv[]) {
                     k = (k + 1) % n;  //Cicla tra le pipes
                 }
             }
-            if (f>0){ //Se e' un processo figlio,non deve liberare le pipe
-            close_pipes(fd, size_pipe);  //Chiude tutte le pipes
-            free(fd);                    //Libera la memoria delle pipes
+            if (f > 0) {                     //Se e' un processo figlio,non deve liberare le pipe
+                close_pipes(fd, size_pipe);  //Chiude tutte le pipes
+                free(fd);                    //Libera la memoria delle pipes
             }
         }
     }
 
     if (value_return == 0) {
         if (f == 0) {  //SON SIDE
+            execC(&m, &f, &id, fd, &value_return, &size_pipe);
+            /*
             //Creates char args
             strcpy(arrayArgomenti[0], "./P");
             sprintf(arrayArgomenti[1], "%d", m);
@@ -254,6 +213,7 @@ int main(int argc, char const* argv[]) {
             if (execvp(args[0], args) == -1) {   //Test exec
                 value_return = err_exec(errno);  //Set value return
             }
+            */
         }
     }
 

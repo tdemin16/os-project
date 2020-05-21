@@ -91,15 +91,21 @@ int main(int argc, char* argv[]) {
             char str[15];
             sprintf(str, "%d.txt", getpid());
             FILE* debug = fopen(str, "a");
-            fprintf(debug, "AVVIATO P con m = %d\n",m);
+            fprintf(debug, "AVVIATO P con m = %d\n", m);
             fclose(debug);
             while (value_return == 0 && (!_close)) {
                 //Write
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
                         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere
-                            if (!strncmp(path, "#CLOSE", 6)) {         //Se leggo una stringa di terminazione
-                                _close = TRUE;                         //Setto end a true
+                            debug = fopen(str, "a");
+                            fprintf(debug, "P: LEGGO %s\n", path);
+                            fclose(debug);
+                            if (!strncmp(path, "#CLOSE", 6)) {  //Se leggo una stringa di terminazione
+                                _close = TRUE;
+                                debug = fopen(str, "a");
+                                fprintf(debug, "C: MI KILLO\n");
+                                fclose(debug);  //Setto end a true
                             } else {
                                 for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q
                                     if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {
@@ -111,6 +117,9 @@ int main(int argc, char* argv[]) {
                                         }
                                     } else {
                                         terminated[i] = TRUE;
+                                        debug = fopen(str, "a");
+                                        fprintf(debug, "P: INVIATO %s\n", path);
+                                        fclose(debug);
                                     }
                                 }
                             }
@@ -127,6 +136,9 @@ int main(int argc, char* argv[]) {
                                     }
                                 } else {
                                     terminated[i] = TRUE;
+                                    debug = fopen(str, "a");
+                                    fprintf(debug, "P: INVIATO %s\n", path);
+                                    fclose(debug);
                                 }
                             }
                         }

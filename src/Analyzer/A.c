@@ -182,7 +182,7 @@ int main(int argc, char *argv[]) {
                                 printf("pipe piena\n");
                             }
                         } else {
-                            printf("count: %d, path:%s\n", lista->count, lista->pathList[i]);
+                            //printf("count: %d, path:%s\n", lista->count, lista->pathList[i]);
                             i++;
                             pathSent++;
                         }
@@ -234,10 +234,13 @@ int main(int argc, char *argv[]) {
                             if (perc == pathSent && value_return == 0) {
                                 analyzing = FALSE;
                                 //system("clear");
-                                printf("Numero file analizzati: %d\nProcessi:%d\nSezioni:%d\n\n", pathSent, n, m);
+                                printf("Numero file analizzati: %d\nProcessi:%d\nSezioni:%d\n", pathSent, n, m);
                                 arrayToCsv(v, sum);
                                 //printStat_Cluster(sum);
-                                setOnFly(2,3,fd_1);
+                                setOnFly(2,1,fd_1);
+                                //sleep(1);
+                                //closeAll(fd_1);
+                                //_close = TRUE;
                                 pathSent = 0;
                             }
 
