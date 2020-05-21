@@ -191,13 +191,7 @@ int main(int argc, char *argv[]) {
     return value_return;
 }
 
-/*comandi possibili:
-setn int setm int 	[da gestire]
-info			
-info -c //clustered info
-close
-help			[da modificare
-*/
+
 
 //Codici Univoci
 //COdice per identificare un comando che deve essere mandato ad A. Per il momento io uso '2'

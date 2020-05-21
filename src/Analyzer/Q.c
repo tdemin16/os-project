@@ -32,10 +32,11 @@ int main(int argc, char* argv[]) {
 
     //IPC Arguments
     char path[PATH_MAX];
-    int _write = FALSE;
+    int _close = FALSE;
     char respSent = FALSE;
     char resp[DIM_RESP];  // = "1044,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647,2147483647";
-
+    int oldfl;
+    int pendingPath = 0;
     //Parsing Arguments--------------------------------------------------------------------
     if (argc != 3) {
         value_return = err_args_Q();
@@ -48,28 +49,30 @@ int main(int argc, char* argv[]) {
         if (part >= m) value_return = err_part_not_valid();
     }
 
-    if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
-        value_return = err_fcntl();
-    }
     if (fcntl(STDOUT_FILENO, F_SETFL, O_NONBLOCK)) {
         value_return = err_fcntl();
     }
-    while (value_return == 0 && !_write) {
-        if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //Legge un percorso
-            if (!strncmp(path, "///", 3)) {            //Se e' terminazione allora setta write a true e rimando indietro
-                _write = TRUE;
-                respSent = FALSE;
-                while (!respSent) {  //finchè la risposta non è stata inviata riprova
-                    if (write(STDOUT_FILENO, path, DIM_RESP) == -1) {
-                        if (errno != EAGAIN) {
-                            value_return = err_write();
-                        }
-                    } else {
-                        respSent = TRUE;
-                    }
-                }
+    char str[15];
+    sprintf(str, "%d.txt", getpid());
+    FILE* debug = fopen(str, "a");
+    fprintf(debug, "AVVIATO Q con m = %d part = %d\n", m, part);
+    fclose(debug);
+    
 
-            } else {  //Senno' analizzo il path
+    while (value_return == 0 && !_close) {
+        if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //Legge un percorso
+            pendingPath++;
+            if (pendingPath == 1) {
+                if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+                    value_return = err_fcntl();
+                }
+            }
+            debug = fopen(str, "a");
+            fprintf(debug, "Q: LEGGO %s\n", path);
+            fclose(debug);
+            if (!strncmp(path, "#CLOSE", 6)) {  //Se leggo una stringa di terminazione
+                _close = TRUE;                  //Setto end a true
+            } else {                            //Senno' analizzo il path
                 tmpDup = strdup(path);
                 id = strtok(tmpDup, "#");
                 analyze = strtok(NULL, "#");
@@ -84,6 +87,9 @@ int main(int argc, char* argv[]) {
                     fclose(fp);
                 }
                 createCsv(v, resp, id);
+                debug = fopen(str, "a");
+                fprintf(debug, "Q: ANALIZZATO %s \n", resp);
+                fclose(debug);
                 respSent = FALSE;
                 while (!respSent) {  //finchè la risposta non è stata inviata riprova
                     if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
@@ -92,10 +98,21 @@ int main(int argc, char* argv[]) {
                         }
                     } else {
                         respSent = TRUE;
+                        pendingPath--;
+                        debug = fopen(str, "a");
+                        fprintf(debug, "Q: RISCRIVO %s \n", resp);
+                        fclose(debug);
                     }
                 }
                 free(tmpDup);
             }
+        }
+        if (pendingPath == 0) {
+            oldfl = fcntl(STDIN_FILENO, F_GETFL);
+            if (oldfl == -1) {
+                /* handle error */
+            }
+            fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
         }
     }
 

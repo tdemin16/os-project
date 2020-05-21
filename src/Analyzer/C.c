@@ -20,14 +20,14 @@ int main(int argc, char* argv[]) {
     int nfiles = 0;  //number of files to retreive from pipe
     int n = 3;
     int m = 4;
-
+    int oldn;
     int i;
     int j;
     int k;
 
     char path[PATH_MAX];        //Paths da mandare ai figli
     char failedPath[PATH_MAX];  //Percorsi non inviati a causa della pipe piena
-
+    char sentClose = FALSE;
     char resp[DIM_RESP];    //Stringa con i valori ricevuta dai figli
     int part_received = 0;  //Parti ricevute
     int count = 0;          //Maintain the current amount of files sended
@@ -38,16 +38,20 @@ int main(int argc, char* argv[]) {
     int id;              //Indica il numero del figlio (necessario per calcolare quale pipe utilizzare)
     int size_pipe;       //Numero pipe * 4 (2 READ 2 WRITE)
 
+    char needFork = FALSE;
     char arrayArgomenti[2][4];  //Array di stringhe d'appoggio per la creazione degli args
     char* args[3];              //Argomenti da passare ai figli
     int _read = FALSE;          //Indica se ha finito di leggere dai figli
     int _write = FALSE;         //Indica se ha finito di scrivere
-
-    failedPath[0] = '\0';                           //Inizializza la stringa failed path
-    char stop = FALSE;                              //Bloccano la ricezione di nuovi dati dai figli
-    char end = FALSE;                               //per rinviare dati precedenti
-    char send_r = TRUE;                             //Controlla la dimensione della pipe del padre
-    int terminated[n];                              //Indica se un file e` stato mandato o meno
+    int _close = FALSE;
+    char* token;
+    failedPath[0] = '\0';  //Inizializza la stringa failed path
+    char stop = FALSE;     //Bloccano la ricezione di nuovi dati dai figli
+    char end = FALSE;      //per rinviare dati precedenti
+    char send_r = TRUE;    //Controlla la dimensione della pipe del padre
+    int terminated[n];     //Indica se un file e` stato mandato o meno
+    int oldfl;             //usato per togliere la O_NONBLOCK dai flag
+    int pendingPath = 0;
     for (i = 0; i < n; i++) terminated[i] = FALSE;  //Inizializzazione a FALSE
 
     //Parsing arguments------------------------------------------------------------------------------------------
@@ -95,9 +99,6 @@ int main(int argc, char* argv[]) {
         if (unlock_pipes(fd, size_pipe) == -1) {  //Set nonblocking pipes
             value_return = err_fcntl();           //Gestione errore sullo sblocco pipe
         }
-        if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {  //Sblocca lo stdin (teoricamente non necessario)
-            value_return = err_fcntl();                  //Gestione errore sullo sblocco pipe
-        }
     }
 
     //Forking----------------------------------------------------------------
@@ -119,15 +120,51 @@ int main(int argc, char* argv[]) {
     if (value_return == 0) {
         i = 0;
         k = 0;
-        if (f > 0) {                                                               //PARENT SIDE
-            while (value_return == 0 && (!_read || !_write)) {                     //Cicla finche` non ha finito di leggere o scrivere o va in errore
-                if (!_write) {                                                     //CICLO DI SCRITTURA
-                    if (count != nfiles) {                                         //Se non sono ancora tutti arraivati
-                        if (stop == FALSE) {                                       //E non ci troviamo in uno stato di stop per rinvio dati
-                            if (read(STDIN_FILENO, path, PATH_MAX) > 0) {          //provo a leggere
-                                                                                   //if (!strncmp(path,"#",1)){
-                                                                                   //    fprintf(stderr,"letto comando\n");
-                                                                                   // }else fprintf(stderr,"letto percorso\n");
+        if (f > 0) {  //PARENT SIDE
+            char str[15];
+            sprintf(str, "%d.txt", getpid());
+            FILE* debug = fopen(str, "a");
+            fprintf(debug, "AVVIATO C\n");
+            fclose(debug);
+            while (value_return == 0 && (!_close)) {  //Cicla finche` non ha finito di leggere o scrivere o va in errore
+                //write
+                if (!_write) {                                         //CICLO DI SCRITTURA
+                    if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
+                        if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere
+                            pendingPath++;
+                            if (pendingPath == 1) {
+                                if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+                                    value_return = err_fcntl();
+                                }
+                            }
+                            debug = fopen(str, "a");
+                            fprintf(debug, "C: LEGGO %s\n", path);
+                            fclose(debug);
+                            if (!strncmp(path, "#", 1)) {
+                                nClearAndClose(fd, n);              //Svuota le pipe in discesa e manda #CLOSE
+                                if (!strncmp(path, "#CLOSE", 6)) {  //Se leggo una stringa di terminazione
+                                    _close = TRUE;                  //Setto end a true
+                                } else if (!strncmp(path, "#SET", 4)) {
+                                    parseOnFly(path, &n, &m);  //Estrae n e m dalla stringa #SET#N#M#
+                                    size_pipe = n * 4;
+                                    fd = (int*)realloc(fd, size_pipe * sizeof(int));
+                                    //Alloco le pipes a due a due
+                                    for (i = 0; i < size_pipe - 1; i += 2) {
+                                        if (pipe(fd + i) == -1) {       //Controlla se ci sono errori nella creazione della pipe
+                                            value_return = err_pipe();  //In caso di errore setta il valore di ritorno
+                                        }
+                                    }
+                                    if (unlock_pipes(fd, size_pipe) == -1) {  //Set nonblocking pipes
+                                        value_return = err_fcntl();           //Gestione errore sullo sblocco pipe
+                                    }
+                                    if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {  //Sblocca lo stdin (teoricamente non necessario)
+                                        value_return = err_fcntl();                  //Gestione errore sullo sblocco pipe
+                                    }
+                                    forkC(&n, &f, &id, &value_return);
+                                    if (f == 0) execC(&m, &f, &id, fd, &value_return, &size_pipe);
+                                }
+                                pendingPath--;
+                            } else {
                                 if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {  //Provo a scrivere
                                     if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
                                         value_return = err_write();                //Setta il valore di ritorno
@@ -135,98 +172,76 @@ int main(int argc, char* argv[]) {
                                         stop = TRUE;
                                         strcpy(failedPath, path);
                                     }
-                                } else {              //scritto con successo
+                                } else {  //scritto con successo
+                                    debug = fopen(str, "a");
+                                    fprintf(debug, "C: Inviato a %d: %s\n", i, path);
+                                    fclose(debug);
                                     count++;          //Tengo conto della scrittura
                                     i = (i + 1) % n;  //Usato per ciclare su tutte le pipe in scrittura
                                 }
                             }
-                        } else {                                                     //Se c'e` uno stop sull'invio dei dati
-                            if (write(fd[i * 4 + 3], failedPath, PATH_MAX) == -1) {  //Test write
-                                if (errno != EAGAIN) {                               //Controlla che non sia una errore di pipe piena
-                                    value_return = err_write();                      //Setta il valore di ritorno
-                                }
-                            } else {
-                                stop = FALSE;     //Se la scrittura va a buon fine esco dallo stato di stop
-                                count++;          //Tengo conto dell'invio
-                                i = (i + 1) % n;  //Incremento i in maniera ciclica
-                            }
                         }
-                    } else {                       //Se tutti i file sono stati ricevuti allora devo inviare una stringa di terminazione: ///
-                        strcpy(path, "///");       //Crea la stringa
-                        end = TRUE;                //Setto end = true, se non ci sono problemi rimarrà true
-                        for (j = 0; j < n; j++) {  //Manda a tutti i processi P la fine della scrittura
-
-                            if (!terminated[j]) {                                  //Se non è ancora stato mandato a quel processo
-                                if (write(fd[j * 4 + 3], path, PATH_MAX) == -1) {  //Prova a scrivere
-                                    if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
-                                        value_return = err_write();                //Setta il valore di ritorno
-                                    } else {
-                                        terminated[j] = FALSE;  //Se non riesce a mandare
-                                        end = FALSE;            //Ha finito di mandare i caratteri di terminazione
-                                    }
-                                } else {
-                                    terminated[j] = TRUE;  //Se e` riuscito a mandare il file j
-                                }
+                    } else {                                                     //Se c'e` uno stop sull'invio dei dati
+                        if (write(fd[i * 4 + 3], failedPath, PATH_MAX) == -1) {  //Test write
+                            if (errno != EAGAIN) {                               //Controlla che non sia una errore di pipe piena
+                                value_return = err_write();                      //Setta il valore di ritorno
                             }
-                        }
-                        if (end == TRUE) {  //Finito di scrivere tutto
-                            _write = TRUE;
+                        } else {
+                            debug = fopen(str, "a");
+                            fprintf(debug, "C: Inviato a %d: %s\n", i, failedPath);
+                            fclose(debug);
+                            stop = FALSE;     //Se la scrittura va a buon fine esco dallo stato di stop
+                            count++;          //Tengo conto dell'invio
+                            i = (i + 1) % n;  //Incremento i in maniera ciclica
                         }
                     }
                 }
 
                 //Read
                 if (!_read) {
-                    if (send_r) {                                       //Coontrolla se non ci sonon valori non inviati
-                        if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {  //Prova a leggere dalla pipe
-                            if (!strncmp(resp, "///", 3)) {             //Lascia questo blocco
-                                part_received++;                        //Incrementa il numero di parti ricevute
-                                if (part_received == n) {               //Controlla di aver ricevuto tutte le parti
-                                    _read = TRUE;                       //Setta il flag a TRUE in caso positivo
-                                }
-                            } else {
-                                if (strstr(resp, "#") != NULL) {                       //Controlla che nella stringa sia contenuto il carattere #
-                                    if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {  //Prova a scrivere sulla pipe del padre
-                                        if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
-                                            value_return = err_write();                //Manda l'errore di write
-                                        } else {                                       //Caso in cui la pipe era piena
-                                            send_r = FALSE;                            //Passa al reinvio
-                                        }
+                    if (send_r) {                                                  //Coontrolla se non ci sonon valori non inviati
+                        if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {             //Prova a leggere dalla pipe
+                            if (strstr(resp, "#") != NULL) {                       //Controlla che nella stringa sia contenuto il carattere #
+                                if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {  //Prova a scrivere sulla pipe del padre
+                                    if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
+                                        value_return = err_write();                //Manda l'errore di write
+                                    } else {                                       //Caso in cui la pipe era piena
+                                        send_r = FALSE;                            //Passa al reinvio
                                     }
+                                } else {
+                                    pendingPath--;
                                 }
                             }
                         }
                     } else {
                         if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {     //Prova il reinvio dei dati al padre
                             if (errno != EAGAIN) value_return = err_write();  // Controlla che non ci sia un errore di pipe piena
-                        } else
+                        } else {
                             send_r = TRUE;  //Se ha inviato passa al prossimo elemento
+                            pendingPath--;
+                        }
                     }
                     k = (k + 1) % n;  //Cicla tra le pipes
                 }
+
+                if (pendingPath == 0) {
+                    oldfl = fcntl(STDIN_FILENO, F_GETFL);
+                    if (oldfl == -1) {
+                        /* handle error */
+                    }
+                    fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
+                }
             }
-            close_pipes(fd, size_pipe);  //Chiude tutte le pipes
-            free(fd);                    //Libera la memoria delle pipes
+            if (f > 0) {                     //Se e' un processo figlio,non deve liberare le pipe
+                close_pipes(fd, size_pipe);  //Chiude tutte le pipes
+                free(fd);                    //Libera la memoria delle pipes
+            }
         }
     }
 
     if (value_return == 0) {
         if (f == 0) {  //SON SIDE
-            //Creates char args
-            strcpy(arrayArgomenti[0], "./P");
-            sprintf(arrayArgomenti[1], "%d", m);
-            args[0] = arrayArgomenti[0];
-            args[1] = arrayArgomenti[1];
-            args[2] = NULL;
-
-            dup2(fd[id * 4 + 2], STDIN_FILENO);
-            dup2(fd[id * 4 + 1], STDOUT_FILENO);
-            close_pipes(fd, size_pipe);
-            free(fd);
-
-            if (execvp(args[0], args) == -1) {   //Test exec
-                value_return = err_exec(errno);  //Set value return
-            }
+            execC(&m, &f, &id, fd, &value_return, &size_pipe);
         }
     }
 
