@@ -47,7 +47,7 @@ int main() {
     catch_sigterm();
     signal(SIGINT, handle_sigint);  //Handler for SIGINT (Ctrl-C)
     p = create_process(1);  //Allocate dynamically p with dimension 1
-    insertProcess(p,getpid());
+    insertProcess(p,getpid()); //Insert process R into p list
 
     const char* fifo = "/tmp/A_R_Comm";
     int _close = FALSE;
