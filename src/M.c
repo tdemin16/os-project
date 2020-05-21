@@ -5,7 +5,7 @@ int check_command(char *str);  //controlla il comando un numero corrispondente: 
 process *p;  //Declaring p (it's global because hendle_sigint can't have parameters, only int sig)
 
 void handle_sigint(int sig) {
-    printf("\n[!] Ricevuta terminazione, inizio terminazione processi ... \n");
+    printf("\n[!] Ricevuta terminazione da M, inizio terminazione processo A ... \n");
     int i = p->count - 1;  //start from the end
     while (i != 0)         //while we haven't controlled every single process
     {
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
             value_return = err_fcntl();
         }
     }
-
+    insertProcess(p, getpid());
     if (value_return == 0) {
         for (i = 0; i < 2 && f > 0 && value_return == 0; i++) {
             f = fork();
@@ -77,7 +77,6 @@ int main(int argc, char *argv[]) {
 
     //--------------------------------------------------------------------------------
     if (value_return == 0) {
-        insertProcess(p, getpid());
         if (f > 0) {                             //PARENT SIDE
             while (!end && value_return == 0) {  //--------- CICLO DI ATTESA COMANDI IN INPUT
                 strcpy(cmd, "");                 //svuota la stringa per il prossimo comando
@@ -181,7 +180,7 @@ help			[da modificare
 //Codici Univoci
 //COdice per identificare un comando che deve essere mandato ad A. Per il momento io uso '2'
 int check_command(char *cmd) {
-    int res = -1;           //errore input comando
+    int res = -1;  //errore input comando
     if (strstr(cmd, "help") != NULL) {
         //mostra help comandi
         printf("Ci sarà una funzione help comandi\n");
