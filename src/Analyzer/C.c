@@ -127,6 +127,20 @@ int main(int argc, char const* argv[]) {
                                     _close = TRUE;                  //Setto end a true
                                 } else if (!strncmp(path, "#SET", 4)) {
                                     parseOnFly(path, &n, &m);  //Estrae n e m dalla stringa #SET#N#M#
+                                    size_pipe = n * 4;
+                                    fd = (int*)realloc(fd, size_pipe * sizeof(int));
+                                    //Alloco le pipes a due a due
+                                    for (i = 0; i < size_pipe - 1; i += 2) {
+                                        if (pipe(fd + i) == -1) {       //Controlla se ci sono errori nella creazione della pipe
+                                            value_return = err_pipe();  //In caso di errore setta il valore di ritorno
+                                        }
+                                    }
+                                    if (unlock_pipes(fd, size_pipe) == -1) {  //Set nonblocking pipes
+                                        value_return = err_fcntl();           //Gestione errore sullo sblocco pipe
+                                    }
+                                    if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {  //Sblocca lo stdin (teoricamente non necessario)
+                                        value_return = err_fcntl();                  //Gestione errore sullo sblocco pipe
+                                    }
                                     forkC(&n, &f, &id, &value_return);
                                     if (f == 0) execC(&m, &f, &id, fd, &value_return, &size_pipe);
                                 }
