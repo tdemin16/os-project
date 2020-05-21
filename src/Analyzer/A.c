@@ -1,38 +1,59 @@
 #include "../lib/lib.h"
 
-process *p;  //Declaring p (it's global because hendle_sigint can't have parameters, only int sig)
+int value_return = 0;  //Valore di ritorno, globale per "send_to_R"
+process *p;            //Declaring p (it's global because hendle_sigint can't have parameters, only int sig)
+int fd_fifo;           //pipe fifo con R
 
 void handle_sigint(int sig) {
-    printf("\n[!] Ricevuta terminazione, inizio terminazione processi ... \n");
+    printf("\n[!] Ricevuta terminazione per A, inizio terminazione processi C,P,Q ... \n");
     int i = p->count - 1;  //start from the end
-    while (i != 0)         //while we haven't controlled every single process
-    {
-        if (p->pid[i] > 0)  //Processo padre
+    if (i > 0) {
+        while (i != 0)  //while we haven't controlled every single process
         {
-            if (kill(p->pid[i], 9) == 0) {                                     //Tries to kill process with pid saved in pid[i]
-                printf("\tProcesso %d terminato con successo!\n", p->pid[i]);  //if it success you terminated it correctly
-            } else {
-                printf("\t[!] Errore, non sono riuscito a chiudere il processo %d!", p->pid[i]);  //if it fail something is wrong
+            if (p->pid[i] > 0)  //Processo padre
+            {
+                if (kill(p->pid[i], 9) == 0) {                                     //Tries to kill process with pid saved in pid[i]
+                    printf("\tProcesso %d terminato con successo!\n", p->pid[i]);  //if it success you terminated it correctly
+                } else {
+                    printf("\t[!] Errore, non sono riuscito a chiudere il processo %d!", p->pid[i]);  //if it fail something is wrong
+                }
             }
+            i--;  //i-- otherwise it will go to infinity
         }
-        i--;  //i-- otherwise it will go to infinity
+    }
+    if (!close(fd_fifo))  //close fifo
+    {
+        printf("[!] Chiusura fifo completata\n");
     }
     freeList(p);  //free memory allocated for p
-    printf("[!] ... Chiusura processi terminata\n");
+    printf("[!] ... Chiusura processi C,P,Q terminata\n");
     exit(-1);  //return exit with error -1
+}
+
+void sig_term_handler(int signum, siginfo_t *info, void *ptr) {
+    value_return = err_kill_process_A();
+}
+
+void catch_sigterm() {
+    static struct sigaction _sigact;
+
+    memset(&_sigact, 0, sizeof(_sigact));
+    _sigact.sa_sigaction = sig_term_handler;
+    _sigact.sa_flags = SA_SIGINFO;
+
+    sigaction(SIGTERM, &_sigact, NULL);
 }
 
 int main(int argc, char *argv[]) {
     printf("Start A\n");
+    catch_sigterm();
     signal(SIGINT, handle_sigint);  //Handler for SIGINT (Ctrl-C)
 
     p = create_process(1);  //Allocate dynamically p with dimension 1
 
-    int value_return = 0;  //Valore di ritorno, globale per "send_to_R"
-
     //COMMUNICATION WITH R
     const char *fifo = "/tmp/A_R_Comm";  //Nome fifo con R
-    int fd_fifo;                         //pipe fifo con R
+    //int fd_fifo;                         //pipe fifo con R
     char print_method[DIM_CMD];
     int retrieve = TRUE;
     int _write_val = -1;
@@ -53,6 +74,9 @@ int main(int argc, char *argv[]) {
     int count = 0;    //numero di file univoci da analizzare
     int perc = 0;     //Ricevimento parziale file
     int oldperc = 0;  //Parziale precedente
+
+    char analyzing = FALSE;
+    int pathSent = 0;
     char *tmp = NULL;
     char *tmpResp = NULL;
     char *tmpPercorso = NULL;
@@ -141,8 +165,7 @@ int main(int argc, char *argv[]) {
         if (f > 0) {              //PARENT SIDE
             insertProcess(p, f);  //Insert child process in list p
             i = 0;
-            //j = 0;
-            while (value_return == 0 && (/*!_read || !_write ||*/ !_close)) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
+            while (value_return == 0 && (!_close)) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
 
                 //M
                 if (!_close) {
@@ -181,6 +204,7 @@ int main(int argc, char *argv[]) {
                         }
                         //Aggiungere flags
 
+                        retrieve = TRUE;
                         do {
                             _write_val = write(fd_fifo, tmp_resp, DIM_RESP);
                             if (_write_val == -1) {
@@ -208,27 +232,35 @@ int main(int argc, char *argv[]) {
                         }
                     }
                 }
+                
 
-                //Write
-                if (!_write && value_return == 0) {                                //Esegue il blocco finche` non ha finito di scrivere
-                    if (write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
-                        if (errno != EAGAIN) {                                     //Se avviene un errore e non e` causato dalla dimensione della pipe
-                            value_return = err_write();                            //Ritorna l'errore sulla scrittura
+                //Quando WRITE e' in funzione inizia a mandare tutti i file con flag 0 di pathList
+                if (!_write && value_return == 0) {  //Esegue il blocco finche` non ha finito di scrivere
+                    analyzing = TRUE;
+                    if (lista->analyzed[i] == 0) {
+                        if (write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
+                            if (errno != EAGAIN) {                                     //Se avviene un errore e non e` causato dalla dimensione della pipe
+                                value_return = err_write();                            //Ritorna l'errore sulla scrittura
+                            } else {
+                                printf("pipe piena\n");
+                            }
+                        } else {
+                            //printf("count: %d, path:%s\n", lista->count, lista->pathList[i]);
+                            i++;
+                            pathSent++;
                         }
                     } else {
-                        i++;                //passa al prossimo elemento della lista
-                        if (i == count) {   //Qunado ha finito di inviare
-                            _write = TRUE;  //Setta il flag a true
-                            //setOnFly(1,1,fd_1);
-                        }
+                        i++;
+                    }
+                    if (i == lista->count) {  //Qunado ha finito di inviare
+                        _write = TRUE;  //Setta il flag a true
+                        i = 0;
                     }
                 }
 
-                if (_write) {
-                }
-
                 //Read
-                if (!_read) {                                    //Esegue il blocco fiche` non c'e` piu` nulla nella pipe
+
+                if (!_read && value_return == 0) {               //Esegue il blocco fiche` non c'e` piu` nulla nella pipe
                     if (read(fd_2[READ], resp, DIM_RESP) > 0) {  //Pero` potremmo vedere se sto controllo serve realmente
                         if (strstr(resp, "#") != NULL) {         //Controlla che ci sia almeno un # nel messaggio
                             tmp = strdup(resp);
@@ -256,18 +288,23 @@ int main(int argc, char *argv[]) {
                             }
 
                             //Barretta
-                            if ((int)((float)perc * 10 / (float)count) > oldperc && value_return == 0) {
+                            if ((int)((float)perc * 10 / (float)pathSent) > oldperc && value_return == 0) {
                                 oldperc = (int)((float)perc * 10 / (float)count);
                                 //system("clear");
                                 //percAvanzamento(perc, count);
                             }
 
-                            if (perc == count && value_return == 0) {
-                                _read = TRUE;
+                            if (perc == pathSent && value_return == 0) {
+                                analyzing = FALSE;
                                 //system("clear");
-                                //printf("Numero file analizzati: %d\nProcessi:%d\nSezioni:%d\n\n", count, n, m);
+                                printf("Numero file analizzati: %d\nProcessi:%d\nSezioni:%d\n", pathSent, n, m);
                                 arrayToCsv(v, sum);
                                 //printStat_Cluster(sum);
+                                //setOnFly(4,5,fd_1);
+                                //sleep(5);
+                                //closeAll(fd_1);
+                                //_close = TRUE;
+                                pathSent = 0;
                             }
 
                             free(tmpPercorso);

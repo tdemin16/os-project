@@ -41,8 +41,7 @@
 #define ERR_ARGS_P 17
 #define ERR_ENXIO 18
 #define ERR_ARGS_M 19
-
-#define SIGTERM_MSG "SIGTERM received.\n"
+#define ERR_KILL_PROC 20
 
 #define REMOVED -2
 #define INEXISTENCE -1
@@ -52,7 +51,6 @@
 
 #define A 0
 #define R 1
-
 
 typedef struct {
     int size;  //size of array
@@ -80,9 +78,6 @@ void insertProcess(process *, pid_t);
 void printList(process *);
 void freeList(process *);
 
-void sig_term_handler(int signum, siginfo_t *info, void *ptr);
-void catch_sigterm();
-
 //Array struct functions -- sostituiscono lista (momentaneamente?)
 array *createPathList(int);
 void reallocPathList(array *, int);
@@ -104,7 +99,14 @@ int parse_string(char *, int *v);
 void add_process_to_v(pid_t, int *);
 void initialize_processes(pid_t *, int);
 char fileExist(char *);
-void setOnFly(int,int,int*);
+void setOnFly(int, int, int *);
+void closeAll(int *);
+
+// /src/Analyzer/C.c
+void parseOnFly(char *, int *, int *);
+void nClearAndClose(int *, int);
+void forkC(int *, int *, int *, int *);
+void execC(int *, int *, int *, int *, int *, int *);
 
 // /src/Analyzer/Q.c
 void initialize_vector(int *);
@@ -165,5 +167,10 @@ int err_close();
 int err_args_R();
 int err_enxio();
 int err_args_M();
+int err_kill_process_R();
+int err_kill_process_A();
+int err_kill_process_C();
+int err_kill_process_P();
+int err_kill_process_Q();
 
 #endif

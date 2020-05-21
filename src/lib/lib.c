@@ -1,7 +1,9 @@
 #include "lib.h"
 
+/*
 void sig_term_handler(int signum, siginfo_t *info, void *ptr) {
     write(STDERR_FILENO, SIGTERM_MSG, sizeof(SIGTERM_MSG));
+    printf("CIao\n");
 }
 
 void catch_sigterm() {
@@ -13,6 +15,7 @@ void catch_sigterm() {
 
     sigaction(SIGTERM, &_sigact, NULL);
 }
+*/
 
 //Allocate memory for process* and process->pid
 process *create_process(int size) {
@@ -325,17 +328,94 @@ char fileExist(char *fname) {
     return ret;
 }
 
-void setOnFly(int n, int m, int * fd_1) {
+void setOnFly(int n, int m, int *fd_1) {
     char resp[DIM_RESP];
     while (read(fd_1[READ], resp, DIM_RESP) > 0) {
     }
     char onFly[PATH_MAX];
-    sprintf(onFly,"#setn %d#setm %d",n,m);
+    sprintf(onFly, "#SET#%d#%d#", n, m);
     if (write(fd_1[WRITE], onFly, PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
         if (errno != EAGAIN) {                        //Se avviene un errore e non e` causato dalla dimensione della pipe
             //value_return = err_write();               //Ritorna l'errore sulla scrittura
         } else
             fprintf(stderr, "errore set on-fly, pipe piena");
+    }
+}
+
+void closeAll(int *fd_1) {
+    char resp[DIM_RESP];
+    while (read(fd_1[READ], resp, DIM_RESP) > 0) {
+    }
+    if (write(fd_1[WRITE], "#CLOSE", PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
+        if (errno != EAGAIN) {                           //Se avviene un errore e non e` causato dalla dimensione della pipe
+            //value_return = err_write();               //Ritorna l'errore sulla scrittura
+        } else
+            fprintf(stderr, "errore set on-fly, pipe piena");
+    }
+}
+
+// /src/Analyzer/C.c
+void parseOnFly(char *path, int *n, int *m) {
+    char *token;
+    char *dupPath = strdup(path);
+    token = strtok(path, "#");
+    token = strtok(NULL, "#");
+    *n = atoi(token);
+    token = strtok(NULL, "#");
+    *m = atoi(token);
+    free(dupPath);
+}
+
+void nClearAndClose(int *fd, int n) {
+    int i;
+    char sentClose = FALSE;
+    char path[PATH_MAX];
+    int terminated[n];  //Indica se un file e` stato mandato o meno
+    for (i = 0; i < n; i++) {
+        while (read(fd[i * 4 + 3], path, PATH_MAX) > 0) {
+        }
+        terminated[i] = FALSE;
+    }
+    strcpy(path, "#CLOSE");
+    while (!sentClose) {
+        sentClose = TRUE;
+        for (i = 0; i < n; i++) {  //Provo a inviare path a tutti i Q
+            if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {
+                if (errno != EAGAIN) {
+                } else {
+                    sentClose = FALSE;  //Se non ci riesce setta send a false
+                    terminated[i] = FALSE;
+                }
+            } else {
+                terminated[i] = TRUE;
+            }
+        }
+    }
+}
+
+void forkC(int *n, int *f, int *id, int *value_return) {
+    int i;
+    for (i = 0; i<*n && * f> 0 && *value_return == 0; i++) {
+        *f = fork();
+        if (*f == 0) {
+            *id = i;                     //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
+        } else if (*f == -1) {           //Controllo che non ci siano stati errori durante il fork
+            *value_return = err_fork();  //In caso di errore setta il valore di ritorno a ERR_FORK
+        }
+    }
+}
+
+void execC(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) {
+    char str[12];
+    sprintf(str, "%d", *m);
+    char *args[3] = {"./P", str, NULL};
+    dup2(fd[*id * 4 + 2], STDIN_FILENO);
+    dup2(fd[*id * 4 + 1], STDOUT_FILENO);
+    close_pipes(fd, *size_pipe);
+    free(fd);
+    if (execvp(args[0], args) == -1) {  //Test exec
+        //fprintf(stderr, "%d", errno);
+        *value_return = err_exec(errno);  //Set value return
     }
 }
 
@@ -378,7 +458,10 @@ void initialize_vector(int *v) {
 void set_add(int *v, char c) {
     int val_ascii;
     val_ascii = ((int)c) - 32;  //casting char to int and difference 32 (in order to save space on the vector) //Se vogliamo togliere lo spazio basta fare -33
-    v[val_ascii]++;
+    if (val_ascii >= 0)
+    {
+        v[val_ascii]++;
+    }
 }
 
 //get the chars from the .txt files from the begin (b) to the end (e)
@@ -886,4 +969,29 @@ int err_enxio() {
 int err_args_M() {
     fprintf(stderr, "\nErrore nella sintassi del comando.\nUsa: /M nomeFile nomeCartella\nPuoi usare -setn e -setm per cambiare n e m\nes: /M A.c ../Analyzer/ -setn 3 -setm 4\n\n");
     return ERR_ARGS_M;
+}
+
+int err_kill_process_R() {
+    fprintf(stderr, "\n[!] Errore, il processo R è stato killato al di fuori del programma!\n");
+    return ERR_KILL_PROC;
+}
+
+int err_kill_process_A() {
+    fprintf(stderr, "\n[!] Errore, il processo A è stato killato al di fuori del programma!\n");
+    return ERR_KILL_PROC;
+}
+
+int err_kill_process_C() {
+    fprintf(stderr, "\n[!] Errore, il processo C è stato killato al di fuori del programma!\n");
+    return ERR_KILL_PROC;
+}
+
+int err_kill_process_P() {
+    fprintf(stderr, "\n[!] Errore, il processo P è stato killato al di fuori del programma!\n");
+    return ERR_KILL_PROC;
+}
+
+int err_kill_process_Q() {
+    fprintf(stderr, "\n[!] Errore, il processo Q è stato killato al di fuori del programma!\n");
+    return ERR_KILL_PROC;
 }

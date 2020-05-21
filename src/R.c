@@ -1,9 +1,55 @@
 #include "lib/lib.h"
+int value_return = 0;  //Valore di ritorno, globale per "send_to_R"
+process *p;            //Declaring p (it's global because hendle_sigint can't have parameters, only int sig)
+int fd_fifo;           //pipe fifo con R
+
+void handle_sigint(int sig) {
+    printf("\n[!] Ricevuta terminazione per R, inizio terminazione processo ... \n");
+    int i = p->count - 1;  //start from the end
+    if (i > 0) {
+        while (i != 0)  //while we haven't controlled every single process
+        {
+            if (p->pid[i] > 0)  //Processo padre
+            {
+                if (kill(p->pid[i], 9) == 0) {                                     //Tries to kill process with pid saved in pid[i]
+                    printf("\tProcesso %d terminato con successo!\n", p->pid[i]);  //if it success you terminated it correctly
+                } else {
+                    printf("\t[!] Errore, non sono riuscito a chiudere il processo %d!", p->pid[i]);  //if it fail something is wrong
+                }
+            }
+            i--;  //i-- otherwise it will go to infinity
+        }
+    }
+    if (!close(fd_fifo))  //close fifo
+    {
+        printf("[!] Chiusura fifo completata\n");
+    }
+    freeList(p);  //free memory allocated for p
+    printf("[!] ... Chiusura processo terminata\n");
+    exit(-1);  //return exit with error -1
+}
+
+void sig_term_handler(int signum, siginfo_t *info, void *ptr) {
+    value_return = err_kill_process_R();
+}
+
+void catch_sigterm() {
+    static struct sigaction _sigact;
+
+    memset(&_sigact, 0, sizeof(_sigact));
+    _sigact.sa_sigaction = sig_term_handler;
+    _sigact.sa_flags = SA_SIGINFO;
+
+    sigaction(SIGTERM, &_sigact, NULL);
+}
 
 int main() {
-    int value_return = 0;
+    catch_sigterm();
+    signal(SIGINT, handle_sigint);  //Handler for SIGINT (Ctrl-C)
+    p = create_process(1);  //Allocate dynamically p with dimension 1
+    insertProcess(p,getpid()); //Insert process R into p list
+
     const char* fifo = "/tmp/A_R_Comm";
-    int fd_fifo;
     int _close = FALSE;
     char cmd[DIM_CMD];
     int retrieve = FALSE;
@@ -105,6 +151,16 @@ int main() {
         }
     }
 
+<<<<<<< HEAD
+=======
+    if (value_return == 0) {
+        //if (unlink(fifo) == -1) {
+        //    value_return = err_unlink();
+        //}
+    }
+    freeList(p);
+
+>>>>>>> 930ad81154918815dc6a782a6991455b39c2e2a5
     return value_return;
 }
 

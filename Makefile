@@ -12,12 +12,12 @@ help:
 build:
 	@if [ ! -d "./bin" ]; then \
 	mkdir ./bin; fi
-	@gcc -g -Wall -Werror -std=gnu90 ./src/lib/lib.c ./src/Analyzer/A.c -o ./bin/A
-	@gcc -g -Wall -Werror -std=gnu90 ./src/lib/lib.c ./src/Analyzer/C.c -o ./bin/C
-	@gcc -g -Wall -Werror -std=gnu90 ./src/lib/lib.c ./src/Analyzer/P.c -o ./bin/P
-	@gcc -g -Wall -Werror -std=gnu90 ./src/lib/lib.c ./src/Analyzer/Q.c -o ./bin/Q
-	@gcc -g -Wall -Werror -std=gnu90 ./src/lib/lib.c ./src/R.c -o ./bin/R
-	@gcc -g -Wall -Werror -std=gnu90 ./src/lib/lib.c ./src/M.c -o ./bin/M
+	@gcc -g  -std=gnu90 ./src/lib/lib.c ./src/Analyzer/A.c -o ./bin/A
+	@gcc -g -std=gnu90 ./src/lib/lib.c ./src/Analyzer/C.c -o ./bin/C
+	@gcc -g  -std=gnu90 ./src/lib/lib.c ./src/Analyzer/P.c -o ./bin/P
+	@gcc -g  -std=gnu90 ./src/lib/lib.c ./src/Analyzer/Q.c -o ./bin/Q
+	@gcc -g  -std=gnu90 ./src/lib/lib.c ./src/R.c -o ./bin/R
+	@gcc -g  -std=gnu90 ./src/lib/lib.c ./src/M.c -o ./bin/M
 
 clean:
 	@rm -rf ./bin

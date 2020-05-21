@@ -5,4 +5,4 @@ BUILD_DIR="bin/"
 $CLEAN
 $MAKE
 cd $BUILD_DIR
-./M ../src/Analyzer
+./A ../src/
