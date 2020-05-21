@@ -151,16 +151,8 @@ int main() {
         }
     }
 
-<<<<<<< HEAD
-=======
-    if (value_return == 0) {
-        //if (unlink(fifo) == -1) {
-        //    value_return = err_unlink();
-        //}
-    }
     freeList(p);
-
->>>>>>> 930ad81154918815dc6a782a6991455b39c2e2a5
+    
     return value_return;
 }
 
