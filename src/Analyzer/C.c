@@ -25,8 +25,8 @@ int main(int argc, char* argv[]) {
 
     char path[PATH_MAX];        //Paths da mandare ai figli
     char failedPath[PATH_MAX];  //Percorsi non inviati a causa della pipe piena
-    char resp[DIM_RESP];    //Stringa con i valori ricevuta dai figli
-    int count = 0;          //Maintain the current amount of files sended
+    char resp[DIM_RESP];        //Stringa con i valori ricevuta dai figli
+    int count = 0;              //Maintain the current amount of files sended
 
     //IPC Variables
     int* fd;             //pipes
@@ -34,15 +34,14 @@ int main(int argc, char* argv[]) {
     int id;              //Indica il numero del figlio (necessario per calcolare quale pipe utilizzare)
     int size_pipe;       //Numero pipe * 4 (2 READ 2 WRITE)
 
-    int _read = FALSE;          //Indica se ha finito di leggere dai figli
-    int _write = FALSE;         //Indica se ha finito di scrivere
+    int _read = FALSE;   //Indica se ha finito di leggere dai figli
+    int _write = FALSE;  //Indica se ha finito di scrivere
     int _close = FALSE;
     failedPath[0] = '\0';  //Inizializza la stringa failed path
     char stop = FALSE;     //Bloccano la ricezione di nuovi dati dai figli
     char send_r = TRUE;    //Controlla la dimensione della pipe del padre
     int oldfl;             //usato per togliere la O_NONBLOCK dai flag
     int pendingPath = 0;
-    
 
     //Parsing arguments------------------------------------------------------------------------------------------
     if (argc % 2 == 0 || argc < 2) {  //if number of arguments is even or less than 1, surely it's a wrong input
@@ -118,8 +117,11 @@ int main(int argc, char* argv[]) {
             fclose(debug);
             while (value_return == 0 && (!_close)) {  //Cicla finche` non ha finito di leggere o scrivere o va in errore
                 //write
-                if (!_write) {                                         //CICLO DI SCRITTURA
-                    if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
+                if (!_write) {            //CICLO DI SCRITTURA
+                    if (stop == FALSE) {  //E non ci troviamo in uno stato di stop per rinvio dati
+                        debug = fopen(str, "a");
+                        fprintf(debug, "C: PRONTO A LEGGERE \n");
+                        fclose(debug);
                         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere
                             pendingPath++;
                             if (pendingPath == 1) {
