@@ -147,14 +147,13 @@ void reallocPathList(array *tmp, int newSize) {
 void printPathList(array *tmp) {
     int i;
     if (tmp->count == 0) {
-        printf("Lista vuota\n");
+        printf("\nLista vuota\n\n");
     }
     for (i = 0; i < tmp->count; i++) {
         usleep(10000);
         printf("%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
         //fprintf(stderr, "%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
     }
-    printf("> ");fflush(stdout);
 }
 
 int dimPathList(array *tmp) {
