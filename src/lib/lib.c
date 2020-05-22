@@ -78,10 +78,23 @@ char insertPathList(array *tmp, char *c, int val) {
     int i;
     char present = FALSE;
     char ret = FALSE;
+    char * dup1 = NULL;
+    char * dup2 = NULL;
+    char * compare1;
+    char * compare2;
     for (i = 0; i < tmp->count; i++) {
-        if (!strcmp(tmp->pathList[i], c)) {
+        dup1 = strdup(tmp->pathList[i]);
+        dup2 = strdup(c);
+        compare1 = strtok(dup1,"#");
+        compare1 = strtok(NULL,"#");
+        compare2 = strtok(dup2,"#");
+        compare2 = strtok(NULL,"#");
+        
+        if (!strcmp(compare1, compare2)) {
             present = TRUE;
         }
+        free(dup1);
+        free(dup2);
     }
     if (present == FALSE) {
         //printf("Provo a inserire %s, size: %d, count:%d\n", c, tmp->size, tmp->count);
@@ -234,6 +247,7 @@ int parser(int argc, char *argv[], array *lista, int *count, int *n, int *m) {
     char setn = FALSE;             // se setn = true, n è stato cambiato
     char setm = FALSE;             // se setn = true, m è stato cambiato
     char errdir = FALSE;
+    //int start = lista->count;
     FILE *fp;
     char riga[1035];
 
@@ -298,7 +312,7 @@ int parser(int argc, char *argv[], array *lista, int *count, int *n, int *m) {
                             resolved_path[strlen(resolved_path) - 1] = 0;  //tolgo l'ultimo carattere che manderebbe a capo
                             char str[12];
                             char path[PATH_MAX];
-                            sprintf(str, "%d", *count);
+                            sprintf(str, "%d", lista->count);
                             strcpy(path, str);
                             strcat(path, "#");
                             strcat(path, resolved_path);

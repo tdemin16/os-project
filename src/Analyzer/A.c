@@ -214,6 +214,8 @@ int main(int argc, char *argv[]) {
                         if (!strncmp(cmd, "reset", 5)) {
                             resetPathList(lista);
                             count = 0;
+                            memset(sum, '\0', sizeof(char) * DIM_RESP);
+                            initialize_vector(v);
                             printf("> ");
                             fflush(stdout);
                         }
@@ -225,11 +227,9 @@ int main(int argc, char *argv[]) {
                         }
 
                         if (!strncmp(cmd, "analyze", 7)) {
-                            memset(sum, '\0', sizeof(char) * DIM_RESP);
-                            initialize_vector(v);
                             pathSent = 0;
                             if (count > 0)
-                                _write = TRUE;
+                                _write = FALSE;
                             else
                                 printf("Non ci sono file da analizzare\n");
                             printf("> ");
