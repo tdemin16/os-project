@@ -196,10 +196,12 @@ int main(int argc, char *argv[]) {
 
                         if (!strncmp(cmd, "reset", 5)) {
                             resetPathList(lista);
+                            printf("> ");fflush(stdout);
                         }
 
                         if (!strncmp(cmd, "print", 5)) {
                             printPathList(lista);
+                            printf("> ");fflush(stdout);
                         }
 
                         if (!strncmp(cmd, "analyze", 7)) {
