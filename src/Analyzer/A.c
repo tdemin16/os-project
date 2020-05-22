@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
     int perc = 0;     //Ricevimento parziale file
     int oldperc = 0;  //Parziale precedente
 
-    char analyzing = FALSE;
+    //char analyzing = FALSE;
     int pathSent = 0;
     char *tmp = NULL;
     char *tmpResp = NULL;
@@ -236,7 +236,7 @@ int main(int argc, char *argv[]) {
 
                 //Quando WRITE e' in funzione inizia a mandare tutti i file con flag 0 di pathList
                 if (!_write && value_return == 0) {  //Esegue il blocco finche` non ha finito di scrivere
-                    analyzing = TRUE;
+                    //analyzing = TRUE;
                     if (lista->analyzed[i] == 0) {
                         if (write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
                             if (errno != EAGAIN) {                                     //Se avviene un errore e non e` causato dalla dimensione della pipe
@@ -298,7 +298,7 @@ int main(int argc, char *argv[]) {
                             }
 
                             if (perc == pathSent && value_return == 0) {
-                                analyzing = FALSE;
+                                //analyzing = FALSE;
                                 _read = FALSE;
                                 //system("clear");
                                 printf("Numero file analizzati: %d\n", pathSent);

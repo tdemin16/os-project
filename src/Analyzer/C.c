@@ -20,16 +20,12 @@ int main(int argc, char* argv[]) {
     int nfiles = 0;  //number of files to retreive from pipe
     int n = 3;
     int m = 4;
-    int oldn;
     int i;
-    int j;
     int k;
 
     char path[PATH_MAX];        //Paths da mandare ai figli
     char failedPath[PATH_MAX];  //Percorsi non inviati a causa della pipe piena
-    char sentClose = FALSE;
     char resp[DIM_RESP];    //Stringa con i valori ricevuta dai figli
-    int part_received = 0;  //Parti ricevute
     int count = 0;          //Maintain the current amount of files sended
 
     //IPC Variables
@@ -38,21 +34,15 @@ int main(int argc, char* argv[]) {
     int id;              //Indica il numero del figlio (necessario per calcolare quale pipe utilizzare)
     int size_pipe;       //Numero pipe * 4 (2 READ 2 WRITE)
 
-    char needFork = FALSE;
-    char arrayArgomenti[2][4];  //Array di stringhe d'appoggio per la creazione degli args
-    char* args[3];              //Argomenti da passare ai figli
     int _read = FALSE;          //Indica se ha finito di leggere dai figli
     int _write = FALSE;         //Indica se ha finito di scrivere
     int _close = FALSE;
-    char* token;
     failedPath[0] = '\0';  //Inizializza la stringa failed path
     char stop = FALSE;     //Bloccano la ricezione di nuovi dati dai figli
-    char end = FALSE;      //per rinviare dati precedenti
     char send_r = TRUE;    //Controlla la dimensione della pipe del padre
-    int terminated[n];     //Indica se un file e` stato mandato o meno
     int oldfl;             //usato per togliere la O_NONBLOCK dai flag
     int pendingPath = 0;
-    for (i = 0; i < n; i++) terminated[i] = FALSE;  //Inizializzazione a FALSE
+    
 
     //Parsing arguments------------------------------------------------------------------------------------------
     if (argc % 2 == 0 || argc < 2) {  //if number of arguments is even or less than 1, surely it's a wrong input

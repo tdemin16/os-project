@@ -380,14 +380,16 @@ void nClearAndClose(int *fd, int n) {
     while (!sentClose) {
         sentClose = TRUE;
         for (i = 0; i < n; i++) {  //Provo a inviare path a tutti i Q
-            if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {
-                if (errno != EAGAIN) {
+            if (!terminated[i]) {
+                if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {
+                    if (errno != EAGAIN) {
+                    } else {
+                        sentClose = FALSE;  //Se non ci riesce setta send a false
+                        terminated[i] = FALSE;
+                    }
                 } else {
-                    sentClose = FALSE;  //Se non ci riesce setta send a false
-                    terminated[i] = FALSE;
+                    terminated[i] = TRUE;
                 }
-            } else {
-                terminated[i] = TRUE;
             }
         }
     }
@@ -458,8 +460,7 @@ void initialize_vector(int *v) {
 void set_add(int *v, char c) {
     int val_ascii;
     val_ascii = ((int)c) - 32;  //casting char to int and difference 32 (in order to save space on the vector) //Se vogliamo togliere lo spazio basta fare -33
-    if (val_ascii >= 0)
-    {
+    if (val_ascii >= 0) {
         v[val_ascii]++;
     }
 }

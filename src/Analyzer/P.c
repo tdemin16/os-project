@@ -36,10 +36,8 @@ int main(int argc, char* argv[]) {
     array* sum = createPathList(10);
     char array[4][4];
     char* args[4];
-    int count = 0;
     char send_w = TRUE;
     char send_r = TRUE;
-    char end = FALSE;
     int terminated[m];
     for (i = 0; i < m; i++) {
         terminated[i] = FALSE;
