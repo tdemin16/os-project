@@ -192,21 +192,20 @@ int main(int argc, char *argv[]) {
                                     for (j = 1; j < argCounter; j++) {
                                         strcpy(tempPath[j], strtok(NULL, " "));
                                     }
-                                    value_return = parser(argCounter, tempPath, lista, &count, &n, &m);  //Controlla i parametri passati ad A
-                                    printf("value error: %d\n", value_return);
+                                    parser(argCounter, tempPath, lista, &count, &n, &m);  //Controlla i parametri passati ad A
                                     for (j = 0; j < argCounter; j++) {
                                         //printf("ARG[%d] - %s\n",j,tempPath[j]);
                                         free(tempPath[j]);
                                     }
                                     free(tempPath);
-                                    printf("Tutto deallocato\n");
                                 } else {
-                                    value_return = err_args_A();
+                                    err_args_A();
                                 }
                             } else {
                                 printf("Analisi in corso, comando non disponibile\n");
                             }
-                            printf("fine add\n");
+                            printf("> ");
+                            fflush(stdout);
                         }
 
                         if (!strncmp(cmd, "remove", 6)) {
@@ -214,6 +213,7 @@ int main(int argc, char *argv[]) {
 
                         if (!strncmp(cmd, "reset", 5)) {
                             resetPathList(lista);
+                            count = 0;
                             printf("> ");
                             fflush(stdout);
                         }
@@ -228,11 +228,12 @@ int main(int argc, char *argv[]) {
                             memset(sum, '\0', sizeof(char) * DIM_RESP);
                             initialize_vector(v);
                             pathSent = 0;
-                            printf("%d aaa\n", count);
                             if (count > 0)
                                 _write = TRUE;
                             else
                                 printf("Non ci sono file da analizzare\n");
+                            printf("> ");
+                            fflush(stdout);
                         }
                     }
                 }
