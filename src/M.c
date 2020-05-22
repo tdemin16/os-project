@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     int i;
     int id;
     FILE *fptr;
-    char c;
+    int c;
 
     //IPC Variables--------------------------------------------------
     int fd[4];
@@ -118,7 +118,8 @@ int main(int argc, char *argv[]) {
                         }
                     }
                     _write = TRUE;
-                    while (wait(NULL) > 0);
+                    while (wait(NULL) > 0)
+                        ;
                 }
 
                 if (res_cmd == 1) {
@@ -149,14 +150,11 @@ int main(int argc, char *argv[]) {
 
                 if (res_cmd == 3) {
                     fptr = fopen("../README.md", "r");
-                    if (fptr == NULL) err_file_open();
-
-                    c = getc(fptr);
-                    while (c != EOF) {
-                        printf("%c", c);
-                        c = getc(fptr);
+                    if (fptr) {
+                        while ((c = getc(fptr)) != EOF)
+                            putchar(c);
+                        fclose(fptr);
                     }
-                    fclose(fptr);
                     printf("> ");
                 }
             }
