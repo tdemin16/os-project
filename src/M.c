@@ -38,6 +38,8 @@ int main(int argc, char *argv[]) {
     int _write = TRUE;
     int i;
     int id;
+    FILE *fptr;
+    char c;
 
     //IPC Variables--------------------------------------------------
     int fd[4];
@@ -80,7 +82,6 @@ int main(int argc, char *argv[]) {
         if (f > 0) {                             //PARENT SIDE
             while (!end && value_return == 0) {  //--------- CICLO DI ATTESA COMANDI IN INPUT
                 strcpy(cmd, "");                 //svuota la stringa per il prossimo comando
-                //printf("> ");
                 fflush(stdout);
                 ch = '\0';
                 while (ch != '\n') {  //fino al "lancio" (invio, '\n') del comando continua a leggere caratteri
@@ -89,10 +90,12 @@ int main(int argc, char *argv[]) {
                 }
 
                 res_cmd = check_command(cmd);
+
                 if (res_cmd == -1) {
                     //richiama la funzione help() coi comandi
-                    printf("Comando inserito non corretto\n");
+                    printf("Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n> ");
                 }
+
                 if (res_cmd == 0) {
                     end = TRUE;
                     while (value_return == 0 && _write) {
@@ -115,8 +118,9 @@ int main(int argc, char *argv[]) {
                         }
                     }
                     _write = TRUE;
-                    while(wait(NULL) > 0);
+                    while (wait(NULL) > 0);
                 }
+
                 if (res_cmd == 1) {
                     while (value_return == 0 && _write) {
                         if (write(fd[R * 2 + WRITE], cmd, DIM_CMD) == -1) {
@@ -129,6 +133,7 @@ int main(int argc, char *argv[]) {
                     }
                     _write = TRUE;
                 }
+
                 if (res_cmd == 2) {
                     while (value_return == 0 && _write) {
                         if (write(fd[A * 2 + WRITE], cmd, DIM_CMD) == -1) {
@@ -140,6 +145,19 @@ int main(int argc, char *argv[]) {
                         }
                     }
                     _write = TRUE;
+                }
+
+                if (res_cmd == 3) {
+                    fptr = fopen("../README.md", "r");
+                    if (fptr == NULL) err_file_open();
+
+                    c = getc(fptr);
+                    while (c != EOF) {
+                        printf("%c", c);
+                        c = getc(fptr);
+                    }
+                    fclose(fptr);
+                    printf("> ");
                 }
             }
             close(fd[R * 2 + WRITE]);
@@ -192,22 +210,21 @@ int main(int argc, char *argv[]) {
     return value_return;
 }
 
-
-
 //Codici Univoci
 //COdice per identificare un comando che deve essere mandato ad A. Per il momento io uso '2'
 int check_command(char *cmd) {
+    printf("%s-----------\n", cmd);
     int res = -1;  //errore input comando
-    if (strstr(cmd, "help") != NULL) {
-        //mostra help comandi
-        printf("Ci sarà una funzione help comandi\n");
-        res = 1;
-    } else if (strstr(cmd, "close") != NULL) {
+
+    if (strstr(cmd, "close") != NULL) {  //CLOSE
         res = 0;
-    } else if (strstr(cmd, "-c") != NULL) {
+    } else if (strstr(cmd, "-c") != NULL) {  //R
         res = 1;
-    } else {  //Provvisorio per testare A in quanto manca il branch per i comandi da mandargli
+    } else if (strstr(cmd, "add") != NULL) {  //A
         res = 2;
+    } else if (strstr(cmd, "help") != NULL) {  //HELP
+        res = 3;
     }
+
     return res;
 }

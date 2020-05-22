@@ -306,6 +306,7 @@ int main(int argc, char *argv[]) {
                                 printf("Numero file analizzati: %d\n", pathSent);
                                 arrayToCsv(v, sum);
                                 printStat_Cluster(sum);
+                                printf("\n> "); fflush(stdout);
                                 //setOnFly(4,5,fd_1);
                                 //sleep(5);
                                 //closeAll(fd_1);
