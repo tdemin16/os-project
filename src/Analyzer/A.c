@@ -183,6 +183,7 @@ int main(int argc, char *argv[]) {
                         if (!strncmp(cmd, "add", 3)) {
                             if (!analyzing) {
                                 if (checkAdd(cmd, &argCounter)) {
+
                                 } else {
                                     value_return = err_args_A();
                                 }
@@ -191,7 +192,7 @@ int main(int argc, char *argv[]) {
                             }
                         }
 
-                        if (!strncmp(cmd, "remove", 5)) {
+                        if (!strncmp(cmd, "remove", 6)) {
                         }
 
                         if (!strncmp(cmd, "reset", 5)) {
