@@ -241,7 +241,7 @@ int parser(int argc, char *argv[], array *lista, int *count, int *n, int *m) {
         value_return = err_args_A();
     } else {
         for (i = 1; i < argc && value_return == 0; i++) {
-            //printf("Argv: %s\n",argv[i]);
+            printf("Argv: %s\n",argv[i]);
             if (!strcmp(argv[i], "-setn")) {  //----ERRORI -setn
                 if (i + 1 < argc) {           //controlla che ci sia effettivamente un argomento dopo il -setn
                     *n = atoi(argv[i + 1]);
