@@ -236,7 +236,7 @@ int parser(int argc, char *argv[], array *lista, int *count, int *n, int *m) {
     char errdir = FALSE;
     FILE *fp;
     char riga[1035];
-
+    *count = 0;
     if (argc < 1) {  //if number of arguments is even or less than 1, surely it's a wrong input
         value_return = err_args_A();
     } else {
@@ -365,6 +365,30 @@ void closeAll(int *fd_1) {
             //value_return = err_write();               //Ritorna l'errore sulla scrittura
         }
     }
+}
+
+char checkAdd(char cmd[DIM_CMD], int *argCounter) {
+    int j;
+    char ret = TRUE;
+    printf("%s\n", cmd);
+    if (!(strstr(cmd, "  ") != NULL)) {
+        *argCounter = 0;
+        for (j = 0; j < DIM_CMD; j++) {
+            //printf("%d\n", cmd[j]);
+            if (cmd[j] == ' ') {
+                (*argCounter)++;
+            }
+            if (cmd[j] == '\0') {
+                if (cmd[j - 1] == ' ')
+                    ret = FALSE;
+                else
+                    j = DIM_CMD - 1;
+            }
+        }
+    } else {
+        ret = FALSE;
+    }
+    return ret;
 }
 
 // /src/Analyzer/C.c

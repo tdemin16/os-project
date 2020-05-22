@@ -104,6 +104,9 @@ char fileExist(char *);
 void setOnFly(int, int, int *);
 void closeAll(int *);
 
+//parser A.c
+char checkAdd(char *,int *);
+
 // /src/Analyzer/C.c
 void parseOnFly(char *, int *, int *);
 void nClearAndClose(int *, int);

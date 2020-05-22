@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
     int perc = 0;     //Ricevimento parziale file
     int oldperc = 0;  //Parziale precedente
 
-    //char analyzing = FALSE;
+    char analyzing = FALSE;
     int pathSent = 0;
     char *tmp = NULL;
     char *tmpResp = NULL;
@@ -97,8 +97,9 @@ int main(int argc, char *argv[]) {
     char *file;           //Messaggio senza Id e identificatori (#)
     int firstVal = 0;     //Controllo sulla validita' di un messaggio
     char sum[DIM_RESP];
-    int v[DIM_V];          //Array con valori totali
-    int notAnalyzed = 0;   //Flag indicante se e` avvenuta o meno la lettura della pipe
+    int v[DIM_V];         //Array con valori totali
+    int notAnalyzed = 0;  //Flag indicante se e` avvenuta o meno la lettura della pipe
+    int argCounter = 0;
     initialize_vector(v);  //Inizializzazione vettore dei valori totali
 
     value_return = parser(argc, argv, lista, &count, &n, &m);  //Controlla i parametri passati ad A
@@ -173,9 +174,42 @@ int main(int argc, char *argv[]) {
                         if (!strncmp(cmd, "close", 5)) {
                             closeAll(fd_1);
 
-                            while (wait(NULL) > 0);
+                            while (wait(NULL) > 0)
+                                ;
                             _close = TRUE;
                             printf("A: Closing...\n");
+                        }
+
+                        if (!strncmp(cmd, "add", 3)) {
+                            if (!analyzing) {
+                                if (checkAdd(cmd, &argCounter)) {
+                                } else {
+                                    value_return = err_args_A();
+                                }
+                            } else {
+                                printf("Analisi in corso, comando non disponibile\n");
+                            }
+                        }
+
+                        if (!strncmp(cmd, "remove", 5)) {
+                        }
+
+                        if (!strncmp(cmd, "reset", 5)) {
+                            resetPathList(lista);
+                        }
+
+                        if (!strncmp(cmd, "print", 5)) {
+                            printPathList(lista);
+                        }
+
+                        if (!strncmp(cmd, "analyze", 7)) {
+                            memset(sum, '\0', sizeof(char) * DIM_RESP);
+                            initialize_vector(v);
+                            pathSent = 0;
+                            if (count > 0)
+                                _write = TRUE;
+                            else
+                                printf("Non ci sono file da analizzare capra\n");
                         }
                     }
                 }
@@ -238,7 +272,7 @@ int main(int argc, char *argv[]) {
 
                 //Quando WRITE e' in funzione inizia a mandare tutti i file con flag 0 di pathList
                 if (!_write && value_return == 0) {  //Esegue il blocco finche` non ha finito di scrivere
-                    //analyzing = TRUE;
+                    analyzing = TRUE;
                     if (lista->analyzed[i] == 0) {
                         if (write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
                             if (errno != EAGAIN) {                                     //Se avviene un errore e non e` causato dalla dimensione della pipe
@@ -294,19 +328,20 @@ int main(int argc, char *argv[]) {
 
                             //Barretta
                             if ((int)((float)perc * 10 / (float)pathSent) > oldperc && value_return == 0) {
-                                oldperc = (int)((float)perc * 10 / (float)count);
+                                oldperc = (int)((float)perc * 10 / (float)pathSent);
                                 //system("clear");
                                 //percAvanzamento(perc, count);
                             }
 
                             if (perc == pathSent && value_return == 0) {
-                                //analyzing = FALSE;
+                                analyzing = FALSE;
                                 _read = FALSE;
                                 //system("clear");
                                 printf("Numero file analizzati: %d\n", pathSent);
                                 arrayToCsv(v, sum);
                                 printStat_Cluster(sum);
-                                printf("\n> "); fflush(stdout);
+                                printf("\n> ");
+                                fflush(stdout);
                                 //setOnFly(4,5,fd_1);
                                 //sleep(5);
                                 //closeAll(fd_1);

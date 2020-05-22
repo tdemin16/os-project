@@ -218,7 +218,7 @@ int check_command(char *cmd) {
         res = 0;
     } else if (strstr(cmd, "-c") != NULL) {  //R
         res = 1;
-    } else if (strstr(cmd, "add") != NULL) {  //A
+    } else if ((strstr(cmd, "add") != NULL) || (strstr(cmd, "remove") != NULL) || (strstr(cmd, "reset") != NULL) || (strstr(cmd, "print") != NULL) || (strstr(cmd, "analyze") != NULL)) {  //A
         res = 2;
     } else if (strstr(cmd, "help") != NULL) {  //HELP
         res = 3;
