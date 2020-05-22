@@ -188,14 +188,14 @@ int main(int argc, char *argv[]) {
                                     for (j = 0; j < argCounter; j++) {
                                         tempPath[j] = malloc(PATH_MAX * sizeof(char));
                                     }
-                                    strtok(cmd," ");
-                                    for (j = 0; j< argCounter; j++){
+                                    strcpy(tempPath[0],strtok(cmd," "));
+                                    for (j = 1; j< argCounter; j++){
                                         strcpy(tempPath[j],strtok(NULL," "));
                                     }
                                     value_return = parser(argCounter, tempPath, lista, &count, &n, &m);  //Controlla i parametri passati ad A
-                                    printf("%d\n",value_return);
+                                    //printf("%d\n",value_return);
                                     for (j = 0; j < argCounter; j++) {
-                                        printf("ARG[%d] - %s\n",j,tempPath[j]);
+                                        //printf("ARG[%d] - %s\n",j,tempPath[j]);
                                         free(tempPath[j]);
                                     }
                                     free(tempPath);

@@ -237,11 +237,12 @@ int parser(int argc, char *argv[], array *lista, int *count, int *n, int *m) {
     FILE *fp;
     char riga[1035];
     *count = 0;
+
     if (argc < 1) {  //if number of arguments is even or less than 1, surely it's a wrong input
         value_return = err_args_A();
     } else {
         for (i = 1; i < argc && value_return == 0; i++) {
-            printf("Argv: %s\n",argv[i]);
+            //printf("Argv: %s\n", argv[i]);
             if (!strcmp(argv[i], "-setn")) {  //----ERRORI -setn
                 if (i + 1 < argc) {           //controlla che ci sia effettivamente un argomento dopo il -setn
                     *n = atoi(argv[i + 1]);
@@ -370,9 +371,8 @@ void closeAll(int *fd_1) {
 char checkAdd(char cmd[DIM_CMD], int *argCounter) {
     int j;
     char ret = TRUE;
-    printf("%s\n", cmd);
     if (!(strstr(cmd, "  ") != NULL)) {
-        *argCounter = 0;
+        *argCounter = 1;
         for (j = 0; j < DIM_CMD; j++) {
             //printf("%d\n", cmd[j]);
             if (cmd[j] == ' ') {
