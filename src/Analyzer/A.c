@@ -307,7 +307,7 @@ int main(int argc, char *argv[]) {
                                 //printStat_Cluster(sum);
                                 //setOnFly(4,5,fd_1);
                                 //sleep(5);
-                                //closeAll(fd_1);
+                                closeAll(fd_1);
                                 //_close = TRUE;
                                 pathSent = 0;
                             }

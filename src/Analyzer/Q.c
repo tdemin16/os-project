@@ -2,7 +2,7 @@
 #include "../lib/lib.h"
 int value_return = 0;
 
-void sig_term_handler(int signum, siginfo_t *info, void *ptr) {
+void sig_term_handler(int signum, siginfo_t* info, void* ptr) {
     value_return = err_kill_process_Q();
 }
 
@@ -18,12 +18,12 @@ void catch_sigterm() {
 
 int main(int argc, char* argv[]) {
     catch_sigterm();
-    
+
     //Arguments passed
     int part;
     int m;
     int v[DIM_V];
-    
+
     FILE* fp;
     char* id;
     char* analyze;
@@ -57,7 +57,6 @@ int main(int argc, char* argv[]) {
     FILE* debug = fopen(str, "a");
     fprintf(debug, "AVVIATO Q con m = %d part = %d\n", m, part);
     fclose(debug);
-    
 
     while (value_return == 0 && !_close) {
         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //Legge un percorso
@@ -113,6 +112,18 @@ int main(int argc, char* argv[]) {
                 /* handle error */
             }
             fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
+        }
+    }
+
+    respSent = FALSE;
+    strcpy(resp, "#CLOSE");
+    while (!respSent) {  //finchè la risposta non è stata inviata riprova
+        if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
+            if (errno != EAGAIN) {
+                value_return = err_write();
+            }
+        } else {
+            respSent = TRUE;
         }
     }
 
