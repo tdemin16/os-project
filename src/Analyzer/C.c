@@ -99,9 +99,7 @@ int main(int argc, char* argv[]) {
                 id = i;                     //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
             } else if (f == -1) {           //Controllo che non ci siano stati errori durante il fork
                 value_return = err_fork();  //In caso di errore setta il valore di ritorno a ERR_FORK
-            }                               /*else{
-                //insert_process(f);
-            }*/
+            }
         }
     }
 
