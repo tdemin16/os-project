@@ -115,6 +115,7 @@ int main(int argc, char *argv[]) {
                         }
                     }
                     _write = TRUE;
+                    while(wait(NULL) > 0);
                 }
                 if (res_cmd == 1) {
                     while (value_return == 0 && _write) {

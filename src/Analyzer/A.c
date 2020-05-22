@@ -172,12 +172,10 @@ int main(int argc, char *argv[]) {
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
                         if (!strncmp(cmd, "close", 5)) {
                             closeAll(fd_1);
+
+                            while (wait(NULL) > 0);
                             _close = TRUE;
                             printf("A: Closing...\n");
-                            strcpy(resp, "NOTCLOSE");
-                            while (strncmp(resp, "#CLOSE", 6) != 0) {
-                                read(fd_2[READ], resp, DIM_RESP);
-                            }
                         }
                     }
                 }
@@ -307,7 +305,7 @@ int main(int argc, char *argv[]) {
                                 //system("clear");
                                 printf("Numero file analizzati: %d\n", pathSent);
                                 arrayToCsv(v, sum);
-                                //printStat_Cluster(sum);
+                                printStat_Cluster(sum);
                                 //setOnFly(4,5,fd_1);
                                 //sleep(5);
                                 //closeAll(fd_1);

@@ -42,7 +42,6 @@ int main(int argc, char* argv[]) {
     char send_r = TRUE;    //Controlla la dimensione della pipe del padre
     int oldfl;             //usato per togliere la O_NONBLOCK dai flag
     int pendingPath = 0;
-    char sentClose = FALSE;
 
     //Parsing arguments------------------------------------------------------------------------------------------
     if (argc % 2 == 0 || argc < 2) {  //if number of arguments is even or less than 1, surely it's a wrong input
@@ -133,6 +132,7 @@ int main(int argc, char* argv[]) {
                             fclose(debug);
                             if (!strncmp(path, "#", 1)) {
                                 nClearAndClose(fd, n);              //Svuota le pipe in discesa e manda #CLOSE
+                                while (wait(NULL) > 0);
                                 if (!strncmp(path, "#CLOSE", 6)) {  //Se leggo una stringa di terminazione
                                     _close = TRUE;                  //Setto end a true
                                 } else if (!strncmp(path, "#SET", 4)) {
@@ -233,28 +233,7 @@ int main(int argc, char* argv[]) {
                 }
             }
 
-            i = 0;
-            do {
-                read(fd[i * 4 + 1], resp, DIM_RESP);
-                if (!strncmp(resp, "#CLOSE", 6)) {
-                    count++;
-                }
-                i = (i + 1) % n;
-
-            } while (count < n);
-
-            sentClose = FALSE;
-            strcpy(resp, "#CLOSE");
-            while (!sentClose) {  //finchè la risposta non è stata inviata riprova
-                if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
-                    if (errno != EAGAIN) {
-                        value_return = err_write();
-                    }
-                } else {
-                    sentClose = FALSE;
-                }
-            }
-
+            while(wait(NULL) > 0);
             close_pipes(fd, size_pipe);  //Chiude tutte le pipes
             free(fd);                    //Libera la memoria delle pipes
         }

@@ -19,7 +19,6 @@ int main(int argc, char* argv[]) {
     catch_sigterm();
     //Argument passed
     int m = 4;
-    int count = 0;
     int i;
     char path[PATH_MAX];
     char resp[DIM_RESP];
@@ -207,6 +206,7 @@ int main(int argc, char* argv[]) {
                         /* handle error */
                     }
                     fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
+                    resetPathList(sum);
                 }
             }
 
@@ -233,27 +233,7 @@ int main(int argc, char* argv[]) {
                 }
             }
 
-            i = 0;
-            do {
-                read(fd[i * 4 + 1], resp, DIM_RESP);
-                if (!strncmp(resp, "#CLOSE", 6)) {
-                    count++;
-                }
-                i = (i + 1) % m;
-
-            } while (count < m);
-
-            sentClose = FALSE;
-            strcpy(resp, "#CLOSE");
-            while (!sentClose) {  //finchè la risposta non è stata inviata riprova
-                if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
-                    if (errno != EAGAIN) {
-                        value_return = err_write();
-                    }
-                } else {
-                    sentClose = FALSE;
-                }
-            }
+            while (wait(NULL) > 0);
             close_pipes(fd, size_pipe);
             free(fd);
             freePathList(sum);
