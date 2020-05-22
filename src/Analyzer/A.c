@@ -171,6 +171,7 @@ int main(int argc, char *argv[]) {
                 if (!_close) {
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
                         if (!strncmp(cmd, "close", 5)) {
+                            closeAll(fd_1);
                             _close = TRUE;
                             printf("A: Closing...\n");
                         }
