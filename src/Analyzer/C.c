@@ -42,6 +42,7 @@ int main(int argc, char* argv[]) {
     char send_r = TRUE;    //Controlla la dimensione della pipe del padre
     int oldfl;             //usato per togliere la O_NONBLOCK dai flag
     int pendingPath = 0;
+    char sentClose = FALSE;
 
     //Parsing arguments------------------------------------------------------------------------------------------
     if (argc % 2 == 0 || argc < 2) {  //if number of arguments is even or less than 1, surely it's a wrong input
@@ -241,6 +242,18 @@ int main(int argc, char* argv[]) {
                 i = (i + 1) % n;
 
             } while (count < n);
+
+            sentClose = FALSE;
+            strcpy(resp, "#CLOSE");
+            while (!sentClose) {  //finchè la risposta non è stata inviata riprova
+                if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
+                    if (errno != EAGAIN) {
+                        value_return = err_write();
+                    }
+                } else {
+                    sentClose = FALSE;
+                }
+            }
 
             close_pipes(fd, size_pipe);  //Chiude tutte le pipes
             free(fd);                    //Libera la memoria delle pipes

@@ -243,6 +243,17 @@ int main(int argc, char* argv[]) {
 
             } while (count < m);
 
+            sentClose = FALSE;
+            strcpy(resp, "#CLOSE");
+            while (!sentClose) {  //finchè la risposta non è stata inviata riprova
+                if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
+                    if (errno != EAGAIN) {
+                        value_return = err_write();
+                    }
+                } else {
+                    sentClose = FALSE;
+                }
+            }
             close_pipes(fd, size_pipe);
             free(fd);
             freePathList(sum);

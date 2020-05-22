@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
     char array[7][20];    //Matrice di appoggio
     char *args[8];        //String og arguments to pass to child
     int _write = FALSE;   //true when finish writing the pipe
-    int _read = TRUE;    //true when fisnish reading from pipe
+    int _read = TRUE;     //true when fisnish reading from pipe
     char resp[DIM_RESP];  //Stringa in cui salvare i messaggi ottenuti dal figlio
     int id_r;             //Id file ricevuto
     char *resp_val;       //Messaggio senza Id
@@ -174,6 +174,10 @@ int main(int argc, char *argv[]) {
                             closeAll(fd_1);
                             _close = TRUE;
                             printf("A: Closing...\n");
+                            strcpy(resp, "NOTCLOSE");
+                            while (strncmp(resp, "#CLOSE", 6) != 0) {
+                                read(fd_2[READ], resp, DIM_RESP);
+                            }
                         }
                     }
                 }
@@ -216,7 +220,7 @@ int main(int argc, char *argv[]) {
                         } while (value_return == 0 && errno == EAGAIN && _write_val == -1);
 
                         if (value_return == 0) {
-                            FILE* debug = fopen("log.txt", "a");
+                            FILE *debug = fopen("log.txt", "a");
                             fprintf(debug, "A CLOSE FIFO\n");
                             fclose(debug);
                             retrieve = TRUE;
@@ -233,7 +237,6 @@ int main(int argc, char *argv[]) {
                         }
                     }
                 }
-                
 
                 //Quando WRITE e' in funzione inizia a mandare tutti i file con flag 0 di pathList
                 if (!_write && value_return == 0) {  //Esegue il blocco finche` non ha finito di scrivere
@@ -249,7 +252,7 @@ int main(int argc, char *argv[]) {
                             //printf("count: %d, path:%s\n", lista->count, lista->pathList[i]);
                             i++;
                             pathSent++;
-                            if (pathSent == 1){
+                            if (pathSent == 1) {
                                 _read = FALSE;
                             }
                         }
@@ -257,7 +260,7 @@ int main(int argc, char *argv[]) {
                         i++;
                     }
                     if (i == lista->count) {  //Qunado ha finito di inviare
-                        _write = TRUE;  //Setta il flag a true
+                        _write = TRUE;        //Setta il flag a true
                         i = 0;
                     }
                 }
@@ -307,7 +310,7 @@ int main(int argc, char *argv[]) {
                                 //printStat_Cluster(sum);
                                 //setOnFly(4,5,fd_1);
                                 //sleep(5);
-                                closeAll(fd_1);
+                                //closeAll(fd_1);
                                 //_close = TRUE;
                                 pathSent = 0;
                             }
