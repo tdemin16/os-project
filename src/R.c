@@ -89,7 +89,7 @@ int main() {
             if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
                 if (!strncmp(cmd, "close", 5)) {
                     _close = TRUE;
-                    printf("R: Closing...\n");
+                    printf(BOLDWHITE"R"RESET": Closing...\n");
                 } else {
                     if (!strncmp(cmd, "-c", 2) /*&& altri flags*/) {
                         do {

@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
                             while (wait(NULL) > 0)
                                 ;
                             _close = TRUE;
-                            printf("A: Closing...\n");
+                            printf(BOLDWHITE"A"RESET": Closing...\n");
                         }
 
                         if (!strncmp(cmd, "add", 3)) {

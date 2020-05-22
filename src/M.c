@@ -93,11 +93,12 @@ int main(int argc, char *argv[]) {
 
                 if (res_cmd == -1) {
                     //richiama la funzione help() coi comandi
-                    printf("Comando inserito non corretto.\nUsa info per vedere la lista di comandi utilizzabili.\n> ");
+                    printf(BOLDRED"[ERRORE] "RESET"Comando inserito non corretto.\nUsa info per vedere la lista di comandi utilizzabili.\n> ");
                 }
 
                 if (res_cmd == 0) {
                     end = TRUE;
+                    printf("\n");
                     while (value_return == 0 && _write) {
                         if (write(fd[A * 2 + WRITE], cmd, DIM_CMD) == -1) {
                             if (errno != EAGAIN) {
@@ -158,17 +159,17 @@ int main(int argc, char *argv[]) {
                             fclose(fptr);
                         }
                     } else {
-                        printf("\nLista Comandi disponibili:\n\n");
-                        printf("add </path1> </path2>: aggiunge uno o piu` file e/o una o piu` directory\n");
-                        printf("\t es: add ../src ../deploy.sh\n\n");
-                        printf("remove </path1> </path2>: rimuove uno o piu` file e/o una o piu` directory\n");
-                        printf("\t es: remove ../src ../deploy.sh\n\n");
-                        printf("reset: elimina dalla cache del programma le statistiche e tutti i percorsi analizzati e non\n\n");
-                        printf("print: stampa a video tutte il percorso di tutti i file analizzati\n\n");
-                        printf("analyze: avvia l'analizzatore\n\n");
-                        printf("-c: stampa le statistiche per cluster\n\n");
-                        printf("help: mostra informazioni aggiuntive sul programma\n\n");
-                        printf("close: chiude il programma\n");
+                        printf(BOLDBLUE"\nLista Comandi disponibili\n"RESET);
+                        printf(BOLDGREEN"add </path1> </path2>"RESET": aggiunge uno o piu` file e/o una o piu` directory\n");
+                        printf(BOLDBLACK"\t es: add ../src ../deploy.sh\n"RESET);
+                        printf(BOLDRED"remove </path1> </path2>"RESET": rimuove uno o piu` file e/o una o piu` directory\n");
+                        printf(BOLDBLACK"\t es: remove ../src ../deploy.sh\n"RESET);
+                        printf(BOLDYELLOW"reset"RESET": elimina dalla cache del programma le statistiche e tutti i percorsi analizzati e non\n");
+                        printf(BOLDWHITE"print"RESET": stampa a video tutte il percorso di tutti i file analizzati\n");
+                        printf(BOLDMAGENTA"analyze"RESET": avvia l'analizzatore\n");
+                        printf(BOLDCYAN"-c"RESET": stampa le statistiche per cluster\n");
+                        printf(WHITE"help"RESET": mostra informazioni aggiuntive sul programma\n");
+                        printf(WHITE"close"RESET": chiude il programma\n");
                     }
                     printf("\n> ");
                 }
@@ -177,7 +178,7 @@ int main(int argc, char *argv[]) {
             close(fd[R * 2 + READ]);
             close(fd[A * 2 + WRITE]);
             close(fd[A * 2 + READ]);
-            printf("M: Closing...\n");
+            printf(BOLDWHITE"M"RESET": Closing...\n");
         }
     }
 
