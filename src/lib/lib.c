@@ -154,6 +154,7 @@ void printPathList(array *tmp) {
         printf("%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
         //fprintf(stderr, "%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
     }
+    printf("> ");fflush(stdout);
 }
 
 int dimPathList(array *tmp) {

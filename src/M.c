@@ -211,7 +211,6 @@ int main(int argc, char *argv[]) {
 //Codici Univoci
 //COdice per identificare un comando che deve essere mandato ad A. Per il momento io uso '2'
 int check_command(char *cmd) {
-    printf("%s-----------\n", cmd);
     int res = -1;  //errore input comando
 
     if (strstr(cmd, "close") != NULL) {  //CLOSE
