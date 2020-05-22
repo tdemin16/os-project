@@ -329,6 +329,9 @@ char fileExist(char *fname) {
 }
 
 void setOnFly(int n, int m, int *fd_1) {
+    if (fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) {
+        //value_return = err_fcntl();
+    }
     char resp[DIM_RESP];
     while (read(fd_1[READ], resp, DIM_RESP) > 0) {
     }
@@ -343,6 +346,9 @@ void setOnFly(int n, int m, int *fd_1) {
 }
 
 void closeAll(int *fd_1) {
+    if (fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) {
+        //value_return = err_fcntl();
+    }
     char path[PATH_MAX];
     while (read(fd_1[READ], path, PATH_MAX) > 0) {
     }
