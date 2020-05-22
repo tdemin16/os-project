@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
     char array[7][20];    //Matrice di appoggio
     char *args[8];        //String og arguments to pass to child
     int _write = FALSE;   //true when finish writing the pipe
-    int _read = FALSE;    //true when fisnish reading from pipe
+    int _read = TRUE;    //true when fisnish reading from pipe
     char resp[DIM_RESP];  //Stringa in cui salvare i messaggi ottenuti dal figlio
     int id_r;             //Id file ricevuto
     char *resp_val;       //Messaggio senza Id
@@ -242,12 +242,15 @@ int main(int argc, char *argv[]) {
                             if (errno != EAGAIN) {                                     //Se avviene un errore e non e` causato dalla dimensione della pipe
                                 value_return = err_write();                            //Ritorna l'errore sulla scrittura
                             } else {
-                                printf("pipe piena\n");
+                                //printf("pipe piena\n");
                             }
                         } else {
                             //printf("count: %d, path:%s\n", lista->count, lista->pathList[i]);
                             i++;
                             pathSent++;
+                            if (pathSent == 1){
+                                _read = FALSE;
+                            }
                         }
                     } else {
                         i++;
@@ -296,8 +299,9 @@ int main(int argc, char *argv[]) {
 
                             if (perc == pathSent && value_return == 0) {
                                 analyzing = FALSE;
+                                _read = FALSE;
                                 //system("clear");
-                                printf("Numero file analizzati: %d\nProcessi:%d\nSezioni:%d\n", pathSent, n, m);
+                                printf("Numero file analizzati: %d\n", pathSent);
                                 arrayToCsv(v, sum);
                                 //printStat_Cluster(sum);
                                 //setOnFly(4,5,fd_1);
