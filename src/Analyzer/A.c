@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 
     //Utility
     int i;  //Variabile usata per ciclare gli argomenti (argv[i])
-    //int j;
+    int j;
     int count = 0;    //numero di file univoci da analizzare
     int perc = 0;     //Ricevimento parziale file
     int oldperc = 0;  //Parziale precedente
@@ -80,6 +80,7 @@ int main(int argc, char *argv[]) {
     char *tmp = NULL;
     char *tmpResp = NULL;
     char *tmpPercorso = NULL;
+    char **tempPath;
 
     array *lista = createPathList(10);  //Nuova lista dei path
 
@@ -183,7 +184,20 @@ int main(int argc, char *argv[]) {
                         if (!strncmp(cmd, "add", 3)) {
                             if (!analyzing) {
                                 if (checkAdd(cmd, &argCounter)) {
-
+                                    tempPath = malloc(argCounter * sizeof(char *));
+                                    for (j = 0; j < argCounter; j++) {
+                                        tempPath[j] = malloc(PATH_MAX * sizeof(char));
+                                    }
+                                    strtok(cmd," ");
+                                    for (j = 0; j< argCounter; j++){
+                                        strcpy(tempPath[j],strtok(NULL," "));
+                                    }
+                                    //value_return = parser(argCounter, tempPath, lista, &count, &n, &m);  //Controlla i parametri passati ad A
+                                    for (j = 0; j < argCounter; j++) {
+                                        printf("ARG[%d] - %s\n",j,tempPath[j]);
+                                        free(tempPath[j]);
+                                    }
+                                    free(tempPath);
                                 } else {
                                     value_return = err_args_A();
                                 }
