@@ -233,7 +233,7 @@ int main(int argc, char* argv[]) {
                     }
                 }
             }
-
+            while (wait(NULL) > 0);
             close_pipes(fd, size_pipe);
             free(fd);
             freePathList(sum);

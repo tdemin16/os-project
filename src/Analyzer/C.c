@@ -132,6 +132,7 @@ int main(int argc, char* argv[]) {
                             fclose(debug);
                             if (!strncmp(path, "#", 1)) {
                                 nClearAndClose(fd, n);              //Svuota le pipe in discesa e manda #CLOSE
+                                while (wait(NULL) > 0);
                                 if (!strncmp(path, "#CLOSE", 6)) {  //Se leggo una stringa di terminazione
                                     _close = TRUE;                  //Setto end a true
                                 } else if (!strncmp(path, "#SET", 4)) {
