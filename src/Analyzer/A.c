@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
                             while (wait(NULL) > 0)
                                 ;
                             _close = TRUE;
-                            printf(BOLDWHITE"A"RESET": Closing...\n");
+                            printf(BOLDWHITE "A" RESET ": Closing...\n");
                         }
 
                         if (!strncmp(cmd, "add", 3)) {
@@ -188,23 +188,25 @@ int main(int argc, char *argv[]) {
                                     for (j = 0; j < argCounter; j++) {
                                         tempPath[j] = malloc(PATH_MAX * sizeof(char));
                                     }
-                                    strcpy(tempPath[0],strtok(cmd," "));
-                                    for (j = 1; j< argCounter; j++){
-                                        strcpy(tempPath[j],strtok(NULL," "));
+                                    strcpy(tempPath[0], strtok(cmd, " "));
+                                    for (j = 1; j < argCounter; j++) {
+                                        strcpy(tempPath[j], strtok(NULL, " "));
                                     }
                                     value_return = parser(argCounter, tempPath, lista, &count, &n, &m);  //Controlla i parametri passati ad A
-                                    //printf("%d\n",value_return);
+                                    printf("value error: %d\n", value_return);
                                     for (j = 0; j < argCounter; j++) {
                                         //printf("ARG[%d] - %s\n",j,tempPath[j]);
                                         free(tempPath[j]);
                                     }
                                     free(tempPath);
+                                    printf("Tutto deallocato\n");
                                 } else {
                                     value_return = err_args_A();
                                 }
                             } else {
                                 printf("Analisi in corso, comando non disponibile\n");
                             }
+                            printf("fine add\n");
                         }
 
                         if (!strncmp(cmd, "remove", 6)) {
@@ -212,22 +214,25 @@ int main(int argc, char *argv[]) {
 
                         if (!strncmp(cmd, "reset", 5)) {
                             resetPathList(lista);
-                            printf("> ");fflush(stdout);
+                            printf("> ");
+                            fflush(stdout);
                         }
 
                         if (!strncmp(cmd, "print", 5)) {
                             printPathList(lista);
-                            printf("> ");fflush(stdout);
+                            printf("> ");
+                            fflush(stdout);
                         }
 
                         if (!strncmp(cmd, "analyze", 7)) {
                             memset(sum, '\0', sizeof(char) * DIM_RESP);
                             initialize_vector(v);
                             pathSent = 0;
+                            printf("%d aaa\n", count);
                             if (count > 0)
                                 _write = TRUE;
                             else
-                                printf("Non ci sono file da analizzare capra\n");
+                                printf("Non ci sono file da analizzare\n");
                         }
                     }
                 }
@@ -352,10 +357,9 @@ int main(int argc, char *argv[]) {
                             }
 
                             if (perc == pathSent && value_return == 0) {
-                                analyzing = FALSE;
-                                _read = FALSE;
-                                //system("clear");
+                                count -= lista->count;
                                 printf("Numero file analizzati: %d\n", pathSent);
+
                                 arrayToCsv(v, sum);
                                 printStat_Cluster(sum);
                                 printf("\n> ");
@@ -365,6 +369,8 @@ int main(int argc, char *argv[]) {
                                 //closeAll(fd_1);
                                 //_close = TRUE;
                                 pathSent = 0;
+                                analyzing = FALSE;
+                                _read = FALSE;
                             }
 
                             free(tmpPercorso);

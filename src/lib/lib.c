@@ -236,7 +236,6 @@ int parser(int argc, char *argv[], array *lista, int *count, int *n, int *m) {
     char errdir = FALSE;
     FILE *fp;
     char riga[1035];
-    *count = 0;
 
     if (argc < 1) {  //if number of arguments is even or less than 1, surely it's a wrong input
         value_return = err_args_A();
@@ -308,7 +307,6 @@ int parser(int argc, char *argv[], array *lista, int *count, int *n, int *m) {
                                 (*count)++;
                                 //printf("%s\n", resolved_path);
                             }
-
                         } else {            //Intercetta l'errore riguardante file o cartelle non esistenti
                             errdir = TRUE;  //Metto il flag errore file/directory sbagliati
                         }
@@ -320,7 +318,7 @@ int parser(int argc, char *argv[], array *lista, int *count, int *n, int *m) {
                 flag = FALSE;  //Analisi argomento saltata, rimetto flag a false
             }
         }
-        if (count == 0 && value_return == 0) value_return = err_args_A();  //counter is higher than zero, if not gives an error (value_return used to avoid double messages)
+        if (*count == 0 && value_return == 0) value_return = err_args_A();  //counter is higher than zero, if not gives an error (value_return used to avoid double messages)
     }
     return value_return;
 }
