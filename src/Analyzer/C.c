@@ -191,8 +191,9 @@ int main(int argc, char* argv[]) {
 
                 //Read
                 if (!_read) {
-                    if (send_r) {                                                  //Coontrolla se non ci sonon valori non inviati
-                        if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {             //Prova a leggere dalla pipe
+                    if (send_r) {                                       //Coontrolla se non ci sonon valori non inviati
+                        if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {  //Prova a leggere dalla pipe
+
                             if (strstr(resp, "#") != NULL) {                       //Controlla che nella stringa sia contenuto il carattere #
                                 if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {  //Prova a scrivere sulla pipe del padre
                                     if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
@@ -214,14 +215,19 @@ int main(int argc, char* argv[]) {
                         }
                     }
                     k = (k + 1) % n;  //Cicla tra le pipes
+                    debug = fopen(str, "a");
+                    fprintf(debug, "C: PENDING %d\n",pendingPath);
+                    fclose(debug);
                 }
 
                 if (pendingPath == 0) {
                     oldfl = fcntl(STDIN_FILENO, F_GETFL);
                     if (oldfl == -1) {
-                        /* handle error */
                     }
                     fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
+                    debug = fopen(str, "a");
+                    fprintf(debug, "C: SLEEP\n");
+                    fclose(debug);
                 }
             }
             if (f > 0) {                     //Se e' un processo figlio,non deve liberare le pipe

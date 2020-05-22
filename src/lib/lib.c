@@ -343,14 +343,13 @@ void setOnFly(int n, int m, int *fd_1) {
 }
 
 void closeAll(int *fd_1) {
-    char resp[DIM_RESP];
-    while (read(fd_1[READ], resp, DIM_RESP) > 0) {
+    char path[PATH_MAX];
+    while (read(fd_1[READ], path, PATH_MAX) > 0) {
     }
     if (write(fd_1[WRITE], "#CLOSE", PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
         if (errno != EAGAIN) {                           //Se avviene un errore e non e` causato dalla dimensione della pipe
             //value_return = err_write();               //Ritorna l'errore sulla scrittura
-        } else
-            fprintf(stderr, "errore set on-fly, pipe piena");
+        }
     }
 }
 

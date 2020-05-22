@@ -119,9 +119,9 @@ int main(int argc, char *argv[]) {
 
     //Set Non-blocking pipes
     if (value_return == 0) {
-        //if (fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) {  //Prova a sbloccare la pipe 1 in lettura
-        //    value_return = err_fcntl();                //Se errore riporta il messaggio di errore
-        //}
+        if (fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) {  //Prova a sbloccare la pipe 1 in lettura
+            value_return = err_fcntl();                //Se errore riporta il messaggio di errore
+        }
         if (fcntl(fd_1[WRITE], F_SETFL, O_NONBLOCK)) {  //Prova a sbloccare la pipe 1 in scrittura
             value_return = err_fcntl();                 //Se errore riporta il messaggio di errore
         }
