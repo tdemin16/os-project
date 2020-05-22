@@ -78,6 +78,7 @@ void insertProcess(process *, pid_t);
 void printList(process *);
 void freeList(process *);
 
+
 //Array struct functions -- sostituiscono lista (momentaneamente?)
 array *createPathList(int);
 void reallocPathList(array *, int);
@@ -88,6 +89,7 @@ void freePathList(array *);
 int dimPathList(array *);
 void setAnalyzed(array *, int, int);
 int getAnalyzed(array *, int);
+void resetPathList(array *);
 
 void close_pipes(int *, int);
 int unlock_pipes(int *, int);

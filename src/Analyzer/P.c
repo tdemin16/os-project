@@ -208,6 +208,7 @@ int main(int argc, char* argv[]) {
                         /* handle error */
                     }
                     fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
+                    resetPathList(sum);
                 }
             }
 

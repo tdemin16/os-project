@@ -146,6 +146,9 @@ void reallocPathList(array *tmp, int newSize) {
 
 void printPathList(array *tmp) {
     int i;
+    if (tmp->count == 0) {
+        printf("Lista vuota\n");
+    }
     for (i = 0; i < tmp->count; i++) {
         usleep(10000);
         printf("%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
@@ -179,6 +182,11 @@ void setAnalyzed(array *tmp, int pos, int value) {
 
 int getAnalyzed(array *tmp, int pos) {
     return tmp->analyzed[pos];  //-1 if not analyzed
+}
+
+void resetPathList(array *tmp) {
+    freePathList(tmp);
+    tmp = createPathList(10);
 }
 
 //Returns -1 if fails
