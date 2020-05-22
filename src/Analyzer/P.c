@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
     catch_sigterm();
     //Argument passed
     int m = 4;
-
+    int count = 0;
     int i;
     char path[PATH_MAX];
     char resp[DIM_RESP];
@@ -202,7 +202,6 @@ int main(int argc, char* argv[]) {
                     }
                 }
                 if (pendingPath == 0) {
-                    
                     oldfl = fcntl(STDIN_FILENO, F_GETFL);
                     if (oldfl == -1) {
                         /* handle error */
@@ -233,6 +232,16 @@ int main(int argc, char* argv[]) {
                     }
                 }
             }
+
+            i = 0;
+            do {
+                read(fd[i * 4 + 1], resp, DIM_RESP);
+                if (!strncmp(resp, "#CLOSE", 6)) {
+                    count++;
+                }
+                i = (i + 1) % m;
+
+            } while (count < m);
 
             close_pipes(fd, size_pipe);
             free(fd);

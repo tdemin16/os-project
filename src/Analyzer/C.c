@@ -214,7 +214,7 @@ int main(int argc, char* argv[]) {
                     }
                     k = (k + 1) % n;  //Cicla tra le pipes
                     debug = fopen(str, "a");
-                    fprintf(debug, "C: PENDING %d\n",pendingPath);
+                    fprintf(debug, "C: PENDING %d\n", pendingPath);
                     fclose(debug);
                 }
 
@@ -231,10 +231,19 @@ int main(int argc, char* argv[]) {
                     fclose(debug);
                 }
             }
-            if (f > 0) {                     //Se e' un processo figlio,non deve liberare le pipe
-                close_pipes(fd, size_pipe);  //Chiude tutte le pipes
-                free(fd);                    //Libera la memoria delle pipes
-            }
+
+            i = 0;
+            do {
+                read(fd[i * 4 + 1], resp, DIM_RESP);
+                if (!strncmp(resp, "#CLOSE", 6)) {
+                    count++;
+                }
+                i = (i + 1) % n;
+
+            } while (count < n);
+
+            close_pipes(fd, size_pipe);  //Chiude tutte le pipes
+            free(fd);                    //Libera la memoria delle pipes
         }
     }
 

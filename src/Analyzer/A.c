@@ -165,7 +165,7 @@ int main(int argc, char *argv[]) {
         if (f > 0) {              //PARENT SIDE
             insertProcess(p, f);  //Insert child process in list p
             i = 0;
-            while (value_return == 0 && (!_close)) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
+            while (value_return == 0 && !_close) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
 
                 //M
                 if (!_close) {
