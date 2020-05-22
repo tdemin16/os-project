@@ -110,8 +110,10 @@ int main(int argc, char* argv[]) {
                         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere
                             pendingPath++;
                             if (pendingPath == 1) {
-                                if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
-                                    value_return = err_fcntl();
+                                for (i = 0; i < m; i++) {
+                                    if (fcntl(fd[i * 4 + 2], F_SETFL, O_NONBLOCK)) {
+                                        value_return = err_fcntl();
+                                    }
                                 }
                             }
                             debug = fopen(str, "a");
@@ -202,12 +204,13 @@ int main(int argc, char* argv[]) {
                     }
                 }
                 if (pendingPath == 0) {
-                    
-                    oldfl = fcntl(STDIN_FILENO, F_GETFL);
-                    if (oldfl == -1) {
-                        /* handle error */
+                    for (i = 0; i < m; i++) {
+                        oldfl = fcntl(fd[i * 4 + 2], F_GETFL);
+                        if (oldfl == -1) {
+                            /* handle error */
+                        }
+                        fcntl(fd[i * 4 + 2], F_SETFL, oldfl & ~O_NONBLOCK);
                     }
-                    fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
                 }
             }
 

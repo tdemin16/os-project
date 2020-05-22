@@ -49,9 +49,9 @@ int main(int argc, char* argv[]) {
         if (part >= m) value_return = err_part_not_valid();
     }
 
-    if (fcntl(STDOUT_FILENO, F_SETFL, O_NONBLOCK)) {
-        value_return = err_fcntl();
-    }
+    //if (fcntl(STDOUT_FILENO, F_SETFL, O_NONBLOCK)) {
+    //    value_return = err_fcntl();
+    //}
     char str[15];
     sprintf(str, "%d.txt", getpid());
     FILE* debug = fopen(str, "a");
@@ -63,9 +63,9 @@ int main(int argc, char* argv[]) {
         if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //Legge un percorso
             pendingPath++;
             if (pendingPath == 1) {
-                if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
-                    value_return = err_fcntl();
-                }
+                //if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+                //    value_return = err_fcntl();
+                //}
             }
             debug = fopen(str, "a");
             fprintf(debug, "Q: LEGGO %s\n", path);
@@ -108,11 +108,11 @@ int main(int argc, char* argv[]) {
             }
         }
         if (pendingPath == 0) {
-            oldfl = fcntl(STDIN_FILENO, F_GETFL);
+            //oldfl = fcntl(STDIN_FILENO, F_GETFL);
             if (oldfl == -1) {
                 /* handle error */
             }
-            fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
+            //fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
         }
     }
 
