@@ -1,8 +1,14 @@
+#!/bin/bash
 MAKE="make build"
 CLEAN="make clean"
 BUILD_DIR="bin/"
 
 $CLEAN
 $MAKE
-cd $BUILD_DIR
-./M ../src/
+
+if [ $? -eq 0 ]; then 
+    cd $BUILD_DIR
+    ./M ../src/
+else
+    echo Fail during building.
+fi
