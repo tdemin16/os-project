@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
 
                 if (res_cmd == -1) {
                     //richiama la funzione help() coi comandi
-                    printf("Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n> ");
+                    printf("Comando inserito non corretto.\nUsa info per vedere la lista di comandi utilizzabili.\n> ");
                 }
 
                 if (res_cmd == 0) {
@@ -149,13 +149,28 @@ int main(int argc, char *argv[]) {
                 }
 
                 if (res_cmd == 3) {
-                    fptr = fopen("../README.md", "r");
-                    if (fptr) {
-                        while ((c = getc(fptr)) != EOF)
-                            putchar(c);
-                        fclose(fptr);
+                    if (!strcmp(cmd, "help")) {
+                        fptr = fopen("../README.md", "r");
+                        printf("\n");
+                        if (fptr) {
+                            while ((c = getc(fptr)) != EOF)
+                                putchar(c);
+                            fclose(fptr);
+                        }
+                    } else {
+                        printf("\nLista Comandi disponibili:\n\n");
+                        printf("add </path1> </path2>: aggiunge uno o piu` file e/o una o piu` directory\n");
+                        printf("\t es: add ../src ../deploy.sh\n\n");
+                        printf("remove </path1> </path2>: rimuove uno o piu` file e/o una o piu` directory\n");
+                        printf("\t es: remove ../src ../deploy.sh\n\n");
+                        printf("reset: elimina dalla cache del programma le statistiche e tutti i percorsi analizzati e non\n\n");
+                        printf("print: stampa a video tutte il percorso di tutti i file analizzati\n\n");
+                        printf("analyze: avvia l'analizzatore\n\n");
+                        printf("-c: stampa le statistiche per cluster\n\n");
+                        printf("help: mostra informazioni aggiuntive sul programma\n\n");
+                        printf("close: chiude il programma\n");
                     }
-                    printf("> ");
+                    printf("\n> ");
                 }
             }
             close(fd[R * 2 + WRITE]);
@@ -213,13 +228,13 @@ int main(int argc, char *argv[]) {
 int check_command(char *cmd) {
     int res = -1;  //errore input comando
 
-    if (strstr(cmd, "close") != NULL) {  //CLOSE
+    if (!strcmp(cmd, "close")) {  //CLOSE
         res = 0;
-    } else if (strstr(cmd, "-c") != NULL) {  //R
+    } else if (!strcmp(cmd, "-c")) {  //R
         res = 1;
-    } else if ((strstr(cmd, "add") != NULL) || (strstr(cmd, "remove") != NULL) || (strstr(cmd, "reset") != NULL) || (strstr(cmd, "print") != NULL) || (strstr(cmd, "analyze") != NULL)) {  //A
+    } else if (!strncmp(cmd, "add", 3) || !strncmp(cmd, "remove", 6) || !strcmp(cmd, "reset") || !strcmp(cmd, "print") || !strcmp(cmd, "analyze")) {  //A
         res = 2;
-    } else if (strstr(cmd, "help") != NULL) {  //HELP
+    } else if (!strcmp(cmd, "help") || !strcmp(cmd, "info")) {  //HELP
         res = 3;
     }
 
