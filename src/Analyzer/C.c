@@ -18,8 +18,8 @@ void catch_sigterm() {
 int main(int argc, char* argv[]) {
     catch_sigterm();
     int nfiles = 0;  //number of files to retreive from pipe
-    int n = 3;
-    int m = 4;
+    int n = atoi(argv[1]);
+    int m = atoi(argv[2]);
     int i;
     int k;
 
@@ -42,27 +42,6 @@ int main(int argc, char* argv[]) {
     char send_r = TRUE;    //Controlla la dimensione della pipe del padre
     int oldfl;             //usato per togliere la O_NONBLOCK dai flag
     int pendingPath = 0;
-
-    //Parsing arguments------------------------------------------------------------------------------------------
-    if (argc % 2 == 0 || argc < 2) {  //if number of arguments is even or less than 1, surely it's a wrong input
-        value_return = err_args_C();  //Ritorna errore sugli argomenti
-    } else {
-        for (i = 1; i < argc && value_return == 0; i += 2) {   //Loop through argv
-            if (!strcmp(argv[i], "-nfiles")) {                 //Check if the argument is equal to -nfiles
-                nfiles = atoi(argv[i + 1]);                    //Converte la stringa in intero
-                if (nfiles == 0) value_return = err_args_C();  //Ritorna errore sugli argomenti
-            } else if (!strcmp(argv[i], "-setn")) {            //Check if argument is equal to -setn
-                n = atoi(argv[i + 1]);                         //Converte la stringa in intero
-                if (n == 0) value_return = err_args_C();       //Ritorna errore sugli argomenti
-            } else if (!strcmp(argv[i], "-setm")) {            //Check if argument is equal to -setm
-                m = atoi(argv[i + 1]);                         //Conversione
-                if (m == 0) value_return = err_args_C();       //Errore
-            } else {                                           //Se compare qualcos'altro e` sicuramente sbagliato
-                value_return = err_args_C();                   //Errore
-            }
-        }
-        if (nfiles == 0 && value_return == 0) value_return = err_args_C();  //Check if nfiles is setted, if not gives an error (value_return used to avoid double messages)
-    }
 
     //Generating pipes-------------------------------------------------------
     if (value_return == 0) {
