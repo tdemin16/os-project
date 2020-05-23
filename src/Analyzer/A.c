@@ -74,6 +74,8 @@ int main(int argc, char *argv[]) {
     int count = 0;    //numero di file univoci da analizzare
     int perc = 0;     //Ricevimento parziale file
     int oldperc = 0;  //Parziale precedente
+    char n_exec[12];
+    char m_exec[12];
 
     char analyzing = FALSE;
     int pathSent = 0;
@@ -88,8 +90,6 @@ int main(int argc, char *argv[]) {
     int fd_1[2];  //Pipes
     int fd_2[2];
     pid_t f;              //fork return value
-    char array[7][20];    //Matrice di appoggio
-    char *args[8];        //String og arguments to pass to child
     int _write = FALSE;   //true when finish writing the pipe
     int _read = TRUE;     //true when fisnish reading from pipe
     char resp[DIM_RESP];  //Stringa in cui salvare i messaggi ottenuti dal figlio
@@ -454,11 +454,9 @@ int main(int argc, char *argv[]) {
 
     if (value_return == 0) {
         if (f == 0) {  //SON SIDE
-            char n_exec[12];
-            char m_exec[12];
             sprintf(n_exec, "%d", n);
             sprintf(m_exec, "%d", m);
-            char args[4] = {"./C", n_exec, m_exec, NULL};
+            char *args[4] = {"./C", n_exec, m_exec, NULL};
             //Redirects pipes to STDIN and STDOUT
             dup2(fd_1[READ], STDIN_FILENO);
             dup2(fd_2[WRITE], STDOUT_FILENO);

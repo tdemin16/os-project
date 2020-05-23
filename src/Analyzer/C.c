@@ -17,7 +17,6 @@ void catch_sigterm() {
 
 int main(int argc, char* argv[]) {
     catch_sigterm();
-    int nfiles = 0;  //number of files to retreive from pipe
     int n = atoi(argv[1]);
     int m = atoi(argv[2]);
     int i;
