@@ -949,7 +949,7 @@ int err_input_A(char *file) {
 }
 
 int err_args_C() {
-    fprintf(stderr, "\nErrore nella sintassi del comando.Usa:\n-nfiles <int> per indicare il numero di files (necessario)\n-setn <int> per settare n\n-setm <int> per settare m.\n\n");
+    fprintf(stderr, "\nErrore argomenti C\n\n");
     return ERR_ARGS_C;
 }
 

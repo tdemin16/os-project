@@ -103,12 +103,11 @@ int main(int argc, char *argv[]) {
     int argCounter = 0;
     initialize_vector(v);  //Inizializzazione vettore dei valori totali
 
-    if (argc > 1){
+    if (argc > 1) {
         value_return = parser(argc, argv, lista, &count, &n, &m);  //Controlla i parametri passati ad A
     } else {
         _write = TRUE;
     }
-    
 
     insertProcess(p, getpid());  //Insert pid of A in process list
 
@@ -388,9 +387,9 @@ int main(int argc, char *argv[]) {
                                     lista->analyzed[id_r] = 1;                                      //Setta il flag ad Analizzato
                                     if (addCsvToArray(resp_val, v)) value_return = err_overflow();  //Aggiunge il file al vettore delle somme
                                     perc++;                                                         //Aumenta l'avanzamento della barretta
-                                    if(value_return == 0) {
-                                        if(!compare_mtime(lista, id_r, file)) {
-                                            printf("\nIl file %s\ne` stato modificato durante l'analisi.\nUsa il comando"BOLDWHITE" reanalyze"RESET" per rianalizzarlo\n\n", file);
+                                    if (value_return == 0) {
+                                        if (!compare_mtime(lista, id_r, file)) {
+                                            printf("\nIl file %s\ne` stato modificato durante l'analisi.\nUsa il comando" BOLDWHITE " reanalyze" RESET " per rianalizzarlo\n\n", file);
                                         }
                                     }
                                 } else {
@@ -455,7 +454,23 @@ int main(int argc, char *argv[]) {
 
     if (value_return == 0) {
         if (f == 0) {  //SON SIDE
-
+            char n_exec[12];
+            char m_exec[12];
+            sprintf(n_exec, "%d", n);
+            sprintf(m_exec, "%d", m);
+            char args[4] = {"./C", n_exec, m_exec, NULL};
+            //Redirects pipes to STDIN and STDOUT
+            dup2(fd_1[READ], STDIN_FILENO);
+            dup2(fd_2[WRITE], STDOUT_FILENO);
+            //Closing pipes
+            close(fd_1[READ]);
+            close(fd_1[WRITE]);
+            close(fd_2[READ]);
+            close(fd_2[WRITE]);
+            if (execvp(args[0], args) == -1) {   //Test exec
+                value_return = err_exec(errno);  //Set value return
+            }
+            /*
             //Creates char* args []
             strcpy(array[0], "./C");
             strcpy(array[1], "-nfiles");
@@ -481,6 +496,7 @@ int main(int argc, char *argv[]) {
             if (execvp(args[0], args) == -1) {   //Test exec
                 value_return = err_exec(errno);  //Set value return
             }
+            */
         }
     }
 
