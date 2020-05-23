@@ -52,30 +52,30 @@
 #define A 0
 #define R 1
 
-#define RESET   "\033[0m"
-#define BLACK   "\033[30m"      /* Black */
-#define RED     "\033[31m"      /* Red */
-#define GREEN   "\033[32m"      /* Green */
-#define YELLOW  "\033[33m"      /* Yellow */
-#define BLUE    "\033[34m"      /* Blue */
-#define MAGENTA "\033[35m"      /* Magenta */
-#define CYAN    "\033[36m"      /* Cyan */
-#define WHITE   "\033[37m"      /* White */
-#define BOLDBLACK   "\033[1m\033[30m"      /* Bold Black */
-#define BOLDRED     "\033[1m\033[31m"      /* Bold Red */
-#define BOLDGREEN   "\033[1m\033[32m"      /* Bold Green */
-#define BOLDYELLOW  "\033[1m\033[33m"      /* Bold Yellow */
-#define BOLDBLUE    "\033[1m\033[34m"      /* Bold Blue */
-#define BOLDMAGENTA "\033[1m\033[35m"      /* Bold Magenta */
-#define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
-#define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
-
+#define RESET "\033[0m"
+#define BLACK "\033[30m"              /* Black */
+#define RED "\033[31m"                /* Red */
+#define GREEN "\033[32m"              /* Green */
+#define YELLOW "\033[33m"             /* Yellow */
+#define BLUE "\033[34m"               /* Blue */
+#define MAGENTA "\033[35m"            /* Magenta */
+#define CYAN "\033[36m"               /* Cyan */
+#define WHITE "\033[37m"              /* White */
+#define BOLDBLACK "\033[1m\033[30m"   /* Bold Black */
+#define BOLDRED "\033[1m\033[31m"     /* Bold Red */
+#define BOLDGREEN "\033[1m\033[32m"   /* Bold Green */
+#define BOLDYELLOW "\033[1m\033[33m"  /* Bold Yellow */
+#define BOLDBLUE "\033[1m\033[34m"    /* Bold Blue */
+#define BOLDMAGENTA "\033[1m\033[35m" /* Bold Magenta */
+#define BOLDCYAN "\033[1m\033[36m"    /* Bold Cyan */
+#define BOLDWHITE "\033[1m\033[37m"   /* Bold White */
 
 typedef struct {
     int size;  //size of array
     char **pathList;
     int *analyzed;
     int count;
+    time_t *last_edit;
 } array;
 
 typedef struct m_process {
@@ -97,7 +97,6 @@ void insertProcess(process *, pid_t);
 void printList(process *);
 void freeList(process *);
 
-
 //Array struct functions -- sostituiscono lista (momentaneamente?)
 array *createPathList(int);
 void reallocPathList(array *, int);
@@ -109,6 +108,7 @@ int dimPathList(array *);
 void setAnalyzed(array *, int, int);
 int getAnalyzed(array *, int);
 void resetPathList(array *);
+int compare_mtime(array *, int, char *);
 
 void close_pipes(int *, int);
 int unlock_pipes(int *, int);
@@ -124,7 +124,7 @@ void setOnFly(int, int, int *);
 void closeAll(int *);
 
 //parser A.c
-char checkAdd(char *,int *);
+char checkAdd(char *, int *);
 
 // /src/Analyzer/C.c
 void parseOnFly(char *, int *, int *);
