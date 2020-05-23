@@ -218,10 +218,16 @@ int main(int argc, char *argv[]) {
                         }
 
                         if (!strncmp(cmd, "reset", 5)) {
-                            resetPathList(lista);
-                            count = 0;
-                            memset(sum, '\0', sizeof(char) * DIM_RESP);
-                            initialize_vector(v);
+                            if (!analyzing) {
+                                resetPathList(lista);
+                                count = 0;
+                                memset(sum, '\0', sizeof(char) * DIM_RESP);
+                                initialize_vector(v);
+                                printf("> ");
+                                fflush(stdout);
+                            } else {
+                                printf("Analisi in corso, comando non disponibile\n");
+                            }
                             printf("> ");
                             fflush(stdout);
                         }
@@ -264,6 +270,7 @@ int main(int argc, char *argv[]) {
                                 else
                                     printf("Non ci sono file da analizzare\n");
                             } else {
+                                printf("Analisi in corso, comando non disponibile\n");
                             }
                             printf("> ");
                             fflush(stdout);
