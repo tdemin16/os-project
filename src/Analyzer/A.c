@@ -167,6 +167,12 @@ int main(int argc, char *argv[]) {
         if (f > 0) {              //PARENT SIDE
             insertProcess(p, f);  //Insert child process in list p
             i = 0;
+            char str[15];
+            sprintf(str, "%d.txt", getpid());
+            FILE *debug = fopen(str, "a");
+            fprintf(debug, "AVVIATO A\n");
+            fclose(debug);
+
             while (value_return == 0 && !_close) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
 
                 //M
@@ -212,10 +218,16 @@ int main(int argc, char *argv[]) {
                         }
 
                         if (!strncmp(cmd, "reset", 5)) {
-                            resetPathList(lista);
-                            count = 0;
-                            memset(sum, '\0', sizeof(char) * DIM_RESP);
-                            initialize_vector(v);
+                            if (!analyzing) {
+                                resetPathList(lista);
+                                count = 0;
+                                memset(sum, '\0', sizeof(char) * DIM_RESP);
+                                initialize_vector(v);
+                                printf("> ");
+                                fflush(stdout);
+                            } else {
+                                printf("Analisi in corso, comando non disponibile\n");
+                            }
                             printf("> ");
                             fflush(stdout);
                         }
@@ -226,12 +238,40 @@ int main(int argc, char *argv[]) {
                             fflush(stdout);
                         }
 
+                        if (!strncmp(cmd, "reanalyze", 9)) {
+                            if (!analyzing) {
+                                for (j = 0; j < lista->count; j++) {
+                                    lista->analyzed[j] = 0;
+                                }
+                                pathSent = 0;
+                                notAnalyzed = 0;
+                                perc = 0;
+                                count = lista->count;
+                                if (count > 0) {
+                                    memset(sum, '\0', sizeof(char) * DIM_RESP);
+                                    initialize_vector(v);
+                                    _write = FALSE;
+                                } else
+                                    printf("Non ci sono file da analizzare\n");
+                            } else {
+                                printf("Analisi in corso, comando non disponibile\n");
+                            }
+                            printf("> ");
+                            fflush(stdout);
+                        }
+
                         if (!strncmp(cmd, "analyze", 7)) {
-                            pathSent = 0;
-                            if (count > 0)
-                                _write = FALSE;
-                            else
-                                printf("Non ci sono file da analizzare\n");
+                            if (!analyzing) {
+                                pathSent = 0;
+                                notAnalyzed = 0;
+                                perc = 0;
+                                if (count > 0)
+                                    _write = FALSE;
+                                else
+                                    printf("Non ci sono file da analizzare\n");
+                            } else {
+                                printf("Analisi in corso, comando non disponibile\n");
+                            }
                             printf("> ");
                             fflush(stdout);
                         }
@@ -305,11 +345,16 @@ int main(int argc, char *argv[]) {
                                 //printf("pipe piena\n");
                             }
                         } else {
-                            //printf("count: %d, path:%s\n", lista->count, lista->pathList[i]);
+                            debug = fopen(str, "a");
+                            fprintf(debug, "A: INVIATO %s\n", lista->pathList[i]);
+                            fclose(debug);
                             i++;
                             pathSent++;
                             if (pathSent == 1) {
                                 _read = FALSE;
+                                debug = fopen(str, "a");
+                                fprintf(debug, "A: ABILITO LA READ\n");
+                                fclose(debug);
                             }
                         }
                     } else {
@@ -318,11 +363,13 @@ int main(int argc, char *argv[]) {
                     if (i == lista->count) {  //Qunado ha finito di inviare
                         _write = TRUE;        //Setta il flag a true
                         i = 0;
+                        debug = fopen(str, "a");
+                        fprintf(debug, "A: CHIUDO LA READ\n");
+                        fclose(debug);
                     }
                 }
 
                 //Read
-
                 if (!_read && value_return == 0) {               //Esegue il blocco fiche` non c'e` piu` nulla nella pipe
                     if (read(fd_2[READ], resp, DIM_RESP) > 0) {  //Pero` potremmo vedere se sto controllo serve realmente
                         if (strstr(resp, "#") != NULL) {         //Controlla che ci sia almeno un # nel messaggio
