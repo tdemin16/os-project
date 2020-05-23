@@ -232,14 +232,39 @@ int main(int argc, char *argv[]) {
                             fflush(stdout);
                         }
 
+                        if (!strncmp(cmd, "reanalyze", 9)) {
+                            if (!analyzing) {
+                                for (j = 0; j < lista->count; j++) {
+                                    lista->analyzed[j] = 0;
+                                }
+                                pathSent = 0;
+                                notAnalyzed = 0;
+                                perc = 0;
+                                count = lista->count;
+                                if (count > 0) {
+                                    memset(sum, '\0', sizeof(char) * DIM_RESP);
+                                    initialize_vector(v);
+                                    _write = FALSE;
+                                } else
+                                    printf("Non ci sono file da analizzare\n");
+                            } else {
+                                printf("Analisi in corso, comando non disponibile\n");
+                            }
+                            printf("> ");
+                            fflush(stdout);
+                        }
+
                         if (!strncmp(cmd, "analyze", 7)) {
-                            pathSent = 0;
-                            notAnalyzed = 0;
-                            perc = 0;
-                            if (count > 0)
-                                _write = FALSE;
-                            else
-                                printf("Non ci sono file da analizzare\n");
+                            if (!analyzing) {
+                                pathSent = 0;
+                                notAnalyzed = 0;
+                                perc = 0;
+                                if (count > 0)
+                                    _write = FALSE;
+                                else
+                                    printf("Non ci sono file da analizzare\n");
+                            } else {
+                            }
                             printf("> ");
                             fflush(stdout);
                         }

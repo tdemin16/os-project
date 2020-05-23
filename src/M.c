@@ -233,7 +233,7 @@ int check_command(char *cmd) {
         res = 0;
     } else if (!strcmp(cmd, "-c")) {  //R
         res = 1;
-    } else if (!strncmp(cmd, "add", 3) || !strncmp(cmd, "remove", 6) || !strcmp(cmd, "reset") || !strcmp(cmd, "print") || !strcmp(cmd, "analyze")) {  //A
+    } else if (!strncmp(cmd, "add", 3) || !strncmp(cmd, "remove", 6) || !strcmp(cmd, "reset") || !strcmp(cmd, "print") || !strcmp(cmd, "analyze") || !strcmp(cmd, "reanalyze")) {  //A
         res = 2;
     } else if (!strcmp(cmd, "help") || !strcmp(cmd, "info")) {  //HELP
         res = 3;
