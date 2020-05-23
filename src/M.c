@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
                 strcpy(cmd, "");                 //svuota la stringa per il prossimo comando
                 fflush(stdout);
                 ch = '\0';
-                
+
                 while (ch != '\n') {  //fino al "lancio" (invio, '\n') del comando continua a leggere caratteri
                     ch = getc(stdin);
                     if (ch != '\n') strcat(cmd, &ch);  //concatena il carattere alla stringa cmd, ma evita di concatenare '\n'
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
 
                 if (res_cmd == -1) {
                     //richiama la funzione help() coi comandi
-                    printf(BOLDRED"[ERRORE] "RESET"Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n> ");
+                    printf(BOLDRED "[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n> ");
                 }
 
                 if (res_cmd == 0) {
@@ -121,16 +121,18 @@ int main(int argc, char *argv[]) {
                 }
 
                 if (res_cmd == 1) {
-                    while (value_return == 0 && _write) {
-                        if (write(fd[R * 2 + WRITE], cmd, DIM_CMD) == -1) {
-                            if (errno != EAGAIN) {
-                                value_return = err_write();
+                    if (!strcmp(cmd, "print")) {
+                        while (value_return == 0 && _write) {
+                            if (write(fd[R * 2 + WRITE], cmd, DIM_CMD) == -1) {
+                                if (errno != EAGAIN) {
+                                    value_return = err_write();
+                                }
+                            } else {
+                                _write = FALSE;
                             }
-                        } else {
-                            _write = FALSE;
                         }
+                        _write = TRUE;
                     }
-                    _write = TRUE;
                 }
 
                 if (res_cmd == 2) {
@@ -156,26 +158,25 @@ int main(int argc, char *argv[]) {
                             fclose(fptr);
                         }
                     } else {
-                        printf(BOLDBLUE"\nLista Comandi disponibili\n"RESET);
-                        printf(BOLDGREEN"add </path1> </path2>"RESET": aggiunge uno o piu` file e/o una o piu` directory\n");
-                        printf(BOLDBLACK"\t es: add ../src ../deploy.sh\n"RESET);
-                        printf(BOLDRED"remove </path1> </path2>"RESET": rimuove uno o piu` file e/o una o piu` directory\n");
-                        printf(BOLDBLACK"\t es: remove ../src ../deploy.sh\n"RESET);
-                        printf(BOLDYELLOW"reset"RESET": elimina dalla cache del programma le statistiche e tutti i percorsi analizzati e non\n");
-                        printf(BOLDWHITE"print"RESET": stampa a video tutte il percorso di tutti i file analizzati\n");
-                        printf(BOLDMAGENTA"analyze"RESET": avvia l'analizzatore\n");
-                        printf(BOLDCYAN"-c"RESET": stampa le statistiche per cluster\n");
-                        printf(WHITE"info"RESET": mostra informazioni aggiuntive sul programma\n");
-                        printf(WHITE"close"RESET": chiude il programma\n");
+                        printf(BOLDBLUE "\nLista Comandi disponibili\n" RESET);
+                        printf(BOLDGREEN "add </path1> </path2>" RESET ": aggiunge uno o piu` file e/o una o piu` directory\n");
+                        printf(BOLDBLACK "\t es: add ../src ../deploy.sh\n" RESET);
+                        printf(BOLDRED "remove </path1> </path2>" RESET ": rimuove uno o piu` file e/o una o piu` directory\n");
+                        printf(BOLDBLACK "\t es: remove ../src ../deploy.sh\n" RESET);
+                        printf(BOLDYELLOW "reset" RESET ": elimina dalla cache del programma le statistiche e tutti i percorsi analizzati e non\n");
+                        printf(BOLDWHITE "print" RESET ": stampa a video tutte il percorso di tutti i file analizzati\n");
+                        printf(BOLDMAGENTA "analyze" RESET ": avvia l'analizzatore\n");
+                        printf(BOLDCYAN "-c" RESET ": stampa le statistiche per cluster\n");
+                        printf(WHITE "info" RESET ": mostra informazioni aggiuntive sul programma\n");
+                        printf(WHITE "close" RESET ": chiude il programma\n");
                     }
-                    printf("\n> ");
                 }
             }
             close(fd[R * 2 + WRITE]);
             close(fd[R * 2 + READ]);
             close(fd[A * 2 + WRITE]);
             close(fd[A * 2 + READ]);
-            printf(BOLDWHITE"M"RESET": Closing...\n");
+            printf(BOLDWHITE "M" RESET ": Closing...\n");
         }
     }
 
@@ -228,9 +229,9 @@ int check_command(char *cmd) {
 
     if (!strcmp(cmd, "close")) {  //CLOSE
         res = 0;
-    } else if (!strcmp(cmd, "-c")) {  //R
+    } else if (!strcmp(cmd, "-c") || !strcmp(cmd, "print")) {  //R
         res = 1;
-    } else if (!strncmp(cmd, "add", 3) || !strncmp(cmd, "remove", 6) || !strcmp(cmd, "reset") || !strcmp(cmd, "print") || !strcmp(cmd, "analyze") || !strcmp(cmd, "reanalyze")) {  //A
+    } else if (!strncmp(cmd, "add", 3) || !strncmp(cmd, "remove", 6) || !strcmp(cmd, "reset") || !strcmp(cmd, "analyze") || !strcmp(cmd, "reanalyze")) {  //A
         res = 2;
     } else if (!strcmp(cmd, "help") || !strcmp(cmd, "info")) {  //HELP
         res = 3;

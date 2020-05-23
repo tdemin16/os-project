@@ -56,9 +56,8 @@ int main(int argc, char *argv[]) {
     //int fd_fifo;                         //pipe fifo con R
     char print_method[DIM_CMD];
     int retrieve = TRUE;
-    int _write_val = -1;
     char tmp_resp[DIM_RESP];
-    strcpy(tmp_resp, "///");
+    int _r_write = TRUE;
 
     //COMMUNICATION WITH M
     char cmd[DIM_CMD];  //Comando rivevuto da M
@@ -89,9 +88,9 @@ int main(int argc, char *argv[]) {
     //Variables for IPC
     int fd_1[2];  //Pipes
     int fd_2[2];
-    pid_t f;              //fork return value
-    int _write = FALSE;   //true when finish writing the pipe
-    int _read = TRUE;     //true when fisnish reading from pipe
+    pid_t f;             //fork return value
+    int _write = FALSE;  //true when finish writing the pipe
+    int _read = TRUE;    //true when fisnish reading from pipe
     char resp[DIM_RESP];  //Stringa in cui salvare i messaggi ottenuti dal figlio
     int id_r;             //Id file ricevuto
     char *resp_val;       //Messaggio senza Id
@@ -234,12 +233,6 @@ int main(int argc, char *argv[]) {
                             fflush(stdout);
                         }
 
-                        if (!strncmp(cmd, "print", 5)) {
-                            printPathList(lista);
-                            printf("> ");
-                            fflush(stdout);
-                        }
-
                         if (!strncmp(cmd, "reanalyze", 9)) {
                             if (!analyzing) {
                                 for (j = 0; j < lista->count; j++) {
@@ -253,12 +246,14 @@ int main(int argc, char *argv[]) {
                                     memset(sum, '\0', sizeof(char) * DIM_RESP);
                                     initialize_vector(v);
                                     _write = FALSE;
-                                } else
-                                    printf("Non ci sono file da analizzare\n");
+                                } else {
+                                    printf("Non ci sono file da analizzare\n> ");
+                                    fflush(stdout);
+                                }
                             } else {
-                                printf("Analisi in corso, comando non disponibile\n");
+                                printf("Analisi in corso, comando non disponibile\n> ");
+                                fflush(stdout);
                             }
-                            printf("\n");
                         }
 
                         if (!strncmp(cmd, "analyze", 7)) {
@@ -269,11 +264,11 @@ int main(int argc, char *argv[]) {
                                 if (count > 0)
                                     _write = FALSE;
                                 else
-                                    printf("Non ci sono file da analizzare\n");
+                                    printf("\nNon ci sono file da analizzare\n");
                             } else {
-                                printf("Analisi in corso, comando non disponibile\n");
+                                printf("\nAnalisi in corso, comando non disponibile\n");
                             }
-                            printf("> ");
+                            printf("\n> ");
                             fflush(stdout);
                         }
                     }
@@ -284,7 +279,6 @@ int main(int argc, char *argv[]) {
                     if (retrieve) {
                         if (read(fd_fifo, print_method, DIM_CMD) > 0) {
                             retrieve = FALSE;
-                            printf("%s\n", print_method);
                             if (close(fd_fifo) == -1) {
                                 value_return = err_close();
                             }
@@ -301,20 +295,33 @@ int main(int argc, char *argv[]) {
                             }
                         }
                     } else {
-                        if (!strncmp(print_method, "-c", 2)) {
-                            //Settare l'output
-                        }
-                        //Aggiungere flags
-
-                        retrieve = TRUE;
-                        do {
-                            _write_val = write(fd_fifo, tmp_resp, DIM_RESP);
-                            if (_write_val == -1) {
-                                if (errno != EAGAIN) {
-                                    value_return = err_write();
+                        if (!strcmp(print_method, "print")) {
+                            if (lista->count > 0) {
+                                for (j = 0; j < lista->count; j++) {
+                                    _r_write = TRUE;
+                                    while (value_return == 0 && _r_write) {
+                                        if (write(fd_fifo, lista->pathList[j], PATH_MAX) == -1) {
+                                            if (errno != EAGAIN) {
+                                                value_return = err_write();
+                                            }
+                                        } else {
+                                            _r_write = FALSE;
+                                        }
+                                    }
                                 }
                             }
-                        } while (value_return == 0 && errno == EAGAIN && _write_val == -1);
+                            strcpy(tmp_resp, "///");
+                            _r_write = TRUE;
+                            while (value_return == 0 && _r_write) {
+                                if (write(fd_fifo, tmp_resp, PATH_MAX) == -1) {
+                                    if (errno != EAGAIN) {
+                                        value_return = err_write();
+                                    }
+                                    _r_write = FALSE;
+                                }
+                            }
+                        }
+                        retrieve = TRUE;
 
                         if (value_return == 0) {
                             FILE *debug = fopen("log.txt", "a");
