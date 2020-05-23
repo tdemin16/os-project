@@ -103,7 +103,12 @@ int main(int argc, char *argv[]) {
     int argCounter = 0;
     initialize_vector(v);  //Inizializzazione vettore dei valori totali
 
-    value_return = parser(argc, argv, lista, &count, &n, &m);  //Controlla i parametri passati ad A
+    if (argc > 1){
+        value_return = parser(argc, argv, lista, &count, &n, &m);  //Controlla i parametri passati ad A
+    } else {
+        _write = TRUE;
+    }
+    
 
     insertProcess(p, getpid());  //Insert pid of A in process list
 
@@ -223,8 +228,6 @@ int main(int argc, char *argv[]) {
                                 count = 0;
                                 memset(sum, '\0', sizeof(char) * DIM_RESP);
                                 initialize_vector(v);
-                                printf("> ");
-                                fflush(stdout);
                             } else {
                                 printf("Analisi in corso, comando non disponibile\n");
                             }

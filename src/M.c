@@ -84,6 +84,7 @@ int main(int argc, char *argv[]) {
                 strcpy(cmd, "");                 //svuota la stringa per il prossimo comando
                 fflush(stdout);
                 ch = '\0';
+                
                 while (ch != '\n') {  //fino al "lancio" (invio, '\n') del comando continua a leggere caratteri
                     ch = getc(stdin);
                     if (ch != '\n') strcat(cmd, &ch);  //concatena il carattere alla stringa cmd, ma evita di concatenare '\n'
