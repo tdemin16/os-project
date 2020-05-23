@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
 
                 if (res_cmd == 3) {
                     if (!strcmp(cmd, "info")) {
-                        fptr = fopen("../README.md", "r");
+                        fptr = fopen("../README.txt", "r");
                         printf("\n");
                         if (fptr) {
                             while ((c = getc(fptr)) != EOF)
