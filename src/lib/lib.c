@@ -58,12 +58,13 @@ void freeList(process *tmp) {  // free the list tmp
     free(tmp);                 // free the list tmp
 }  //
 
-array *createPathList(int size) {                                       //allocate an array for the PathList
-    array *st = (array *)malloc(sizeof(array));                         //allocate list of paths
-    st->size = size;                                                    //assign the size of the array
-    st->pathList = malloc(sizeof(char **) * size);                      //allocate the array of path (strings / char*)
-    st->analyzed = (int *)malloc(sizeof(int *) * size);                 //allocate the array of int analyzed
-    st->count = 0;                                                      //set the counter to 0
+array *createPathList(int size) {                        //allocate an array for the PathList
+    array *st = (array *)malloc(sizeof(array));          //allocate list of paths
+    st->size = size;                                     //assign the size of the array
+    st->pathList = malloc(sizeof(char **) * size);       //allocate the array of path (strings / char*)
+    st->analyzed = (int *)malloc(sizeof(int *) * size);  //allocate the array of int analyzed
+    st->count = 0;                                       //set the counter to 0
+    st->last_edit = (time_t *)malloc(sizeof(time_t *) * size);
     int i;                                                              //initialize variable i for the next cycle
     for (i = 0; i < size; i++)                                          //start the cycle from 0 to the size of the process
     {                                                                   //
@@ -78,18 +79,20 @@ char insertPathList(array *tmp, char *c, int val) {
     int i;
     char present = FALSE;
     char ret = FALSE;
-    char * dup1 = NULL;
-    char * dup2 = NULL;
-    char * compare1;
-    char * compare2;
+    char *dup1 = NULL;
+    char *dup2 = NULL;
+    char *compare1;
+    char *compare2;
+    struct stat attr;
+
     for (i = 0; i < tmp->count; i++) {
         dup1 = strdup(tmp->pathList[i]);
         dup2 = strdup(c);
-        compare1 = strtok(dup1,"#");
-        compare1 = strtok(NULL,"#");
-        compare2 = strtok(dup2,"#");
-        compare2 = strtok(NULL,"#");
-        
+        compare1 = strtok(dup1, "#");
+        compare1 = strtok(NULL, "#");
+        compare2 = strtok(dup2, "#");
+        compare2 = strtok(NULL, "#");
+
         if (!strcmp(compare1, compare2)) {
             present = TRUE;
         }
@@ -102,6 +105,13 @@ char insertPathList(array *tmp, char *c, int val) {
             reallocPathList(tmp, 2);
         }
         //printf("Stringa inserita\n");
+        dup2 = strdup(c);
+        compare2 = strtok(dup2, "#");
+        compare2 = strtok(NULL, "#");
+        stat(compare2, &attr);
+        tmp->last_edit[tmp->count] = attr.st_mtime;
+        free(dup2);
+
         strcpy(tmp->pathList[tmp->count], c);
         tmp->analyzed[tmp->count] = val;
         tmp->count++;
@@ -149,6 +159,7 @@ void reallocPathList(array *tmp, int newSize) {
     tmp->size *= newSize;
     tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
     tmp->analyzed = (int *)realloc(tmp->analyzed, sizeof(int *) * tmp->size);
+    tmp->last_edit = (time_t *)realloc(tmp->last_edit, sizeof(time_t *) * tmp->size);
 
     for (i = tmp->count; i < tmp->size; i++) {
         tmp->pathList[i] = (char *)malloc(sizeof(char *) * (DIM_RESP + 1));
@@ -162,11 +173,13 @@ void printPathList(array *tmp) {
     if (tmp->count == 0) {
         printf("\nLista vuota\n\n");
     }
+    printf("\n");
     for (i = 0; i < tmp->count; i++) {
         usleep(10000);
         printf("%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
         //fprintf(stderr, "%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
     }
+    printf("\n");
 }
 
 int dimPathList(array *tmp) {
@@ -180,6 +193,7 @@ void freePathList(array *tmp) {
     }
     free(tmp->pathList);
     free(tmp->analyzed);
+    free(tmp->last_edit);
     free(tmp);
 }
 
@@ -200,6 +214,18 @@ int getAnalyzed(array *tmp, int pos) {
 void resetPathList(array *tmp) {
     freePathList(tmp);
     tmp = createPathList(10);
+}
+
+//Compare mtime of string1 and string2, returns TRUE if equal
+int compare_mtime(array* tmp, int i, char* str) {
+    int value_return = FALSE;
+    struct stat attr;
+    stat(str, &attr);
+    if(tmp->last_edit[i] == attr.st_mtime) {
+        value_return = TRUE;
+    }
+
+    return value_return;
 }
 
 //Returns -1 if fails
@@ -736,7 +762,7 @@ void printStat_Cluster(char *char_count) {
         }
     }
 
-    printf("STAMPA STATISTICHE PER CLUSTER\n\n");
+    printf("\nSTAMPA STATISTICHE PER CLUSTER\n\n");
     printf("Lettere minuscole:\t %d\t%.4g%%\n", lettereMin, (float)lettereMin / (float)tot * 100);
     printf("Lettere maiuscole:\t %d\t%.4g%%\n", lettereMai, (float)lettereMai / (float)tot * 100);
     printf("Spazi:\t\t\t %d\t%.4g%%\n", spazi, (float)spazi / (float)tot * 100);

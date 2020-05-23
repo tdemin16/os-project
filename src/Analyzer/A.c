@@ -223,7 +223,6 @@ int main(int argc, char *argv[]) {
                                 count = 0;
                                 memset(sum, '\0', sizeof(char) * DIM_RESP);
                                 initialize_vector(v);
-                                printf("> ");
                                 fflush(stdout);
                             } else {
                                 printf("Analisi in corso, comando non disponibile\n");
@@ -256,8 +255,7 @@ int main(int argc, char *argv[]) {
                             } else {
                                 printf("Analisi in corso, comando non disponibile\n");
                             }
-                            printf("> ");
-                            fflush(stdout);
+                            printf("\n");
                         }
 
                         if (!strncmp(cmd, "analyze", 7)) {
@@ -386,6 +384,11 @@ int main(int argc, char *argv[]) {
                                     lista->analyzed[id_r] = 1;                                      //Setta il flag ad Analizzato
                                     if (addCsvToArray(resp_val, v)) value_return = err_overflow();  //Aggiunge il file al vettore delle somme
                                     perc++;                                                         //Aumenta l'avanzamento della barretta
+                                    if(value_return == 0) {
+                                        if(!compare_mtime(lista, id_r, file)) {
+                                            printf("\nIl file %s\ne` stato modificato durante l'analisi.\nUsa il comando"BOLDWHITE" reanalyze"RESET" per rianalizzarlo\n\n", file);
+                                        }
+                                    }
                                 } else {
                                     if (addCsvToArray(resp_val, v)) value_return = err_overflow();  //Aggiunge il file al vettore delle somme
                                     lista->analyzed[id_r] = 2;                                      //Setta il flag ad analizzato ma non piu` esistente
