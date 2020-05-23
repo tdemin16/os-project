@@ -45,10 +45,6 @@ int main(int argc, char *argv[]) {
     int fd[4];
     char array_args[4];
 
-    if (argc == 1) {
-        value_return = err_args_M();
-    }
-
     //IPC
     if (value_return == 0) {
         for (i = 0; i < 3; i += 2) {
