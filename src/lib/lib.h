@@ -52,6 +52,9 @@
 #define A 0
 #define R 1
 
+#define ADD 0
+#define REMOVE 1
+
 #define RESET "\033[0m"
 #define BLACK "\033[30m"              /* Black */
 #define RED "\033[31m"                /* Red */
@@ -102,6 +105,7 @@ array *createPathList(int);
 void reallocPathList(array *, int);
 char insertPathList(array *, char *, int);
 int insertAndSumPathList(array *, char *, int);
+char removeFromPathList(array *, char *c);
 void printPathList(array *);
 void freePathList(array *);
 int dimPathList(array *);
@@ -109,12 +113,13 @@ void setAnalyzed(array *, int, int);
 int getAnalyzed(array *, int);
 void resetPathList(array *);
 int compare_mtime(array *, int, char *);
+array* cleanRemoved(array *);
 
 void close_pipes(int *, int);
 int unlock_pipes(int *, int);
 
 // /src/Analyzer/A.c
-int parser(int, char **, array *, int *, int *, int *);
+int parser(char, int, char **, array *, int *, int *, int *);
 void handle_sigint(int);
 int parse_string(char *, int *v);
 void add_process_to_v(pid_t, int *);
@@ -124,7 +129,7 @@ void setOnFly(int, int, int *);
 void closeAll(int *);
 
 //parser A.c
-char checkAdd(char *, int *);
+char checkArg(char *, int *);
 
 // /src/Analyzer/C.c
 void parseOnFly(char *, int *, int *);

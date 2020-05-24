@@ -122,6 +122,32 @@ char insertPathList(array *tmp, char *c, int val) {
     return ret;
 }
 
+char removeFromPathList(array *tmp, char *c) {
+    int i;
+    char ret = FALSE;
+    char *dup1 = NULL;
+    char *dup2 = NULL;
+    char *compare1;
+    char *compare2;
+
+    for (i = 0; i < tmp->count; i++) {
+        dup1 = strdup(tmp->pathList[i]);
+        dup2 = strdup(c);
+        compare1 = strtok(dup1, "#");
+        compare1 = strtok(NULL, "#");
+        compare2 = strtok(dup2, "#");
+        compare2 = strtok(NULL, "#");
+
+        if (!strcmp(compare1, compare2)) {
+            ret = TRUE;
+            tmp->analyzed[i] = REMOVED;
+        }
+        free(dup1);
+        free(dup2);
+    }
+    return ret;
+}
+
 int insertAndSumPathList(array *tmp, char *c, int val) {
     int i;
     char sum = FALSE;
@@ -217,17 +243,30 @@ void resetPathList(array *tmp) {
 }
 
 //Compare mtime of string1 and string2, returns TRUE if equal
-int compare_mtime(array* tmp, int i, char* str) {
+int compare_mtime(array *tmp, int i, char *str) {
     int value_return = FALSE;
     struct stat attr;
     stat(str, &attr);
-    if(tmp->last_edit[i] == attr.st_mtime) {
+    if (tmp->last_edit[i] == attr.st_mtime) {
         value_return = TRUE;
     }
 
     return value_return;
 }
-
+array * cleanRemoved(array *lista){
+    int j;
+    array *tmp = createPathList(lista->size);
+    for (j = 0; j<lista->count;j++){
+        if (lista->analyzed[j]!=REMOVED){
+            strcpy(tmp->pathList[lista->count],lista->pathList[j]);
+            tmp->analyzed[lista->count] = lista->analyzed[j];
+            tmp->last_edit[lista->count] = lista->last_edit[j];
+            lista->count++;
+        }
+    }
+    freePathList(lista);
+    return tmp;
+}
 //Returns -1 if fails
 int unlock_pipes(int *fd, int size) {
     int i;
@@ -265,7 +304,7 @@ char sameId(char *a, char *b) {
 // /src/Analyzer/A.c
 // Handler for SIGINT, caused by
 // Ctrl-C at keyboard
-int parser(int argc, char *argv[], array *lista, int *count, int *n, int *m) {
+int parser(char type, int argc, char *argv[], array *lista, int *count, int *n, int *m) {
     int value_return = 0;
     int i;
     char resolved_path[PATH_MAX];  //contiene il percorso assoluto di un file
@@ -343,10 +382,18 @@ int parser(int argc, char *argv[], array *lista, int *count, int *n, int *m) {
                             strcat(path, "#");
                             strcat(path, resolved_path);
                             //printf("%s\n",path);
-                            if (insertPathList(lista, path, 0)) {
-                                (*count)++;
-                                //printf("%s\n", resolved_path);
+                            if (type == ADD) {
+                                if (insertPathList(lista, path, 0)) {
+                                    (*count)++;
+                                    //printf("%s\n", resolved_path);
+                                }
+                            } else {
+                                if (removeFromPathList(lista, path)) {
+                                    (*count)--;
+                                    //printf("%s\n", resolved_path);
+                                }
                             }
+
                         } else {            //Intercetta l'errore riguardante file o cartelle non esistenti
                             errdir = TRUE;  //Metto il flag errore file/directory sbagliati
                         }
@@ -406,7 +453,7 @@ void closeAll(int *fd_1) {
     }
 }
 
-char checkAdd(char cmd[DIM_CMD], int *argCounter) {
+char checkArg(char cmd[DIM_CMD], int *argCounter) {
     int j;
     char ret = TRUE;
     if (!(strstr(cmd, "  ") != NULL)) {

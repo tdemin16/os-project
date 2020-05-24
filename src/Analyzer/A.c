@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
     initialize_vector(v);  //Inizializzazione vettore dei valori totali
 
     if (argc > 1) {
-        value_return = parser(argc, argv, lista, &count, &n, &m);  //Controlla i parametri passati ad A
+        value_return = parser(ADD,argc, argv, lista, &count, &n, &m);  //Controlla i parametri passati ad A
     } else {
         _write = TRUE;
     }
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
 
                         if (!strncmp(cmd, "add", 3)) {
                             if (!analyzing) {
-                                if (checkAdd(cmd, &argCounter)) {
+                                if (checkArg(cmd, &argCounter)) {
                                     tempPath = malloc(argCounter * sizeof(char *));
                                     for (j = 0; j < argCounter; j++) {
                                         tempPath[j] = malloc(PATH_MAX * sizeof(char));
@@ -201,7 +201,7 @@ int main(int argc, char *argv[]) {
                                     for (j = 1; j < argCounter; j++) {
                                         strcpy(tempPath[j], strtok(NULL, " "));
                                     }
-                                    parser(argCounter, tempPath, lista, &count, &n, &m);  //Controlla i parametri passati ad A
+                                    parser(ADD,argCounter, tempPath, lista, &count, &n, &m);  //Controlla i parametri passati ad A
                                     for (j = 0; j < argCounter; j++) {
                                         //printf("ARG[%d] - %s\n",j,tempPath[j]);
                                         free(tempPath[j]);
@@ -218,6 +218,33 @@ int main(int argc, char *argv[]) {
                         }
 
                         if (!strncmp(cmd, "remove", 6)) {
+                            printPathList(lista);
+                            if (!analyzing) {
+                                if (checkArg(cmd, &argCounter)) {
+                                    tempPath = malloc(argCounter * sizeof(char *));
+                                    for (j = 0; j < argCounter; j++) {
+                                        tempPath[j] = malloc(PATH_MAX * sizeof(char));
+                                    }
+                                    strcpy(tempPath[0], strtok(cmd, " "));
+                                    for (j = 1; j < argCounter; j++) {
+                                        strcpy(tempPath[j], strtok(NULL, " "));
+                                    }
+                                    parser(REMOVE,argCounter, tempPath, lista, &count, &n, &m);  //Controlla i parametri passati ad A
+                                    for (j = 0; j < argCounter; j++) {
+                                        //printf("ARG[%d] - %s\n",j,tempPath[j]);
+                                        free(tempPath[j]);
+                                    }
+                                    free(tempPath);
+                                    lista = cleanRemoved(lista);
+                                    printPathList(lista);
+                                } else {
+                                    err_args_A();
+                                }
+                            } else {
+                                printf("Analisi in corso, comando non disponibile\n");
+                            }
+                            printf("> ");
+                            fflush(stdout);
                         }
 
                         if (!strncmp(cmd, "reset", 5)) {
