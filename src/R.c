@@ -59,7 +59,7 @@ int main() {
     int retrieve = FALSE;
     int _r_write = TRUE;
     char resp[DIM_RESP];
-    char path[PATH_MAX];
+    char path[DIM_PATH];
     int arr = FALSE;
     int spaces;
     char *dupl = NULL;
