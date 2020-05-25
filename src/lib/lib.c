@@ -68,8 +68,8 @@ array *createPathList(int size) {                        //allocate an array for
     int i;                                                              //initialize variable i for the next cycle
     for (i = 0; i < size; i++)                                          //start the cycle from 0 to the size of the process
     {                                                                   //
-        st->pathList[i] = (char *)malloc(sizeof(char *) * (PATH_MAX));  //allocate the array of chars that compose the string
-        memset(st->pathList[i], '\0', sizeof(char *) * PATH_MAX);       //set the first character to '\0' (= end of string)
+        st->pathList[i] = (char *)malloc(sizeof(char *) * (DIM_PATH));  //allocate the array of chars that compose the string
+        memset(st->pathList[i], '\0', sizeof(char *) * DIM_PATH);       //set the first character to '\0' (= end of string)
         st->analyzed[i] = -1;                                           //set analyzed to -1 (= not analyzed)
     }                                                                   //
     return st;                                                          //return the created list of paths
@@ -139,8 +139,12 @@ char removeFromPathList(array *tmp, char *c) {
         compare2 = strtok(NULL, "#");
 
         if (!strcmp(compare1, compare2)) {
-            ret = TRUE;
-            tmp->analyzed[i] = REMOVED;
+            if (tmp->analyzed[i] != REMOVED) {
+                if (tmp->analyzed[i] != ANALIZED) {
+                    ret = TRUE;
+                }
+                tmp->analyzed[i] = REMOVED;
+            }
         }
         free(dup1);
         free(dup2);
@@ -189,7 +193,7 @@ void reallocPathList(array *tmp, int newSize) {
 
     for (i = tmp->count; i < tmp->size; i++) {
         tmp->pathList[i] = (char *)malloc(sizeof(char *) * (DIM_RESP + 1));
-        //memset(tmp->pathList[i], '\0', sizeof(char *) * PATH_MAX);  //set the first character to '\0' (= end of string)
+        //memset(tmp->pathList[i], '\0', sizeof(char *) * DIM_PATH);  //set the first character to '\0' (= end of string)
         tmp->analyzed[i] = -1;
     }
 }
@@ -253,20 +257,31 @@ int compare_mtime(array *tmp, int i, char *str) {
 
     return value_return;
 }
-array * cleanRemoved(array *lista){
+void cleanRemoved(array *lista) {
     int j;
+    char *dup = NULL;
+    char *path = NULL;
+    char newPath[DIM_PATH];
+
     array *tmp = createPathList(lista->size);
-    for (j = 0; j<lista->count;j++){
-        if (lista->analyzed[j]!=REMOVED){
-            strcpy(tmp->pathList[lista->count],lista->pathList[j]);
-            tmp->analyzed[lista->count] = lista->analyzed[j];
-            tmp->last_edit[lista->count] = lista->last_edit[j];
-            lista->count++;
+    for (j = 0; j < lista->count; j++) {
+        if (lista->analyzed[j] != REMOVED) {
+            insertPathList(tmp, lista->pathList[j], lista->analyzed[j]);
         }
     }
     freePathList(lista);
-    return tmp;
+    lista = createPathList(tmp->count + 1);
+    for (j = 0; j < tmp->count; j++) {
+        dup = strdup(tmp->pathList[j]);
+        path = strtok(dup, "#");
+        path = strtok(NULL, "#");
+        sprintf(newPath, "%d#%s", lista->count, path);
+        insertPathList(lista, newPath, tmp->analyzed[j]);
+        free(dup);
+    }
+    freePathList(tmp);
 }
+
 //Returns -1 if fails
 int unlock_pipes(int *fd, int size) {
     int i;
@@ -304,110 +319,106 @@ char sameId(char *a, char *b) {
 // /src/Analyzer/A.c
 // Handler for SIGINT, caused by
 // Ctrl-C at keyboard
-int parser(char type, int argc, char *argv[], array *lista, int *count, int *n, int *m) {
-    int value_return = 0;
-    int i;
-    char resolved_path[PATH_MAX];  //contiene il percorso assoluto di un file
-    char flag = FALSE;             // se flag = true, non bisogna analizzare l'argomento. (l'argomento successivo è il numero o di n o di m)
-    char setn = FALSE;             // se setn = true, n è stato cambiato
-    char setm = FALSE;             // se setn = true, m è stato cambiato
-    char errdir = FALSE;
-    //int start = lista->count;
-    FILE *fp;
-    char riga[1035];
 
-    if (argc < 1) {  //if number of arguments is even or less than 1, surely it's a wrong input
-        value_return = err_args_A();
+//Aggiunge alla PathList passata tutti i file contenenti, restituisce 0 se è andato tutto bene
+int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, int *res) {
+    char type;
+    int i;
+    FILE *fp;
+    *res = 0;
+    char riga[PATH_MAX];
+    char resolved_path[PATH_MAX - 12];
+    int ret = parser_CheckArguments(argc, argv, &(*n), &(*m));
+    if (ret < 0) {
+        ret = ERR_ARGS_A;
+    } else if (ret > 0) {
+        err_input_A(argv[ret]);
+        ret = ERR_ARGS_A;
     } else {
-        for (i = 1; i < argc && value_return == 0; i++) {
-            //printf("Argv: %s\n", argv[i]);
+        if (!strncmp(argv[0], "add", 3) || !strncmp(argv[0], "./A", 3))
+            type = ADD;
+        else
+            type = REMOVE;
+        for (i = 1; i < argc && ret == 0; i++) {
+            if (!strcmp(argv[i], "-setn") || !strcmp(argv[i], "-setm")) {  //----ERRORI -setn
+                i++;
+            } else {
+                char command[parser_LenghtCommand(argv[i])];
+                sprintf(command, "find %s -type f -follow -print", argv[i]);
+                fp = popen(command, "r");  //avvia il comando e in fp prende l'output
+                if (fp == NULL) {
+                    ret = ERR_ARGS_A;
+                    printf("Errore\n");
+                } else {  //Il comando va a buon fine
+                    while (fgets(riga, sizeof(riga), fp) != NULL) {
+                        realpath(riga, resolved_path);                    //risalgo al percorso assoluto
+                        resolved_path[strlen(resolved_path) - 1] = '\0';  //tolgo l'ultimo carattere che manderebbe a capo
+                        char path[DIM_PATH];
+                        sprintf(path, "%d#%s", lista->count, resolved_path);
+                        if (type == ADD) {
+                            if (insertPathList(lista, path, 0)) {
+                                (*count)++;
+                                (*res)++;
+                            }
+                        } else {
+                            if (removeFromPathList(lista, path)) {
+                                (*count)--;
+                                (*res)++;
+                                //printf("%s\n", resolved_path);
+                            }
+                        }
+                    }
+                }
+                pclose(fp);
+            }
+        }
+    }
+    return ret;
+}
+
+int parser_LenghtCommand(char *search) {
+    int ret = strlen("find  -type f -follow -print") + strlen(search) + 1;
+    return ret;
+}
+//Return -1 if ERR_ARGS, 0 if all arguments are correct, i if argv[i] doesn't exist
+int parser_CheckArguments(int argc, char *argv[], int *n, int *m) {
+    int ret = 0;
+    int i;
+    char setn = FALSE;  // se setn = true, n è stato cambiato
+    char setm = FALSE;
+    if (argc < 1) {  //if number of arguments is even or less than 1, surely it's a wrong input
+        ret = -1;
+    } else {
+        for (i = 1; i < argc && ret == 0; i++) {
             if (!strcmp(argv[i], "-setn")) {  //----ERRORI -setn
                 if (i + 1 < argc) {           //controlla che ci sia effettivamente un argomento dopo il -setn
                     *n = atoi(argv[i + 1]);
-                    if (*n == 0) value_return = err_args_A();       //Il campo dopo -setn non è un numero
-                    if (setn == TRUE) value_return = err_args_A();  //n gia' settato
-                    flag = TRUE;                                    //Salto prossimo argomento
-                    setn = TRUE;                                    //n e' stato settato, serve a controllare che non venga settato due volte
+                    if (*n == 0) ret = -1;       //Il campo dopo -setn non è un numero
+                    if (setn == TRUE) ret = -1;  //n gia' settato
+                    setn = TRUE;                 //n e' stato settato, serve a controllare che non venga settato due volte
                     i++;
                 } else {
-                    value_return = err_args_A();
+                    ret = -1;
                 }
 
             } else if (!strcmp(argv[i], "-setm")) {  //-----ERRORI -setm
                 if (i + 1 < argc) {                  //controlla che ci sia effettivamente un argomento dopo il -setn
                     *m = atoi(argv[i + 1]);
-                    if (*m == 0) value_return = err_args_A();       //Il campo dopo -setm non è un numero
-                    if (setm == TRUE) value_return = err_args_A();  //m gia' settato
-                    flag = TRUE;                                    //Salto il prossimo argomento
-                    setm = TRUE;                                    //m e' stato settato, serve a controllare che non venga settato due volte
+                    if (*m == 0) ret = -1;       //Il campo dopo -setm non è un numero
+                    if (setm == TRUE) ret = -1;  //m gia' settato
+                    setm = TRUE;                 //m e' stato settato, serve a controllare che non venga settato due volte
                     i++;
                 } else {
-                    value_return = err_args_A();
-                }
-
-            }  //else if(strncmp(argv[i], "-", 1) == 0){//-----ERRORI input strani che iniziano con -
-            //    value_return = err_args_A();
-            //}
-
-            if (flag == FALSE && value_return == 0) {  //------Vuol dire che argv[i] e' un file o una cartella
-                /*  Viene utilizzato il comando:  test -d [dir] && find [dir] -type f -follow -print || echo "-[ERROR]"
-                    Il comando test -d controlla l'esistenza del file/directory input. In caso di successo viene lanciato find
-                    In caso di successo viene lanciato find che restituisce la lista di tutti i file nella cartella e nelle sottocartelle
-                    Se l'input non esiste restituisce -[ERROR], in modo che possa essere intercettato dal parser
-                */
-
-                char command[strlen("(test -f  || test -d ) && find ") + strlen(argv[i]) * 3 + strlen(" -type f -follow -print || echo \"-[ERROR]\"") + 1];  //Creazione comando
-                strcpy(command, "(test -f ");
-                strcat(command, argv[i]);
-                strcat(command, " || test -d ");
-                strcat(command, argv[i]);
-                strcat(command, ") && find ");
-                strcat(command, argv[i]);
-                strcat(command, " -type f -follow -print || echo \"-[ERROR]\"");
-                //printf("%s\n",command);
-                fp = popen(command, "r");  //avvia il comando e in fp prende l'output
-                if (fp == NULL)            //Se il comando non va a buon fine
-                {
-                    value_return = err_args_A();
-                } else {                                                                //Il comando va a buon fine
-                    while (fgets(riga, sizeof(riga), fp) != NULL && errdir == FALSE) {  //Legge riga per riga e aggiunge alla lista
-                        if (strcmp(riga, "-[ERROR]\n")) {
-                            //memset( resolved_path, '\0', sizeof(resolved_path));
-                            realpath(riga, resolved_path);                 //risalgo al percorso assoluto
-                            resolved_path[strlen(resolved_path) - 1] = 0;  //tolgo l'ultimo carattere che manderebbe a capo
-                            char str[12];
-                            char path[PATH_MAX];
-                            sprintf(str, "%d", lista->count);
-                            strcpy(path, str);
-                            strcat(path, "#");
-                            strcat(path, resolved_path);
-                            //printf("%s\n",path);
-                            if (type == ADD) {
-                                if (insertPathList(lista, path, 0)) {
-                                    (*count)++;
-                                    //printf("%s\n", resolved_path);
-                                }
-                            } else {
-                                if (removeFromPathList(lista, path)) {
-                                    (*count)--;
-                                    //printf("%s\n", resolved_path);
-                                }
-                            }
-
-                        } else {            //Intercetta l'errore riguardante file o cartelle non esistenti
-                            errdir = TRUE;  //Metto il flag errore file/directory sbagliati
-                        }
-                    }
-                    pclose(fp);                                               //chiudo fp
-                    if (errdir == TRUE) value_return = err_input_A(argv[i]);  //Mando l'errore per la directory
+                    ret = -1;
                 }
             } else {
-                flag = FALSE;  //Analisi argomento saltata, rimetto flag a false
+                if (!fileExist(argv[i])) {
+                    ret = i;
+                }
             }
         }
-        if (*count == 0 && value_return == 0) value_return = err_args_A();  //counter is higher than zero, if not gives an error (value_return used to avoid double messages)
     }
-    return value_return;
+    return ret;
 }
 
 void initialize_processes(pid_t *p, int dim) {
@@ -429,9 +440,9 @@ void setOnFly(int n, int m, int *fd_1) {
     char resp[DIM_RESP];
     while (read(fd_1[READ], resp, DIM_RESP) > 0) {
     }
-    char onFly[PATH_MAX];
+    char onFly[DIM_PATH];
     sprintf(onFly, "#SET#%d#%d#", n, m);
-    if (write(fd_1[WRITE], onFly, PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
+    if (write(fd_1[WRITE], onFly, DIM_PATH) == -1) {  //Prova a scrivere sulla pipe
         if (errno != EAGAIN) {                        //Se avviene un errore e non e` causato dalla dimensione della pipe
             //value_return = err_write();               //Ritorna l'errore sulla scrittura
         } else
@@ -443,10 +454,10 @@ void closeAll(int *fd_1) {
     if (fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) {
         //value_return = err_fcntl();
     }
-    char path[PATH_MAX];
-    while (read(fd_1[READ], path, PATH_MAX) > 0) {
+    char path[DIM_PATH];
+    while (read(fd_1[READ], path, DIM_PATH) > 0) {
     }
-    if (write(fd_1[WRITE], "#CLOSE", PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
+    if (write(fd_1[WRITE], "#CLOSE", DIM_PATH) == -1) {  //Prova a scrivere sulla pipe
         if (errno != EAGAIN) {                           //Se avviene un errore e non e` causato dalla dimensione della pipe
             //value_return = err_write();               //Ritorna l'errore sulla scrittura
         }
@@ -491,10 +502,10 @@ void parseOnFly(char *path, int *n, int *m) {
 void nClearAndClose(int *fd, int n) {
     int i;
     char sentClose = FALSE;
-    char path[PATH_MAX];
+    char path[DIM_PATH];
     int terminated[n];  //Indica se un file e` stato mandato o meno
     for (i = 0; i < n; i++) {
-        while (read(fd[i * 4 + 3], path, PATH_MAX) > 0) {
+        while (read(fd[i * 4 + 3], path, DIM_PATH) > 0) {
         }
         terminated[i] = FALSE;
     }
@@ -503,7 +514,7 @@ void nClearAndClose(int *fd, int n) {
         sentClose = TRUE;
         for (i = 0; i < n; i++) {  //Provo a inviare path a tutti i Q
             if (!terminated[i]) {
-                if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {
+                if (write(fd[i * 4 + 3], path, DIM_PATH) == -1) {
                     if (errno != EAGAIN) {
                     } else {
                         sentClose = FALSE;  //Se non ci riesce setta send a false

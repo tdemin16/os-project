@@ -21,6 +21,7 @@
 #define DIM_V 95
 #define DIM_RESP 1051
 #define DIM_CMD 4096
+#define DIM_PATH 4112
 
 #define ERR_ARGS_A 1
 #define ERR_ARGS_C 2
@@ -113,13 +114,18 @@ void setAnalyzed(array *, int, int);
 int getAnalyzed(array *, int);
 void resetPathList(array *);
 int compare_mtime(array *, int, char *);
-array *cleanRemoved(array *);
+void cleanRemoved(array *);
 
 void close_pipes(int *, int);
 int unlock_pipes(int *, int);
 
 // /src/Analyzer/A.c
-int parser(char, int, char **, array *, int *, int *, int *);
+int parser(char, int, char **, array *, int *, int *, int *, int *);
+int parser2(int, char **, array *, int *, int *, int *, int *);
+int parser_CheckArguments(int, char **, int *, int *);
+int parser_LenghtCommand(char *);
+void parser_CreateCommand(char *);
+
 void handle_sigint(int);
 int parse_string(char *, int *v);
 void add_process_to_v(pid_t, int *);

@@ -151,7 +151,7 @@ int main() {
         }
         while (retrieve) {
             if (!strncmp(cmd, "print", 5)) {
-                if (read(fd1_fifo, path, PATH_MAX + 2) > 0) {
+                if (read(fd1_fifo, path, DIM_PATH+2) > 0) {
                     if (strstr(path, "#") != NULL) {
                         printf("%s\n", path);
                         usleep(10000);
