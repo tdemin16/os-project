@@ -167,9 +167,16 @@ int main(int argc, char *argv[]) {
                         printf(BOLDYELLOW "reset" RESET ": elimina dalla cache del programma le statistiche e tutti i percorsi analizzati e non\n");
                         printf(BOLDWHITE "print" RESET ": stampa a video tutte il percorso di tutti i file analizzati\n");
                         printf(BOLDMAGENTA "analyze" RESET ": avvia l'analizzatore\n");
-                        printf(BOLDCYAN "-c" RESET ": stampa le statistiche per cluster\n");
+                        printf(BOLDWHITE"set <n> <m>"RESET": setta i nuovi valori di n e m\n");
+                        printf(BOLDBLACK "\t es: set 4 5\n" RESET);
+                        printf(BOLDWHITE"setn <val>"RESET": setta i nuovi valori di n\n");
+                        printf(BOLDBLACK "\t es: setn 4\n" RESET);
+                        printf(BOLDWHITE"setm <val>"RESET": setta i nuovi valori di m\n");
+                        printf(BOLDBLACK "\t es: setm 5\n" RESET);
+                        printf(BOLDCYAN "report -c" RESET ": stampa le statistiche per cluster\n");
                         printf(WHITE "info" RESET ": mostra informazioni aggiuntive sul programma\n");
-                        printf(WHITE "close" RESET ": chiude il programma\n");
+                        printf(WHITE "close" RESET ": chiude il programma\n\n> ");
+                        fflush(stdout);
                     }
                 }
             }
