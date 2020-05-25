@@ -373,7 +373,7 @@ int main(int argc, char *argv[]) {
                                     setOnFly(n,m,fd_1);
                                 }
                             }
-                            printf("\n> ");
+                            printf("> ");
                             fflush(stdout);
                         }
                     }

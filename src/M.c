@@ -160,22 +160,22 @@ int main(int argc, char *argv[]) {
                         }
                     } else {
                         printf(BOLDBLUE "\nLista Comandi disponibili\n" RESET);
-                        printf(BOLDGREEN "add </path1> </path2>" RESET ": aggiunge uno o piu` file e/o una o piu` directory\n");
+                        printf(BOLDWHITE "add </path1> </path2>" RESET ": aggiunge uno o piu` file e/o una o piu` directory\n");
                         printf(BOLDBLACK "\t es: add ../src ../deploy.sh\n" RESET);
-                        printf(BOLDRED "remove </path1> </path2>" RESET ": rimuove uno o piu` file e/o una o piu` directory\n");
+                        printf(BOLDWHITE"remove </path1> </path2>" RESET ": rimuove uno o piu` file e/o una o piu` directory\n");
                         printf(BOLDBLACK "\t es: remove ../src ../deploy.sh\n" RESET);
-                        printf(BOLDYELLOW "reset" RESET ": elimina dalla cache del programma le statistiche e tutti i percorsi analizzati e non\n");
+                        printf(BOLDWHITE "reset" RESET ": elimina dalla cache del programma le statistiche e tutti i percorsi analizzati e non\n");
                         printf(BOLDWHITE "print" RESET ": stampa a video tutte il percorso di tutti i file analizzati\n");
-                        printf(BOLDMAGENTA "analyze" RESET ": avvia l'analizzatore\n");
+                        printf(BOLDWHITE "analyze" RESET ": avvia l'analizzatore\n");
                         printf(BOLDWHITE"set <n> <m>"RESET": setta i nuovi valori di n e m\n");
                         printf(BOLDBLACK "\t es: set 4 5\n" RESET);
                         printf(BOLDWHITE"setn <val>"RESET": setta i nuovi valori di n\n");
                         printf(BOLDBLACK "\t es: setn 4\n" RESET);
                         printf(BOLDWHITE"setm <val>"RESET": setta i nuovi valori di m\n");
                         printf(BOLDBLACK "\t es: setm 5\n" RESET);
-                        printf(BOLDCYAN "report -c" RESET ": stampa le statistiche per cluster\n");
-                        printf(WHITE "info" RESET ": mostra informazioni aggiuntive sul programma\n");
-                        printf(WHITE "close" RESET ": chiude il programma\n\n> ");
+                        printf(BOLDWHITE "report -c" RESET ": stampa le statistiche per cluster\n");
+                        printf(BOLDWHITE "info" RESET ": mostra informazioni aggiuntive sul programma\n");
+                        printf(BOLDWHITE "close" RESET ": chiude il programma\n\n> ");
                         fflush(stdout);
                     }
                 }
