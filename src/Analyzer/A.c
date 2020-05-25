@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
     int fd_1[2];  //Pipes
     int fd_2[2];
     pid_t f;              //fork return value
-    int _write = TRUE;   //true when finish writing the pipe
+    int _write = TRUE;    //true when finish writing the pipe
     int _read = TRUE;     //true when fisnish reading from pipe
     char resp[DIM_RESP];  //Stringa in cui salvare i messaggi ottenuti dal figlio
     int id_r;             //Id file ricevuto
@@ -106,11 +106,11 @@ int main(int argc, char *argv[]) {
     initialize_vector(v);  //Inizializzazione vettore dei valori totali
 
     if (argc > 1) {
-        value_return = parser2(argc, argv, lista, &count, &n, &m,&vReturn);  //Controlla i parametri passati ad A
-        if (vReturn>0){
+        value_return = parser2(argc, argv, lista, &count, &n, &m, &vReturn);  //Controlla i parametri passati ad A
+        if (vReturn > 0) {
             _write = FALSE;
         }
-    } 
+    }
 
     insertProcess(p, getpid());  //Insert pid of A in process list
 
@@ -222,7 +222,9 @@ int main(int argc, char *argv[]) {
 
                         if (!strncmp(cmd, "add", 3)) {
                             if (!analyzing) {
-                                if (checkArg(cmd, &argCounter)) {
+                                if (!(strstr(cmd, "-setn") != NULL) && !(strstr(cmd, "-setm") != NULL)) {
+                                    printf("Errore sintassi add\n");
+                                } else if (checkArg(cmd, &argCounter)) {
                                     tempPath = malloc(argCounter * sizeof(char *));
                                     for (j = 0; j < argCounter; j++) {
                                         tempPath[j] = malloc(DIM_PATH * sizeof(char));
@@ -232,7 +234,7 @@ int main(int argc, char *argv[]) {
                                         strcpy(tempPath[j], strtok(NULL, " "));
                                     }
                                     if ((parser2(argCounter, tempPath, lista, &count, &n, &m, &vReturn)) == 0) {
-                                        printf("Aggiunti %d files\ncount=%d\nn=%d\nm=%d\n", vReturn, count, n, m);
+                                        printf("Aggiunti %d files\n", vReturn);
                                     } else {
                                         //err_args_A();
                                     }
@@ -252,7 +254,9 @@ int main(int argc, char *argv[]) {
 
                         if (!strncmp(cmd, "remove", 6)) {
                             if (!analyzing) {
-                                if (checkArg(cmd, &argCounter)) {
+                                if (!(strstr(cmd, "-setn") != NULL) && !(strstr(cmd, "-setm") != NULL)) {
+                                    printf("Errore sintassi remove\n");
+                                } else if (checkArg(cmd, &argCounter)) {
                                     tempPath = malloc(argCounter * sizeof(char *));
                                     for (j = 0; j < argCounter; j++) {
                                         tempPath[j] = malloc(DIM_PATH * sizeof(char));
@@ -263,7 +267,7 @@ int main(int argc, char *argv[]) {
                                     }
                                     if ((parser2(argCounter, tempPath, lista, &count, &n, &m, &vReturn)) == 0) {
                                         cleanRemoved(lista);
-                                        printf("Rimossi %d files\ncount=%d\nn=%d\nm=%d\n", vReturn, count, n, m);
+                                        printf("Rimossi %d files\n", vReturn);
                                     } else {
                                         //err_args_A();
                                     }
@@ -355,7 +359,7 @@ int main(int argc, char *argv[]) {
 
                             write(fd1_fifo, tmp_resp, DIM_PATH + 2);
                         }
-                        if(!strcmp(print_method, "-c")) {
+                        if (!strcmp(print_method, "-c")) {
                             analyzeCluster(sum, type_resp);
                             write(fd1_fifo, type_resp, DIM_RESP);
                         }
