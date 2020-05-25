@@ -22,8 +22,8 @@ int main(int argc, char* argv[]) {
     int i;
     int k;
 
-    char path[PATH_MAX];        //Paths da mandare ai figli
-    char failedPath[PATH_MAX];  //Percorsi non inviati a causa della pipe piena
+    char path[DIM_PATH];        //Paths da mandare ai figli
+    char failedPath[DIM_PATH];  //Percorsi non inviati a causa della pipe piena
     char resp[DIM_RESP];        //Stringa con i valori ricevuta dai figli
     int count = 0;              //Maintain the current amount of files sended
 
@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
                         debug = fopen(str, "a");
                         fprintf(debug, "C: PRONTO A LEGGERE \n");
                         fclose(debug);
-                        if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere
+                        if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
                             pendingPath++;
                             if (pendingPath == 1) {
                                 if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
@@ -133,7 +133,7 @@ int main(int argc, char* argv[]) {
                                 }
                                 pendingPath--;
                             } else {
-                                if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {  //Provo a scrivere
+                                if (write(fd[i * 4 + 3], path, DIM_PATH) == -1) {  //Provo a scrivere
                                     if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
                                         value_return = err_write();                //Setta il valore di ritorno
                                     } else {                                       //Se da errore in scrittura copio il path in failedPath e setto lo stato di stop (Retransmit)
@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
                             }
                         }
                     } else {                                                     //Se c'e` uno stop sull'invio dei dati
-                        if (write(fd[i * 4 + 3], failedPath, PATH_MAX) == -1) {  //Test write
+                        if (write(fd[i * 4 + 3], failedPath, DIM_PATH) == -1) {  //Test write
                             if (errno != EAGAIN) {                               //Controlla che non sia una errore di pipe piena
                                 value_return = err_write();                      //Setta il valore di ritorno
                             }

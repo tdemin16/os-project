@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
     //Argument passed
     int m = 4;
     int i;
-    char path[PATH_MAX];
+    char path[DIM_PATH];
     char resp[DIM_RESP];
 
     //IPC Variables
@@ -106,7 +106,7 @@ int main(int argc, char* argv[]) {
                 //Write
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
-                        if (read(STDIN_FILENO, path, PATH_MAX) > 0) {  //provo a leggere
+                        if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
                             pendingPath++;
                             if (pendingPath == 1) {
                                 if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
@@ -123,7 +123,7 @@ int main(int argc, char* argv[]) {
                                 fclose(debug);  //Setto end a true
                             } else {
                                 for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q
-                                    if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {
+                                    if (write(fd[i * 4 + 3], path, DIM_PATH) == -1) {
                                         if (errno != EAGAIN) {
                                             value_return = err_write();
                                         } else {
@@ -143,7 +143,7 @@ int main(int argc, char* argv[]) {
                         send_w = TRUE;
                         for (i = 0; i < m; i++) {
                             if (!terminated[i]) {  //Per ogni path non inviato, riprova
-                                if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {
+                                if (write(fd[i * 4 + 3], path, DIM_PATH) == -1) {
                                     if (errno != EAGAIN) {
                                         value_return = err_write();
                                     } else {
@@ -211,7 +211,7 @@ int main(int argc, char* argv[]) {
             }
 
             for (i = 0; i < m; i++) {
-                while (read(fd[i * 4 + 3], path, PATH_MAX) > 0) {
+                while (read(fd[i * 4 + 3], path, DIM_PATH) > 0) {
                 }
                 terminated[i] = FALSE;
             }
@@ -220,7 +220,7 @@ int main(int argc, char* argv[]) {
             while (!sentClose) {
                 sentClose = TRUE;
                 for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q
-                    if (write(fd[i * 4 + 3], path, PATH_MAX) == -1) {
+                    if (write(fd[i * 4 + 3], path, DIM_PATH) == -1) {
                         if (errno != EAGAIN) {
                             value_return = err_write();
                         } else {

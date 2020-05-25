@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
     const char *fifo2 = "/tmp/R_to_A";
     int retrieve = TRUE;
     char print_method[DIM_CMD];
-    char tmp_resp[PATH_MAX];
+    char tmp_resp[DIM_PATH];
     strcpy(tmp_resp, "///");
 
     //COMMUNICATION WITH M
@@ -83,6 +83,7 @@ int main(int argc, char *argv[]) {
     char *tmpResp = NULL;
     char *tmpPercorso = NULL;
     char **tempPath;
+    int vReturn;
 
     array *lista = createPathList(10);  //Nuova lista dei path
 
@@ -90,7 +91,7 @@ int main(int argc, char *argv[]) {
     int fd_1[2];  //Pipes
     int fd_2[2];
     pid_t f;              //fork return value
-    int _write = FALSE;   //true when finish writing the pipe
+    int _write = TRUE;   //true when finish writing the pipe
     int _read = TRUE;     //true when fisnish reading from pipe
     char resp[DIM_RESP];  //Stringa in cui salvare i messaggi ottenuti dal figlio
     int id_r;             //Id file ricevuto
@@ -104,10 +105,11 @@ int main(int argc, char *argv[]) {
     initialize_vector(v);  //Inizializzazione vettore dei valori totali
 
     if (argc > 1) {
-        value_return = parser(ADD, argc, argv, lista, &count, &n, &m);  //Controlla i parametri passati ad A
-    } else {
-        _write = TRUE;
-    }
+        value_return = parser2(argc, argv, lista, &count, &n, &m,&vReturn);  //Controlla i parametri passati ad A
+        if (vReturn>0){
+            _write = FALSE;
+        }
+    } 
 
     insertProcess(p, getpid());  //Insert pid of A in process list
 
@@ -222,15 +224,18 @@ int main(int argc, char *argv[]) {
                                 if (checkArg(cmd, &argCounter)) {
                                     tempPath = malloc(argCounter * sizeof(char *));
                                     for (j = 0; j < argCounter; j++) {
-                                        tempPath[j] = malloc(PATH_MAX * sizeof(char));
+                                        tempPath[j] = malloc(DIM_PATH * sizeof(char));
                                     }
                                     strcpy(tempPath[0], strtok(cmd, " "));
                                     for (j = 1; j < argCounter; j++) {
                                         strcpy(tempPath[j], strtok(NULL, " "));
                                     }
-                                    parser(ADD, argCounter, tempPath, lista, &count, &n, &m);  //Controlla i parametri passati ad A
+                                    if ((parser2(argCounter, tempPath, lista, &count, &n, &m, &vReturn)) == 0) {
+                                        printf("Aggiunti %d files\ncount=%d\nn=%d\nm=%d\n", vReturn, count, n, m);
+                                    } else {
+                                        //err_args_A();
+                                    }
                                     for (j = 0; j < argCounter; j++) {
-                                        //printf("ARG[%d] - %s\n",j,tempPath[j]);
                                         free(tempPath[j]);
                                     }
                                     free(tempPath);
@@ -245,25 +250,27 @@ int main(int argc, char *argv[]) {
                         }
 
                         if (!strncmp(cmd, "remove", 6)) {
-                            printPathList(lista);
                             if (!analyzing) {
                                 if (checkArg(cmd, &argCounter)) {
                                     tempPath = malloc(argCounter * sizeof(char *));
                                     for (j = 0; j < argCounter; j++) {
-                                        tempPath[j] = malloc(PATH_MAX * sizeof(char));
+                                        tempPath[j] = malloc(DIM_PATH * sizeof(char));
                                     }
                                     strcpy(tempPath[0], strtok(cmd, " "));
                                     for (j = 1; j < argCounter; j++) {
                                         strcpy(tempPath[j], strtok(NULL, " "));
                                     }
-                                    parser(REMOVE, argCounter, tempPath, lista, &count, &n, &m);  //Controlla i parametri passati ad A
+                                    if ((parser2(argCounter, tempPath, lista, &count, &n, &m, &vReturn)) == 0) {
+                                        cleanRemoved(lista);
+                                        printf("Rimossi %d files\ncount=%d\nn=%d\nm=%d\n", vReturn, count, n, m);
+                                    } else {
+                                        //err_args_A();
+                                    }
                                     for (j = 0; j < argCounter; j++) {
                                         //printf("ARG[%d] - %s\n",j,tempPath[j]);
                                         free(tempPath[j]);
                                     }
                                     free(tempPath);
-                                    lista = cleanRemoved(lista);
-                                    printPathList(lista);
                                 } else {
                                     err_args_A();
                                 }
@@ -341,11 +348,11 @@ int main(int argc, char *argv[]) {
                         if (!strcmp(print_method, "print")) {
                             if (lista->count > 0) {
                                 for (j = 0; j < lista->count; j++) {
-                                    write(fd1_fifo, lista->pathList[j], PATH_MAX+2);
+                                    write(fd1_fifo, lista->pathList[j], DIM_PATH + 2);
                                 }
                             }
 
-                            write(fd1_fifo, tmp_resp, PATH_MAX + 2);
+                            write(fd1_fifo, tmp_resp, DIM_PATH + 2);
                         }
                         retrieve = TRUE;
                     }
@@ -355,7 +362,7 @@ int main(int argc, char *argv[]) {
                 if (!_write && value_return == 0) {  //Esegue il blocco finche` non ha finito di scrivere
                     analyzing = TRUE;
                     if (lista->analyzed[i] == 0) {
-                        if (write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
+                        if (write(fd_1[WRITE], lista->pathList[i], DIM_PATH) == -1) {  //Prova a scrivere sulla pipe
                             if (errno != EAGAIN) {                                     //Se avviene un errore e non e` causato dalla dimensione della pipe
                                 value_return = err_write();                            //Ritorna l'errore sulla scrittura
                             }
