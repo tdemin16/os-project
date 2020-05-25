@@ -64,9 +64,9 @@ int main(int argc, char *argv[]) {
     //COMMUNICATION WITH M - STDIN
     char cmd[DIM_CMD];  //Comando rivevuto da M
     int _close = FALSE;
-    int new_n;
+    /* int new_n;
     int new_m;
-    char* dupl = NULL;
+    char* dupl = NULL; */
 
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
@@ -225,8 +225,9 @@ int main(int argc, char *argv[]) {
 
                         if (!strncmp(cmd, "add", 3)) {
                             if (!analyzing) {
-                                if (!(strstr(cmd, "-setn") != NULL) && !(strstr(cmd, "-setm") != NULL)) {
-                                    printf("Errore sintassi add\n");
+                                if (!(strstr(cmd, "-setn") != NULL && strstr(cmd, "-setm") != NULL)) {
+                                    printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");
+                                    fflush(stdout);
                                 } else if (checkArg(cmd, &argCounter)) {
                                     tempPath = malloc(argCounter * sizeof(char *));
                                     for (j = 0; j < argCounter; j++) {
@@ -257,8 +258,9 @@ int main(int argc, char *argv[]) {
 
                         if (!strncmp(cmd, "remove", 6)) {
                             if (!analyzing) {
-                                if (!(strstr(cmd, "-setn") != NULL) && !(strstr(cmd, "-setm") != NULL)) {
-                                    printf("Errore sintassi remove\n");
+                                if (!(strstr(cmd, "-setn") != NULL && strstr(cmd, "-setm") != NULL)) {
+                                    printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");
+                                    fflush(stdout);
                                 } else if (checkArg(cmd, &argCounter)) {
                                     tempPath = malloc(argCounter * sizeof(char *));
                                     for (j = 0; j < argCounter; j++) {
@@ -343,10 +345,8 @@ int main(int argc, char *argv[]) {
 
                         if (!strncmp(cmd, "set", 3)) {
                             if (!strncmp(cmd, "setn", 4)) {
-
                             } else if (!strncmp(cmd, "setm", 4)) {
                             } else {
-
                             }
                         }
                     }
