@@ -2,7 +2,8 @@
 
 int value_return = 0;  //Valore di ritorno, globale per "send_to_R"
 process *p;            //Declaring p (it's global because hendle_sigint can't have parameters, only int sig)
-int fd_fifo;           //pipe fifo con R
+int fd1_fifo;          //A writes in R
+int fd2_fifo;          //R writes in A
 
 void handle_sigint(int sig) {
     printf("\n[!] Ricevuta terminazione per A, inizio terminazione processi C,P,Q ... \n");
@@ -21,10 +22,10 @@ void handle_sigint(int sig) {
             i--;  //i-- otherwise it will go to infinity
         }
     }
-    if (!close(fd_fifo))  //close fifo
-    {
+    if (!close(fd1_fifo) && !close(fd2_fifo)) {  //close fifo
         printf("[!] Chiusura fifo completata\n");
     }
+
     freeList(p);  //free memory allocated for p
     printf("[!] ... Chiusura processi C,P,Q terminata\n");
     exit(-1);  //return exit with error -1
@@ -52,12 +53,12 @@ int main(int argc, char *argv[]) {
     p = create_process(1);  //Allocate dynamically p with dimension 1
 
     //COMMUNICATION WITH R
-    const char *fifo = "/tmp/A_R_Comm";  //Nome fifo con R
-    //int fd_fifo;                         //pipe fifo con R
-    char print_method[DIM_CMD];
+    const char *fifo1 = "/tmp/A_to_R";  //Nome fifo con R
+    const char *fifo2 = "/tmp/R_to_A";
     int retrieve = TRUE;
-    char tmp_resp[DIM_RESP];
-    int _r_write = TRUE;
+    char print_method[DIM_CMD];
+    char tmp_resp[PATH_MAX];
+    strcpy(tmp_resp, "///");
 
     //COMMUNICATION WITH M
     char cmd[DIM_CMD];  //Comando rivevuto da M
@@ -88,9 +89,9 @@ int main(int argc, char *argv[]) {
     //Variables for IPC
     int fd_1[2];  //Pipes
     int fd_2[2];
-    pid_t f;             //fork return value
-    int _write = FALSE;  //true when finish writing the pipe
-    int _read = TRUE;    //true when fisnish reading from pipe
+    pid_t f;              //fork return value
+    int _write = FALSE;   //true when finish writing the pipe
+    int _read = TRUE;     //true when fisnish reading from pipe
     char resp[DIM_RESP];  //Stringa in cui salvare i messaggi ottenuti dal figlio
     int id_r;             //Id file ricevuto
     char *resp_val;       //Messaggio senza Id
@@ -103,7 +104,7 @@ int main(int argc, char *argv[]) {
     initialize_vector(v);  //Inizializzazione vettore dei valori totali
 
     if (argc > 1) {
-        value_return = parser(ADD,argc, argv, lista, &count, &n, &m);  //Controlla i parametri passati ad A
+        value_return = parser(ADD, argc, argv, lista, &count, &n, &m);  //Controlla i parametri passati ad A
     } else {
         _write = TRUE;
     }
@@ -142,7 +143,12 @@ int main(int argc, char *argv[]) {
     }
 
     if (value_return == 0) {
-        if (mkfifo(fifo, 0666) == -1) {     //Prova a creare la pipe
+        if (mkfifo(fifo1, 0666) == -1) {    //Prova a creare la pipe
+            if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
+                value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
+            }
+        }
+        if (mkfifo(fifo2, 0666) == -1) {    //Prova a creare la pipe
             if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
                 value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
             }
@@ -151,13 +157,34 @@ int main(int argc, char *argv[]) {
 
     //Open fifo in nonblocking read mode
     if (value_return == 0) {
-        fd_fifo = open(fifo, O_RDONLY | O_NONBLOCK);
-        if (fd_fifo == -1) {
-            value_return = err_fifo();
+        do {
+            fd1_fifo = open(fifo1, O_WRONLY);        //Prova ad aprire la pipe in scrittura
+            if (fd1_fifo == -1) {                    //Error handling
+                if (errno != ENXIO) {                //Se errno == 6, il file A non e' stato ancora aperto
+                    value_return = err_file_open();  //Errore nell'apertura del file
+                }
+            }
+            if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
+                if (!strncmp(cmd, "close", 5)) {
+                    closeAll(fd_1);
+
+                    while (wait(NULL) > 0)
+                        ;
+                    _close = TRUE;
+                    printf(BOLDWHITE "A" RESET ": Closing...\n");
+                }
+            }
+        } while (value_return == 0 && fd1_fifo == -1 && !_close);
+
+        if (!_close) {
+            fd2_fifo = open(fifo2, O_RDONLY | O_NONBLOCK);
+            if (fd2_fifo == -1) {
+                value_return = err_fifo();
+            }
         }
     }
 
-    if (value_return == 0) {
+    if (value_return == 0 && !_close) {
         f = fork();                     //Fork dei processi
         if (f == -1) {                  //Controllo che non ci siano stati errori durante il fork
             value_return = err_fork();  //in caso di errore setta il valore di ritorno a ERR_FORK
@@ -166,7 +193,7 @@ int main(int argc, char *argv[]) {
 
     //------------------------------------------------------------------------------
 
-    if (value_return == 0) {
+    if (value_return == 0 && !_close) {
         if (f > 0) {              //PARENT SIDE
             insertProcess(p, f);  //Insert child process in list p
             i = 0;
@@ -201,7 +228,7 @@ int main(int argc, char *argv[]) {
                                     for (j = 1; j < argCounter; j++) {
                                         strcpy(tempPath[j], strtok(NULL, " "));
                                     }
-                                    parser(ADD,argCounter, tempPath, lista, &count, &n, &m);  //Controlla i parametri passati ad A
+                                    parser(ADD, argCounter, tempPath, lista, &count, &n, &m);  //Controlla i parametri passati ad A
                                     for (j = 0; j < argCounter; j++) {
                                         //printf("ARG[%d] - %s\n",j,tempPath[j]);
                                         free(tempPath[j]);
@@ -229,7 +256,7 @@ int main(int argc, char *argv[]) {
                                     for (j = 1; j < argCounter; j++) {
                                         strcpy(tempPath[j], strtok(NULL, " "));
                                     }
-                                    parser(REMOVE,argCounter, tempPath, lista, &count, &n, &m);  //Controlla i parametri passati ad A
+                                    parser(REMOVE, argCounter, tempPath, lista, &count, &n, &m);  //Controlla i parametri passati ad A
                                     for (j = 0; j < argCounter; j++) {
                                         //printf("ARG[%d] - %s\n",j,tempPath[j]);
                                         free(tempPath[j]);
@@ -302,70 +329,25 @@ int main(int argc, char *argv[]) {
                 }
 
                 //R
-                if (!_close) {
-                    if (retrieve) {
-                        if (read(fd_fifo, print_method, DIM_CMD) > 0) {
-                            retrieve = FALSE;
-                            if (close(fd_fifo) == -1) {
-                                value_return = err_close();
-                            }
-                            //Open fifo in nonblocking write mode
-                            if (value_return == 0) {
-                                do {
-                                    fd_fifo = open(fifo, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
-                                    if (fd_fifo == -1) {                          //Error handling
-                                        if (errno != ENXIO) {                     //Se errno == 6, il file A non e' stato ancora aperto
-                                            value_return = err_file_open();       //Errore nell'apertura del file
-                                        }
-                                    }
-                                } while (value_return == 0 && fd_fifo == -1);
+                if (!_close && value_return == 0) {
+                    if (retrieve) {  //Try read from R
+                        if (read(fd2_fifo, print_method, DIM_CMD) > 0) {
+                            if (!strncmp(print_method, "print", 5)) {
+                                retrieve = FALSE;
+                                //printf("print arrivata\n");
                             }
                         }
                     } else {
                         if (!strcmp(print_method, "print")) {
                             if (lista->count > 0) {
                                 for (j = 0; j < lista->count; j++) {
-                                    _r_write = TRUE;
-                                    while (value_return == 0 && _r_write) {
-                                        if (write(fd_fifo, lista->pathList[j], PATH_MAX) == -1) {
-                                            if (errno != EAGAIN) {
-                                                value_return = err_write();
-                                            }
-                                        } else {
-                                            _r_write = FALSE;
-                                        }
-                                    }
+                                    write(fd1_fifo, lista->pathList[j], PATH_MAX+2);
                                 }
                             }
-                            strcpy(tmp_resp, "///");
-                            _r_write = TRUE;
-                            while (value_return == 0 && _r_write) {
-                                if (write(fd_fifo, tmp_resp, PATH_MAX) == -1) {
-                                    if (errno != EAGAIN) {
-                                        value_return = err_write();
-                                    }
-                                    _r_write = FALSE;
-                                }
-                            }
+
+                            write(fd1_fifo, tmp_resp, PATH_MAX + 2);
                         }
                         retrieve = TRUE;
-
-                        if (value_return == 0) {
-                            FILE *debug = fopen("log.txt", "a");
-                            fprintf(debug, "A CLOSE FIFO\n");
-                            fclose(debug);
-                            retrieve = TRUE;
-                            if (close(fd_fifo) == -1) {
-                                value_return = err_close();
-                            }
-                            //Open fifo in nonblocking read mode
-                            if (value_return == 0) {
-                                fd_fifo = open(fifo, O_RDONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
-                                if (fd_fifo == -1) {                          //Error handling
-                                    value_return = err_file_open();           //Errore nell'apertura del file
-                                }
-                            }
-                        }
                     }
                 }
 
@@ -376,8 +358,6 @@ int main(int argc, char *argv[]) {
                         if (write(fd_1[WRITE], lista->pathList[i], PATH_MAX) == -1) {  //Prova a scrivere sulla pipe
                             if (errno != EAGAIN) {                                     //Se avviene un errore e non e` causato dalla dimensione della pipe
                                 value_return = err_write();                            //Ritorna l'errore sulla scrittura
-                            } else {
-                                //printf("pipe piena\n");
                             }
                         } else {
                             debug = fopen(str, "a");
@@ -477,7 +457,10 @@ int main(int argc, char *argv[]) {
 
             //Chiusura fifo
             if (value_return == 0) {
-                if (close(fd_fifo) == -1) {
+                if (close(fd1_fifo) == -1) {
+                    value_return = err_close();
+                }
+                if (close(fd2_fifo) == -1) {
                     value_return = err_close();
                 }
             }

@@ -90,7 +90,8 @@ int main(int argc, char *argv[]) {
 
                 if (res_cmd == -1) {
                     //richiama la funzione help() coi comandi
-                    printf(BOLDRED "[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n> ");
+                    printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
+                    fflush(stdout);
                 }
 
                 if (res_cmd == 0) {

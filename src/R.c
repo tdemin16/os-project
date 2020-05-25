@@ -1,7 +1,8 @@
 #include "lib/lib.h"
 int value_return = 0;  //Valore di ritorno, globale per "send_to_R"
 process *p;            //Declaring p (it's global because hendle_sigint can't have parameters, only int sig)
-int fd_fifo;           //pipe fifo con R
+int fd1_fifo;          //A writes in R
+int fd2_fifo;          //R writes in A
 
 void handle_sigint(int sig) {
     printf("\n[!] Ricevuta terminazione per R, inizio terminazione processo ... \n");
@@ -20,8 +21,10 @@ void handle_sigint(int sig) {
             i--;  //i-- otherwise it will go to infinity
         }
     }
-    if (!close(fd_fifo))  //close fifo
-    {
+    if (!close(fd1_fifo)) {  //close fifo
+        printf("[!] Chiusura fifo completata\n");
+    }
+    if (!close(fd2_fifo)) {  //close fifo
         printf("[!] Chiusura fifo completata\n");
     }
     freeList(p);  //free memory allocated for p
@@ -49,20 +52,27 @@ int main() {
     p = create_process(1);          //Allocate dynamically p with dimension 1
     insertProcess(p, getpid());     //Insert process R into p list
 
-    const char *fifo = "/tmp/A_R_Comm";
+    const char *fifo1 = "/tmp/A_to_R";
+    const char *fifo2 = "/tmp/R_to_A";
     int _close = FALSE;
     char cmd[DIM_CMD];
     int retrieve = FALSE;
     int _r_write = TRUE;
     //char resp[DIM_RESP];
     char path[PATH_MAX];
+    int arr = FALSE;
 
     printf("Start R\n");
     fflush(stdout);
 
     //IPC--------------------------------------------------------------------------------------------
     if (value_return == 0) {
-        if (mkfifo(fifo, 0666) == -1) {     //Prova a creare la pipe
+        if (mkfifo(fifo1, 0666) == -1) {    //Prova a creare la pipe
+            if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
+                value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
+            }
+        }
+        if (mkfifo(fifo2, 0666) == -1) {    //Prova a creare la pipe
             if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
                 value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
             }
@@ -70,14 +80,19 @@ int main() {
     }
 
     if (value_return == 0) {
+        fd1_fifo = open(fifo1, O_RDONLY);
+        if (fd1_fifo == -1) {
+            value_return = err_fifo();
+        }
+
         do {
-            fd_fifo = open(fifo, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
-            if (fd_fifo == -1) {                          //Error handling
-                if (errno != ENXIO) {                     //Se errno == 6, il file A non e' stato ancora aperto
-                    value_return = err_file_open();       //Errore nell'apertura del file
+            fd2_fifo = open(fifo2, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
+            if (fd2_fifo == -1) {                           //Error handling
+                if (errno != ENXIO) {                       //Se errno == 6, il file A non e' stato ancora aperto
+                    value_return = err_file_open();         //Errore nell'apertura del file
                 }
             }
-        } while (value_return == 0 && fd_fifo == -1);
+        } while (value_return == 0 && fd2_fifo == -1);
     }
 
     if (value_return == 0) {
@@ -87,76 +102,51 @@ int main() {
     }
 
     while (value_return == 0 && !_close) {
-        if (!retrieve) {
-            if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
-                if (!strncmp(cmd, "close", 5)) {
-                    _close = TRUE;
-                    printf(BOLDWHITE "R" RESET ": Closing...\n");
-                } else {
-                    if (!strncmp(cmd, "print", 5)) {
-                        _r_write = TRUE;
-                        while (value_return == 0 && _r_write) {
-                            if (write(fd_fifo, cmd, DIM_CMD) == -1) {
-                                if (errno != EAGAIN) {
-                                    value_return = err_write();
-                                }
-                            } else {
-                                _r_write = FALSE;
-                            }
+        if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
+            if (!strncmp(cmd, "close", 5)) {
+                _close = TRUE;
+                printf(BOLDWHITE "R" RESET ": Closing...\n");
+            } else if (!retrieve && !strncmp(cmd, "print", 5)) {  //Add flags
+                retrieve = TRUE;
+                _r_write = TRUE;
+                while (value_return == 0 && _r_write) {
+                    if (write(fd2_fifo, cmd, DIM_CMD) == -1) {
+                        if (errno != EAGAIN) {
+                            value_return = err_write();
                         }
-                        if (value_return == 0) {
-                            retrieve = TRUE;
-                            if (close(fd_fifo) == -1) {
-                                value_return = err_close();
-                            }
-                            //Open fifo in nonblocking read mode
-                            if (value_return == 0) {
-                                fd_fifo = open(fifo, O_RDONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
-                                if (fd_fifo == -1) {                          //Error handling
-                                    value_return = err_file_open();           //Errore nell'apertura del file
-                                }
-                            }
-                        }
+                    } else {
+                        _r_write = FALSE;
                     }
                 }
             }
-        } else {
-            if (!strcmp(cmd, "print")) {
-                printf("\n");
-                while (retrieve) {
-                    if (read(fd_fifo, path, PATH_MAX) > 0) {
-                        if (strstr(path, "#") != NULL) {
-                            printf("%s\n", path);
-                        } else if (strncmp(path, "///", 3)) {
-                            retrieve = FALSE;
-                        }
+        }
+        if (retrieve) {
+            printf("\n");
+            arr = FALSE;
+        }
+        while (retrieve) {
+            if (!strncmp(cmd, "print", 5)) {
+                if (read(fd1_fifo, path, PATH_MAX+2) > 0) {
+                    if (strstr(path, "#") != NULL) {
+                        printf("%s\n", path);
+                        usleep(10000);
+                        arr = TRUE;
+                    } else if (!strncmp(path, "///", 3)) {
+                        retrieve = FALSE;
+                        if(!arr) printf("Lista vuota\n");
+                        printf("\n> ");
+                        fflush(stdout);
                     }
                 }
-                printf("\n> ");fflush(stdout);
-            }
-
-            if (close(fd_fifo) == -1) {
-                value_return = err_close();
-            }
-
-            //Open fifo in nonblocking write mode
-            if (value_return == 0) {
-                do {
-                    fd_fifo = open(fifo, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
-                    if (fd_fifo == -1) {                          //Error handling
-                        if (errno != ENXIO) {                     //Se errno == 6, il file A non e' stato ancora aperto
-                            value_return = err_file_open();       //Errore nell'apertura del file
-                        } else {
-                            //fprintf(stderr, "ENXIO");
-                        }
-                    }
-                } while (value_return == 0 && fd_fifo == -1);
             }
         }
     }
 
     if (value_return == 0) {
-        if (close(fd_fifo) == -1) {
+        if (close(fd1_fifo) == -1) {
+            value_return = err_close();
+        }
+        if (close(fd2_fifo) == -1) {
             value_return = err_close();
         }
     }
