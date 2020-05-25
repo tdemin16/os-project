@@ -225,7 +225,7 @@ int main(int argc, char *argv[]) {
 
                         if (!strncmp(cmd, "add", 3)) {
                             if (!analyzing) {
-                                if (!(strstr(cmd, "-setn") != NULL && strstr(cmd, "-setm") != NULL)) {
+                                if ((strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL)) {
                                     printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");
                                     fflush(stdout);
                                 } else if (checkArg(cmd, &argCounter)) {
@@ -258,7 +258,7 @@ int main(int argc, char *argv[]) {
 
                         if (!strncmp(cmd, "remove", 6)) {
                             if (!analyzing) {
-                                if (!(strstr(cmd, "-setn") != NULL && strstr(cmd, "-setm") != NULL)) {
+                                if ((strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL)) {
                                     printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");
                                     fflush(stdout);
                                 } else if (checkArg(cmd, &argCounter)) {
