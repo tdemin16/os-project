@@ -64,9 +64,9 @@ int main(int argc, char *argv[]) {
     //COMMUNICATION WITH M - STDIN
     char cmd[DIM_CMD];  //Comando rivevuto da M
     int _close = FALSE;
-    int new_n;
-    int new_m;
-    char* dupl = NULL;
+    char *new_n;
+    char *new_m;
+    char *dupl = NULL;
 
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
@@ -342,12 +342,28 @@ int main(int argc, char *argv[]) {
                         }
 
                         if (!strncmp(cmd, "set", 3)) {
-                            if (!strncmp(cmd, "setn", 4)) {
+                            if (checkArg(cmd, &argCounter)) {
+                                if (argCounter == 2) {
+                                    if (!strncmp(cmd, "setn", 4)) {
+                                        dupl = strdup(cmd);
+                                        new_n = strtok(dupl, " ");
+                                        new_n = strtok(NULL, " ");
+                                        n = atoi(new_n);
+                                        free(dupl);
 
-                            } else if (!strncmp(cmd, "setm", 4)) {
-                            } else {
-
+                                    } else if (!strncmp(cmd, "setm", 4)) {
+                                        dupl = strdup(cmd);
+                                        new_m = strtok(dupl, " ");
+                                        new_m = strtok(NULL, " ");
+                                        m = atoi(new_m);
+                                        free(dupl);
+                                    }
+                                } else if (argCounter == 1) {
+                                    //setonfly nigga nigga
+                                }
                             }
+                            printf("\n> ");
+                            fflush(stdout);
                         }
                     }
                 }
