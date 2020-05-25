@@ -61,9 +61,12 @@ int main(int argc, char *argv[]) {
     char tmp_resp[PATH_MAX];
     strcpy(tmp_resp, "///");
 
-    //COMMUNICATION WITH M
+    //COMMUNICATION WITH M - STDIN
     char cmd[DIM_CMD];  //Comando rivevuto da M
     int _close = FALSE;
+    int new_n;
+    int new_m;
+    char* dupl = NULL;
 
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
@@ -208,7 +211,7 @@ int main(int argc, char *argv[]) {
 
             while (value_return == 0 && !_close) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
 
-                //M
+                //M - STDIN
                 if (!_close) {
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
                         if (!strncmp(cmd, "close", 5)) {
@@ -336,6 +339,15 @@ int main(int argc, char *argv[]) {
                             }
                             printf("\n> ");
                             fflush(stdout);
+                        }
+
+                        if (!strncmp(cmd, "set", 3)) {
+                            if (!strncmp(cmd, "setn", 4)) {
+
+                            } else if (!strncmp(cmd, "setm", 4)) {
+                            } else {
+
+                            }
                         }
                     }
                 }
