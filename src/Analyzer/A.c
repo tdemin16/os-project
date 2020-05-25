@@ -370,7 +370,7 @@ int main(int argc, char *argv[]) {
                                         free(dupl);
                                     }
                                 } else if (argCounter == 1) {
-                                    //setonfly nigga nigga
+                                    setOnFly(n,m,fd_1);
                                 }
                             }
                             printf("\n> ");
