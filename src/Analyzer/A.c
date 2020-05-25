@@ -61,9 +61,12 @@ int main(int argc, char *argv[]) {
     char tmp_resp[PATH_MAX];
     strcpy(tmp_resp, "///");
 
-    //COMMUNICATION WITH M
+    //COMMUNICATION WITH M - STDIN
     char cmd[DIM_CMD];  //Comando rivevuto da M
     int _close = FALSE;
+    int new_n;
+    int new_m;
+    char* dupl = NULL;
 
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
@@ -92,7 +95,7 @@ int main(int argc, char *argv[]) {
     int fd_1[2];  //Pipes
     int fd_2[2];
     pid_t f;              //fork return value
-    int _write = TRUE;   //true when finish writing the pipe
+    int _write = TRUE;    //true when finish writing the pipe
     int _read = TRUE;     //true when fisnish reading from pipe
     char resp[DIM_RESP];  //Stringa in cui salvare i messaggi ottenuti dal figlio
     int id_r;             //Id file ricevuto
@@ -106,11 +109,11 @@ int main(int argc, char *argv[]) {
     initialize_vector(v);  //Inizializzazione vettore dei valori totali
 
     if (argc > 1) {
-        value_return = parser2(argc, argv, lista, &count, &n, &m,&vReturn);  //Controlla i parametri passati ad A
-        if (vReturn>0){
+        value_return = parser2(argc, argv, lista, &count, &n, &m, &vReturn);  //Controlla i parametri passati ad A
+        if (vReturn > 0) {
             _write = FALSE;
         }
-    } 
+    }
 
     insertProcess(p, getpid());  //Insert pid of A in process list
 
@@ -208,7 +211,7 @@ int main(int argc, char *argv[]) {
 
             while (value_return == 0 && !_close) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
 
-                //M
+                //M - STDIN
                 if (!_close) {
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
                         if (!strncmp(cmd, "close", 5)) {
@@ -333,6 +336,15 @@ int main(int argc, char *argv[]) {
                             printf("\n> ");
                             fflush(stdout);
                         }
+
+                        if (!strncmp(cmd, "set", 3)) {
+                            if (!strncmp(cmd, "setn", 4)) {
+
+                            } else if (!strncmp(cmd, "setm", 4)) {
+                            } else {
+
+                            }
+                        }
                     }
                 }
 
@@ -355,7 +367,7 @@ int main(int argc, char *argv[]) {
 
                             write(fd1_fifo, tmp_resp, DIM_PATH + 2);
                         }
-                        if(!strcmp(print_method, "-c")) {
+                        if (!strcmp(print_method, "-c")) {
                             analyzeCluster(sum, type_resp);
                             write(fd1_fifo, type_resp, DIM_RESP);
                         }
