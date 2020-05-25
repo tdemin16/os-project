@@ -350,14 +350,23 @@ int main(int argc, char *argv[]) {
                                         dupl = strdup(cmd);
                                         new_n = strtok(dupl, " ");
                                         new_n = strtok(NULL, " ");
-                                        n = atoi(new_n);
+                                        if (atoi(new_n) > 0) {
+                                            n = atoi(new_n);
+                                        } else {
+                                            printf("\nValore di n non valido\n");
+                                        }
+
                                         free(dupl);
 
                                     } else if (!strncmp(cmd, "setm", 4)) {
                                         dupl = strdup(cmd);
                                         new_m = strtok(dupl, " ");
                                         new_m = strtok(NULL, " ");
-                                        m = atoi(new_m);
+                                        if (atoi(new_m) > 0) {
+                                            m = atoi(new_m);
+                                        } else {
+                                            printf("\nValore di m non valido\n");
+                                        }
                                         free(dupl);
                                     }
                                 } else if (argCounter == 1) {
