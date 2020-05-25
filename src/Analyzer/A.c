@@ -64,15 +64,9 @@ int main(int argc, char *argv[]) {
     //COMMUNICATION WITH M - STDIN
     char cmd[DIM_CMD];  //Comando rivevuto da M
     int _close = FALSE;
-<<<<<<< HEAD
     char *new_n;
     char *new_m;
     char *dupl = NULL;
-=======
-    /* int new_n;
-    int new_m;
-    char* dupl = NULL; */
->>>>>>> 42a35835dee966a1f78381da8776ac500b50dddd
 
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;
