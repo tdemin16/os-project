@@ -57,6 +57,7 @@ int main(int argc, char *argv[]) {
     const char *fifo2 = "/tmp/R_to_A";
     int retrieve = TRUE;
     char print_method[DIM_CMD];
+    char type_resp[DIM_RESP];
     char tmp_resp[PATH_MAX];
     strcpy(tmp_resp, "///");
 
@@ -348,7 +349,8 @@ int main(int argc, char *argv[]) {
                             write(fd1_fifo, tmp_resp, PATH_MAX + 2);
                         }
                         if(!strcmp(print_method, "-c")) {
-                            write(fd1_fifo, tmp_resp, PATH_MAX + 2);
+                            analyzeCluster(sum, type_resp);
+                            write(fd1_fifo, type_resp, DIM_RESP);
                         }
                         retrieve = TRUE;
                     }
@@ -429,12 +431,12 @@ int main(int argc, char *argv[]) {
 
                             if (perc == pathSent && value_return == 0) {
                                 count -= lista->count;
-                                printf("Numero file analizzati: %d\n", pathSent);
-
-                                arrayToCsv(v, sum);
-                                printStat_Cluster(sum);
-                                printf("\n> ");
+                                printf("Numero file analizzati: %d\n\n> ", pathSent);
                                 fflush(stdout);
+                                arrayToCsv(v, sum);
+                                //printStat_Cluster(sum);
+                                //printf("\n> ");
+                                //fflush(stdout);
                                 //setOnFly(4,5,fd_1);
                                 //sleep(5);
                                 //closeAll(fd_1);

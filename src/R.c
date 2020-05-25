@@ -58,7 +58,7 @@ int main() {
     char cmd[DIM_CMD];
     int retrieve = FALSE;
     int _r_write = TRUE;
-    //char resp[DIM_RESP];
+    char resp[DIM_RESP];
     char path[PATH_MAX];
     int arr = FALSE;
     int spaces;
@@ -113,25 +113,26 @@ int main() {
                 retrieve = TRUE;
                 _r_write = TRUE;
                 checkArg(cmd, &spaces);
-                if (spaces != 2) {
-                    _r_write = FALSE;
-                    retrieve = FALSE;
-                    printf("spaces\n");
-                    printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
-                    fflush(stdout);
-                } else {
-                    dupl = strdup(cmd);
-                    flag = strtok(dupl, " ");
-                    flag = strtok(NULL, " ");
-                    if (strncmp(flag, "-c", 2)) {
+                if (strstr(cmd, "report") != NULL) {
+                    if (spaces != 2) {
                         _r_write = FALSE;
                         retrieve = FALSE;
                         printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
                         fflush(stdout);
                     } else {
-                        strcpy(cmd, flag);
+                        dupl = strdup(cmd);
+                        flag = strtok(dupl, " ");
+                        flag = strtok(NULL, " ");
+                        if (strncmp(flag, "-c", 2)) {
+                            _r_write = FALSE;
+                            retrieve = FALSE;
+                            printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
+                            fflush(stdout);
+                        } else {
+                            strcpy(cmd, flag);
+                        }
+                        free(dupl);
                     }
-                    free(dupl);
                 }
                 while (value_return == 0 && _r_write) {
                     if (write(fd2_fifo, cmd, DIM_CMD) == -1) {
@@ -163,13 +164,13 @@ int main() {
                     }
                 }
             }
-            if(!strncmp(cmd, "-c", 2)) {
-                if(read(fd1_fifo, path, PATH_MAX+2) > 0) {
-                    if (!strncmp(path, "///", 3)) {
-                        retrieve = FALSE;
-                        printf("%s\n", path);
+            if (!strncmp(cmd, "-c", 2)) {
+                if (read(fd1_fifo, resp, DIM_RESP) > 0) {
+                    if (strstr(resp, ",") != NULL) {
+                        printCluster(resp);
                         printf("\n> ");
                         fflush(stdout);
+                        retrieve = FALSE;
                     }
                 }
             }

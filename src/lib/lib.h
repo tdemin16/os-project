@@ -113,7 +113,7 @@ void setAnalyzed(array *, int, int);
 int getAnalyzed(array *, int);
 void resetPathList(array *);
 int compare_mtime(array *, int, char *);
-array* cleanRemoved(array *);
+array *cleanRemoved(array *);
 
 void close_pipes(int *, int);
 int unlock_pipes(int *, int);
@@ -166,7 +166,8 @@ char sameId(char *, char *);
 
 // /src/R.c
 void printStat(char *);
-void printStat_Cluster(char *);
+void analyzeCluster(char *, char *);
+void printCluster(char *);
 void printInfoCluster();
 float roundValue(float, int);
 void percAvanzamento(int, int);

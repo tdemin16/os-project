@@ -771,7 +771,7 @@ void printStat(char *char_count) {
     }
 }
 
-void printStat_Cluster(char *char_count) {
+void analyzeCluster(char *char_count, char* resp) {
     int v[DIM_V];
     int i;
     int lettereMin = 0;
@@ -781,6 +781,9 @@ void printStat_Cluster(char *char_count) {
     int punt = 0;
     int carSpec = 0;
     int tot = 0;
+    for(i = 0; i < DIM_V; i++) {
+        v[i] = 0;
+    }
     parse_string(char_count, v);
     for (i = 0; i < DIM_V; i++) {
         if (i == 0) {
@@ -809,15 +812,33 @@ void printStat_Cluster(char *char_count) {
         }
     }
 
-    printf("\nSTAMPA STATISTICHE PER CLUSTER\n\n");
-    printf("Lettere minuscole:\t %d\t%.4g%%\n", lettereMin, (float)lettereMin / (float)tot * 100);
-    printf("Lettere maiuscole:\t %d\t%.4g%%\n", lettereMai, (float)lettereMai / (float)tot * 100);
-    printf("Spazi:\t\t\t %d\t%.4g%%\n", spazi, (float)spazi / (float)tot * 100);
-    printf("Numeri:\t\t\t %d\t%.4g%%\n", numeri, (float)numeri / (float)tot * 100);
-    printf("Segni di punteggiatura:\t %d\t%.4g%%\n", punt, (float)punt / (float)tot * 100);
-    printf("Caratteri speciali:\t %d\t%.4g%%\n", carSpec, (float)carSpec / (float)tot * 100);
+    sprintf(resp, "%d,%d,%d,%d,%d,%d,%d", tot, spazi, punt, carSpec, numeri, lettereMai, lettereMin);
+}
+
+void printCluster(char* char_count) {
+    int v[7];
+    int i;
+    for(i = 0; i < 7; i++) {
+        v[i] = 0;
+    }
+    parse_string(char_count, v);
+    int lettereMin = v[6];
+    int lettereMai = v[5];
+    int spazi = v[1];
+    int numeri = v[4];
+    int punt = v[2];
+    int carSpec = v[3];
+    int tot = v[0];
+
+    printf(BOLDWHITE"STAMPA STATISTICHE PER CLUSTER\n\n"RESET);
+    printf(WHITE"Lettere minuscole"RESET":\t %d\t%.4g%%\n", lettereMin, (float)lettereMin / (float)tot * 100);
+    printf(WHITE"Lettere maiuscole"RESET":\t %d\t%.4g%%\n", lettereMai, (float)lettereMai / (float)tot * 100);
+    printf(WHITE"Spazi"RESET":\t\t\t %d\t%.4g%%\n", spazi, (float)spazi / (float)tot * 100);
+    printf(WHITE"Numeri"RESET":\t\t\t %d\t%.4g%%\n", numeri, (float)numeri / (float)tot * 100);
+    printf(WHITE"Segni di punteggiatura"RESET":\t %d\t%.4g%%\n", punt, (float)punt / (float)tot * 100);
+    printf(WHITE"Caratteri speciali"RESET":\t %d\t%.4g%%\n", carSpec, (float)carSpec / (float)tot * 100);
     printf("\n");
-    printf("Caratteri totali: %d\n", tot);
+    printf(WHITE"Caratteri totali"RESET": %d\n", tot);
 }
 
 void printInfoCluster() {
