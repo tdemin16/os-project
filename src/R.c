@@ -61,6 +61,9 @@ int main() {
     //char resp[DIM_RESP];
     char path[PATH_MAX];
     int arr = FALSE;
+    int spaces;
+    char *dupl = NULL;
+    char *flag;
 
     printf("Start R\n");
     fflush(stdout);
@@ -106,9 +109,30 @@ int main() {
             if (!strncmp(cmd, "close", 5)) {
                 _close = TRUE;
                 printf(BOLDWHITE "R" RESET ": Closing...\n");
-            } else if (!retrieve && !strncmp(cmd, "print", 5)) {  //Add flags
+            } else if (!retrieve && (!strncmp(cmd, "print", 5) || !strncmp(cmd, "report", 6))) {  //Add flags
                 retrieve = TRUE;
                 _r_write = TRUE;
+                checkArg(cmd, &spaces);
+                if (spaces != 2) {
+                    _r_write = FALSE;
+                    retrieve = FALSE;
+                    printf("spaces\n");
+                    printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
+                    fflush(stdout);
+                } else {
+                    dupl = strdup(cmd);
+                    flag = strtok(dupl, " ");
+                    flag = strtok(NULL, " ");
+                    if (strncmp(flag, "-c", 2)) {
+                        _r_write = FALSE;
+                        retrieve = FALSE;
+                        printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
+                        fflush(stdout);
+                    } else {
+                        strcpy(cmd, flag);
+                    }
+                    free(dupl);
+                }
                 while (value_return == 0 && _r_write) {
                     if (write(fd2_fifo, cmd, DIM_CMD) == -1) {
                         if (errno != EAGAIN) {
@@ -126,14 +150,24 @@ int main() {
         }
         while (retrieve) {
             if (!strncmp(cmd, "print", 5)) {
-                if (read(fd1_fifo, path, PATH_MAX+2) > 0) {
+                if (read(fd1_fifo, path, PATH_MAX + 2) > 0) {
                     if (strstr(path, "#") != NULL) {
                         printf("%s\n", path);
                         usleep(10000);
                         arr = TRUE;
                     } else if (!strncmp(path, "///", 3)) {
                         retrieve = FALSE;
-                        if(!arr) printf("Lista vuota\n");
+                        if (!arr) printf("Lista vuota\n");
+                        printf("\n> ");
+                        fflush(stdout);
+                    }
+                }
+            }
+            if(!strncmp(cmd, "-c", 2)) {
+                if(read(fd1_fifo, path, PATH_MAX+2) > 0) {
+                    if (!strncmp(path, "///", 3)) {
+                        retrieve = FALSE;
+                        printf("%s\n", path);
                         printf("\n> ");
                         fflush(stdout);
                     }

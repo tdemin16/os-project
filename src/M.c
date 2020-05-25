@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
                 }
 
                 if (res_cmd == 1) {
-                    if (!strcmp(cmd, "print")) {
+                    if (!strcmp(cmd, "print") || strstr(cmd, "report")) {
                         while (value_return == 0 && _write) {
                             if (write(fd[R * 2 + WRITE], cmd, DIM_CMD) == -1) {
                                 if (errno != EAGAIN) {
@@ -227,11 +227,16 @@ int main(int argc, char *argv[]) {
 //COdice per identificare un comando che deve essere mandato ad A. Per il momento io uso '2'
 int check_command(char *cmd) {
     int res = -1;  //errore input comando
+    int spaces;
 
     if (!strcmp(cmd, "close")) {  //CLOSE
         res = 0;
-    } else if (!strcmp(cmd, "-c") || !strcmp(cmd, "print")) {  //R
+    } else if (strstr(cmd, "report") != NULL || !strcmp(cmd, "print")) {  //R
         res = 1;
+        if (!strncmp(cmd, "report", 6)) {
+            checkArg(cmd, &spaces);
+            if(spaces != 2) res = -1;
+        }
     } else if (!strncmp(cmd, "add", 3) || !strncmp(cmd, "remove", 6) || !strcmp(cmd, "reset") || !strcmp(cmd, "analyze") || !strcmp(cmd, "reanalyze")) {  //A
         res = 2;
     } else if (!strcmp(cmd, "help") || !strcmp(cmd, "info")) {  //HELP

@@ -332,9 +332,9 @@ int main(int argc, char *argv[]) {
                 if (!_close && value_return == 0) {
                     if (retrieve) {  //Try read from R
                         if (read(fd2_fifo, print_method, DIM_CMD) > 0) {
-                            if (!strncmp(print_method, "print", 5)) {
+                            if (!strncmp(print_method, "print", 5) || !strncmp(print_method, "-c", 2)) {
                                 retrieve = FALSE;
-                                //printf("print arrivata\n");
+                                //printf("%s\n", print_method);
                             }
                         }
                     } else {
@@ -345,6 +345,9 @@ int main(int argc, char *argv[]) {
                                 }
                             }
 
+                            write(fd1_fifo, tmp_resp, PATH_MAX + 2);
+                        }
+                        if(!strcmp(print_method, "-c")) {
                             write(fd1_fifo, tmp_resp, PATH_MAX + 2);
                         }
                         retrieve = TRUE;
