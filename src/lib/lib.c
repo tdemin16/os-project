@@ -449,6 +449,22 @@ void setOnFly(int n, int m, int *fd_1) {
             fprintf(stderr, "errore set on-fly, pipe piena");
     }
 }
+void setmOnFly(int m, int *fd_1) {
+    if (fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) {
+        //value_return = err_fcntl();
+    }
+    char resp[DIM_RESP];
+    while (read(fd_1[READ], resp, DIM_RESP) > 0) {
+    }
+    char onFly[DIM_PATH];
+    sprintf(onFly, "#SETM#%d#", m);
+    if (write(fd_1[WRITE], onFly, DIM_PATH) == -1) {  //Prova a scrivere sulla pipe
+        if (errno != EAGAIN) {                        //Se avviene un errore e non e` causato dalla dimensione della pipe
+            //value_return = err_write();               //Ritorna l'errore sulla scrittura
+        } else
+            fprintf(stderr, "errore set on-fly, pipe piena\n");
+    }    
+}
 
 void closeAll(int *fd_1) {
     if (fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) {
@@ -498,6 +514,14 @@ void parseOnFly(char *path, int *n, int *m) {
     *m = atoi(token);
     free(dupPath);
 }
+void mParseOnFly(char *path, int *m) {
+    char *token;
+    char *dupPath = strdup(path);
+    token = strtok(path, "#");
+    token = strtok(NULL, "#");
+    *m = atoi(token);
+    free(dupPath);
+}
 
 void nClearAndClose(int *fd, int n) {
     int i;
@@ -528,6 +552,36 @@ void nClearAndClose(int *fd, int n) {
     }
 }
 
+void mSendOnFly(int *fd, int n, int m) {
+    int i;
+    char sentClose = FALSE;
+    char path[DIM_PATH];
+    int terminated[n];  //Indica se un file e` stato mandato o meno
+    for (i = 0; i < n; i++) {
+        while (read(fd[i * 4 + 3], path, DIM_PATH) > 0) {
+        }
+        terminated[i] = FALSE;
+    }
+    sprintf(path, "#SETM#%d#", m);
+    //fprintf(stderr,"%s\n",path);
+    while (!sentClose) {
+        sentClose = TRUE;
+        for (i = 0; i < n; i++) {  //Provo a inviare path a tutti i Q
+            if (!terminated[i]) {
+                if (write(fd[i * 4 + 3], path, DIM_PATH) == -1) {
+                    if (errno != EAGAIN) {
+                    } else {
+                        sentClose = FALSE;  //Se non ci riesce setta send a false
+                        terminated[i] = FALSE;
+                    }
+                } else {
+                    terminated[i] = TRUE;
+                    
+                }
+            }
+        }
+    }
+}
 void forkC(int *n, int *f, int *id, int *value_return) {
     int i;
     for (i = 0; i<*n && * f> 0 && *value_return == 0; i++) {
@@ -782,7 +836,7 @@ void printStat(char *char_count) {
     }
 }
 
-void analyzeCluster(char *char_count, char* resp) {
+void analyzeCluster(char *char_count, char *resp) {
     int v[DIM_V];
     int i;
     int lettereMin = 0;
@@ -792,7 +846,7 @@ void analyzeCluster(char *char_count, char* resp) {
     int punt = 0;
     int carSpec = 0;
     int tot = 0;
-    for(i = 0; i < DIM_V; i++) {
+    for (i = 0; i < DIM_V; i++) {
         v[i] = 0;
     }
     parse_string(char_count, v);
@@ -826,10 +880,10 @@ void analyzeCluster(char *char_count, char* resp) {
     sprintf(resp, "%d,%d,%d,%d,%d,%d,%d", tot, spazi, punt, carSpec, numeri, lettereMai, lettereMin);
 }
 
-void printCluster(char* char_count) {
+void printCluster(char *char_count) {
     int v[7];
     int i;
-    for(i = 0; i < 7; i++) {
+    for (i = 0; i < 7; i++) {
         v[i] = 0;
     }
     parse_string(char_count, v);
@@ -841,15 +895,15 @@ void printCluster(char* char_count) {
     int carSpec = v[3];
     int tot = v[0];
 
-    printf(BOLDWHITE"STAMPA STATISTICHE PER CLUSTER\n\n"RESET);
-    printf(WHITE"Lettere minuscole"RESET":\t %d\t%.4g%%\n", lettereMin, (float)lettereMin / (float)tot * 100);
-    printf(WHITE"Lettere maiuscole"RESET":\t %d\t%.4g%%\n", lettereMai, (float)lettereMai / (float)tot * 100);
-    printf(WHITE"Spazi"RESET":\t\t\t %d\t%.4g%%\n", spazi, (float)spazi / (float)tot * 100);
-    printf(WHITE"Numeri"RESET":\t\t\t %d\t%.4g%%\n", numeri, (float)numeri / (float)tot * 100);
-    printf(WHITE"Segni di punteggiatura"RESET":\t %d\t%.4g%%\n", punt, (float)punt / (float)tot * 100);
-    printf(WHITE"Caratteri speciali"RESET":\t %d\t%.4g%%\n", carSpec, (float)carSpec / (float)tot * 100);
+    printf(BOLDWHITE "STAMPA STATISTICHE PER CLUSTER\n\n" RESET);
+    printf(WHITE "Lettere minuscole" RESET ":\t %d\t%.4g%%\n", lettereMin, (float)lettereMin / (float)tot * 100);
+    printf(WHITE "Lettere maiuscole" RESET ":\t %d\t%.4g%%\n", lettereMai, (float)lettereMai / (float)tot * 100);
+    printf(WHITE "Spazi" RESET ":\t\t\t %d\t%.4g%%\n", spazi, (float)spazi / (float)tot * 100);
+    printf(WHITE "Numeri" RESET ":\t\t\t %d\t%.4g%%\n", numeri, (float)numeri / (float)tot * 100);
+    printf(WHITE "Segni di punteggiatura" RESET ":\t %d\t%.4g%%\n", punt, (float)punt / (float)tot * 100);
+    printf(WHITE "Caratteri speciali" RESET ":\t %d\t%.4g%%\n", carSpec, (float)carSpec / (float)tot * 100);
     printf("\n");
-    printf(WHITE"Caratteri totali"RESET": %d\n", tot);
+    printf(WHITE "Caratteri totali" RESET ": %d\n", tot);
 }
 
 void printInfoCluster() {

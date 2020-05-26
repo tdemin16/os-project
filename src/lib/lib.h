@@ -132,6 +132,7 @@ void add_process_to_v(pid_t, int *);
 void initialize_processes(pid_t *, int);
 char fileExist(char *);
 void setOnFly(int, int, int *);
+void setmOnFly(int, int *);
 void closeAll(int *);
 
 //parser A.c
@@ -139,7 +140,9 @@ char checkArg(char *, int *);
 
 // /src/Analyzer/C.c
 void parseOnFly(char *, int *, int *);
+void mParseOnFly(char *, int *);
 void nClearAndClose(int *, int);
+void mSendOnFly(int *, int, int);
 void forkC(int *, int *, int *, int *);
 void execC(int *, int *, int *, int *, int *, int *);
 

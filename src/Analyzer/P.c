@@ -119,8 +119,16 @@ int main(int argc, char* argv[]) {
                             if (!strncmp(path, "#CLOSE", 6)) {  //Se leggo una stringa di terminazione
                                 _close = TRUE;
                                 debug = fopen(str, "a");
-                                fprintf(debug, "C: MI KILLO\n");
+                                fprintf(debug, "P: MI KILLO\n");
                                 fclose(debug);  //Setto end a true
+                            } else if (!strncmp(path, "#SETM#", 6)) {
+                                mParseOnFly(path,&m);
+                                debug = fopen(str, "a");
+                                fprintf(debug, "P: NUOVO M: %d\n",m);
+                                fclose(debug);  //Setto end a true
+                                fprintf(stderr,"RICEVUTO\n");
+                                
+                                pendingPath--;
                             } else {
                                 for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q
                                     if (write(fd[i * 4 + 3], path, DIM_PATH) == -1) {
@@ -233,7 +241,8 @@ int main(int argc, char* argv[]) {
                 }
             }
 
-            while (wait(NULL) > 0);
+            while (wait(NULL) > 0)
+                ;
             close_pipes(fd, size_pipe);
             free(fd);
             freePathList(sum);

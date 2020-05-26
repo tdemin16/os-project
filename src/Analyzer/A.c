@@ -352,6 +352,7 @@ int main(int argc, char *argv[]) {
                                         new_n = strtok(NULL, " ");
                                         if (atoi(new_n) > 0) {
                                             n = atoi(new_n);
+                                            setOnFly(n,m,fd_1);
                                         } else {
                                             printf("\nValore di n non valido\n");
                                         }
@@ -364,6 +365,7 @@ int main(int argc, char *argv[]) {
                                         new_m = strtok(NULL, " ");
                                         if (atoi(new_m) > 0) {
                                             m = atoi(new_m);
+                                            setmOnFly(m,fd_1);
                                         } else {
                                             printf("\nValore di m non valido\n");
                                         }
