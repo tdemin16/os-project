@@ -326,8 +326,8 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
     int i;
     FILE *fp;
     *res = 0;
-    char riga[PATH_MAX];
-    char resolved_path[PATH_MAX];
+    char riga[DIM_PATH-16];
+    char resolved_path[DIM_PATH-16];
     int ret = parser_CheckArguments(argc, argv, &(*n), &(*m));
     if (ret < 0) {
         ret = ERR_ARGS_A;
