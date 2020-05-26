@@ -144,8 +144,9 @@ void mParseOnFly(char *, int *);
 void nClearAndClose(int *, int);
 void mSendOnFly(int *, int, int);
 void forkC(int *, int *, int *, int *);
+void forkP(int *, int *, int *, int *);
 void execC(int *, int *, int *, int *, int *, int *);
-
+void execP(int *, int *, int *, int *, int *, int *);
 // /src/Analyzer/Q.c
 void initialize_vector(int *);
 void set_add(int *, char);

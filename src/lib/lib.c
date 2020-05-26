@@ -593,6 +593,17 @@ void forkC(int *n, int *f, int *id, int *value_return) {
         }
     }
 }
+void forkP(int *m, int *f, int *id, int *value_return) {
+    int i;
+    for (i = 0; i<*m && * f> 0 && *value_return == 0; i++) {
+        *f = fork();
+        if (*f == 0) {
+            *id = i;                     //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
+        } else if (*f == -1) {           //Controllo che non ci siano stati errori durante il fork
+            *value_return = err_fork();  //In caso di errore setta il valore di ritorno a ERR_FORK
+        }
+    }
+}
 
 void execC(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) {
     char str[12];
@@ -606,6 +617,22 @@ void execC(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) 
         //fprintf(stderr, "%d", errno);
         *value_return = err_exec(errno);  //Set value return
     }
+}
+void execP(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) {
+    char str[12];
+    sprintf(str, "%d", *id);
+    char str2[12];
+    sprintf(str2, "%d", *m);
+    char *args[4] = {"./Q", str,str2, NULL};
+    dup2(fd[*id * 4 + 2], STDIN_FILENO);
+    dup2(fd[*id * 4 + 1], STDOUT_FILENO);
+    close_pipes(fd, *size_pipe);
+    free(fd);
+    if (execvp(args[0], args) == -1) {  //Test exec
+        //fprintf(stderr, "%d", errno);
+        *value_return = err_exec(errno);  //Set value return
+    }
+    
 }
 
 void add_process_to_v(pid_t f, int *v) {

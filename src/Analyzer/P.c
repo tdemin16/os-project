@@ -33,8 +33,6 @@ int main(int argc, char* argv[]) {
     int _close = FALSE;
     char sentClose = FALSE;
     array* sum = createPathList(10);
-    char array[4][4];
-    char* args[4];
     char send_w = TRUE;
     char send_r = TRUE;
     int terminated[m];
@@ -82,16 +80,7 @@ int main(int argc, char* argv[]) {
     //Forking-----------------------------------------------------------
     if (value_return == 0) {
         //Ciclo m volte, controllando che f > 0 (padre) e non ci siano errori -> genera quindi m processi
-        for (i = 0; i < m && f > 0 && value_return == 0; i++) {
-            f = fork();
-            if (f == 0) {  //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
-                id = i;
-            } else if (f == -1) {
-                value_return = err_fork();
-            } /*else{
-                //insert_process(f);
-            }*/
-        }
+        forkP(&m, &f, &id, &value_return);
     }
 
     //----------------------------------------------------------------------
@@ -122,11 +111,35 @@ int main(int argc, char* argv[]) {
                                 fprintf(debug, "P: MI KILLO\n");
                                 fclose(debug);  //Setto end a true
                             } else if (!strncmp(path, "#SETM#", 6)) {
-                                mParseOnFly(path,&m);
                                 debug = fopen(str, "a");
-                                fprintf(debug, "P: NUOVO M: %d\n",m);
+                                fprintf(debug, "P: NUOVO M: %d\n", m);
                                 fclose(debug);  //Setto end a true
-                                
+                                nClearAndClose(fd, m);
+                                while (wait(NULL) > 0)
+                                    ;
+                                mParseOnFly(path, &m);
+                                size_pipe = m * 4;
+                                fd = (int*)realloc(fd, size_pipe * sizeof(int));
+                                //Alloco le pipes a due a due
+                                for (i = 0; i < size_pipe - 1; i += 2) {
+                                    if (close(fd[i]) == -1) {       //Controlla se ci sono errori nella creazione della pipe
+                                        value_return = err_pipe();  //In caso di errore setta il valore di ritorno
+                                    }
+                                }
+                                for (i = 0; i < size_pipe - 1; i += 2) {
+                                    if (pipe(fd + i) == -1) {       //Controlla se ci sono errori nella creazione della pipe
+                                        value_return = err_pipe();  //In caso di errore setta il valore di ritorno
+                                    }
+                                }
+                                if (unlock_pipes(fd, size_pipe) == -1) {  //Set nonblocking pipes
+                                    value_return = err_fcntl();           //Gestione errore sullo sblocco pipe
+                                }
+                                if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {  //Sblocca lo stdin (teoricamente non necessario)
+                                    value_return = err_fcntl();                  //Gestione errore sullo sblocco pipe
+                                }
+                                forkP(&m, &f, &id, &value_return);
+                                if (f == 0) execP(&m, &f, &id, fd, &value_return, &size_pipe);
+
                                 pendingPath--;
                             } else {
                                 for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q
@@ -250,23 +263,7 @@ int main(int argc, char* argv[]) {
 
     if (value_return == 0) {
         if (f == 0) {  //SON SIDE
-            //Creates char args
-            strcpy(array[0], "./Q");
-            sprintf(array[1], "%d", id);
-            sprintf(array[2], "%d", m);
-            args[0] = array[0];
-            args[1] = array[1];
-            args[2] = array[2];
-            args[3] = NULL;
-
-            dup2(fd[id * 4 + 2], STDIN_FILENO);
-            dup2(fd[id * 4 + 1], STDOUT_FILENO);
-            close_pipes(fd, size_pipe);
-            free(fd);
-
-            if (execvp(args[0], args) == -1) {
-                value_return = err_exec(errno);
-            }
+            execP(&m, &f, &id, fd, &value_return, &size_pipe);
         }
     }
 
