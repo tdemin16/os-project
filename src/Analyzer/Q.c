@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
     int m;
     int v[DIM_V];
 
-    FILE* fp;
+    int fp;
     char* id;
     char* analyze;
     int i;
@@ -75,15 +75,15 @@ int main(int argc, char* argv[]) {
                 tmpDup = strdup(path);
                 id = strtok(tmpDup, "#");
                 analyze = strtok(NULL, "#");
-                fp = fopen(analyze, "r");
-                if (fp == NULL) {
+                fp = open(analyze, O_RDONLY);
+                if (fp == -1) {
                     //value_return = err_file_open();
                     for (i = 0; i < DIM_V; i++) {
                         v[i] = -1;
                     }
                 } else {
-                    get_frequencies(fp, v, part, m);
-                    fclose(fp);
+                    get_frequencies(&fp, v, part, m);
+                    close(fp);
                 }
                 createCsv(v, resp, id);
                 debug = fopen(str, "a");
