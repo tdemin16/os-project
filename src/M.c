@@ -186,7 +186,7 @@ int main(int argc, char *argv[]) {
             close(fd[R * 2 + READ]);
             close(fd[A * 2 + WRITE]);
             close(fd[A * 2 + READ]);
-            printf(BOLDWHITE "M" RESET ": Closing...\n");
+            printf(BOLDWHITE "M" RESET ": Closing...\n\n");
         }
     }
 
