@@ -172,7 +172,7 @@ int insertAndSumPathList(array *tmp, char *c, int val) {
     if (sum == FALSE) {
         //printf("Provo a inserire %s, size: %d, count:%d\n", c, tmp->size, tmp->count);
         if (tmp->count == tmp->size - 1) {
-            //reallocPathList(tmp, 2);
+            reallocPathList(tmp, 2);
         }
         //printf("Stringa inserita\n");
         strcpy(tmp->pathList[tmp->count], c);
