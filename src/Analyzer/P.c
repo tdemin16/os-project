@@ -126,7 +126,6 @@ int main(int argc, char* argv[]) {
                                 debug = fopen(str, "a");
                                 fprintf(debug, "P: NUOVO M: %d\n",m);
                                 fclose(debug);  //Setto end a true
-                                fprintf(stderr,"RICEVUTO\n");
                                 
                                 pendingPath--;
                             } else {

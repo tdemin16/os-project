@@ -111,10 +111,11 @@ int main(int argc, char* argv[]) {
                             fprintf(debug, "C: LEGGO %s\n", path);
                             fclose(debug);
                             if (!strncmp(path, "#", 1)) {
-                                nClearAndClose(fd, n);              //Svuota le pipe in discesa e manda #CLOSE
                                 if (!strncmp(path, "#CLOSE", 6)) {  //Se leggo una stringa di terminazione
+                                    nClearAndClose(fd, n);          //Svuota le pipe in discesa e manda #CLOSE
                                     _close = TRUE;                  //Setto end a true
                                 } else if (!strncmp(path, "#SET#", 5) || !strncmp(path, "#SETN", 5)) {
+                                    nClearAndClose(fd, n);     //Svuota le pipe in discesa e manda #CLOSE
                                     parseOnFly(path, &n, &m);  //Estrae n e m dalla stringa #SET#N#M#
                                     size_pipe = n * 4;
                                     fd = (int*)realloc(fd, size_pipe * sizeof(int));
@@ -137,7 +138,7 @@ int main(int argc, char* argv[]) {
                                     }
                                     forkC(&n, &f, &id, &value_return);
                                     if (f == 0) execC(&m, &f, &id, fd, &value_return, &size_pipe);
-                                } else if (!strncmp(path, "#SETM#", 6)){
+                                } else if (!strncmp(path, "#SETM#", 6)) {
                                     mParseOnFly(path, &m);
                                     mSendOnFly(fd, n, m);
                                 }
