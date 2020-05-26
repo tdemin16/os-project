@@ -604,11 +604,9 @@ void get_subset(int *fp, int *v, int b, int e) {
     char c[1];
     lseek(*fp, b, SEEK_SET);  //setting initial position of SEEK cursor
     while (read(*fp, c, 1) && i < e) {
-        if (c[1] != '\n') set_add(v, c[1]);
-        fprintf(stderr, "%c", c[1]);
+        if (c[0] != '\n') set_add(v, c[0]);
         i++;
     }
-    fprintf(stderr,"%d\n", i);
 }
 
 void get_frequencies(int *fp, int *freq, int part, int m) {  //Prima di commentarlo bene testiamo
