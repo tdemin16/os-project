@@ -326,8 +326,8 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
     int i;
     FILE *fp;
     *res = 0;
-    char riga[DIM_PATH-16];
-    char resolved_path[DIM_PATH-16];
+    char riga[DIM_PATH - 16];
+    char resolved_path[DIM_PATH - 16];
     int ret = parser_CheckArguments(argc, argv, &(*n), &(*m));
     if (ret < 0) {
         ret = ERR_ARGS_A;
@@ -463,7 +463,7 @@ void setmOnFly(int m, int *fd_1) {
             //value_return = err_write();               //Ritorna l'errore sulla scrittura
         } else
             fprintf(stderr, "errore set on-fly, pipe piena\n");
-    }    
+    }
 }
 
 void closeAll(int *fd_1) {
@@ -514,10 +514,22 @@ void parseOnFly(char *path, int *n, int *m) {
     *m = atoi(token);
     free(dupPath);
 }
+
+void parseSetOnFly(char *string, int *n, int *m) {
+    char *token;
+    char *dupPath = strdup(string);
+    token = strtok(dupPath, " ");
+    token = strtok(NULL, " ");
+    *n = atoi(token);
+    token = strtok(NULL, " ");
+    *m = atoi(token);
+    free(dupPath);
+}
+
 void mParseOnFly(char *path, int *m) {
     char *token;
     char *dupPath = strdup(path);
-    token = strtok(path, "#");
+    token = strtok(dupPath, "#");
     token = strtok(NULL, "#");
     *m = atoi(token);
     free(dupPath);
@@ -576,7 +588,6 @@ void mSendOnFly(int *fd, int n, int m) {
                     }
                 } else {
                     terminated[i] = TRUE;
-                    
                 }
             }
         }
@@ -623,7 +634,7 @@ void execP(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) 
     sprintf(str, "%d", *id);
     char str2[12];
     sprintf(str2, "%d", *m);
-    char *args[4] = {"./Q", str,str2, NULL};
+    char *args[4] = {"./Q", str, str2, NULL};
     dup2(fd[*id * 4 + 2], STDIN_FILENO);
     dup2(fd[*id * 4 + 1], STDOUT_FILENO);
     close_pipes(fd, *size_pipe);
@@ -632,7 +643,6 @@ void execP(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) 
         //fprintf(stderr, "%d", errno);
         *value_return = err_exec(errno);  //Set value return
     }
-    
 }
 
 void add_process_to_v(pid_t f, int *v) {

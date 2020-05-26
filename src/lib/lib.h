@@ -125,7 +125,6 @@ int parser2(int, char **, array *, int *, int *, int *, int *);
 int parser_CheckArguments(int, char **, int *, int *);
 int parser_LenghtCommand(char *);
 void parser_CreateCommand(char *);
-
 void handle_sigint(int);
 int parse_string(char *, int *v);
 void add_process_to_v(pid_t, int *);
@@ -140,6 +139,7 @@ char checkArg(char *, int *);
 
 // /src/Analyzer/C.c
 void parseOnFly(char *, int *, int *);
+void parseSetOnFly(char* ,int*,int*);
 void mParseOnFly(char *, int *);
 void nClearAndClose(int *, int);
 void mSendOnFly(int *, int, int);

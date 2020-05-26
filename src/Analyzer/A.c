@@ -371,7 +371,9 @@ int main(int argc, char *argv[]) {
                                         }
                                         free(dupl);
                                     }
-                                } else if (argCounter == 1) {
+                                } else if (argCounter == 3) {
+                                    parseSetOnFly(cmd,&n,&m);
+                                    //printf("\nValori n e m cambiati con successo\n\n");
                                     setOnFly(n,m,fd_1);
                                 }
                             }
