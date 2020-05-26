@@ -21,7 +21,7 @@
 #define DIM_V 95
 #define DIM_RESP 1051
 #define DIM_CMD 4096
-#define DIM_PATH 4112
+#define DIM_PATH 4096
 
 #define ERR_ARGS_A 1
 #define ERR_ARGS_C 2
