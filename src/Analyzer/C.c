@@ -20,6 +20,7 @@ int main(int argc, char* argv[]) {
     int n = atoi(argv[1]);
     int m = atoi(argv[2]);
     int i;
+    int j;
     int k;
 
     char path[DIM_PATH];        //Paths da mandare ai figli
@@ -85,6 +86,7 @@ int main(int argc, char* argv[]) {
     if (value_return == 0) {
         i = 0;
         k = 0;
+        j = 0;
         if (f > 0) {  //PARENT SIDE
             char str[15];
             sprintf(str, "%d.txt", getpid());
@@ -118,6 +120,11 @@ int main(int argc, char* argv[]) {
                                     fd = (int*)realloc(fd, size_pipe * sizeof(int));
                                     //Alloco le pipes a due a due
                                     for (i = 0; i < size_pipe - 1; i += 2) {
+                                        if (close(fd[i]) == -1) {       //Controlla se ci sono errori nella creazione della pipe
+                                            value_return = err_pipe();  //In caso di errore setta il valore di ritorno
+                                        }
+                                    }
+                                    for (i = 0; i < size_pipe - 1; i += 2) {
                                         if (pipe(fd + i) == -1) {       //Controlla se ci sono errori nella creazione della pipe
                                             value_return = err_pipe();  //In caso di errore setta il valore di ritorno
                                         }
@@ -133,7 +140,7 @@ int main(int argc, char* argv[]) {
                                 }
                                 pendingPath--;
                             } else {
-                                if (write(fd[i * 4 + 3], path, DIM_PATH) == -1) {  //Provo a scrivere
+                                if (write(fd[j * 4 + 3], path, DIM_PATH) == -1) {  //Provo a scrivere
                                     if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
                                         value_return = err_write();                //Setta il valore di ritorno
                                     } else {                                       //Se da errore in scrittura copio il path in failedPath e setto lo stato di stop (Retransmit)
@@ -142,25 +149,25 @@ int main(int argc, char* argv[]) {
                                     }
                                 } else {  //scritto con successo
                                     debug = fopen(str, "a");
-                                    fprintf(debug, "C: Inviato a %d: %s\n", i, path);
+                                    fprintf(debug, "C: Inviato a %d: %s\n", j, path);
                                     fclose(debug);
                                     count++;          //Tengo conto della scrittura
-                                    i = (i + 1) % n;  //Usato per ciclare su tutte le pipe in scrittura
+                                    j = (j + 1) % n;  //Usato per ciclare su tutte le pipe in scrittura
                                 }
                             }
                         }
                     } else {                                                     //Se c'e` uno stop sull'invio dei dati
-                        if (write(fd[i * 4 + 3], failedPath, DIM_PATH) == -1) {  //Test write
+                        if (write(fd[j * 4 + 3], failedPath, DIM_PATH) == -1) {  //Test write
                             if (errno != EAGAIN) {                               //Controlla che non sia una errore di pipe piena
                                 value_return = err_write();                      //Setta il valore di ritorno
                             }
                         } else {
                             debug = fopen(str, "a");
-                            fprintf(debug, "C: Inviato a %d: %s\n", i, failedPath);
+                            fprintf(debug, "C: Inviato a %d: %s\n", j, failedPath);
                             fclose(debug);
                             stop = FALSE;     //Se la scrittura va a buon fine esco dallo stato di stop
                             count++;          //Tengo conto dell'invio
-                            i = (i + 1) % n;  //Incremento i in maniera ciclica
+                            j = (j + 1) % n;  //Incremento i in maniera ciclica
                         }
                     }
                 }
@@ -210,7 +217,8 @@ int main(int argc, char* argv[]) {
                 }
             }
 
-            while(wait(NULL) > 0);
+            while (wait(NULL) > 0)
+                ;
             close_pipes(fd, size_pipe);  //Chiude tutte le pipes
             free(fd);                    //Libera la memoria delle pipes
         }
