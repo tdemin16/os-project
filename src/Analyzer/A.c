@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     int retrieve = TRUE;
     char print_method[DIM_CMD];
     char type_resp[DIM_RESP];
-    char tmp_resp[PATH_MAX];
+    char tmp_resp[DIM_PATH];
     strcpy(tmp_resp, "///");
 
     //COMMUNICATION WITH M - STDIN

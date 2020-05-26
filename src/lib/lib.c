@@ -172,7 +172,7 @@ int insertAndSumPathList(array *tmp, char *c, int val) {
     if (sum == FALSE) {
         //printf("Provo a inserire %s, size: %d, count:%d\n", c, tmp->size, tmp->count);
         if (tmp->count == tmp->size - 1) {
-            reallocPathList(tmp, 2);
+            //reallocPathList(tmp, 2);
         }
         //printf("Stringa inserita\n");
         strcpy(tmp->pathList[tmp->count], c);
@@ -192,8 +192,8 @@ void reallocPathList(array *tmp, int newSize) {
     tmp->last_edit = (time_t *)realloc(tmp->last_edit, sizeof(time_t *) * tmp->size);
 
     for (i = tmp->count; i < tmp->size; i++) {
-        tmp->pathList[i] = (char *)malloc(sizeof(char *) * (DIM_RESP + 1));
-        //memset(tmp->pathList[i], '\0', sizeof(char *) * DIM_PATH);  //set the first character to '\0' (= end of string)
+        tmp->pathList[i] = (char *)malloc(sizeof(char *) * (DIM_PATH));
+        memset(tmp->pathList[i], '\0', sizeof(char *) * DIM_PATH);  //set the first character to '\0' (= end of string)
         tmp->analyzed[i] = -1;
     }
 }
@@ -327,7 +327,7 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
     FILE *fp;
     *res = 0;
     char riga[PATH_MAX];
-    char resolved_path[PATH_MAX - 12];
+    char resolved_path[PATH_MAX];
     int ret = parser_CheckArguments(argc, argv, &(*n), &(*m));
     if (ret < 0) {
         ret = ERR_ARGS_A;
