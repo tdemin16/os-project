@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
     if (value_return == 0) {
         if (f > 0) {  //PARENT SIDE
             char str[15];
-            sprintf(str, "%d.txt", getpid());
+            sprintf(str, "P%d.txt", getpid());
             FILE* debug = fopen(str, "a");
             fprintf(debug, "AVVIATO P con m = %d\n", m);
             fclose(debug);
@@ -118,14 +118,16 @@ int main(int argc, char* argv[]) {
                                 while (wait(NULL) > 0)
                                     ;
                                 mParseOnFly(path, &m);
-                                size_pipe = m * 4;
-                                fd = (int*)realloc(fd, size_pipe * sizeof(int));
-                                //Alloco le pipes a due a due
                                 for (i = 0; i < size_pipe - 1; i += 2) {
                                     if (close(fd[i]) == -1) {       //Controlla se ci sono errori nella creazione della pipe
                                         value_return = err_pipe();  //In caso di errore setta il valore di ritorno
                                     }
                                 }
+                                size_pipe = m * 4;
+                                free(fd);
+                                fd = (int*)malloc(size_pipe * sizeof(int));
+                                //Alloco le pipes a due a due
+
                                 for (i = 0; i < size_pipe - 1; i += 2) {
                                     if (pipe(fd + i) == -1) {       //Controlla se ci sono errori nella creazione della pipe
                                         value_return = err_pipe();  //In caso di errore setta il valore di ritorno

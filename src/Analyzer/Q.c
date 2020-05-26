@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
         value_return = err_fcntl();
     }
     char str[15];
-    sprintf(str, "%d.txt", getpid());
+    sprintf(str, "Q%d.txt", getpid());
     FILE* debug = fopen(str, "a");
     fprintf(debug, "AVVIATO Q con m = %d part = %d\n", m, part);
     fclose(debug);

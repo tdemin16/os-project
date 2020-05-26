@@ -188,6 +188,7 @@ int main(int argc, char *argv[]) {
                 value_return = err_fifo();
             }
         }
+        system("clear");
     }
 
     if (value_return == 0 && !_close) {
@@ -204,7 +205,7 @@ int main(int argc, char *argv[]) {
             insertProcess(p, f);  //Insert child process in list p
             i = 0;
             char str[15];
-            sprintf(str, "%d.txt", getpid());
+            sprintf(str, "A%d.txt", getpid());
             FILE *debug = fopen(str, "a");
             fprintf(debug, "AVVIATO A\n");
             fclose(debug);
@@ -352,7 +353,7 @@ int main(int argc, char *argv[]) {
                                         new_n = strtok(NULL, " ");
                                         if (atoi(new_n) > 0) {
                                             n = atoi(new_n);
-                                            setOnFly(n,m,fd_1);
+                                            setOnFly(n, m, fd_1);
                                         } else {
                                             printf("\nValore di n non valido\n");
                                         }
@@ -365,16 +366,16 @@ int main(int argc, char *argv[]) {
                                         new_m = strtok(NULL, " ");
                                         if (atoi(new_m) > 0) {
                                             m = atoi(new_m);
-                                            setmOnFly(m,fd_1);
+                                            setmOnFly(m, fd_1);
                                         } else {
                                             printf("\nValore di m non valido\n");
                                         }
                                         free(dupl);
                                     }
                                 } else if (argCounter == 3) {
-                                    parseSetOnFly(cmd,&n,&m);
-                                    //printf("\nValori n e m cambiati con successo\n\n");
-                                    setOnFly(n,m,fd_1);
+                                    parseSetOnFly(cmd, &n, &m);
+                                    //printf("\nn:%d m:%d\n\n",n,m);
+                                    setOnFly(n, m, fd_1);
                                 }
                             }
                             printf("> ");
@@ -477,6 +478,16 @@ int main(int argc, char *argv[]) {
                             }
 
                             //Barretta
+
+                            
+                            char *ptr = strchr(lista->pathList[id_r], '\0');
+                            if (ptr) {
+                                int index = ptr - lista->pathList[id_r];
+                                char *last_ten = &lista->pathList[id_r][index - 50];
+                                printf("\033[A\33[2KT\r"BOLDGREEN"[ANALYZED]"RESET" ..%s\n", last_ten);
+                                fflush(stdout);
+                            }
+
                             if ((int)((float)perc * 10 / (float)pathSent) > oldperc && value_return == 0) {
                                 oldperc = (int)((float)perc * 10 / (float)pathSent);
                                 //system("clear");
