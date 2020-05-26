@@ -38,8 +38,8 @@ int main(int argc, char *argv[]) {
     int _write = TRUE;
     int i;
     int id;
-    FILE *fptr;
-    int c;
+    int fptr;
+    int c[1];
 
     //IPC Variables--------------------------------------------------
     int fd[4];
@@ -151,13 +151,15 @@ int main(int argc, char *argv[]) {
 
                 if (res_cmd == 3) {
                     if (!strcmp(cmd, "info")) {
-                        fptr = fopen("../README.txt", "r");
+                        fptr = open("../README.txt", O_RDONLY);
                         printf("\n");
-                        if (fptr) {
-                            while ((c = getc(fptr)) != EOF)
-                                putchar(c);
-                            fclose(fptr);
+                        if (fptr != -1) {
+                            while (read(fptr, c, 1)) putchar(c[0]);
+                            close(fptr);
+                        } else {
+                            err_file_open();
                         }
+                        printf("\n> ");fflush(stdout);
                     } else {
                         printf(BOLDBLUE "\nLista Comandi disponibili\n" RESET);
                         printf(BOLDWHITE "add </path1> </path2>" RESET ": aggiunge uno o piu` file e/o una o piu` directory\n");
@@ -242,7 +244,7 @@ int check_command(char *cmd) {
         res = 1;
         if (!strncmp(cmd, "report", 6)) {
             checkArg(cmd, &spaces);
-            if(spaces != 2) res = -1;
+            if (spaces != 2) res = -1;
         }
     } else if (!strncmp(cmd, "add", 3) || !strncmp(cmd, "remove", 6) || !strcmp(cmd, "reset") || !strcmp(cmd, "analyze") || !strcmp(cmd, "reanalyze") || !strncmp(cmd, "set", 3)) {  //A
         res = 2;
