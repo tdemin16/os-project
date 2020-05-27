@@ -117,6 +117,8 @@ int main(int argc, char *argv[]) {
             }
         } else {
             system("clear");
+            printf(BOLDWHITE "ANALYZER AVVIATO" RESET "\n");
+            fflush(stdout);
             if (val == 1) err_args_A();
             printf("> ");
             fflush(stdout);
@@ -198,6 +200,9 @@ int main(int argc, char *argv[]) {
         }
         if (argc == 1) {
             system("clear");
+            printf(BOLDWHITE "ANALYZER AVVIATO" RESET "\n\n");
+            fflush(stdout);
+
             printf("> ");
             fflush(stdout);
         }
