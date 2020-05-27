@@ -246,7 +246,7 @@ int check_command(char *cmd) {
             checkArg(cmd, &spaces);
             if (spaces != 2) res = -1;
         }
-    } else if (!strncmp(cmd, "add", 3) || !strncmp(cmd, "remove", 6) || !strcmp(cmd, "reset") || !strcmp(cmd, "analyze") || !strcmp(cmd, "reanalyze") || !strncmp(cmd, "set", 3) || !strncmp(cmd, "clear", 4) || !strncmp(cmd, "oldprint", 8)) {  //A
+    } else if (!strncmp(cmd, "add", 3) || !strncmp(cmd, "remove", 6) || !strcmp(cmd, "reset") || !strcmp(cmd, "analyze") || !strcmp(cmd, "reanalyze") || !strncmp(cmd, "set", 3) || !strncmp(cmd, "clear", 4) || !strncmp(cmd, "oldprint", 8) || !strncmp(cmd, "debug", 5)) {  //A
         res = 2;
     } else if (!strcmp(cmd, "help") || !strcmp(cmd, "info")) {  //HELP
         res = 3;
