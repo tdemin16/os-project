@@ -480,19 +480,19 @@ int main(int argc, char *argv[]) {
                             //Barretta
 
                             
-                            char *ptr = strchr(lista->pathList[id_r], '\0');
+                            /* char *ptr = strchr(lista->pathList[id_r], '\0');
                             if (ptr) {
                                 int index = ptr - lista->pathList[id_r];
                                 char *last_ten = &lista->pathList[id_r][index - 50];
                                 printf("\033[A\33[2KT\r"BOLDGREEN"[ANALYZED]"RESET" ..%s\n", last_ten);
                                 fflush(stdout);
-                            }
+                            } */
 
-                            if ((int)((float)perc * 10 / (float)pathSent) > oldperc && value_return == 0) {
+                             if ((int)((float)perc * 10 / (float)pathSent) > oldperc && value_return == 0) {
                                 oldperc = (int)((float)perc * 10 / (float)pathSent);
                                 //system("clear");
                                 //percAvanzamento(perc, count);
-                            }
+                             }
 
                             if (perc == pathSent && value_return == 0) {
                                 count -= lista->count;
