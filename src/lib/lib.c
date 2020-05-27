@@ -140,10 +140,8 @@ char removeFromPathList(array *tmp, char *c) {
 
         if (!strcmp(compare1, compare2)) {
             if (tmp->analyzed[i] != REMOVED) {
-                if (tmp->analyzed[i] != ANALIZED) {
-                    ret = TRUE;
-                }
                 tmp->analyzed[i] = REMOVED;
+                ret = TRUE;
             }
         }
         free(dup1);
