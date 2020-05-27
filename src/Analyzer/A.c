@@ -344,6 +344,18 @@ int main(int argc, char *argv[]) {
                             fflush(stdout);
                         }
 
+                        if (!strncmp(cmd, "oldprint", 8)) {
+                            printPathList(lista);
+                            printf("\n> ");
+                            fflush(stdout);
+                        }
+
+                        if (!strncmp(cmd, "clear", 5)) {
+                            system("clear");
+                            printf("\n> ");
+                            fflush(stdout);
+                        }
+
                         if (!strncmp(cmd, "set", 3)) {
                             if (checkArg(cmd, &argCounter)) {
                                 if (argCounter == 2) {
