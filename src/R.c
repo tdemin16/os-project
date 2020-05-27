@@ -64,37 +64,48 @@ int main() {
     int spaces;
     char *dupl = NULL;
     char *flag;
+    int p_create = FALSE;
+    int enoent = FALSE;
 
     printf("Start R\n");
-
+    sleep(15);
     //IPC--------------------------------------------------------------------------------------------
     if (value_return == 0) {
-        if (mkfifo(fifo1, 0666) == -1) {    //Prova a creare la pipe
-            if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
-                value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
-            }
-        }
-        if (mkfifo(fifo2, 0666) == -1) {    //Prova a creare la pipe
-            if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
-                value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
-            }
-        }
-    }
-
-    if (value_return == 0) {
-        fd1_fifo = open(fifo1, O_RDONLY);
-        if (fd1_fifo == -1) {
-            value_return = err_fifo();
-        }
-
+        printf("Waiting for A...\n");
+        printf("Use " BOLDYELLOW "[CTRL+C]" RESET " to interrupt\n");
         do {
-            fd2_fifo = open(fifo2, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
-            if (fd2_fifo == -1) {                           //Error handling
-                if (errno != ENXIO) {                       //Se errno == 6, il file A non e' stato ancora aperto
-                    value_return = err_file_open();         //Errore nell'apertura del file
+            if (mkfifo(fifo1, 0666) == -1) {    //Prova a creare la pipe
+                if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
+                    value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
                 }
             }
-        } while (value_return == 0 && fd2_fifo == -1);
+            fd1_fifo = open(fifo1, O_RDONLY);
+            if (fd1_fifo != -1) {
+                p_create = TRUE;
+            } else if (errno != ENOENT) {
+                value_return = err_fifo();
+            }
+        } while (value_return == 0 && !p_create);
+        printf("R OK\n");
+
+        p_create = FALSE;
+        do {
+            if (!enoent) {
+                if (mkfifo(fifo2, 0666) == -1) {    //Prova a creare la pipe
+                    if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
+                        value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
+                    }
+                }
+            }
+            fd2_fifo = open(fifo2, O_WRONLY | O_NONBLOCK);
+            if (fd2_fifo != -1) {
+                p_create = TRUE;
+            } else if (errno == ENOENT) {
+                enoent = FALSE;
+            } else if(errno != ENXIO) {
+                value_return = err_fifo();
+            }
+        } while(value_return == 0 && !p_create);
     }
 
     if (value_return == 0) {
@@ -150,7 +161,7 @@ int main() {
         }
         while (retrieve) {
             if (!strncmp(cmd, "print", 5)) {
-                if (read(fd1_fifo, path, DIM_PATH+2) > 0) {
+                if (read(fd1_fifo, path, DIM_PATH + 2) > 0) {
                     if (strstr(path, "#") != NULL) {
                         printf("%s\n", path);
                         usleep(10000);

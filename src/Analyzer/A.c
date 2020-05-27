@@ -56,6 +56,7 @@ int main(int argc, char *argv[]) {
     const char *fifo1 = "/tmp/A_to_R";  //Nome fifo con R
     const char *fifo2 = "/tmp/R_to_A";
     int retrieve = TRUE;
+    int p_create = FALSE;
     char print_method[DIM_CMD];
     char type_resp[DIM_RESP];
     char tmp_resp[DIM_PATH];
@@ -148,46 +149,35 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    //Open fifo in nonblocking read mode
     if (value_return == 0) {
+        printf("Waiting for R...\n");
+        printf("Use " BOLDYELLOW "[CTRL+C]" RESET " to interrupt\n");
         if (mkfifo(fifo1, 0666) == -1) {    //Prova a creare la pipe
             if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
                 value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
             }
         }
-        if (mkfifo(fifo2, 0666) == -1) {    //Prova a creare la pipe
-            if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
-                value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
+        fd1_fifo = open(fifo1, O_WRONLY);        //Prova ad aprire la pipe in scrittura
+        if (fd1_fifo == -1) {                    //Error handling
+            if (errno != ENOENT) {               //Se errno == 6, il file A non e' stato ancora aperto
+                value_return = err_file_open();  //Errore nell'apertura del file
             }
         }
-    }
-
-    //Open fifo in nonblocking read mode
-    if (value_return == 0) {
+        printf("A OK\n");
         do {
-            fd1_fifo = open(fifo1, O_WRONLY);        //Prova ad aprire la pipe in scrittura
-            if (fd1_fifo == -1) {                    //Error handling
-                if (errno != ENXIO) {                //Se errno == 6, il file A non e' stato ancora aperto
-                    value_return = err_file_open();  //Errore nell'apertura del file
+            if (mkfifo(fifo2, 0666) == -1) {    //Prova a creare la pipe
+                if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
+                    value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
                 }
             }
-            if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
-                if (!strncmp(cmd, "close", 5)) {
-                    closeAll(fd_1);
-
-                    while (wait(NULL) > 0)
-                        ;
-                    _close = TRUE;
-                    printf(BOLDWHITE "A" RESET ": Closing...\n");
-                }
-            }
-        } while (value_return == 0 && fd1_fifo == -1 && !_close);
-
-        if (!_close) {
             fd2_fifo = open(fifo2, O_RDONLY | O_NONBLOCK);
-            if (fd2_fifo == -1) {
+            if (fd2_fifo != -1) {
+                p_create = TRUE;
+            } else if (errno != ENOENT) {
                 value_return = err_fifo();
             }
-        }
+        } while (value_return == 0 && !p_create);
         system("clear");
     }
 
@@ -490,7 +480,6 @@ int main(int argc, char *argv[]) {
 
                             //Barretta
 
-                            
                             /* char *ptr = strchr(lista->pathList[id_r], '\0');
                             if (ptr) {
                                 int index = ptr - lista->pathList[id_r];
@@ -499,11 +488,11 @@ int main(int argc, char *argv[]) {
                                 fflush(stdout);
                             } */
 
-                             if ((int)((float)perc * 10 / (float)pathSent) > oldperc && value_return == 0) {
+                            if ((int)((float)perc * 10 / (float)pathSent) > oldperc && value_return == 0) {
                                 oldperc = (int)((float)perc * 10 / (float)pathSent);
                                 //system("clear");
                                 //percAvanzamento(perc, count);
-                             }
+                            }
 
                             if (perc == pathSent && value_return == 0) {
                                 count -= lista->count;
