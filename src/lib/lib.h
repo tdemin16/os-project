@@ -139,7 +139,7 @@ char checkArg(char *, int *);
 
 // /src/Analyzer/C.c
 void parseOnFly(char *, int *, int *);
-void parseSetOnFly(char* ,int*,int*);
+int parseSetOnFly(char* ,int*,int*);
 void mParseOnFly(char *, int *);
 void nClearAndClose(int *, int);
 void mSendOnFly(int *, int, int);

@@ -515,15 +515,27 @@ void parseOnFly(char *path, int *n, int *m) {
     free(dupPath);
 }
 
-void parseSetOnFly(char *string, int *n, int *m) {
+//Retrun -1 if n and m are the same as before, 0 otherwise
+int parseSetOnFly(char *string, int *n, int *m) {
+    int tmpn;
+    int tmpm;
+    int ret = 0;
     char *token;
     char *dupPath = strdup(string);
     token = strtok(dupPath, " ");
     token = strtok(NULL, " ");
-    *n = atoi(token);
+    tmpn = atoi(token);
     token = strtok(NULL, " ");
-    *m = atoi(token);
+    tmpm = atoi(token);
+    if((tmpn == (*n) && tmpm == (*m)) || (tmpn == 0 || tmpm == 0)) {
+        ret = -1;
+    } else {
+        *n = tmpn;
+        *m = tmpm;
+    }
+
     free(dupPath);
+    return ret;
 }
 
 void mParseOnFly(char *path, int *m) {

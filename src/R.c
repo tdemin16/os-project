@@ -68,27 +68,21 @@ int main() {
     int enoent = FALSE;
 
     printf("Start R\n");
-    //sleep(15);
     //IPC--------------------------------------------------------------------------------------------
     if (value_return == 0) {
         printf("Waiting for A...\n");
         printf("Use " BOLDYELLOW "[CTRL+C]" RESET " to interrupt\n");
-        do {
-            if (mkfifo(fifo1, 0666) == -1) {    //Prova a creare la pipe
-                if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
-                    value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
-                }
-            }
-            fd1_fifo = open(fifo1, O_RDONLY);
-            if (fd1_fifo != -1) {
-                p_create = TRUE;
-            } else if (errno != ENOENT) {
-                value_return = err_fifo();
-            }
-        } while (value_return == 0 && !p_create);
-        printf("R OK\n");
 
-        p_create = FALSE;
+        if (mkfifo(fifo1, 0666) == -1) {    //Prova a creare la pipe
+            if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
+                value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
+            }
+        }
+
+        fd1_fifo = open(fifo1, O_RDONLY);
+        if (fd1_fifo == -1) {
+            value_return = err_fifo();
+        }
         do {
             if (!enoent) {
                 if (mkfifo(fifo2, 0666) == -1) {    //Prova a creare la pipe
@@ -102,10 +96,10 @@ int main() {
                 p_create = TRUE;
             } else if (errno == ENOENT) {
                 enoent = FALSE;
-            } else if(errno != ENXIO) {
+            } else if (errno != ENXIO) {
                 value_return = err_fifo();
             }
-        } while(value_return == 0 && !p_create);
+        } while (value_return == 0 && !p_create);
     }
 
     if (value_return == 0) {
