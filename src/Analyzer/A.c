@@ -275,6 +275,7 @@ int main(int argc, char *argv[]) {
                                     if ((parser2(argCounter, tempPath, lista, &count, &n, &m, &vReturn)) == 0) {
                                         cleanRemoved(lista);
                                         printf(BOLDYELLOW "\n[ATTENTION]" RESET " Rimossi %d files\n\n", vReturn);
+                                        printf("Si consiglia di utilizzare il comando " BOLDWHITE "reanalyze" RESET " la prossima volta che si vuole analizzare dei file\n\n");
                                     } else {
                                         //err_args_A();
                                     }
@@ -299,8 +300,7 @@ int main(int argc, char *argv[]) {
                                 count = 0;
                                 memset(sum, '\0', sizeof(char) * DIM_RESP);
                                 initialize_vector(v);
-                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Tutti i file sono stati rimossi.\n");
-                                printf("Si consiglia di utilizzare il comando " BOLDWHITE "reanalyze" RESET " la prossima volta che si vuole analizzare dei file\n\n");
+                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Tutti i file sono stati rimossi.\n\n");
                             } else {
                                 printf("Analisi in corso, comando non disponibile\n");
                             }
