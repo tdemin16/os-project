@@ -57,6 +57,20 @@ int main(int argc, char* argv[]) {
     FILE* debug = fopen(str, "a");
     fprintf(debug, "AVVIATO Q con m = %d part = %d\n", m, part);
     fclose(debug);
+    strcpy(resp,"#CHECK");
+    char pathSent = FALSE;
+    while (!pathSent) {
+        if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
+            if (errno != EAGAIN) {
+                value_return = err_write();
+            }
+        } else {
+            debug = fopen(str, "a");
+            fprintf(debug, "Q: CHECK SEND\n");
+            fclose(debug);
+            pathSent = TRUE;
+        }
+    }
 
     while (value_return == 0 && !_close) {
         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //Legge un percorso

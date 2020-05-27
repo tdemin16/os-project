@@ -84,6 +84,8 @@ int main(int argc, char* argv[]) {
     }
 
     //----------------------------------------------------------------------
+    int checkRecived = 0;
+    int son = 0;
     if (value_return == 0) {
         if (f > 0) {  //PARENT SIDE
             char str[15];
@@ -91,6 +93,19 @@ int main(int argc, char* argv[]) {
             FILE* debug = fopen(str, "a");
             fprintf(debug, "AVVIATO P con m = %d\n", m);
             fclose(debug);
+            while (checkRecived < m) {
+                for (son = 0; son < m; son++) {
+                    if (read(fd[son * 4 + 0], resp, DIM_RESP) > 0) {
+                        if (!strncmp(resp, "#CHECK", 6)) {
+                            checkRecived++;
+                        }
+                    }
+                }
+            }
+            checkRecived = 0;
+            debug = fopen(str, "a");
+            fprintf(debug, "P: TUTTI I FIGLI GENERATI\n");
+            fclose(debug);  //Setto end a true
             while (value_return == 0 && (!_close)) {
                 //Write
                 if (!_write) {                                         //Se non ha finito di scrivere
@@ -141,7 +156,27 @@ int main(int argc, char* argv[]) {
                                 }
                                 forkP(&m, &f, &id, &value_return);
                                 if (f == 0) execP(&m, &f, &id, fd, &value_return, &size_pipe);
-
+                                while (checkRecived < m) {
+                                    for (son = 0; son < m; son++) {
+                                        if (read(fd[son * 4 + 0], resp, DIM_RESP) > 0) {
+                                            if (!strncmp(resp, "#CHECK", 6)) {
+                                                checkRecived++;
+                                                debug = fopen(str, "a");
+                                                fprintf(debug, "P: RICEVUTO %d su %d\n", checkRecived, m);
+                                                fclose(debug);
+                                            }
+                                        }
+                                    }
+                                }
+                                debug = fopen(str, "a");
+                                fprintf(debug, "P: TUTTI I FIGLI GENERATI\n");
+                                fclose(debug);
+                                resetPathList(sum);
+                                debug = fopen(str, "a");
+                                fprintf(debug, "P: SUM LIST RESETTATA\n");
+                                fclose(debug);
+                                checkRecived = 0;
+                                send_r = TRUE;
                                 pendingPath--;
                             } else {
                                 for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q
@@ -181,7 +216,19 @@ int main(int argc, char* argv[]) {
                         }
                     }
                 }
-
+                if (send_r) {
+                    debug = fopen(str, "a");
+                    fprintf(debug, "P: TRUE SEND_R = %c\n", send_r);
+                    fclose(debug);
+                } else if (!send_r) {
+                    debug = fopen(str, "a");
+                    fprintf(debug, "P: FALSE SEND_R = %c\n", send_r);
+                    fclose(debug);
+                } else {
+                    debug = fopen(str, "a");
+                    fprintf(debug, "P: QUALCOSA NON VA SEND_R = %c\n", send_r);
+                    fclose(debug);
+                }
                 //Read
                 if (!_read) {
                     if (send_r) {
@@ -199,6 +246,9 @@ int main(int argc, char* argv[]) {
                                                 value_return = err_write();
                                             } else {
                                                 send_r = FALSE;
+                                                debug = fopen(str, "a");
+                                                fprintf(debug, "P: Setto send_r a false\n");
+                                                fclose(debug);
                                             }
                                         } else {
                                             pendingPath--;
@@ -217,7 +267,7 @@ int main(int argc, char* argv[]) {
                             send_r = TRUE;
                             pendingPath--;
                             debug = fopen(str, "a");
-                            fprintf(debug, "P: RITORNO %s PENDING: %d\n", resp, pendingPath);
+                            fprintf(debug, "P:s RITORNO %s PENDING: %d\n", resp, pendingPath);
                             fclose(debug);
                         }
                     }

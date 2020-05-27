@@ -95,13 +95,13 @@ int main(int argc, char* argv[]) {
             fclose(debug);
             while (value_return == 0 && (!_close)) {  //Cicla finche` non ha finito di leggere o scrivere o va in errore
                 //usleep(100000);
-                if (!_write) {            //CICLO DI SCRITTURA
-                    if (stop == FALSE) {  //E non ci troviamo in uno stato di stop per rinvio dati
-                        debug = fopen(str, "a");
-                        fprintf(debug, "C: PRONTO A LEGGERE \n");
-                        fclose(debug);
+                if (!_write) {                                         //CICLO DI SCRITTURA
+                    if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
                             pendingPath++;
+                            debug = fopen(str, "a");
+                            fprintf(debug, "C: PENDING %d\n", pendingPath);
+                            fclose(debug);
                             if (pendingPath == 1) {
                                 if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
                                     value_return = err_fcntl();
@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
                                     free(fd);
                                     fd = (int*)malloc(size_pipe * sizeof(int));
                                     //Alloco le pipes a due a due
-                                    
+
                                     for (i = 0; i < size_pipe - 1; i += 2) {
                                         if (pipe(fd + i) == -1) {       //Controlla se ci sono errori nella creazione della pipe
                                             value_return = err_pipe();  //In caso di errore setta il valore di ritorno
@@ -192,6 +192,9 @@ int main(int argc, char* argv[]) {
                                     }
                                 } else {
                                     pendingPath--;
+                                    debug = fopen(str, "a");
+                                    fprintf(debug, "C: PENDING %d\n", pendingPath);
+                                    fclose(debug);
                                 }
                             }
                         }
@@ -201,12 +204,12 @@ int main(int argc, char* argv[]) {
                         } else {
                             send_r = TRUE;  //Se ha inviato passa al prossimo elemento
                             pendingPath--;
+                            debug = fopen(str, "a");
+                            fprintf(debug, "C: PENDING %d\n", pendingPath);
+                            fclose(debug);
                         }
                     }
                     k = (k + 1) % n;  //Cicla tra le pipes
-                    debug = fopen(str, "a");
-                    fprintf(debug, "C: PENDING %d\n", pendingPath);
-                    fclose(debug);
                 }
 
                 if (pendingPath == 0) {
@@ -216,10 +219,15 @@ int main(int argc, char* argv[]) {
                         fprintf(debug, "C: ERRORE OLDFL\n");
                         fclose(debug);
                     }
-                    fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
-                    debug = fopen(str, "a");
-                    fprintf(debug, "C: SLEEP\n");
-                    fclose(debug);
+                    if (fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK)) {
+                        debug = fopen(str, "a");
+                        fprintf(debug, "C: ERRORE SET SLEEP\n");
+                        fclose(debug);
+                    } else {
+                        debug = fopen(str, "a");
+                        fprintf(debug, "C: SLEEP\n");
+                        fclose(debug);
+                    }
                 }
             }
 
