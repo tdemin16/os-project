@@ -126,13 +126,13 @@ int main(int argc, char* argv[]) {
                                 fprintf(debug, "P: MI KILLO\n");
                                 fclose(debug);  //Setto end a true
                             } else if (!strncmp(path, "#SETM#", 6)) {
-                                debug = fopen(str, "a");
-                                fprintf(debug, "P: NUOVO M: %d\n", m);
-                                fclose(debug);  //Setto end a true
                                 nClearAndClose(fd, m);
                                 while (wait(NULL) > 0)
                                     ;
                                 mParseOnFly(path, &m);
+                                debug = fopen(str, "a");
+                                fprintf(debug, "P: NUOVO M: %d\n", m);
+                                fclose(debug);  //Setto end a true
                                 for (i = 0; i < size_pipe - 1; i += 2) {
                                     if (close(fd[i]) == -1) {       //Controlla se ci sono errori nella creazione della pipe
                                         value_return = err_pipe();  //In caso di errore setta il valore di ritorno
@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
                                         }
                                     }
                                 }
-                                
+
                                 debug = fopen(str, "a");
                                 fprintf(debug, "P: TUTTI I FIGLI GENERATI\n");
                                 fclose(debug);
@@ -217,11 +217,16 @@ int main(int argc, char* argv[]) {
                         }
                     }
                 }
+                if (send_r == FALSE) {
+                    debug = fopen(str, "a");
+                    fprintf(debug, "P: Send_r false\n");
+                    fclose(debug);
+                }
                 //Read
                 if (!_read) {
-                    if (!strncmp(resp,"#CHECK",6)){
+                    /* if (!strncmp(resp, "#CHECK", 6)) {
                         send_r = TRUE;
-                    }
+                    } */
                     if (send_r) {
                         for (i = 0; i < m; i++) {  //Cicla tra tutti i figli
                             if (read(fd[i * 4 + 0], resp, DIM_RESP) > 0) {

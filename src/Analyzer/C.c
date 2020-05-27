@@ -111,6 +111,7 @@ int main(int argc, char* argv[]) {
                             fprintf(debug, "C: LEGGO %s\n", path);
                             fclose(debug);
                             if (!strncmp(path, "#", 1)) {
+                                pendingPath--;
                                 if (!strncmp(path, "#CLOSE", 6)) {  //Se leggo una stringa di terminazione
                                     nClearAndClose(fd, n);          //Svuota le pipe in discesa e manda #CLOSE
                                     _close = TRUE;                  //Setto end a true
@@ -144,7 +145,7 @@ int main(int argc, char* argv[]) {
                                     mParseOnFly(path, &m);
                                     mSendOnFly(fd, n, m);
                                 }
-                                pendingPath--;
+                                
                             } else {
                                 if (write(fd[j * 4 + 3], path, DIM_PATH) == -1) {  //Provo a scrivere
                                     if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
