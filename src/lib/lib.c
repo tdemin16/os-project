@@ -1094,7 +1094,7 @@ int err_pipe() {
 }
 
 int err_args_A() {
-    fprintf(stderr, "\nErrore nella sintassi del comando.\nUsa: /A nomeFile nomeCartella\nPuoi usare -setn e -setm per cambiare n e m\nes: /A A.c ../Analyzer/ -setn 3 -setm 4\n\n");
+    fprintf(stderr, "\nErrore nella sintassi del comando.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");
     return ERR_ARGS_A;
 }
 

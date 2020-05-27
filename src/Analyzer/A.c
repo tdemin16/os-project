@@ -108,11 +108,21 @@ int main(int argc, char *argv[]) {
     int notAnalyzed = 0;  //Flag indicante se e` avvenuta o meno la lettura della pipe
     int argCounter = 0;
     initialize_vector(v);  //Inizializzazione vettore dei valori totali
+    int val = 0;
 
     if (argc > 1) {
-        value_return = parser2(argc, argv, lista, &count, &n, &m, &vReturn);  //Controlla i parametri passati ad A
-        if (vReturn > 0) {
-            _write = FALSE;
+        val = parser2(argc, argv, lista, &count, &n, &m, &vReturn);
+        if (val == 0) {  //Controlla i parametri passati ad A
+            if (vReturn > 0) {
+                _write = FALSE;
+            }
+        } else {
+            system("clear");
+            printf(BOLDWHITE "ANALYZER AVVIATO" RESET "\n");
+            fflush(stdout);
+            if (val == 1) err_args_A();
+            printf("> ");
+            fflush(stdout);
         }
     }
 
@@ -178,8 +188,17 @@ int main(int argc, char *argv[]) {
                 value_return = err_fifo();
             }
         } while (value_return == 0 && !p_create);
-        system("clear");
+
     }
+
+    if (argc == 1) {
+            system("clear");
+            printf(BOLDWHITE "ANALYZER AVVIATO" RESET "\n\n");
+            fflush(stdout);
+
+            printf("> ");
+            fflush(stdout);
+        }
 
     if (value_return == 0 && !_close) {
         f = fork();                     //Fork dei processi
@@ -291,6 +310,12 @@ int main(int argc, char *argv[]) {
                             } else {
                                 printf("Analisi in corso, comando non disponibile\n");
                             }
+                            printf("> ");
+                            fflush(stdout);
+                        }
+
+                        if (!strncmp(cmd, "debug", 5)) {
+                            printf("count = %d\npathSent=%d\n", count, pathSent);
                             printf("> ");
                             fflush(stdout);
                         }
@@ -494,7 +519,7 @@ int main(int argc, char *argv[]) {
                                 //percAvanzamento(perc, count);
                             }
 
-                            if (perc == pathSent && value_return == 0) {
+                            if (_write == TRUE && perc == pathSent && value_return == 0) {
                                 count -= lista->count;
                                 printf("Numero file analizzati: %d\n\n> ", pathSent);
                                 fflush(stdout);

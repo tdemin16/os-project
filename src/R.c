@@ -68,7 +68,7 @@ int main() {
     int enoent = FALSE;
 
     printf("Start R\n");
-    sleep(15);
+    //sleep(15);
     //IPC--------------------------------------------------------------------------------------------
     if (value_return == 0) {
         printf("Waiting for A...\n");
