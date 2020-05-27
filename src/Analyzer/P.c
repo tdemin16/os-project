@@ -168,6 +168,7 @@ int main(int argc, char* argv[]) {
                                         }
                                     }
                                 }
+                                
                                 debug = fopen(str, "a");
                                 fprintf(debug, "P: TUTTI I FIGLI GENERATI\n");
                                 fclose(debug);
@@ -216,21 +217,11 @@ int main(int argc, char* argv[]) {
                         }
                     }
                 }
-                if (send_r) {
-                    debug = fopen(str, "a");
-                    fprintf(debug, "P: TRUE SEND_R = %c\n", send_r);
-                    fclose(debug);
-                } else if (!send_r) {
-                    debug = fopen(str, "a");
-                    fprintf(debug, "P: FALSE SEND_R = %c\n", send_r);
-                    fclose(debug);
-                } else {
-                    debug = fopen(str, "a");
-                    fprintf(debug, "P: QUALCOSA NON VA SEND_R = %c\n", send_r);
-                    fclose(debug);
-                }
                 //Read
                 if (!_read) {
+                    if (!strncmp(resp,"#CHECK",6)){
+                        send_r = TRUE;
+                    }
                     if (send_r) {
                         for (i = 0; i < m; i++) {  //Cicla tra tutti i figli
                             if (read(fd[i * 4 + 0], resp, DIM_RESP) > 0) {
