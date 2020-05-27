@@ -425,11 +425,10 @@ int main(int argc, char *argv[]) {
                         if (read(fd2_fifo, print_method, DIM_CMD) > 0) {
                             if (!strncmp(print_method, "print", 5) || !strncmp(print_method, "-c", 2)) {
                                 retrieve = FALSE;
-                                //printf("%s\n", print_method);
                             }
                         }
                     } else {
-                        if (!strcmp(print_method, "print")) {
+                        if (!strncmp(print_method, "print", 5)) {
                             if (lista->count > 0) {
                                 for (j = 0; j < lista->count; j++) {
                                     write(fd1_fifo, lista->pathList[j], DIM_PATH + 2);
@@ -438,7 +437,7 @@ int main(int argc, char *argv[]) {
 
                             write(fd1_fifo, tmp_resp, DIM_PATH + 2);
                         }
-                        if (!strcmp(print_method, "-c")) {
+                        if (!strncmp(print_method, "-c", 2)) {
                             analyzeCluster(sum, type_resp);
                             write(fd1_fifo, type_resp, DIM_RESP);
                         }
