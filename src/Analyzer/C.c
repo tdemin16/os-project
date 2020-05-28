@@ -257,7 +257,7 @@ int main(int argc, char* argv[]) {
 
     if (value_return == 0) {
         if (f == 0) {  //SON SIDE
-            execC(&n, &f, &id, fd, &value_return, &size_pipe);
+            execC(&m, &f, &id, fd, &value_return, &size_pipe);
         }
     }
 
