@@ -175,7 +175,9 @@ int main(int argc, char *argv[]) {
                         printf(BOLDBLACK "\t es: setn 4\n" RESET);
                         printf(BOLDWHITE"setm <val>"RESET": setta i nuovi valori di m\n");
                         printf(BOLDBLACK "\t es: setm 5\n" RESET);
-                        printf(BOLDWHITE "report -c" RESET ": stampa le statistiche per cluster\n");
+                        printf(BOLDWHITE "report"RESET" <-flag>\n");
+                        printf(WHITE"\t-c"RESET": stampa le statistiche per cluster\n");
+                        printf(WHITE"\t-a"RESET": stampa la frequenza di ogni carattere\n");
                         printf(BOLDWHITE "info" RESET ": mostra informazioni aggiuntive sul programma\n");
                         printf(BOLDWHITE "close" RESET ": chiude il programma\n\n> ");
                         fflush(stdout);
