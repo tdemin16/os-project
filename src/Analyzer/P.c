@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
                             fclose(debug);
                             if (!strncmp(path, "#CLOSE", 6)) {  //Se leggo una stringa di terminazione
                                 _read = TRUE;
-                                _close = TRUE;                  //Setto close a true per far uscire dalciclo
+                                _close = TRUE;  //Setto close a true per far uscire dalciclo
                                 debug = fopen(str, "a");
                                 fprintf(debug, "P: MI KILLO\n");
                                 fclose(debug);
@@ -122,15 +122,14 @@ int main(int argc, char* argv[]) {
                                 while (wait(NULL) > 0)  //Aspetto che vengano chiusi
                                     ;
                                 cleanPipe = FALSE;
-                                    while (!cleanPipe) {  //Ciclo per svuotare tutte le pipe in lettura da Q a P
-                                        cleanPipe = TRUE;
-                                        for (son = 0; son < m; son++) {  //Cicla tra tutti i figli
-                                            if (read(fd[son * 4 + 0], resp, DIM_RESP) > 0) {
-                                                cleanPipe = FALSE;
-                                                
-                                            }
+                                while (!cleanPipe) {  //Ciclo per svuotare tutte le pipe in lettura da Q a P
+                                    cleanPipe = TRUE;
+                                    for (son = 0; son < m; son++) {  //Cicla tra tutti i figli
+                                        if (read(fd[son * 4 + 0], resp, DIM_RESP) > 0) {
+                                            cleanPipe = FALSE;
                                         }
                                     }
+                                }
                                 close_pipes(fd, size_pipe);
                                 mParseOnFly(path, &m);  //Estraggo m da path
 
@@ -147,16 +146,13 @@ int main(int argc, char* argv[]) {
                                 if (unlock_pipes(fd, size_pipe) == -1) {  //Set nonblocking pipes
                                     value_return = err_fcntl();           //Gestione errore sullo sblocco pipe
                                 }
-                                if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {  //Sblocca lo stdin (teoricamente non necessario)
-                                    value_return = err_fcntl();                  //Gestione errore sullo sblocco pipe
-                                }
                                 forkP(&m, &f, &id, &value_return);                              //Forko i processi
                                 if (f == 0) execP(&m, &f, &id, fd, &value_return, &size_pipe);  //Exec dei processi forkati
                                 send_r = TRUE;                                                  //setto a true per evitare che vada nel ramo sbagliato della read sotto
                                 resetPathList(sum);                                             //resetto sum
                                 while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                     ;
-                                pendingPath = 0; //C
+                                pendingPath = 0;  //C
                             } else {
                                 for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q
                                     if (write(fd[i * 4 + 3], path, DIM_PATH) == -1) {
@@ -270,6 +266,8 @@ int main(int argc, char* argv[]) {
             }
 
             while (wait(NULL) > 0)
+                ;
+            while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                 ;
             close_pipes(fd, size_pipe);
             free(fd);

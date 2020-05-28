@@ -99,9 +99,6 @@ int main(int argc, char* argv[]) {
                 usleep(500000);
                 if (!_write) {            //CICLO DI SCRITTURA
                     if (stop == FALSE) {  //E non ci troviamo in uno stato di stop per rinvio dati
-                        debug = fopen(str, "a");
-                        fprintf(debug, "C: PRONTO A LEGGERE \n");
-                        fclose(debug);
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
                             pendingPath++;
                             if (pendingPath == 1) {
@@ -152,7 +149,6 @@ int main(int argc, char* argv[]) {
                                     if (f == 0) execC(&m, &f, &id, fd, &value_return, &size_pipe);
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
-                                    pendingPath = 1;  //Così poi appena esce torna a 0
                                 } else if (!strncmp(path, "#SETM#", 6)) {
                                     mParseOnFly(path, &m);
                                     mSendOnFly(fd, n, m);
@@ -168,10 +164,10 @@ int main(int argc, char* argv[]) {
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
                                     send_r = TRUE;
-                                    pendingPath = 1;
+                                    
 
                                 }
-                                pendingPath--;
+                                pendingPath = 0;
                             } else {
                                 if (write(fd[j * 4 + 3], path, DIM_PATH) == -1) {  //Provo a scrivere
                                     if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena

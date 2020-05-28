@@ -115,5 +115,7 @@ int main(int argc, char* argv[]) {
             fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
         }
     }
+    while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
+                                    ;
     return value_return;
 }
