@@ -86,6 +86,7 @@ int main(int argc, char *argv[]) {  //Main
     char *tmpPercorso = NULL;  //
     char **tempPath;           //
     int vReturn;               //
+    int duplicate = 0;         //Conta i duplicati non aggiunti dal parser
 
     array *lista = createPathList(10);  //Nuova lista dei path
 
@@ -106,22 +107,21 @@ int main(int argc, char *argv[]) {  //Main
     int argCounter = 0;
     initialize_vector(v);  //Inizializzazione vettore dei valori totali
     int val = 0;
-
-    if (argc > 1) {                                                  //
-        val = parser2(argc, argv, lista, &count, &n, &m, &vReturn);  //
-        if (val == 0) {                                              //Controlla i parametri passati ad A
-            if (vReturn > 0) {                                       //Vuol dire che c'è stato un errore nell'inserimento di PathList
-                _write = FALSE;                                      //Non può scrivere
-            }                                                        //
-        } else {                                                     //Altrimenti
-            system("clear");                                         //Libera il terminale
-            printf(BOLDWHITE "ANALYZER AVVIATO" RESET "\n");         //Avvisa l'inizio dell'Analyzer
-            fflush(stdout);                                          //Libera il buffer
-            if (val == 1) err_args_A();                              //Se val == 1 allora c'è errore argomenti di A non sufficienti
-            printf("> ");                                            //
-            fflush(stdout);                                          //
-        }                                                            //
-    }                                                                //
+    if (argc > 1) {                                                              //
+        val = parser2(argc, argv, lista, &count, &n, &m, &vReturn, &duplicate);  //
+        if (val == 0) {                                                          //Controlla i parametri passati ad A
+            if (vReturn > 0) {                                                   //Vuol dire che c'è stato un errore nell'inserimento di PathList
+                _write = FALSE;                                                  //Non può scrivere
+            }                                                                    //
+        } else {                                                                 //Altrimenti
+            system("clear");                                                     //Libera il terminale
+            printf(BOLDWHITE "ANALYZER AVVIATO" RESET "\n");                     //Avvisa l'inizio dell'Analyzer
+            fflush(stdout);                                                      //Libera il buffer
+            if (val == 1) err_args_A();                                          //Se val == 1 allora c'è errore argomenti di A non sufficienti
+            printf("> ");                                                        //
+            fflush(stdout);                                                      //
+        }                                                                        //
+    }                                                                            //
 
     insertProcess(p, getpid());  //Insert pid of A in process list
 
@@ -245,9 +245,25 @@ int main(int argc, char *argv[]) {  //Main
                                     for (j = 1; j < argCounter; j++) {                                                                                                //Cicla da 0 al numero di argomenti
                                         strcpy(tempPath[j], strtok(NULL, " "));                                                                                       //Stessa copia della riga superirore
                                     }                                                                                                                                 //
-                                    if ((parser2(argCounter, tempPath, lista, &count, &n, &m, &vReturn)) == 0) {                                                      //Se il parsing funziona (=> i file sono stati aggiunti correttamente)
-                                        printf("\n" WHITE "Aggiunti" RESET " %d files\n", vReturn);                                                                   //Stampo il corretto parsing
-                                    } else {                                                                                                                          //
+                                    if ((parser2(argCounter, tempPath, lista, &count, &n, &m, &vReturn, &duplicate)) == 0) {                                          //Se il parsing funziona (=> i file sono stati aggiunti correttamente)
+
+                                        if (vReturn > 0) {
+                                            printf("\n" WHITE "Aggiunti" RESET " %d files\n", vReturn);
+                                            if (duplicate > 0) {
+                                                printf("%d files ignorati perche' gia' presenti\n\n", duplicate);
+                                            } else {
+                                                printf("\n");
+                                            }
+
+                                        } else {
+                                            printf("\nNon sono stati aggiunti files");
+                                            if (duplicate > 0) {
+                                                printf("\n%d files ignorati perche' gia' presenti\n\n", duplicate);
+                                            }
+                                        }
+
+                                        //Stampo il corretto parsing
+                                    } else {  //
                                         //err_args_A();//
                                     }                                                   //
                                     for (j = 0; j < argCounter; j++) {                  //Cicla da 0 al numero di argomenti
@@ -264,28 +280,46 @@ int main(int argc, char *argv[]) {  //Main
                             fflush(stdout);                                             //Libera il buffer
                         }                                                               //
 
-                        if (!strncmp(cmd, "remove", 6)) {                                                                                                                          //Se il comando è "remove"
-                            if (!analyzing) {                                                                                                                                      //Verifica che non stia già analizzando
-                                debug = fopen(str, "a");                                                                                                                           //
-                                fprintf(debug, "A: %s\n", cmd);                                                                                                                    //
-                                fclose(debug);                                                                                                                                     //
-                                if ((strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL)) {                                                                              //Mentra analizza controlla se l'utente cambia setn o setm ed in tal caso verifica se sono correttamente inseriti
-                                    printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");               //Stampa errore se sono stati inseriti comandi errati
-                                    fflush(stdout);                                                                                                                                //
-                                } else if (checkArg(cmd, &argCounter)) {                                                                                                           //Verifica gli argomenti inseriti a comando
-                                    tempPath = malloc(argCounter * sizeof(char *));                                                                                                //Alloca memoria a tempPath
-                                    for (j = 0; j < argCounter; j++) {                                                                                                             //Cicla da 0 al numero di argomenti
-                                        tempPath[j] = malloc(DIM_PATH * sizeof(char));                                                                                             //Alloca a tempPath la dimensione DIM_PATH
-                                    }                                                                                                                                              //
-                                    strcpy(tempPath[0], strtok(cmd, " "));                                                                                                         //Copia il comando cmd in tempPath[0] (cmd è il comando senza spazi)
-                                    for (j = 1; j < argCounter; j++) {                                                                                                             //Cicla da 0 al numero di argomenti
-                                        strcpy(tempPath[j], strtok(NULL, " "));                                                                                                    //Stessa copia della riga superirore
-                                    }                                                                                                                                              //
-                                    if ((parser2(argCounter, tempPath, lista, &count, &n, &m, &vReturn)) == 0) {                                                                   //Se il parsing funziona (=> i file sono stati aggiunti correttamente)
-                                        cleanRemoved(lista);                                                                                                                       //Stampo il corretto parsing
-                                        printf(BOLDYELLOW "\n[ATTENTION]" RESET " Rimossi %d files\n\n", vReturn);                                                                 //
-                                        printf("Si consiglia di utilizzare il comando " BOLDWHITE "reanalyze" RESET " la prossima volta che si vuole analizzare dei //file\n\n");  //
-                                    } else {                                                                                                                                       //
+                        if (!strncmp(cmd, "remove", 6)) {                                                                                                             //Se il comando è "remove"
+                            if (!analyzing) {                                                                                                                         //Verifica che non stia già analizzando
+                                debug = fopen(str, "a");                                                                                                              //
+                                fprintf(debug, "A: %s\n", cmd);                                                                                                       //
+                                fclose(debug);                                                                                                                        //
+                                if ((strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL)) {                                                                 //Mentra analizza controlla se l'utente cambia setn o setm ed in tal caso verifica se sono correttamente inseriti
+                                    printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");  //Stampa errore se sono stati inseriti comandi errati
+                                    fflush(stdout);                                                                                                                   //
+                                } else if (checkArg(cmd, &argCounter)) {                                                                                              //Verifica gli argomenti inseriti a comando
+                                    tempPath = malloc(argCounter * sizeof(char *));                                                                                   //Alloca memoria a tempPath
+                                    for (j = 0; j < argCounter; j++) {                                                                                                //Cicla da 0 al numero di argomenti
+                                        tempPath[j] = malloc(DIM_PATH * sizeof(char));                                                                                //Alloca a tempPath la dimensione DIM_PATH
+                                    }                                                                                                                                 //
+                                    strcpy(tempPath[0], strtok(cmd, " "));                                                                                            //Copia il comando cmd in tempPath[0] (cmd è il comando senza spazi)
+                                    for (j = 1; j < argCounter; j++) {                                                                                                //Cicla da 0 al numero di argomenti
+                                        strcpy(tempPath[j], strtok(NULL, " "));                                                                                       //Stessa copia della riga superirore
+                                    }                                                                                                                                 //
+                                    if ((parser2(argCounter, tempPath, lista, &count, &n, &m, &vReturn, &duplicate)) == 0) {                                          //Se il parsing funziona (=> i file sono stati aggiunti correttamente)
+                                        cleanRemoved(lista);
+
+                                        if (vReturn > 0) {
+                                            printf(BOLDYELLOW "\n[ATTENTION]" RESET " Rimossi %d files\n", vReturn);
+                                            if (duplicate > 0) {
+                                                printf("%d files ignorati perche' non presenti\n\n", duplicate);
+                                            } else {
+                                                printf("\n");
+                                            }
+                                            if (lista->count == 0) {
+                                                printf("La lista dei file e' vuota, per resettare il risultati precedenti usare" BOLDWHITE "reset" RESET "\n\n");  //
+                                            } else {
+                                                printf("Per analizzare anche i file che sono gia' stati analizzati usare il comando " BOLDWHITE "reanalyze" RESET "\n\n");  //
+                                            }
+
+                                        } else {
+                                            printf(BOLDYELLOW "\n[ATTENTION]" RESET " Non sono stati rimossi file\n");
+                                            printf("%d files ignorati perche' non presenti\n\n", duplicate);
+                                        }
+
+                                        //Stampo il corretto parsing
+                                    } else {  //
                                         //err_args_A();
                                     }
                                     for (j = 0; j < argCounter; j++) {  //

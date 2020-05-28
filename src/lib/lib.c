@@ -319,7 +319,7 @@ char sameId(char *a, char *b) {
 // Ctrl-C at keyboard
 
 //Aggiunge alla PathList passata tutti i file contenenti, restituisce 0 se è andato tutto bene
-int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, int *res) {
+int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, int *res, int* duplicate) {
     char type;
     int i;
     FILE *fp;
@@ -327,6 +327,7 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
     char riga[DIM_PATH - 16];
     char resolved_path[DIM_PATH - 16];
     int ret = parser_CheckArguments(argc, argv, &(*n), &(*m));
+    *duplicate = 0;
     if (ret < 0) {
         ret = ERR_ARGS_A;
     } else if (ret > 0) {
@@ -357,12 +358,16 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
                             if (insertPathList(lista, path, 0)) {
                                 (*count)++;
                                 (*res)++;
+                            } else {
+                                (*duplicate)++;
                             }
                         } else {
                             if (removeFromPathList(lista, path)) {
                                 (*count)--;
                                 (*res)++;
                                 //printf("%s\n", resolved_path);
+                            } else {
+                                (*duplicate)++;
                             }
                         }
                     }
