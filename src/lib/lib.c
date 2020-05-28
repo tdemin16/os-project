@@ -525,7 +525,7 @@ int parseSetOnFly(char *string, int *n, int *m) {
     tmpn = atoi(token);
     token = strtok(NULL, " ");
     tmpm = atoi(token);
-    if((tmpn == (*n) && tmpm == (*m)) || (tmpn == 0 || tmpm == 0)) {
+    if ((tmpn == (*n) && tmpm == (*m)) || (tmpn == 0 || tmpm == 0)) {
         ret = -1;
     } else {
         *n = tmpn;
@@ -703,34 +703,33 @@ void set_add(long *v, char c) {
 void get_subset(int *fp, long *v, int b, int e) {
     int i = b;
     char c[1];
+    char tmp[e - b + 1];      //DA ELIMINARE
     lseek(*fp, b, SEEK_SET);  //setting initial position of SEEK cursor
     while (read(*fp, c, 1) && i < e) {
         if (c[0] != '\n') set_add(v, c[0]);
+        tmp[i - b] = c[0];
         i++;
     }
+    tmp[e - b] = '\0';
+    fprintf(stderr, "%s\n", tmp);
 }
 
-void get_frequencies(int *fp, long *freq, int part, int m) {  //Prima di commentarlo bene testiamo
-    //int *freq = malloc(sizeof(int*) * DIM_V); //where frequencies will be stored
+void get_frequencies(int *fp, long *freq, int part, int m) {
     initialize_vector(freq);
-    int i = 0;
     int file_length = lseek(*fp, 0, SEEK_END);
     int char_parts = file_length / m;
-    int rest = file_length - (char_parts * m);
-    while (i != part) {
-        if (rest != 0) {
-            rest--;
-        }
-        i++;
-    }
-    int begin = i * char_parts;
+    int remain = file_length - (char_parts * m);
+    int begin = part * char_parts;
     int end = begin + char_parts;
-    if (rest != 0) {
-        end++;
+    if (part - remain < 0) {
+        begin += part;
+        end += part + 1;
+    } else {
+        begin += remain;
+        end += remain;
     }
+    fprintf(stderr, "PART: %d BEGIN: %d END: %d\n", part, begin, end);
     get_subset(fp, freq, begin, end);
-
-    //return &freq[0];
 }
 
 //display how meny times chars are in the text (display only visited chars)
