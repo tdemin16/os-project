@@ -739,7 +739,6 @@ void get_frequencies(int *fp, long *freq, int part, int m) {
         begin += remain;                          //Avanza di remain
         end += remain;                            //Avanza di remain
     }
-    fprintf(stderr, "PART: %d BEGIN: %d END: %d\n", part, begin, end);
     get_subset(fp, freq, begin, end);
 }
 
