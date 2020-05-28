@@ -718,15 +718,11 @@ void set_add(long *v, char c) {
 void get_subset(int *fp, long *v, int b, int e) {
     int i = b;
     char c[1];
-    char tmp[e - b + 1];      //DA ELIMINARE
     lseek(*fp, b, SEEK_SET);  //setting initial position of SEEK cursor
     while (read(*fp, c, 1) && i < e) {
         if (c[0] != '\n') set_add(v, c[0]);
-        tmp[i - b] = c[0];
         i++;
     }
-    tmp[e - b] = '\0';
-    fprintf(stderr, "%s\n", tmp);
 }
 
 void get_frequencies(int *fp, long *freq, int part, int m) {
