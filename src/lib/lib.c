@@ -718,34 +718,33 @@ void set_add(long *v, char c) {
 void get_subset(int *fp, long *v, int b, int e) {
     int i = b;
     char c[1];
+    char tmp[e - b + 1];      //DA ELIMINARE
     lseek(*fp, b, SEEK_SET);  //setting initial position of SEEK cursor
     while (read(*fp, c, 1) && i < e) {
         if (c[0] != '\n') set_add(v, c[0]);
+        tmp[i - b] = c[0];
         i++;
     }
+    tmp[e - b] = '\0';
+    fprintf(stderr, "%s\n", tmp);
 }
 
-void get_frequencies(int *fp, long *freq, int part, int m) {  //Prima di commentarlo bene testiamo
-    //int *freq = malloc(sizeof(int*) * DIM_V); //where frequencies will be stored
-    initialize_vector(freq);
-    int i = 0;
-    int file_length = lseek(*fp, 0, SEEK_END);
-    int char_parts = file_length / m;
-    int rest = file_length - (char_parts * m);
-    while (i != part) {
-        if (rest != 0) {
-            rest--;
-        }
-        i++;
+void get_frequencies(int *fp, long *freq, int part, int m) {
+    initialize_vector(freq);                      //Inizializza il vettore delle frequenze
+    int file_length = lseek(*fp, 0, SEEK_END);    //Salva la lunghezza totale del file
+    int char_parts = file_length / m;             //Conta di quanti caratteri deve essere ogni parte (floor round)
+    int remain = file_length - (char_parts * m);  //Resto della divisione precedente -> utilizzato per correggere i caratteri per parte
+    int begin = part * char_parts;                //Calcola l'inizio con parte per numero di caratteri per parte (es. part = 2, char_parts = 3, begin = 6) 000 111 222
+    int end = begin + char_parts;                 //La fine e` l'inizio piu` il numero di caratteri per parte
+    if (remain > part) {                          //Redistribuisce i caretteri in piu` sui primi "remain" parti, percio` se la parte e` minore di remain deve ricevere caratteri aggiuntivi
+        begin += part;                            //Avanza di un carattere per il numero della parte
+        end += part + 1;                          //Avanza di un carattere per il numero della parte + 1
+    } else {                                      //Caso in cui la parte non debba ricevere caratteri aggiuntivi
+        begin += remain;                          //Avanza di remain
+        end += remain;                            //Avanza di remain
     }
-    int begin = i * char_parts;
-    int end = begin + char_parts;
-    if (rest != 0) {
-        end++;
-    }
+    fprintf(stderr, "PART: %d BEGIN: %d END: %d\n", part, begin, end);
     get_subset(fp, freq, begin, end);
-
-    //return &freq[0];
 }
 
 //display how meny times chars are in the text (display only visited chars)

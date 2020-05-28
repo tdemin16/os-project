@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
                                     }
                                     fprintf(stderr,".\n");
                                     forkC(&n, &f, &id, &value_return);
-                                    if (f == 0) execC(&n, &f, &id, fd, &value_return, &size_pipe);
+                                    if (f == 0) execC(&m, &f, &id, fd, &value_return, &size_pipe);
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
 
