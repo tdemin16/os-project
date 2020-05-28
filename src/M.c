@@ -199,7 +199,7 @@ int main(int argc, char *argv[]) {  //main
             argv[0] = array_args;       //argv[0] assume valore: array_string
 
             //Redirects pipes
-            dup2(fd[A * 2 + READ], STDIN_FILENO);  // ---??? cosa fa dup2 ???---
+            dup2(fd[A * 2 + READ], STDIN_FILENO);  //Uso la pipe di A in read per il file descriptor
 
             //Close pipes
             close(fd[A * 2 + WRITE]);  //chiudo la pipe di scrittura con A
@@ -217,7 +217,7 @@ int main(int argc, char *argv[]) {  //main
             strcpy(array_args, "./R");             //Copio "./R" nella stringa di array_args
             argv[0] = array_args;                  //ad argv[0] assegno array_args
             argv[1] = NULL;                        //ad argv[1] assegno NULL poiché non servono parametri aggiuntivi
-            dup2(fd[R * 2 + READ], STDIN_FILENO);  //---??? ???---
+            dup2(fd[R * 2 + READ], STDIN_FILENO);  //Uso la pipe di R in read per il file descriptor
                                                    //
             close(fd[R * 2 + READ]);               //chiudo la pipe di lettura con R
             close(fd[R * 2 + WRITE]);              //chiudo la pipe di scrittura con R
