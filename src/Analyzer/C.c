@@ -126,7 +126,6 @@ int main(int argc, char* argv[]) {
                                         for (son = 0; son < n; son++) {  //Cicla tra tutti i figli
                                             if (read(fd[son * 4 + 0], resp, DIM_RESP) > 0) {
                                                 cleanPipe = FALSE;
-                                                
                                             }
                                         }
                                     }
@@ -155,9 +154,18 @@ int main(int argc, char* argv[]) {
                                 } else if (!strncmp(path, "#SETM#", 6)) {
                                     mParseOnFly(path, &m);
                                     mSendOnFly(fd, n, m);
+                                    cleanPipe = FALSE;
+                                    while (!cleanPipe) {  //Ciclo per svuotare tutte le pipe in lettura da Q a P
+                                        cleanPipe = TRUE;
+                                        for (son = 0; son < n; son++) {  //Cicla tra tutti i figli
+                                            if (read(fd[son * 4 + 0], resp, DIM_RESP) > 0) {
+                                                cleanPipe = FALSE;
+                                            }
+                                        }
+                                    }
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
-                                        
+
                                     pendingPath = 1;
                                 }
                                 pendingPath--;
@@ -198,7 +206,9 @@ int main(int argc, char* argv[]) {
                 if (!_read) {
                     if (send_r) {                                       //Coontrolla se non ci sonon valori non inviati
                         if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {  //Prova a leggere dalla pipe
-
+                            debug = fopen(str, "a");
+                            fprintf(debug, "C: LEGGO DA P %s\n", resp);
+                            fclose(debug);
                             if (strstr(resp, "#") != NULL) {                       //Controlla che nella stringa sia contenuto il carattere #
                                 if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {  //Prova a scrivere sulla pipe del padre
                                     if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
