@@ -6,7 +6,6 @@ int fd1_fifo;          //A writes in R
 int fd2_fifo;          //R writes in A
 
 void handle_sigint(int sig) {                                                                                             //handler per il CTRL-C, ha l'obiettivo di
-    printf(BOLDYELLOW "\n[ATTENZIONE]" RESET " Ricevuta terminazione per A, inizio terminazione processi C,P,Q ... \n");  //Stampo a terminale la corretta ricezione del comando Ctrl-C
     int i = p->count - 1;                                                                                                 //Parto dalla fine (poiché nella lista i processi figli vengono salvati dopo il processo padre)
     if (i > 0) {                                                                                                          //Se i > 0 => ci sono processi avviati
         while (i != 0) {                                                                                                  //Ciclo while fino a quando non ho controllato tutti i processi
