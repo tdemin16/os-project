@@ -212,13 +212,13 @@ int main(int argc, char *argv[]) {  //Main
             while (value_return == 0 && !_close) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
 
                 //M - STDIN
-                if (!_close) {                                   //Controlla close non sia già settato a true 
+                if (!_close) {                                   //Controlla close non sia già settato a true
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {  //La read non ha errori
                         if (!strncmp(cmd, "close", 5)) {         //Verifica se cmd è close, in tal caso prosegue alla chiusura dei processi
                             debug = fopen(str, "a");             //
                             fprintf(debug, "A: %s\n", cmd);      //
                             fclose(debug);                       //
-                            closeAll(fd_1);                      //
+                            closeAll(fd_1);                      //chiudi tutti i processi figli
 
                             while (wait(NULL) > 0)                         //
                                 ;                                          //
@@ -231,9 +231,9 @@ int main(int argc, char *argv[]) {  //Main
                                 debug = fopen(str, "a");                                                                                                              //
                                 fprintf(debug, "A: %s\n", cmd);                                                                                                       //
                                 fclose(debug);                                                                                                                        //
-                                if ((strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL)) {                                                                 //
-                                    printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");  //
-                                    fflush(stdout);                                                                                                                   //
+                                if ((strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL)) {                                                                 //Mentra analizza controlla se l'utente cambia setn o setm ed in tal caso verifica se sono correttamente inseriti
+                                    printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");  //Stampa errore se sono stati inseriti comandi errati
+                                    fflush(stdout);                                                                                                                   //Libera il buffer
                                 } else if (checkArg(cmd, &argCounter)) {                                                                                              //
                                     tempPath = malloc(argCounter * sizeof(char *));                                                                                   //
                                     for (j = 0; j < argCounter; j++) {                                                                                                //
