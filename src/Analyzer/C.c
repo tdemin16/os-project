@@ -124,7 +124,9 @@ int main(int argc, char* argv[]) {
                                     if (unlock_pipes(fd, size_pipe) == -1) {  //Set nonblocking pipes
                                         value_return = err_fcntl();           //Gestione errore sullo sblocco pipe
                                     }
-                                    fprintf(stderr,".\n");
+                                    if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {  //Sblocca lo stdin (teoricamente non necessario)
+                                        value_return = err_fcntl();                  //Gestione errore sullo sblocco pipe
+                                    }
                                     forkC(&n, &f, &id, &value_return);
                                     if (f == 0) execC(&m, &f, &id, fd, &value_return, &size_pipe);
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
