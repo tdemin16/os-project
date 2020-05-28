@@ -18,12 +18,6 @@ void handle_sigint(int sig) {                                                   
             }                                                                                                           //
             i--;                                                                                                        //itero i--
         }                                                                                                               //
-    }                                                                                                                   //Se la fifo è aperta la chiudo
-    if (!close(fd1_fifo)) {                                                                                             //Stampo la corretta chiusura
-        printf(BOLDGREEN "[!] Chiusura fifo completata\n" RESET);                                                       //
-    }                                                                                                                   //
-    if (!close(fd2_fifo)) {                                                                                             //Se la fifo è aperta la chiudo
-        printf(BOLDGREEN "[!] Chiusura fifo completata\n" RESET);                                                       //Stampo la corretta chiusura
     }                                                                                                                   //
     freeList(p);                                                                                                        //Libero la lista di processi che ho salvato
     printf(BOLDGREEN "[COMPLETATO]" RESET " ... Chiusura processo terminata\n");                                        //Stampo a terminale la fine della chiusura processi
