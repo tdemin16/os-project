@@ -4,25 +4,31 @@ int check_command(char *str);  //controlla il comando un numero corrispondente: 
 
 process *p;  //Declaring p (it's global because hendle_sigint can't have parameters, only int sig)
 
-void handle_sigint(int sig) {
-    printf("\n[!] Ricevuta terminazione da M, inizio terminazione processo A ... \n");
-    int i = p->count - 1;  //start from the end
-    while (i != 0)         //while we haven't controlled every single process
-    {
-        if (p->pid[i] > 0)  //Processo padre
-        {
-            if (kill(p->pid[i], 9) == 0) {                                     //Tries to kill process with pid saved in pid[i]
-                printf("\tProcesso %d terminato con successo!\n", p->pid[i]);  //if it success you terminated it correctly
-            } else {
-                printf("\t[!] Errore, non sono riuscito a chiudere il processo %d!", p->pid[i]);  //if it fail something is wrong
-            }
-        }
-        i--;  //i-- otherwise it will go to infinity
-    }
-    freeList(p);  //free memory allocated for p
-    printf("[!] ... Chiusura processi terminata\n");
-    exit(-1);  //return exit with error -1
-}
+void handle_sigint(int sig) {                                                                                           //handler per il CTRL-C, ha l'obiettivo di
+    printf(BOLDYELLOW "\n[ATTENZIONE]" RESET " Ricevuta terminazione per R, inizio terminazione processo ... \n");      //Stampo a terminale la corretta ricezione del comando Ctrl-C
+    int i = p->count - 1;                                                                                               //Parto dalla fine (poiché nella lista i processi figli vengono salvati dopo il processo padre)
+    if (i > 0) {                                                                                                        //Se i > 0 => ci sono processi avviati
+        while (i != 0) {                                                                                                //Ciclo while fino a quando non ho controllato tutti i processi
+            if (p->pid[i] > 0) {                                                                                        //Controllo che non sia un processo padre
+                if (kill(p->pid[i], 9) == 0) {                                                                          //Provo a killare il pid[i]
+                    printf(BOLDGREEN "\tProcesso %d terminato con successo!\n" RESET, p->pid[i]);                       //Se ha successo allora stampo la corretta terminazione
+                } else {                                                                                                //Altrimenti
+                    printf(RED "\t[ERRORE]" RESET " Errore, non sono riuscito a chiudere il processo %d!", p->pid[i]);  //Qualcosa è andato storto nel kill
+                }                                                                                                       //
+            }                                                                                                           //
+            i--;                                                                                                        //itero i--
+        }                                                                                                               //
+    }                                                                                                                   //Se la fifo è aperta la chiudo
+    if (!close(fd1_fifo)) {                                                                                             //Stampo la corretta chiusura
+        printf(BOLDGREEN "[!] Chiusura fifo completata\n" RESET);                                                       //
+    }                                                                                                                   //
+    if (!close(fd2_fifo)) {                                                                                             //Se la fifo è aperta la chiudo
+        printf(BOLDGREEN "[!] Chiusura fifo completata\n" RESET);                                                       //Stampo la corretta chiusura
+    }                                                                                                                   //
+    freeList(p);                                                                                                        //Libero la lista di processi che ho salvato
+    printf(BOLDGREEN "[COMPLETATO]" RESET " ... Chiusura processo terminata\n");                                        //Stampo a terminale la fine della chiusura processi
+    exit(-1);                                                                                                           //Eseguo exit con codice di ritorno -1
+}  //
 
 int main(int argc, char *argv[]) {
     signal(SIGINT, handle_sigint);  //Handler for SIGINT (Ctrl-C)
@@ -159,25 +165,26 @@ int main(int argc, char *argv[]) {
                         } else {
                             err_file_open();
                         }
-                        printf("\n> ");fflush(stdout);
+                        printf("\n> ");
+                        fflush(stdout);
                     } else {
                         printf(BOLDBLUE "\nLista Comandi disponibili\n" RESET);
                         printf(BOLDWHITE "add </path1> </path2>" RESET ": aggiunge uno o piu` file e/o una o piu` directory\n");
                         printf(BOLDBLACK "\t es: add ../src ../deploy.sh\n" RESET);
-                        printf(BOLDWHITE"remove </path1> </path2>" RESET ": rimuove uno o piu` file e/o una o piu` directory\n");
+                        printf(BOLDWHITE "remove </path1> </path2>" RESET ": rimuove uno o piu` file e/o una o piu` directory\n");
                         printf(BOLDBLACK "\t es: remove ../src ../deploy.sh\n" RESET);
                         printf(BOLDWHITE "reset" RESET ": elimina dalla cache del programma le statistiche e tutti i percorsi analizzati e non\n");
                         printf(BOLDWHITE "print" RESET ": stampa a video tutte il percorso di tutti i file analizzati\n");
                         printf(BOLDWHITE "analyze" RESET ": avvia l'analizzatore\n");
-                        printf(BOLDWHITE"set <n> <m>"RESET": setta i nuovi valori di n e m\n");
+                        printf(BOLDWHITE "set <n> <m>" RESET ": setta i nuovi valori di n e m\n");
                         printf(BOLDBLACK "\t es: set 4 5\n" RESET);
-                        printf(BOLDWHITE"setn <val>"RESET": setta i nuovi valori di n\n");
+                        printf(BOLDWHITE "setn <val>" RESET ": setta i nuovi valori di n\n");
                         printf(BOLDBLACK "\t es: setn 4\n" RESET);
-                        printf(BOLDWHITE"setm <val>"RESET": setta i nuovi valori di m\n");
+                        printf(BOLDWHITE "setm <val>" RESET ": setta i nuovi valori di m\n");
                         printf(BOLDBLACK "\t es: setm 5\n" RESET);
-                        printf(BOLDWHITE "report"RESET" <-flag>\n");
-                        printf(WHITE"\t-c"RESET": stampa le statistiche per cluster\n");
-                        printf(WHITE"\t-a"RESET": stampa la frequenza di ogni carattere\n");
+                        printf(BOLDWHITE "report" RESET " <-flag>\n");
+                        printf(WHITE "\t-c" RESET ": stampa le statistiche per cluster\n");
+                        printf(WHITE "\t-a" RESET ": stampa la frequenza di ogni carattere\n");
                         printf(BOLDWHITE "info" RESET ": mostra informazioni aggiuntive sul programma\n");
                         printf(BOLDWHITE "close" RESET ": chiude il programma\n\n> ");
                         fflush(stdout);
