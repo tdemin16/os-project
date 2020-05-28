@@ -120,7 +120,7 @@ void close_pipes(int *, int);
 int unlock_pipes(int *, int);
 
 // /src/Analyzer/A.c
-int parser2(int, char **, array *, int *, int *, int *, int *);
+int parser2(int, char **, array *, int *, int *, int *, int *, int*);
 int parser_CheckArguments(int, char **, int *, int *);
 int parser_LenghtCommand(char *);
 void parser_CreateCommand(char *);
@@ -132,7 +132,8 @@ char fileExist(char *);
 void setOnFly(int, int, int *);
 void setmOnFly(int, int *);
 void closeAll(int *);
-
+void reallocPipe(int *, int);
+int createPipe(int *, int);
 //parser A.c
 char checkArg(char *, int *);
 

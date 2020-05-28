@@ -319,7 +319,7 @@ char sameId(char *a, char *b) {
 // Ctrl-C at keyboard
 
 //Aggiunge alla PathList passata tutti i file contenenti, restituisce 0 se è andato tutto bene
-int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, int *res) {
+int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, int *res, int* duplicate) {
     char type;
     int i;
     FILE *fp;
@@ -327,6 +327,7 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
     char riga[DIM_PATH - 16];
     char resolved_path[DIM_PATH - 16];
     int ret = parser_CheckArguments(argc, argv, &(*n), &(*m));
+    *duplicate = 0;
     if (ret < 0) {
         ret = ERR_ARGS_A;
     } else if (ret > 0) {
@@ -357,12 +358,16 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
                             if (insertPathList(lista, path, 0)) {
                                 (*count)++;
                                 (*res)++;
+                            } else {
+                                (*duplicate)++;
                             }
                         } else {
                             if (removeFromPathList(lista, path)) {
                                 (*count)--;
                                 (*res)++;
                                 //printf("%s\n", resolved_path);
+                            } else {
+                                (*duplicate)++;
                             }
                         }
                     }
@@ -478,6 +483,21 @@ void closeAll(int *fd_1) {
     }
 }
 
+void reallocPipe(int *fd, int size_pipe) {
+    free(fd);
+    fd = (int *)malloc(size_pipe * sizeof(int));
+}
+int createPipe(int *fd, int size_pipe) {
+    int i;
+    int ret = 0;
+    for (i = 0; i < size_pipe - 1; i += 2) {
+        if (pipe(fd + i) == -1) {       //Controlla se ci sono errori nella creazione della pipe
+            ret = ERR_PIPE;  //In caso di errore setta il valore di ritorno
+        }
+    }
+    return ret;
+}
+
 char checkArg(char cmd[DIM_CMD], int *argCounter) {
     int j;
     char ret = TRUE;
@@ -525,7 +545,7 @@ int parseSetOnFly(char *string, int *n, int *m) {
     tmpn = atoi(token);
     token = strtok(NULL, " ");
     tmpm = atoi(token);
-    if((tmpn == (*n) && tmpm == (*m)) || (tmpn == 0 || tmpm == 0)) {
+    if ((tmpn == (*n) && tmpm == (*m)) || (tmpn == 0 || tmpm == 0)) {
         ret = -1;
     } else {
         *n = tmpn;
@@ -710,27 +730,21 @@ void get_subset(int *fp, long *v, int b, int e) {
     }
 }
 
-void get_frequencies(int *fp, long *freq, int part, int m) {  //Prima di commentarlo bene testiamo
-    //int *freq = malloc(sizeof(int*) * DIM_V); //where frequencies will be stored
-    initialize_vector(freq);
-    int i = 0;
-    int file_length = lseek(*fp, 0, SEEK_END);
-    int char_parts = file_length / m;
-    int rest = file_length - (char_parts * m);
-    while (i != part) {
-        if (rest != 0) {
-            rest--;
-        }
-        i++;
-    }
-    int begin = i * char_parts;
-    int end = begin + char_parts;
-    if (rest != 0) {
-        end++;
+void get_frequencies(int *fp, long *freq, int part, int m) {
+    initialize_vector(freq);                      //Inizializza il vettore delle frequenze
+    int file_length = lseek(*fp, 0, SEEK_END);    //Salva la lunghezza totale del file
+    int char_parts = file_length / m;             //Conta di quanti caratteri deve essere ogni parte (floor round)
+    int remain = file_length - (char_parts * m);  //Resto della divisione precedente -> utilizzato per correggere i caratteri per parte
+    int begin = part * char_parts;                //Calcola l'inizio con parte per numero di caratteri per parte (es. part = 2, char_parts = 3, begin = 6) 000 111 222
+    int end = begin + char_parts;                 //La fine e` l'inizio piu` il numero di caratteri per parte
+    if (remain > part) {                          //Redistribuisce i caretteri in piu` sui primi "remain" parti, percio` se la parte e` minore di remain deve ricevere caratteri aggiuntivi
+        begin += part;                            //Avanza di un carattere per il numero della parte
+        end += part + 1;                          //Avanza di un carattere per il numero della parte + 1
+    } else {                                      //Caso in cui la parte non debba ricevere caratteri aggiuntivi
+        begin += remain;                          //Avanza di remain
+        end += remain;                            //Avanza di remain
     }
     get_subset(fp, freq, begin, end);
-
-    //return &freq[0];
 }
 
 //display how meny times chars are in the text (display only visited chars)
