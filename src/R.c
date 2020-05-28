@@ -20,21 +20,21 @@ void handle_sigint(int sig) {                                                   
         }                                                                                                               //
     }                                                                                                                   //Se la fifo è aperta la chiudo
     if (!close(fd1_fifo)) {                                                                                             //Stampo la corretta chiusura
-        printf(BOLDGREEN "[!] Chiusura fifo completata\n" RESET);                                                       //
+        printf(BOLDGREEN "[!]" RESET " Chiusura fifo completata\n");                                                    //
     }                                                                                                                   //
     if (!close(fd2_fifo)) {                                                                                             //Se la fifo è aperta la chiudo
-        printf(BOLDGREEN "[!] Chiusura fifo completata\n" RESET);                                                       //Stampo la corretta chiusura
+        printf(BOLDGREEN "[!]" RESET " Chiusura fifo completata\n");                                                    //Stampo la corretta chiusura
     }                                                                                                                   //
     freeList(p);                                                                                                        //Libero la lista di processi che ho salvato
     printf(BOLDGREEN "[COMPLETATO]" RESET " ... Chiusura processo terminata\n");                                        //Stampo a terminale la fine della chiusura processi
     exit(-1);                                                                                                           //Eseguo exit con codice di ritorno -1
 }  //
 
-void sig_term_handler(int signum, siginfo_t *info, void *ptr) {
-    value_return = err_kill_process_R();
-}
+void sig_term_handler(int signum, siginfo_t *info, void *ptr) {  //Handler per ricezione di SIGTERM
+    value_return = err_kill_process_R();                         //Ritorna il valore di errore kill processo R
+}  //
 
-void catch_sigterm() {
+void catch_sigterm() {  //handler per catturare il kill al di fuori del programma
     static struct sigaction _sigact;
 
     memset(&_sigact, 0, sizeof(_sigact));
@@ -44,98 +44,100 @@ void catch_sigterm() {
     sigaction(SIGTERM, &_sigact, NULL);
 }
 
-int main() {
-    catch_sigterm();
-    signal(SIGINT, handle_sigint);  //Handler for SIGINT (Ctrl-C)
-    p = create_process(1);          //Allocate dynamically p with dimension 1
-    insertProcess(p, getpid());     //Insert process R into p list
+int main() {                            //struttura main
+    catch_sigterm();                    //avvio il ciclo di cattura del segnale di SIGTERM
+    signal(SIGINT, handle_sigint);      //Handler per SIGINT (Ctrl-C)
+    p = create_process(1);              //Alloca dinamicamente p con dimensione 1
+    insertProcess(p, getpid());         //Inserisce il pid di R nella prima posizione della lista p
+                                        //
+    const char *fifo1 = "/tmp/A_to_R";  //
+    const char *fifo2 = "/tmp/R_to_A";  //
+    int _close = FALSE;                 //
+    char cmd[DIM_CMD];                  //
+    int retrieve = FALSE;               //
+    int _r_write = TRUE;                //
+    char resp[DIM_RESP];                //
+    char path[DIM_PATH];                //
+    int arr = FALSE;                    //
+    int spaces;                         //
+    char *dupl = NULL;                  //
+    char *flag;                         //
+    int p_create = FALSE;               //
+    int enoent = FALSE;                 //
+                                        //
+    printf("Start R\n");                //
 
-    const char *fifo1 = "/tmp/A_to_R";
-    const char *fifo2 = "/tmp/R_to_A";
-    int _close = FALSE;
-    char cmd[DIM_CMD];
-    int retrieve = FALSE;
-    int _r_write = TRUE;
-    char resp[DIM_RESP];
-    char path[DIM_PATH];
-    int arr = FALSE;
-    int spaces;
-    char *dupl = NULL;
-    char *flag;
-    int p_create = FALSE;
-    int enoent = FALSE;
-
-    printf("Start R\n");
     //IPC--------------------------------------------------------------------------------------------
-    if (value_return == 0) {
-        printf("Waiting for A...\n");
-        printf("Use " BOLDYELLOW "[CTRL+C]" RESET " to interrupt\n");
+
+    if (value_return == 0) {                                           //
+        printf("Waiting for A...\n");                                  //
+        printf("Use " BOLDYELLOW "[CTRL+C]" RESET " to interrupt\n");  //
 
         if (mkfifo(fifo1, 0666) == -1) {    //Prova a creare la pipe
             if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
                 value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
-            }
-        }
+            }                               //
+        }                                   //
 
-        fd1_fifo = open(fifo1, O_RDONLY);
-        if (fd1_fifo == -1) {
-            value_return = err_fifo();
-        }
-        do {
-            if (!enoent) {
-                if (mkfifo(fifo2, 0666) == -1) {    //Prova a creare la pipe
-                    if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
-                        value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
-                    }
-                }
-            }
-            fd2_fifo = open(fifo2, O_WRONLY | O_NONBLOCK);
-            if (fd2_fifo != -1) {
-                p_create = TRUE;
-            } else if (errno == ENOENT) {
-                enoent = FALSE;
-            } else if (errno != ENXIO) {
-                value_return = err_fifo();
-            }
-        } while (value_return == 0 && !p_create);
-    }
+        fd1_fifo = open(fifo1, O_RDONLY);                   //
+        if (fd1_fifo == -1) {                               //
+            value_return = err_fifo();                      //
+        }                                                   //
+        do {                                                //
+            if (!enoent) {                                  //
+                if (mkfifo(fifo2, 0666) == -1) {            //Prova a creare la pipe
+                    if (errno != EEXIST) {                  //In caso di errore controlla che la pipe non fosse gia` presente
+                        value_return = err_fifo();          //Ritorna errore se l'operazione non va a buon fine
+                    }                                       //
+                }                                           //
+            }                                               //
+            fd2_fifo = open(fifo2, O_WRONLY | O_NONBLOCK);  //
+            if (fd2_fifo != -1) {                           //
+                p_create = TRUE;                            //
+            } else if (errno == ENOENT) {                   //
+                enoent = FALSE;                             //
+            } else if (errno != ENXIO) {                    //
+                value_return = err_fifo();                  //
+            }                                               //
+        } while (value_return == 0 && !p_create);           //
+    }                                                       //
 
-    if (value_return == 0) {
-        if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
-            value_return = err_fcntl();
-        }
-    }
+    if (value_return == 0) {                             //
+        if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {  //
+            value_return = err_fcntl();                  //
+        }                                                //
+    }                                                    //
 
-    while (value_return == 0 && !_close) {
-        if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
-            if (!strncmp(cmd, "close", 5)) {
-                _close = TRUE;
-                printf(BOLDWHITE "R" RESET ": Closing...\n");
-            } else if (!retrieve && (!strncmp(cmd, "print", 5) || !strncmp(cmd, "report", 6))) {  //Add flags
-                retrieve = TRUE;
-                _r_write = TRUE;
-                checkArg(cmd, &spaces);
-                if (strstr(cmd, "report") != NULL) {
-                    if (spaces != 2) {
-                        _r_write = FALSE;
-                        retrieve = FALSE;
-                        printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
-                        fflush(stdout);
-                    } else {
-                        dupl = strdup(cmd);
-                        flag = strtok(dupl, " ");
-                        flag = strtok(NULL, " ");
-                        if (strncmp(flag, "-c", 2) && strncmp(flag, "-a", 2)) {
-                            _r_write = FALSE;
-                            retrieve = FALSE;
-                            printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
-                            fflush(stdout);
-                        } else {
-                            strcpy(cmd, flag);
-                        }
-                        free(dupl);
-                    }
-                }
+    while (value_return == 0 && !_close) {                                                                                                                      //
+        if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {                                                                                                             //
+            if (!strncmp(cmd, "close", 5)) {                                                                                                                    //
+                _close = TRUE;                                                                                                                                  //
+                printf(BOLDWHITE "R" RESET ": Closing...\n");                                                                                                   //
+            } else if (!retrieve && (!strncmp(cmd, "print", 5) || !strncmp(cmd, "report", 6))) {                                                                //Add flags
+                retrieve = TRUE;                                                                                                                                //
+                _r_write = TRUE;                                                                                                                                //
+                checkArg(cmd, &spaces);                                                                                                                         //
+                if (strstr(cmd, "report") != NULL) {                                                                                                            //
+                    if (spaces != 2) {                                                                                                                          //
+                        _r_write = FALSE;                                                                                                                       //
+                        retrieve = FALSE;                                                                                                                       //
+                        printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");      //
+                        fflush(stdout);                                                                                                                         //
+                    } else {                                                                                                                                    //
+                        dupl = strdup(cmd);                                                                                                                     //
+                        flag = strtok(dupl, " ");                                                                                                               //
+                        flag = strtok(NULL, " ");                                                                                                               //
+                        if (strncmp(flag, "-c", 2) && strncmp(flag, "-a", 2)) {                                                                                 //
+                            _r_write = FALSE;                                                                                                                   //
+                            retrieve = FALSE;                                                                                                                   //
+                            printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");  //
+                            fflush(stdout);                                                                                                                     //
+                        } else {                                                                                                                                //
+                            strcpy(cmd, flag);                                                                                                                  //
+                        }                                                                                                                                       //
+                        free(dupl);                                                                                                                             //
+                    }                                                                                                                                           //
+                }                                                                                                                                               //
                 while (value_return == 0 && _r_write) {
                     if (write(fd2_fifo, cmd, DIM_CMD) == -1) {
                         if (errno != EAGAIN) {
@@ -176,9 +178,9 @@ int main() {
                     }
                 }
             }
-            if(!strncmp(cmd, "-a", 2)) {
-                if(read(fd1_fifo, resp, DIM_RESP) > 0) {
-                    if(strstr(resp, ",") != NULL) {
+            if (!strncmp(cmd, "-a", 2)) {
+                if (read(fd1_fifo, resp, DIM_RESP) > 0) {
+                    if (strstr(resp, ",") != NULL) {
                         printStat(resp);
                         printf("\n> ");
                         fflush(stdout);
