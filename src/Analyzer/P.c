@@ -118,11 +118,7 @@ int main(int argc, char* argv[]) {
                                 nClearAndClose(fd, m);  //Mando a tutti i figli il comando di chiusura
                                 while (wait(NULL) > 0)  //Aspetto che vengano chiusi
                                     ;
-                                for (i = 0; i < size_pipe - 1; i += 2) {  //chiudo le pipe
-                                    if (close(fd[i]) == -1) {             //Controlla se ci sono errori nella creazione della pipe
-                                        value_return = err_pipe();        //In caso di errore setta il valore di ritorno
-                                    }
-                                }
+                                close_pipes(fd, size_pipe);
                                 mParseOnFly(path, &m);  //Estraggo m da path
 
                                 size_pipe = m * 4;  //ridimensiono le pipe
