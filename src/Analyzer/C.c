@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
             fprintf(debug, "AVVIATO C\n");
             fclose(debug);
             while (value_return == 0 && (!_close)) {  //Cicla finche` non ha finito di leggere o scrivere o va in errore
-                //usleep(100000);
+                usleep(500000);
                 if (!_write) {            //CICLO DI SCRITTURA
                     if (stop == FALSE) {  //E non ci troviamo in uno stato di stop per rinvio dati
                         debug = fopen(str, "a");
@@ -115,18 +115,15 @@ int main(int argc, char* argv[]) {
                                     nClearAndClose(fd, n);          //Svuota le pipe in discesa e manda #CLOSE
                                     _close = TRUE;                  //Setto end a true
                                 } else if (!strncmp(path, "#SET#", 5) || !strncmp(path, "#SETN", 5)) {
-                                    nClearAndClose(fd, n);     //Svuota le pipe in discesa e manda #CLOSE
+                                    nClearAndClose(fd, n);  //Svuota le pipe in discesa e manda #CLOSE
+                                    while (wait(NULL) > 0)  //Aspetto che vengano chiusi
+                                        ;
+                                    close_pipes(fd, size_pipe);
                                     parseOnFly(path, &n, &m);  //Estrae n e m dalla stringa #SET#N#M#
-                                    for (i = 0; i < size_pipe - 1; i += 2) {
-                                        if (close(fd[i]) == -1) {       //Controlla se ci sono errori nella creazione della pipe
-                                            value_return = err_pipe();  //In caso di errore setta il valore di ritorno
-                                        }
-                                    }
                                     size_pipe = n * 4;
                                     free(fd);
                                     fd = (int*)malloc(size_pipe * sizeof(int));
                                     //Alloco le pipes a due a due
-                                    
                                     for (i = 0; i < size_pipe - 1; i += 2) {
                                         if (pipe(fd + i) == -1) {       //Controlla se ci sono errori nella creazione della pipe
                                             value_return = err_pipe();  //In caso di errore setta il valore di ritorno
@@ -140,9 +137,14 @@ int main(int argc, char* argv[]) {
                                     }
                                     forkC(&n, &f, &id, &value_return);
                                     if (f == 0) execC(&m, &f, &id, fd, &value_return, &size_pipe);
+                                    while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
+                                        ;
+
                                 } else if (!strncmp(path, "#SETM#", 6)) {
                                     mParseOnFly(path, &m);
                                     mSendOnFly(fd, n, m);
+                                    while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
+                                        ;
                                 }
                                 pendingPath--;
                             } else {

@@ -56,6 +56,7 @@ int main(int argc, char *argv[]) {
     const char *fifo1 = "/tmp/A_to_R";  //Nome fifo con R
     const char *fifo2 = "/tmp/R_to_A";
     int retrieve = TRUE;
+    int p_create = FALSE;
     char print_method[DIM_CMD];
     char type_resp[DIM_RESP];
     char tmp_resp[DIM_PATH];
@@ -103,7 +104,7 @@ int main(int argc, char *argv[]) {
     char *file;           //Messaggio senza Id e identificatori (#)
     int firstVal = 0;     //Controllo sulla validita' di un messaggio
     char sum[DIM_RESP];
-    int v[DIM_V];         //Array con valori totali
+    long v[DIM_V];        //Array con valori totali
     int notAnalyzed = 0;  //Flag indicante se e` avvenuta o meno la lettura della pipe
     int argCounter = 0;
     initialize_vector(v);  //Inizializzazione vettore dei valori totali
@@ -158,55 +159,38 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    //Open fifo in nonblocking read mode
     if (value_return == 0) {
+        printf("Waiting for R...\n");
+        printf("Use " BOLDYELLOW "[CTRL+C]" RESET " to interrupt\n");
         if (mkfifo(fifo1, 0666) == -1) {    //Prova a creare la pipe
             if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
                 value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
             }
         }
-        if (mkfifo(fifo2, 0666) == -1) {    //Prova a creare la pipe
-            if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
-                value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
-            }
+        fd1_fifo = open(fifo1, O_WRONLY);  //Prova ad aprire la pipe in scrittura
+        if (fd1_fifo == -1) {              //Error handling
+            value_return = err_fifo();
         }
-    }
 
-    //Open fifo in nonblocking read mode
-    if (value_return == 0) {
         do {
-            fd1_fifo = open(fifo1, O_WRONLY);        //Prova ad aprire la pipe in scrittura
-            if (fd1_fifo == -1) {                    //Error handling
-                if (errno != ENXIO) {                //Se errno == 6, il file A non e' stato ancora aperto
-                    value_return = err_file_open();  //Errore nell'apertura del file
+            if (mkfifo(fifo2, 0666) == -1) {    //Prova a creare la pipe
+                if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
+                    value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
                 }
             }
-            if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
-                if (!strncmp(cmd, "close", 5)) {
-                    closeAll(fd_1);
-
-                    while (wait(NULL) > 0)
-                        ;
-                    _close = TRUE;
-                    printf(BOLDWHITE "A" RESET ": Closing...\n");
-                }
-            }
-        } while (value_return == 0 && fd1_fifo == -1 && !_close);
-
-        if (!_close) {
             fd2_fifo = open(fifo2, O_RDONLY | O_NONBLOCK);
-            if (fd2_fifo == -1) {
+            if (fd2_fifo != -1) {
+                p_create = TRUE;
+            } else if (errno != ENOENT) {
                 value_return = err_fifo();
             }
-        }
-        if (argc == 1) {
-            system("clear");
-            printf(BOLDWHITE "ANALYZER AVVIATO" RESET "\n\n");
-            fflush(stdout);
-
-            printf("> ");
-            fflush(stdout);
-        }
+        } while (value_return == 0 && !p_create);
     }
+
+    system("clear");
+    printf(BOLDWHITE "ANALYZER AVVIATO" RESET "\n\n");
+    fflush(stdout);
 
     if (value_return == 0 && !_close) {
         f = fork();                     //Fork dei processi
@@ -256,7 +240,7 @@ int main(int argc, char *argv[]) {
                                         strcpy(tempPath[j], strtok(NULL, " "));
                                     }
                                     if ((parser2(argCounter, tempPath, lista, &count, &n, &m, &vReturn)) == 0) {
-                                        printf("Aggiunti %d files\n", vReturn);
+                                        printf("\n" WHITE "Aggiunti" RESET " %d files\n", vReturn);
                                     } else {
                                         //err_args_A();
                                     }
@@ -270,7 +254,7 @@ int main(int argc, char *argv[]) {
                             } else {
                                 printf("Analisi in corso, comando non disponibile\n");
                             }
-                            printf("> ");
+                            printf("\n> ");
                             fflush(stdout);
                         }
 
@@ -290,7 +274,8 @@ int main(int argc, char *argv[]) {
                                     }
                                     if ((parser2(argCounter, tempPath, lista, &count, &n, &m, &vReturn)) == 0) {
                                         cleanRemoved(lista);
-                                        printf("Rimossi %d files\n", vReturn);
+                                        printf(BOLDYELLOW "\n[ATTENTION]" RESET " Rimossi %d files\n\n", vReturn);
+                                        printf("Si consiglia di utilizzare il comando " BOLDWHITE "reanalyze" RESET " la prossima volta che si vuole analizzare dei file\n\n");
                                     } else {
                                         //err_args_A();
                                     }
@@ -315,6 +300,7 @@ int main(int argc, char *argv[]) {
                                 count = 0;
                                 memset(sum, '\0', sizeof(char) * DIM_RESP);
                                 initialize_vector(v);
+                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Tutti i file sono stati rimossi.\n\n");
                             } else {
                                 printf("Analisi in corso, comando non disponibile\n");
                             }
@@ -341,8 +327,9 @@ int main(int argc, char *argv[]) {
                                     memset(sum, '\0', sizeof(char) * DIM_RESP);
                                     initialize_vector(v);
                                     _write = FALSE;
+                                    printf("\n");
                                 } else {
-                                    printf("Non ci sono file da analizzare\n> ");
+                                    printf(BOLDYELLOW "\n[ATTENTION]" RESET " Non ci sono file da analizzare\n\n> ");
                                     fflush(stdout);
                                 }
                             } else {
@@ -363,8 +350,7 @@ int main(int argc, char *argv[]) {
                             } else {
                                 printf("\nAnalisi in corso, comando non disponibile\n");
                             }
-                            printf("\n> ");
-                            fflush(stdout);
+                            printf("\n");
                         }
 
                         if (!strncmp(cmd, "oldprint", 8)) {
@@ -386,13 +372,18 @@ int main(int argc, char *argv[]) {
                                         dupl = strdup(cmd);
                                         new_n = strtok(dupl, " ");
                                         new_n = strtok(NULL, " ");
-                                        if (atoi(new_n) > 0) {
+                                        if (atoi(new_n) > 0 && atof(new_n) != n) {
                                             n = atoi(new_n);
                                             setOnFly(n, m, fd_1);
+                                            printf("\n" BOLDYELLOW "[ATTENTION]" RESET " n e` stato modificato\n\n");
+                                            if (analyzing) {
+                                                i = 0;
+                                                pathSent = perc;
+                                            }
                                         } else {
-                                            printf("\nValore di n non valido\n");
+                                            printf("\nn non e` stato modificato.\n");
+                                            printf("Il valore inserito e` equivalente al precedente oppure e` uguale a 0\n\n");
                                         }
-
                                         free(dupl);
 
                                     } else if (!strncmp(cmd, "setm", 4)) {
@@ -402,15 +393,29 @@ int main(int argc, char *argv[]) {
                                         if (atoi(new_m) > 0) {
                                             m = atoi(new_m);
                                             setmOnFly(m, fd_1);
+                                            printf("\n" BOLDYELLOW "[ATTENTION]" RESET " m e` stato modificato\n\n");
+                                            if (analyzing) {
+                                                i = 0;
+                                                pathSent = perc;
+                                            }
                                         } else {
-                                            printf("\nValore di m non valido\n");
+                                            printf("\nm non e` stato modificato.\n");
+                                            printf("Il valore inserito e` equivalente al precedente oppure e` uguale a 0\n\n");
                                         }
                                         free(dupl);
                                     }
                                 } else if (argCounter == 3) {
-                                    parseSetOnFly(cmd, &n, &m);
-                                    //printf("\nn:%d m:%d\n\n",n,m);
-                                    setOnFly(n, m, fd_1);
+                                    if (parseSetOnFly(cmd, &n, &m) == 0) {
+                                        printf("\n" BOLDYELLOW "[ATTENTION]" RESET " n e m sono stati modificati\n\n");
+                                        setOnFly(n, m, fd_1);
+                                        if (analyzing) {
+                                            i = 0;
+                                            pathSent = perc;
+                                        }
+                                    } else {
+                                        printf("\nn e m non sono stati modificati.\n");
+                                        printf("I valori inseriti sono equivalenti ai precedenti oppure uno dei due e` uguale a 0\n\n");
+                                    }
                                 }
                             }
                             printf("> ");
@@ -423,7 +428,7 @@ int main(int argc, char *argv[]) {
                 if (!_close && value_return == 0) {
                     if (retrieve) {  //Try read from R
                         if (read(fd2_fifo, print_method, DIM_CMD) > 0) {
-                            if (!strncmp(print_method, "print", 5) || !strncmp(print_method, "-c", 2)) {
+                            if (!strncmp(print_method, "print", 5) || !strncmp(print_method, "-c", 2) || !strncmp(print_method, "-a", 2)) {
                                 retrieve = FALSE;
                             }
                         }
@@ -440,6 +445,9 @@ int main(int argc, char *argv[]) {
                         if (!strncmp(print_method, "-c", 2)) {
                             analyzeCluster(sum, type_resp);
                             write(fd1_fifo, type_resp, DIM_RESP);
+                        }
+                        if (!strncmp(print_method, "-a", 2)) {
+                            write(fd1_fifo, sum, DIM_RESP);
                         }
                         retrieve = TRUE;
                     }
@@ -529,7 +537,7 @@ int main(int argc, char *argv[]) {
 
                             if (_write == TRUE && perc == pathSent && value_return == 0) {
                                 count -= lista->count;
-                                printf("Numero file analizzati: %d\n\n> ", pathSent);
+                                printf(WHITE "Numero file analizzati" RESET ": %d\n\n> ", pathSent);
                                 fflush(stdout);
                                 arrayToCsv(v, sum);
                                 //printStat_Cluster(sum);

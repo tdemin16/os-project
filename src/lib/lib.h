@@ -19,7 +19,7 @@
 #define TRUE 1
 #define FALSE 0
 #define DIM_V 95
-#define DIM_RESP 1051
+#define DIM_RESP 2102
 #define DIM_CMD 4096
 #define DIM_PATH 4096
 
@@ -139,7 +139,7 @@ char checkArg(char *, int *);
 
 // /src/Analyzer/C.c
 void parseOnFly(char *, int *, int *);
-void parseSetOnFly(char* ,int*,int*);
+int parseSetOnFly(char* ,int*,int*);
 void mParseOnFly(char *, int *);
 void nClearAndClose(int *, int);
 void mSendOnFly(int *, int, int);
@@ -148,11 +148,11 @@ void forkP(int *, int *, int *, int *);
 void execC(int *, int *, int *, int *, int *, int *);
 void execP(int *, int *, int *, int *, int *, int *);
 // /src/Analyzer/Q.c
-void initialize_vector(int *);
-void set_add(int *, char);
-void get_subset(int *, int *, int, int);
+void initialize_vector(long *);
+void set_add(long *, char);
+void get_subset(int *, long *, int, int);
 void print_vector(int *);
-void get_frequencies(int *, int *, int, int);
+void get_frequencies(int *, long *, int, int);
 //int err_end_file(); used here
 //int err_args_Q(); used here
 //int err_file_open(); used here
@@ -163,13 +163,13 @@ m_process *splitter(FILE *, int);
 inline void swap(char *, char *);
 char *reverse(char *, int, int);
 char *itoa(int, char *, int);
-void arrayToCsv(int *, char *);
+void arrayToCsv(long *, char *);
 char *integer_to_string(int);
 int countDigit(int);
 int lenghtCsv(int *);
 char sumCsv(char *, char *);
-void createCsv(int *, char *, char *);
-char addCsvToArray(char *, int *);
+void createCsv(long *, char *, char *);
+char addCsvToArray(char *, long *);
 char sameId(char *, char *);
 //int err_args_P(); used here
 //int err_file_open(); used here

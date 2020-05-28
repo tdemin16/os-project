@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
     //Arguments passed
     int part;
     int m;
-    int v[DIM_V];
+    long v[DIM_V];
 
     int fp;
     char* id;

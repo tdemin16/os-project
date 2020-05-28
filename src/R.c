@@ -62,37 +62,42 @@ int main() {
     int spaces;
     char *dupl = NULL;
     char *flag;
+    int p_create = FALSE;
+    int enoent = FALSE;
 
     printf("Start R\n");
-
     //IPC--------------------------------------------------------------------------------------------
     if (value_return == 0) {
+        printf("Waiting for A...\n");
+        printf("Use " BOLDYELLOW "[CTRL+C]" RESET " to interrupt\n");
+
         if (mkfifo(fifo1, 0666) == -1) {    //Prova a creare la pipe
             if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
                 value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
             }
         }
-        if (mkfifo(fifo2, 0666) == -1) {    //Prova a creare la pipe
-            if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
-                value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
-            }
-        }
-    }
 
-    if (value_return == 0) {
         fd1_fifo = open(fifo1, O_RDONLY);
         if (fd1_fifo == -1) {
             value_return = err_fifo();
         }
-
         do {
-            fd2_fifo = open(fifo2, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
-            if (fd2_fifo == -1) {                           //Error handling
-                if (errno != ENXIO) {                       //Se errno == 6, il file A non e' stato ancora aperto
-                    value_return = err_file_open();         //Errore nell'apertura del file
+            if (!enoent) {
+                if (mkfifo(fifo2, 0666) == -1) {    //Prova a creare la pipe
+                    if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
+                        value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
+                    }
                 }
             }
-        } while (value_return == 0 && fd2_fifo == -1);
+            fd2_fifo = open(fifo2, O_WRONLY | O_NONBLOCK);
+            if (fd2_fifo != -1) {
+                p_create = TRUE;
+            } else if (errno == ENOENT) {
+                enoent = FALSE;
+            } else if (errno != ENXIO) {
+                value_return = err_fifo();
+            }
+        } while (value_return == 0 && !p_create);
     }
 
     if (value_return == 0) {
@@ -120,7 +125,7 @@ int main() {
                         dupl = strdup(cmd);
                         flag = strtok(dupl, " ");
                         flag = strtok(NULL, " ");
-                        if (strncmp(flag, "-c", 2)) {
+                        if (strncmp(flag, "-c", 2) && strncmp(flag, "-a", 2)) {
                             _r_write = FALSE;
                             retrieve = FALSE;
                             printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
@@ -165,6 +170,16 @@ int main() {
                 if (read(fd1_fifo, resp, DIM_RESP) > 0) {
                     if (strstr(resp, ",") != NULL) {
                         printCluster(resp);
+                        printf("\n> ");
+                        fflush(stdout);
+                        retrieve = FALSE;
+                    }
+                }
+            }
+            if(!strncmp(cmd, "-a", 2)) {
+                if(read(fd1_fifo, resp, DIM_RESP) > 0) {
+                    if(strstr(resp, ",") != NULL) {
+                        printStat(resp);
                         printf("\n> ");
                         fflush(stdout);
                         retrieve = FALSE;
