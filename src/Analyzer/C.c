@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
             fprintf(debug, "AVVIATO C\n");
             fclose(debug);
             while (value_return == 0 && (!_close)) {  //Cicla finche` non ha finito di leggere o scrivere o va in errore
-                //usleep(100000);
+                usleep(500000);
                 if (!_write) {            //CICLO DI SCRITTURA
                     if (stop == FALSE) {  //E non ci troviamo in uno stato di stop per rinvio dati
                         debug = fopen(str, "a");
@@ -137,9 +137,14 @@ int main(int argc, char* argv[]) {
                                     }
                                     forkC(&n, &f, &id, &value_return);
                                     if (f == 0) execC(&m, &f, &id, fd, &value_return, &size_pipe);
+                                    while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
+                                        ;
+
                                 } else if (!strncmp(path, "#SETM#", 6)) {
                                     mParseOnFly(path, &m);
                                     mSendOnFly(fd, n, m);
+                                    while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
+                                        ;
                                 }
                                 pendingPath--;
                             } else {

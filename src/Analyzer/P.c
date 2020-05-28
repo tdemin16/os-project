@@ -42,7 +42,6 @@ int main(int argc, char* argv[]) {
     int sum_value;
     int oldfl;
     int pendingPath = 0;
-    char cleanPipe = FALSE;
 
     //Parsing arguments-------------------------------------------------------
     if (argc != 2) {
@@ -141,15 +140,16 @@ int main(int argc, char* argv[]) {
                                 if (f == 0) execP(&m, &f, &id, fd, &value_return, &size_pipe);  //Exec dei processi forkati
                                 send_r = TRUE;                                                  //setto a true per evitare che vada nel ramo sbagliato della read sotto
                                 resetPathList(sum);                                             //resetto sum
-                                cleanPipe = FALSE;
-                                while (!cleanPipe) {  //Ciclo per svuotare tutte le pipe in lettura da Q a P
+                                while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
+                                    ;
+                                /* while (!cleanPipe) {  //Ciclo per svuotare tutte le pipe in lettura da Q a P
                                     cleanPipe = TRUE;
                                     for (i = 0; i < m; i++) {  //Cicla tra tutti i figli
                                         if (read(fd[i * 4 + 0], resp, DIM_RESP) > 0) {
                                             cleanPipe = FALSE;
                                         }
                                     }
-                                }
+                                } */
                                 pendingPath--;  //Tolgo un pending path perchè non si trattava di un percorso ma di un comando
                             } else {
                                 for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q

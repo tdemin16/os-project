@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
     char *file;           //Messaggio senza Id e identificatori (#)
     int firstVal = 0;     //Controllo sulla validita' di un messaggio
     char sum[DIM_RESP];
-    long v[DIM_V];         //Array con valori totali
+    long v[DIM_V];        //Array con valori totali
     int notAnalyzed = 0;  //Flag indicante se e` avvenuta o meno la lettura della pipe
     int argCounter = 0;
     initialize_vector(v);  //Inizializzazione vettore dei valori totali
@@ -376,11 +376,12 @@ int main(int argc, char *argv[]) {
                                             n = atoi(new_n);
                                             setOnFly(n, m, fd_1);
                                             printf("\n" BOLDYELLOW "[ATTENTION]" RESET " n e` stato modificato\n\n");
+                                            i = 0;
+                                            pathSent = perc;
                                         } else {
                                             printf("\nn non e` stato modificato.\n");
                                             printf("Il valore inserito e` equivalente al precedente oppure e` uguale a 0\n\n");
                                         }
-
                                         free(dupl);
 
                                     } else if (!strncmp(cmd, "setm", 4)) {
@@ -391,6 +392,9 @@ int main(int argc, char *argv[]) {
                                             m = atoi(new_m);
                                             setmOnFly(m, fd_1);
                                             printf("\n" BOLDYELLOW "[ATTENTION]" RESET " m e` stato modificato\n\n");
+                                            if (perc != )
+                                            i = 0;
+                                            pathSent = perc;
                                         } else {
                                             printf("\nm non e` stato modificato.\n");
                                             printf("Il valore inserito e` equivalente al precedente oppure e` uguale a 0\n\n");
@@ -401,6 +405,8 @@ int main(int argc, char *argv[]) {
                                     if (parseSetOnFly(cmd, &n, &m) == 0) {
                                         printf("\n" BOLDYELLOW "[ATTENTION]" RESET " n e m sono stati modificati\n\n");
                                         setOnFly(n, m, fd_1);
+                                        i = 0;
+                                        pathSent = perc;
                                     } else {
                                         printf("\nn e m non sono stati modificati.\n");
                                         printf("I valori inseriti sono equivalenti ai precedenti oppure uno dei due e` uguale a 0\n\n");
