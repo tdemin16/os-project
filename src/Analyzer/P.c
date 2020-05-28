@@ -92,6 +92,7 @@ int main(int argc, char* argv[]) {
             fprintf(debug, "AVVIATO P con m = %d\n", m);
             fclose(debug);
             while (value_return == 0 && (!_close)) {
+                usleep(500000);
                 //Write
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
@@ -150,7 +151,7 @@ int main(int argc, char* argv[]) {
                                         }
                                     }
                                 } */
-                                pendingPath--;  //Tolgo un pending path perchè non si trattava di un percorso ma di un comando
+                                pendingPath = 0; //C
                             } else {
                                 for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q
                                     if (write(fd[i * 4 + 3], path, DIM_PATH) == -1) {

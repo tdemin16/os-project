@@ -59,6 +59,7 @@ int main(int argc, char* argv[]) {
     fclose(debug);
 
     while (value_return == 0 && !_close) {
+        usleep(500000);
         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //Legge un percorso
             pendingPath++;
             if (pendingPath == 1) {

@@ -489,7 +489,10 @@ int main(int argc, char *argv[]) {
                 //Read
                 if (!_read && value_return == 0) {               //Esegue il blocco fiche` non c'e` piu` nulla nella pipe
                     if (read(fd_2[READ], resp, DIM_RESP) > 0) {  //Pero` potremmo vedere se sto controllo serve realmente
-                        if (strstr(resp, "#") != NULL) {         //Controlla che ci sia almeno un # nel messaggio
+                        debug = fopen(str, "a");
+                        fprintf(debug, "A: RICEVUTO %s\n", lista->pathList[i]);
+                        fclose(debug);
+                        if (strstr(resp, "#") != NULL) {  //Controlla che ci sia almeno un # nel messaggio
                             tmp = strdup(resp);
                             id_r = atoi(strtok(tmp, "#"));  //id del file da valutare
                             resp_val = strtok(NULL, "#");   //valori

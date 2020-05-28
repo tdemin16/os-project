@@ -139,12 +139,13 @@ int main(int argc, char* argv[]) {
                                     if (f == 0) execC(&m, &f, &id, fd, &value_return, &size_pipe);
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
-
+                                    pendingPath = 1;  //Così poi appena esce torna a 0
                                 } else if (!strncmp(path, "#SETM#", 6)) {
                                     mParseOnFly(path, &m);
                                     mSendOnFly(fd, n, m);
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
+                                    pendingPath = 1;
                                 }
                                 pendingPath--;
                             } else {
