@@ -489,9 +489,7 @@ int main(int argc, char *argv[]) {
                 //Read
                 if (!_read && value_return == 0) {               //Esegue il blocco fiche` non c'e` piu` nulla nella pipe
                     if (read(fd_2[READ], resp, DIM_RESP) > 0) {  //Pero` potremmo vedere se sto controllo serve realmente
-                        debug = fopen(str, "a");
-                        fprintf(debug, "A: RICEVUTO %s\n", lista->pathList[i]);
-                        fclose(debug);
+
                         if (strstr(resp, "#") != NULL) {  //Controlla che ci sia almeno un # nel messaggio
                             tmp = strdup(resp);
                             id_r = atoi(strtok(tmp, "#"));  //id del file da valutare
@@ -501,6 +499,9 @@ int main(int argc, char *argv[]) {
                             tmpPercorso = strdup(lista->pathList[id_r]);
                             file = strtok(tmpPercorso, "#");  //Recupera path corrispondente nella lista
                             file = strtok(NULL, "#");         //percorso
+                            debug = fopen(str, "a");
+                            fprintf(debug, "A: RICEVUTO %s\n", lista->pathList[id_r]);
+                            fclose(debug);
                             if (firstVal != -1) {
                                 if (fileExist(file)) {                                              // File esistente
                                     lista->analyzed[id_r] = 1;                                      //Setta il flag ad Analizzato
