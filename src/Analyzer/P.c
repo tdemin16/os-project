@@ -42,6 +42,8 @@ int main(int argc, char* argv[]) {
     int sum_value;
     int oldfl;
     int pendingPath = 0;
+    char cleanPipe = FALSE;
+    int son = 0;
 
     //Parsing arguments-------------------------------------------------------
     if (argc != 2) {
@@ -107,6 +109,7 @@ int main(int argc, char* argv[]) {
                             fprintf(debug, "P: LEGGO %s PENDING: %d\n", path, pendingPath);
                             fclose(debug);
                             if (!strncmp(path, "#CLOSE", 6)) {  //Se leggo una stringa di terminazione
+                                _read = TRUE;
                                 _close = TRUE;                  //Setto close a true per far uscire dalciclo
                                 debug = fopen(str, "a");
                                 fprintf(debug, "P: MI KILLO\n");
@@ -118,6 +121,16 @@ int main(int argc, char* argv[]) {
                                 nClearAndClose(fd, m);  //Mando a tutti i figli il comando di chiusura
                                 while (wait(NULL) > 0)  //Aspetto che vengano chiusi
                                     ;
+                                cleanPipe = FALSE;
+                                    while (!cleanPipe) {  //Ciclo per svuotare tutte le pipe in lettura da Q a P
+                                        cleanPipe = TRUE;
+                                        for (son = 0; son < m; son++) {  //Cicla tra tutti i figli
+                                            if (read(fd[son * 4 + 0], resp, DIM_RESP) > 0) {
+                                                cleanPipe = FALSE;
+                                                
+                                            }
+                                        }
+                                    }
                                 close_pipes(fd, size_pipe);
                                 mParseOnFly(path, &m);  //Estraggo m da path
 
@@ -143,14 +156,6 @@ int main(int argc, char* argv[]) {
                                 resetPathList(sum);                                             //resetto sum
                                 while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                     ;
-                                /* while (!cleanPipe) {  //Ciclo per svuotare tutte le pipe in lettura da Q a P
-                                    cleanPipe = TRUE;
-                                    for (i = 0; i < m; i++) {  //Cicla tra tutti i figli
-                                        if (read(fd[i * 4 + 0], resp, DIM_RESP) > 0) {
-                                            cleanPipe = FALSE;
-                                        }
-                                    }
-                                } */
                                 pendingPath = 0; //C
                             } else {
                                 for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q

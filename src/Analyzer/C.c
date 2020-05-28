@@ -42,6 +42,8 @@ int main(int argc, char* argv[]) {
     char send_r = TRUE;    //Controlla la dimensione della pipe del padre
     int oldfl;             //usato per togliere la O_NONBLOCK dai flag
     int pendingPath = 0;
+    char cleanPipe = FALSE;
+    int son = 0;
 
     //Generating pipes-------------------------------------------------------
     if (value_return == 0) {
@@ -118,6 +120,16 @@ int main(int argc, char* argv[]) {
                                     nClearAndClose(fd, n);  //Svuota le pipe in discesa e manda #CLOSE
                                     while (wait(NULL) > 0)  //Aspetto che vengano chiusi
                                         ;
+                                    cleanPipe = FALSE;
+                                    while (!cleanPipe) {  //Ciclo per svuotare tutte le pipe in lettura da Q a P
+                                        cleanPipe = TRUE;
+                                        for (son = 0; son < n; son++) {  //Cicla tra tutti i figli
+                                            if (read(fd[son * 4 + 0], resp, DIM_RESP) > 0) {
+                                                cleanPipe = FALSE;
+                                                
+                                            }
+                                        }
+                                    }
                                     close_pipes(fd, size_pipe);
                                     parseOnFly(path, &n, &m);  //Estrae n e m dalla stringa #SET#N#M#
                                     size_pipe = n * 4;
@@ -145,6 +157,7 @@ int main(int argc, char* argv[]) {
                                     mSendOnFly(fd, n, m);
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
+                                        
                                     pendingPath = 1;
                                 }
                                 pendingPath--;
