@@ -157,9 +157,13 @@ int main() {                            //struttura main
             if (!strncmp(cmd, "print", 5)) {
                 if (read(fd1_fifo, path, DIM_PATH + 2) > 0) {
                     if (strstr(path, "#") != NULL) {
-                        printf("%s\n", path);
-                        usleep(10000);
-                        arr = TRUE;
+                        if (strncmp(path, "#ANALYZING", 10)) {
+                            printf("%s\n", path);
+                            usleep(10000);
+                            arr = TRUE;
+                        } else {
+                            retrieve = FALSE;
+                        }
                     } else if (!strncmp(path, "///", 3)) {
                         retrieve = FALSE;
                         if (!arr) printf("Lista vuota\n");
@@ -170,7 +174,9 @@ int main() {                            //struttura main
             }
             if (!strncmp(cmd, "-c", 2)) {
                 if (read(fd1_fifo, resp, DIM_RESP) > 0) {
-                    if (strstr(resp, ",") != NULL) {
+                    if (!strncmp(resp, "#ANALYZING", 10)) {
+                        retrieve = FALSE;
+                    } else if (strstr(resp, ",") != NULL) {
                         printCluster(resp);
                         printf("\n> ");
                         fflush(stdout);
@@ -180,7 +186,9 @@ int main() {                            //struttura main
             }
             if (!strncmp(cmd, "-a", 2)) {
                 if (read(fd1_fifo, resp, DIM_RESP) > 0) {
-                    if (strstr(resp, ",") != NULL) {
+                    if (!strncmp(resp, "#ANALYZING", 10)) {
+                        retrieve = FALSE;
+                    } else if (strstr(resp, ",") != NULL) {
                         printStat(resp);
                         printf("\n> ");
                         fflush(stdout);

@@ -454,23 +454,36 @@ int main(int argc, char *argv[]) {
                         if (read(fd2_fifo, print_method, DIM_CMD) > 0) {
                             if (!strncmp(print_method, "print", 5) || !strncmp(print_method, "-c", 2) || !strncmp(print_method, "-a", 2)) {
                                 retrieve = FALSE;
+                                if (analyzing) {
+                                    printf(BOLDYELLOW "\n[ATTENZIONE]" RESET " Analisi in corso, non e` possibile stampare\n");
+                                }
                             }
                         }
                     } else {
                         if (!strncmp(print_method, "print", 5)) {
-                            if (lista->count > 0) {
-                                for (j = 0; j < lista->count; j++) {
-                                    write(fd1_fifo, lista->pathList[j], DIM_PATH + 2);
+                            if (!analyzing) {
+                                if (lista->count > 0) {
+                                    for (j = 0; j < lista->count; j++) {
+                                        write(fd1_fifo, lista->pathList[j], DIM_PATH + 2);
+                                    }
                                 }
+                            } else {
+                                strcpy(tmp_resp, "#ANALYZING");
                             }
 
                             write(fd1_fifo, tmp_resp, DIM_PATH + 2);
+                            strcpy(tmp_resp, "///");
                         }
                         if (!strncmp(print_method, "-c", 2)) {
-                            analyzeCluster(sum, type_resp);
+                            if (!analyzing) {
+                                analyzeCluster(sum, type_resp);
+                            } else {
+                                strcpy(type_resp, "#ANALYZING");
+                            }
                             write(fd1_fifo, type_resp, DIM_RESP);
                         }
                         if (!strncmp(print_method, "-a", 2)) {
+                            if(analyzing) strcpy(sum, "#ANALYZING");
                             write(fd1_fifo, sum, DIM_RESP);
                         }
                         retrieve = TRUE;
