@@ -117,7 +117,8 @@ int main(int argc, char* argv[]) {
                                     close_pipes(fd, size_pipe);
                                     parseOnFly(path, &n, &m);  //Estrae n e m dalla stringa #SET#N#M#
                                     size_pipe = n * 4;
-                                    reallocPipe(fd, size_pipe);
+                                    free(fd);
+                                    fd = (int*)malloc(size_pipe * sizeof(int));
                                     if (createPipe(fd, size_pipe) != 0) {
                                         value_return = err_pipe();
                                     }

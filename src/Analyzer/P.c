@@ -109,7 +109,27 @@ int main(int argc, char* argv[]) {
                                     _close = TRUE;
                                     nClearAndClose(fd, m);
                                 } else if (!strncmp(path, "#SETM#", 6)) {
-                                    //Da implementare
+                                    nClearAndClose(fd, m);  //Mando a tutti i figli il comando di chiusura
+                                    while (wait(NULL) > 0)  //Aspetto che vengano chiusi
+                                        ;
+                                    close_pipes(fd, size_pipe);
+                                    mParseOnFly(path, &m);  //Estraggo m da path
+
+                                    size_pipe = m * 4;  //ridimensiono le pipe
+                                    free(fd);
+                                    fd = (int*)malloc(size_pipe * sizeof(int));  //Le rialloco
+                                    if (createPipe(fd, size_pipe) != 0) {
+                                        value_return = err_pipe();
+                                    }
+                                    if (unlock_pipes(fd, size_pipe) == -1) {     //Set nonblocking pipes
+                                        value_return = err_fcntl();              //Gestione errore sullo sblocco pipe
+                                    }
+                                    forkP(&m, &f, &id, &value_return);                              //Forko i processi
+                                    if (f == 0) execP(&m, &f, &id, fd, &value_return, &size_pipe);  //Exec dei processi forkati
+                                    send_r = TRUE;                                                  //setto a true per evitare che vada nel ramo sbagliato della read sotto
+                                    resetPathList(sum);                                             //resetto sum
+                                    while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
+                                        ;
                                 }
                                 pendingPath = 0;
                             } else {            //Se si tratta di un percorso
