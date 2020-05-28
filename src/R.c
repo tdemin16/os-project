@@ -127,7 +127,7 @@ int main() {
                         dupl = strdup(cmd);
                         flag = strtok(dupl, " ");
                         flag = strtok(NULL, " ");
-                        if (strncmp(flag, "-c", 2)) {
+                        if (strncmp(flag, "-c", 2) && strncmp(flag, "-a", 2)) {
                             _r_write = FALSE;
                             retrieve = FALSE;
                             printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
@@ -172,6 +172,16 @@ int main() {
                 if (read(fd1_fifo, resp, DIM_RESP) > 0) {
                     if (strstr(resp, ",") != NULL) {
                         printCluster(resp);
+                        printf("\n> ");
+                        fflush(stdout);
+                        retrieve = FALSE;
+                    }
+                }
+            }
+            if(!strncmp(cmd, "-a", 2)) {
+                if(read(fd1_fifo, resp, DIM_RESP) > 0) {
+                    if(strstr(resp, ",") != NULL) {
+                        printStat(resp);
                         printf("\n> ");
                         fflush(stdout);
                         retrieve = FALSE;

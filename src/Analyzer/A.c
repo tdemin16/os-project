@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
     char *file;           //Messaggio senza Id e identificatori (#)
     int firstVal = 0;     //Controllo sulla validita' di un messaggio
     char sum[DIM_RESP];
-    long v[DIM_V];         //Array con valori totali
+    long v[DIM_V];        //Array con valori totali
     int notAnalyzed = 0;  //Flag indicante se e` avvenuta o meno la lettura della pipe
     int argCounter = 0;
     initialize_vector(v);  //Inizializzazione vettore dei valori totali
@@ -417,7 +417,7 @@ int main(int argc, char *argv[]) {
                 if (!_close && value_return == 0) {
                     if (retrieve) {  //Try read from R
                         if (read(fd2_fifo, print_method, DIM_CMD) > 0) {
-                            if (!strncmp(print_method, "print", 5) || !strncmp(print_method, "-c", 2)) {
+                            if (!strncmp(print_method, "print", 5) || !strncmp(print_method, "-c", 2) || !strncmp(print_method, "-a", 2)) {
                                 retrieve = FALSE;
                             }
                         }
@@ -434,6 +434,9 @@ int main(int argc, char *argv[]) {
                         if (!strncmp(print_method, "-c", 2)) {
                             analyzeCluster(sum, type_resp);
                             write(fd1_fifo, type_resp, DIM_RESP);
+                        }
+                        if (!strncmp(print_method, "-a", 2)) {
+                            write(fd1_fifo, sum, DIM_RESP);
                         }
                         retrieve = TRUE;
                     }
