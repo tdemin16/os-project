@@ -120,6 +120,8 @@ int main(int argc, char* argv[]) {
                                     nClearAndClose(fd, n);  //Svuota le pipe in discesa e manda #CLOSE
                                     while (wait(NULL) > 0)  //Aspetto che vengano chiusi
                                         ;
+                                        j = 0;
+                                        k = 0;
                                     cleanPipe = FALSE;
                                     while (!cleanPipe) {  //Ciclo per svuotare tutte le pipe in lettura da Q a P
                                         cleanPipe = TRUE;
@@ -165,8 +167,9 @@ int main(int argc, char* argv[]) {
                                     }
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
-
+                                    send_r = TRUE;
                                     pendingPath = 1;
+
                                 }
                                 pendingPath--;
                             } else {
