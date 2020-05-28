@@ -683,7 +683,7 @@ int parse_string(char *string, int v[DIM_V]) {
 
 ///src/Analyzer/Q.c
 //Initialize frequence vector all to 0
-void initialize_vector(int *v) {
+void initialize_vector(long *v) {
     int i;
     for (i = 0; i < DIM_V; i++) {
         v[i] = 0;
@@ -691,7 +691,7 @@ void initialize_vector(int *v) {
 }
 
 //Increase frequence of the global vector in the position val_ascii
-void set_add(int *v, char c) {
+void set_add(long *v, char c) {
     int val_ascii;
     val_ascii = ((int)c) - 32;  //casting char to int and difference 32 (in order to save space on the vector) //Se vogliamo togliere lo spazio basta fare -33
     if (val_ascii >= 0) {
@@ -700,7 +700,7 @@ void set_add(int *v, char c) {
 }
 
 //get the chars from the .txt files from the begin (b) to the end (e)
-void get_subset(int *fp, int *v, int b, int e) {
+void get_subset(int *fp, long *v, int b, int e) {
     int i = b;
     char c[1];
     lseek(*fp, b, SEEK_SET);  //setting initial position of SEEK cursor
@@ -710,7 +710,7 @@ void get_subset(int *fp, int *v, int b, int e) {
     }
 }
 
-void get_frequencies(int *fp, int *freq, int part, int m) {  //Prima di commentarlo bene testiamo
+void get_frequencies(int *fp, long *freq, int part, int m) {  //Prima di commentarlo bene testiamo
     //int *freq = malloc(sizeof(int*) * DIM_V); //where frequencies will be stored
     initialize_vector(freq);
     int i = 0;
@@ -766,7 +766,7 @@ int countDigit(int n) {
     return count;
 }
 
-void createCsv(int *v, char *res, char *id) {
+void createCsv(long *v, char *res, char *id) {
     int i;
     char str[12];
     for (i = 0; i < DIM_RESP; i++) {
@@ -775,11 +775,11 @@ void createCsv(int *v, char *res, char *id) {
 
     strcat(res, id);
     strcat(res, "#");
-    sprintf(str, "%d", v[0]);
+    sprintf(str, "%ld", v[0]);
     strcat(res, str);
     for (i = 1; i < DIM_V; i++) {
         strcat(res, ",");
-        sprintf(str, "%d", v[i]);
+        sprintf(str, "%ld", v[i]);
         strcat(res, str);
     }
     strcat(res, "#");
@@ -798,7 +798,7 @@ char sumCsv(char *str1, char *str2) {
 
     char *id2 = strtok(dup2, "#");
     char *tmp2 = strtok(NULL, "#");
-    int v[DIM_RESP];
+    long v[DIM_RESP];
     initialize_vector(v);
     char deleteCheck = FALSE;
     int firstVal = 0;
@@ -821,7 +821,7 @@ char sumCsv(char *str1, char *str2) {
     return ret;
 }
 
-char addCsvToArray(char *tmp, int *v) {
+char addCsvToArray(char *tmp, long *v) {
     char ret = FALSE;
     int i = 0;
     char *token = strtok(tmp, "#");
@@ -1082,17 +1082,17 @@ char *itoa(int value, char *buffer, int base) {
     return reverse(buffer, 0, i - 1);
 }
 
-void arrayToCsv(int *v, char *res) {
+void arrayToCsv(long *v, char *res) {
     int i;
     char str[12];
     for (i = 0; i < DIM_RESP; i++) {
         res[i] = '\0';
     }
-    sprintf(str, "%d", v[0]);
+    sprintf(str, "%ld", v[0]);
     strcat(res, str);
     for (i = 1; i < DIM_V; i++) {
         strcat(res, ",");
-        sprintf(str, "%d", v[i]);
+        sprintf(str, "%ld", v[i]);
         strcat(res, str);
     }
 }

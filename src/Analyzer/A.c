@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
     char *file;           //Messaggio senza Id e identificatori (#)
     int firstVal = 0;     //Controllo sulla validita' di un messaggio
     char sum[DIM_RESP];
-    int v[DIM_V];         //Array con valori totali
+    long v[DIM_V];         //Array con valori totali
     int notAnalyzed = 0;  //Flag indicante se e` avvenuta o meno la lettura della pipe
     int argCounter = 0;
     initialize_vector(v);  //Inizializzazione vettore dei valori totali
