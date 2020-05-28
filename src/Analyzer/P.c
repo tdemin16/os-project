@@ -42,6 +42,7 @@ int main(int argc, char* argv[]) {
     int sum_value;
     int oldfl;
     int pendingPath = 0;
+    char cleanPipe = FALSE;
 
     //Parsing arguments-------------------------------------------------------
     if (argc != 2) {
@@ -96,9 +97,9 @@ int main(int argc, char* argv[]) {
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
-                            pendingPath++;
+                            pendingPath++;                             //Incremento il numero di percorsi da analizzare
                             if (pendingPath == 1) {
-                                if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+                                if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {  //Se è il primo sblocco lo stdin
                                     value_return = err_fcntl();
                                 }
                             }
@@ -106,26 +107,27 @@ int main(int argc, char* argv[]) {
                             fprintf(debug, "P: LEGGO %s PENDING: %d\n", path, pendingPath);
                             fclose(debug);
                             if (!strncmp(path, "#CLOSE", 6)) {  //Se leggo una stringa di terminazione
-                                _close = TRUE;
+                                _close = TRUE;                  //Setto close a true per far uscire dalciclo
                                 debug = fopen(str, "a");
                                 fprintf(debug, "P: MI KILLO\n");
-                                fclose(debug);  //Setto end a true
+                                fclose(debug);
                             } else if (!strncmp(path, "#SETM#", 6)) {
                                 debug = fopen(str, "a");
                                 fprintf(debug, "P: NUOVO M: %d\n", m);
-                                fclose(debug);  //Setto end a true
-                                nClearAndClose(fd, m);
-                                while (wait(NULL) > 0)
+                                fclose(debug);
+                                nClearAndClose(fd, m);  //Mando a tutti i figli il comando di chiusura
+                                while (wait(NULL) > 0)  //Aspetto che vengano chiusi
                                     ;
-                                mParseOnFly(path, &m);
-                                for (i = 0; i < size_pipe - 1; i += 2) {
-                                    if (close(fd[i]) == -1) {       //Controlla se ci sono errori nella creazione della pipe
-                                        value_return = err_pipe();  //In caso di errore setta il valore di ritorno
+                                for (i = 0; i < size_pipe - 1; i += 2) {  //chiudo le pipe
+                                    if (close(fd[i]) == -1) {             //Controlla se ci sono errori nella creazione della pipe
+                                        value_return = err_pipe();        //In caso di errore setta il valore di ritorno
                                     }
                                 }
-                                size_pipe = m * 4;
+                                mParseOnFly(path, &m);  //Estraggo m da path
+
+                                size_pipe = m * 4;  //ridimensiono le pipe
                                 free(fd);
-                                fd = (int*)malloc(size_pipe * sizeof(int));
+                                fd = (int*)malloc(size_pipe * sizeof(int));  //Le rialloco
                                 //Alloco le pipes a due a due
 
                                 for (i = 0; i < size_pipe - 1; i += 2) {
@@ -139,10 +141,20 @@ int main(int argc, char* argv[]) {
                                 if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {  //Sblocca lo stdin (teoricamente non necessario)
                                     value_return = err_fcntl();                  //Gestione errore sullo sblocco pipe
                                 }
-                                forkP(&m, &f, &id, &value_return);
-                                if (f == 0) execP(&m, &f, &id, fd, &value_return, &size_pipe);
-
-                                pendingPath--;
+                                forkP(&m, &f, &id, &value_return);                              //Forko i processi
+                                if (f == 0) execP(&m, &f, &id, fd, &value_return, &size_pipe);  //Exec dei processi forkati
+                                send_r = TRUE;                                                  //setto a true per evitare che vada nel ramo sbagliato della read sotto
+                                resetPathList(sum);                                             //resetto sum
+                                cleanPipe = FALSE;
+                                while (!cleanPipe) {  //Ciclo per svuotare tutte le pipe in lettura da Q a P
+                                    cleanPipe = TRUE;
+                                    for (i = 0; i < m; i++) {  //Cicla tra tutti i figli
+                                        if (read(fd[i * 4 + 0], resp, DIM_RESP) > 0) {
+                                            cleanPipe = FALSE;
+                                        }
+                                    }
+                                }
+                                pendingPath--;  //Tolgo un pending path perchè non si trattava di un percorso ma di un comando
                             } else {
                                 for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q
                                     if (write(fd[i * 4 + 3], path, DIM_PATH) == -1) {

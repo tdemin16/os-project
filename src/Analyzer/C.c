@@ -115,18 +115,20 @@ int main(int argc, char* argv[]) {
                                     nClearAndClose(fd, n);          //Svuota le pipe in discesa e manda #CLOSE
                                     _close = TRUE;                  //Setto end a true
                                 } else if (!strncmp(path, "#SET#", 5) || !strncmp(path, "#SETN", 5)) {
-                                    nClearAndClose(fd, n);     //Svuota le pipe in discesa e manda #CLOSE
-                                    parseOnFly(path, &n, &m);  //Estrae n e m dalla stringa #SET#N#M#
+                                    nClearAndClose(fd, n);  //Svuota le pipe in discesa e manda #CLOSE
+                                    while (wait(NULL) > 0)  //Aspetto che vengano chiusi
+                                    ;
                                     for (i = 0; i < size_pipe - 1; i += 2) {
                                         if (close(fd[i]) == -1) {       //Controlla se ci sono errori nella creazione della pipe
                                             value_return = err_pipe();  //In caso di errore setta il valore di ritorno
                                         }
                                     }
+                                    parseOnFly(path, &n, &m);  //Estrae n e m dalla stringa #SET#N#M#
                                     size_pipe = n * 4;
                                     free(fd);
                                     fd = (int*)malloc(size_pipe * sizeof(int));
                                     //Alloco le pipes a due a due
-                                    
+
                                     for (i = 0; i < size_pipe - 1; i += 2) {
                                         if (pipe(fd + i) == -1) {       //Controlla se ci sono errori nella creazione della pipe
                                             value_return = err_pipe();  //In caso di errore setta il valore di ritorno
