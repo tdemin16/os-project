@@ -12,12 +12,12 @@ help:
 build:
 	@if [ ! -d "./bin" ]; then \
 	mkdir ./bin; fi
-	@gcc -g -Werror -Wall -std=gnu90 ./src/lib/lib.c ./src/Analyzer/A.c -o ./bin/A
-	@gcc -g -Werror -Wall -std=gnu90 ./src/lib/lib.c ./src/Analyzer/C.c -o ./bin/C
-	@gcc -g -Werror -Wall -std=gnu90 ./src/lib/lib.c ./src/Analyzer/P.c -o ./bin/P
-	@gcc -g -Werror -Wall -std=gnu90 ./src/lib/lib.c ./src/Analyzer/Q.c -o ./bin/Q
-	@gcc -g -Werror -Wall -std=gnu90 ./src/lib/lib.c ./src/R.c -o ./bin/R
-	@gcc -g -Werror -Wall -std=gnu90 ./src/lib/lib.c ./src/M.c -o ./bin/M
+	@gcc -g -Werror -Wall -Wunused -std=gnu90 ./src/lib/lib.c ./src/Analyzer/A.c -o ./bin/A
+	@gcc -g -Werror -Wall -Wunused -std=gnu90 ./src/lib/lib.c ./src/Analyzer/C.c -o ./bin/C
+	@gcc -g -Werror -Wall -Wunused -std=gnu90 ./src/lib/lib.c ./src/Analyzer/P.c -o ./bin/P
+	@gcc -g -Werror -Wall -Wunused -std=gnu90 ./src/lib/lib.c ./src/Analyzer/Q.c -o ./bin/Q
+	@gcc -g -Werror -Wall -Wunused -std=gnu90 ./src/lib/lib.c ./src/R.c -o ./bin/R
+	@gcc -g -Werror -Wall -Wunused -std=gnu90 ./src/lib/lib.c ./src/M.c -o ./bin/M
 
 clean:
 	@rm -rf ./bin

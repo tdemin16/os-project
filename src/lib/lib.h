@@ -120,7 +120,6 @@ void close_pipes(int *, int);
 int unlock_pipes(int *, int);
 
 // /src/Analyzer/A.c
-int parser(char, int, char **, array *, int *, int *, int *, int *);
 int parser2(int, char **, array *, int *, int *, int *, int *);
 int parser_CheckArguments(int, char **, int *, int *);
 int parser_LenghtCommand(char *);
