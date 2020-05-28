@@ -42,8 +42,8 @@ int main(int argc, char* argv[]) {
     char send_r = TRUE;    //Controlla la dimensione della pipe del padre
     int oldfl;             //usato per togliere la O_NONBLOCK dai flag
     int pendingPath = 0;
-    char cleanPipe = FALSE;
-    int son = 0;
+    /* char cleanPipe = FALSE;
+    int son = 0; */
 
     //Generating pipes-------------------------------------------------------
     if (value_return == 0) {
@@ -97,78 +97,59 @@ int main(int argc, char* argv[]) {
             fclose(debug);
             while (value_return == 0 && (!_close)) {  //Cicla finche` non ha finito di leggere o scrivere o va in errore
                 usleep(500000);
-                if (!_write) {            //CICLO DI SCRITTURA
-                    if (stop == FALSE) {  //E non ci troviamo in uno stato di stop per rinvio dati
+                if (!_write) {                                         //CICLO DI SCRITTURA
+                    if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
-                            pendingPath++;
-                            if (pendingPath == 1) {
-                                if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
-                                    value_return = err_fcntl();
-                                }
-                            }
                             debug = fopen(str, "a");
                             fprintf(debug, "C: LEGGO %s\n", path);
                             fclose(debug);
                             if (!strncmp(path, "#", 1)) {
-                                if (!strncmp(path, "#CLOSE", 6)) {  //Se leggo una stringa di terminazione
-                                    nClearAndClose(fd, n);          //Svuota le pipe in discesa e manda #CLOSE
-                                    _close = TRUE;                  //Setto end a true
+                                if (!strncmp(path, "#CLOSE", 6)) {
+                                    _read = TRUE;
+                                    _close = TRUE;
+                                    nClearAndClose(fd, n);
                                 } else if (!strncmp(path, "#SET#", 5) || !strncmp(path, "#SETN", 5)) {
-                                    nClearAndClose(fd, n);  //Svuota le pipe in discesa e manda #CLOSE
+                                    j = 0;
+                                    k = 0;
+                                    nClearAndClose(fd, n);  //mando #CLOSE alle n pipe
                                     while (wait(NULL) > 0)  //Aspetto che vengano chiusi
                                         ;
-                                        j = 0;
-                                        k = 0;
-                                    cleanPipe = FALSE;
-                                    while (!cleanPipe) {  //Ciclo per svuotare tutte le pipe in lettura da Q a P
-                                        cleanPipe = TRUE;
-                                        for (son = 0; son < n; son++) {  //Cicla tra tutti i figli
-                                            if (read(fd[son * 4 + 0], resp, DIM_RESP) > 0) {
-                                                cleanPipe = FALSE;
-                                            }
-                                        }
-                                    }
                                     close_pipes(fd, size_pipe);
                                     parseOnFly(path, &n, &m);  //Estrae n e m dalla stringa #SET#N#M#
                                     size_pipe = n * 4;
-                                    free(fd);
-                                    fd = (int*)malloc(size_pipe * sizeof(int));
-                                    //Alloco le pipes a due a due
-                                    for (i = 0; i < size_pipe - 1; i += 2) {
-                                        if (pipe(fd + i) == -1) {       //Controlla se ci sono errori nella creazione della pipe
-                                            value_return = err_pipe();  //In caso di errore setta il valore di ritorno
-                                        }
+                                    reallocPipe(fd, size_pipe);
+                                    if (createPipe(fd, size_pipe) != 0) {
+                                        value_return = err_pipe();
                                     }
                                     if (unlock_pipes(fd, size_pipe) == -1) {  //Set nonblocking pipes
                                         value_return = err_fcntl();           //Gestione errore sullo sblocco pipe
                                     }
-                                    if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {  //Sblocca lo stdin (teoricamente non necessario)
-                                        value_return = err_fcntl();                  //Gestione errore sullo sblocco pipe
-                                    }
+                                    fprintf(stderr,".\n");
                                     forkC(&n, &f, &id, &value_return);
-                                    if (f == 0) execC(&m, &f, &id, fd, &value_return, &size_pipe);
+                                    if (f == 0) execC(&n, &f, &id, fd, &value_return, &size_pipe);
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
+
                                 } else if (!strncmp(path, "#SETM#", 6)) {
+                                    j = 0;
+                                    k = 0;
                                     mParseOnFly(path, &m);
                                     mSendOnFly(fd, n, m);
-                                    cleanPipe = FALSE;
-                                    while (!cleanPipe) {  //Ciclo per svuotare tutte le pipe in lettura da Q a P
-                                        cleanPipe = TRUE;
-                                        for (son = 0; son < n; son++) {  //Cicla tra tutti i figli
-                                            if (read(fd[son * 4 + 0], resp, DIM_RESP) > 0) {
-                                                cleanPipe = FALSE;
-                                            }
-                                        }
-                                    }
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
                                     send_r = TRUE;
-                                    
-
                                 }
                                 pendingPath = 0;
-                            } else {
+                            } else {  //Se si tratta di un percorso
+                                pendingPath++;
+                                if (pendingPath == 1) {
+                                    if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+                                        value_return = err_fcntl();
+                                    }
+                                    debug = fopen(str, "a");
+                                    fprintf(debug, "C: WAKE UP\n");
+                                    fclose(debug);
+                                }
                                 if (write(fd[j * 4 + 3], path, DIM_PATH) == -1) {  //Provo a scrivere
                                     if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
                                         value_return = err_write();                //Setta il valore di ritorno
@@ -249,6 +230,8 @@ int main(int argc, char* argv[]) {
             }
 
             while (wait(NULL) > 0)
+                ;
+            while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)  //Svuota lo stdout
                 ;
             close_pipes(fd, size_pipe);  //Chiude tutte le pipes
             free(fd);                    //Libera la memoria delle pipes

@@ -478,6 +478,21 @@ void closeAll(int *fd_1) {
     }
 }
 
+void reallocPipe(int *fd, int size_pipe) {
+    free(fd);
+    fd = (int *)malloc(size_pipe * sizeof(int));
+}
+int createPipe(int *fd, int size_pipe) {
+    int i;
+    int ret = 0;
+    for (i = 0; i < size_pipe - 1; i += 2) {
+        if (pipe(fd + i) == -1) {       //Controlla se ci sono errori nella creazione della pipe
+            ret = ERR_PIPE;  //In caso di errore setta il valore di ritorno
+        }
+    }
+    return ret;
+}
+
 char checkArg(char cmd[DIM_CMD], int *argCounter) {
     int j;
     char ret = TRUE;
@@ -525,7 +540,7 @@ int parseSetOnFly(char *string, int *n, int *m) {
     tmpn = atoi(token);
     token = strtok(NULL, " ");
     tmpm = atoi(token);
-    if((tmpn == (*n) && tmpm == (*m)) || (tmpn == 0 || tmpm == 0)) {
+    if ((tmpn == (*n) && tmpm == (*m)) || (tmpn == 0 || tmpm == 0)) {
         ret = -1;
     } else {
         *n = tmpn;

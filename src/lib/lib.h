@@ -133,7 +133,8 @@ char fileExist(char *);
 void setOnFly(int, int, int *);
 void setmOnFly(int, int *);
 void closeAll(int *);
-
+void reallocPipe(int *, int);
+int createPipe(int *, int);
 //parser A.c
 char checkArg(char *, int *);
 
