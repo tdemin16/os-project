@@ -1,36 +1,34 @@
 #include "lib/lib.h"
 int value_return = 0;  //Valore di ritorno, globale per "send_to_R"
-process *p;            //Declaring p (it's global because hendle_sigint can't have parameters, only int sig)
+process *p;            //Dichiaro p, viene dichiarato globalmente perché handle_sigint non può ricevere parametri al di fuori di sig
 int fd1_fifo;          //A writes in R
 int fd2_fifo;          //R writes in A
 
-void handle_sigint(int sig) {
-    printf("\n[!] Ricevuta terminazione per R, inizio terminazione processo ... \n");
-    int i = p->count - 1;  //start from the end
-    if (i > 0) {
-        while (i != 0)  //while we haven't controlled every single process
-        {
-            if (p->pid[i] > 0)  //Processo padre
-            {
-                if (kill(p->pid[i], 9) == 0) {                                     //Tries to kill process with pid saved in pid[i]
-                    printf("\tProcesso %d terminato con successo!\n", p->pid[i]);  //if it success you terminated it correctly
-                } else {
-                    printf("\t[!] Errore, non sono riuscito a chiudere il processo %d!", p->pid[i]);  //if it fail something is wrong
-                }
-            }
-            i--;  //i-- otherwise it will go to infinity
-        }
-    }
-    if (!close(fd1_fifo)) {  //close fifo
-        printf("[!] Chiusura fifo completata\n");
-    }
-    if (!close(fd2_fifo)) {  //close fifo
-        printf("[!] Chiusura fifo completata\n");
-    }
-    freeList(p);  //free memory allocated for p
-    printf("[!] ... Chiusura processo terminata\n");
-    exit(-1);  //return exit with error -1
-}
+void handle_sigint(int sig) {                                                                                           //handler per il CTRL-C, ha l'obiettivo di
+    printf(BOLDYELLOW "\n[ATTENZIONE]" RESET " Ricevuta terminazione per R, inizio terminazione processo ... \n");      //Stampo a terminale la corretta ricezione del comando Ctrl-C
+    int i = p->count - 1;                                                                                               //Parto dalla fine (poiché nella lista i processi figli vengono salvati dopo il processo padre)
+    if (i > 0) {                                                                                                        //Se i > 0 => ci sono processi avviati
+        while (i != 0) {                                                                                                //Ciclo while fino a quando non ho controllato tutti i processi
+            if (p->pid[i] > 0) {                                                                                        //Controllo che non sia un processo padre
+                if (kill(p->pid[i], 9) == 0) {                                                                          //Provo a killare il pid[i]
+                    printf(BOLDGREEN "\tProcesso %d terminato con successo!\n" RESET, p->pid[i]);                       //Se ha successo allora stampo la corretta terminazione
+                } else {                                                                                                //Altrimenti
+                    printf(RED "\t[ERRORE]" RESET " Errore, non sono riuscito a chiudere il processo %d!", p->pid[i]);  //Qualcosa è andato storto nel kill
+                }                                                                                                       //
+            }                                                                                                           //
+            i--;                                                                                                        //itero i--
+        }                                                                                                               //
+    }                                                                                                                   //Se la fifo è aperta la chiudo
+    if (!close(fd1_fifo)) {                                                                                             //Stampo la corretta chiusura
+        printf(BOLDGREEN "[!] Chiusura fifo completata\n" RESET);                                                       //
+    }                                                                                                                   //
+    if (!close(fd2_fifo)) {                                                                                             //Se la fifo è aperta la chiudo
+        printf(BOLDGREEN "[!] Chiusura fifo completata\n" RESET);                                                       //Stampo la corretta chiusura
+    }                                                                                                                   //
+    freeList(p);                                                                                                        //Libero la lista di processi che ho salvato
+    printf(BOLDGREEN "[COMPLETATO]" RESET " ... Chiusura processo terminata\n");                                        //Stampo a terminale la fine della chiusura processi
+    exit(-1);                                                                                                           //Eseguo exit con codice di ritorno -1
+}  //
 
 void sig_term_handler(int signum, siginfo_t *info, void *ptr) {
     value_return = err_kill_process_R();
