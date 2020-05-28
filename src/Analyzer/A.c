@@ -208,6 +208,8 @@ int main(int argc, char *argv[]) {  //Main
             FILE *debug = fopen(str, "a");      //
             fprintf(debug, "AVVIATO A\n");      //
             fclose(debug);                      //
+            printf("> ");                       //
+            fflush(stdout);
 
             while (value_return == 0 && !_close) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
 
@@ -237,7 +239,7 @@ int main(int argc, char *argv[]) {  //Main
                                 } else if (checkArg(cmd, &argCounter)) {                                                                                              //Verifica gli argomenti inseriti a comando
                                     tempPath = malloc(argCounter * sizeof(char *));                                                                                   //Alloca memoria a tempPath
                                     for (j = 0; j < argCounter; j++) {                                                                                                //Cicla da 0 al numero di argomenti
-                                        tempPath[j] = malloc(DIM_PATH * sizeof(char));                                                                                //Alloca a tempPath la dimensione DIM_PATH 
+                                        tempPath[j] = malloc(DIM_PATH * sizeof(char));                                                                                //Alloca a tempPath la dimensione DIM_PATH
                                     }                                                                                                                                 //
                                     strcpy(tempPath[0], strtok(cmd, " "));                                                                                            //Copia il comando cmd in tempPath[0] (cmd è il comando senza spazi)
                                     for (j = 1; j < argCounter; j++) {                                                                                                //Cicla da 0 al numero di argomenti
@@ -273,7 +275,7 @@ int main(int argc, char *argv[]) {  //Main
                                 } else if (checkArg(cmd, &argCounter)) {                                                                                                           //Verifica gli argomenti inseriti a comando
                                     tempPath = malloc(argCounter * sizeof(char *));                                                                                                //Alloca memoria a tempPath
                                     for (j = 0; j < argCounter; j++) {                                                                                                             //Cicla da 0 al numero di argomenti
-                                        tempPath[j] = malloc(DIM_PATH * sizeof(char));                                                                                             //Alloca a tempPath la dimensione DIM_PATH 
+                                        tempPath[j] = malloc(DIM_PATH * sizeof(char));                                                                                             //Alloca a tempPath la dimensione DIM_PATH
                                     }                                                                                                                                              //
                                     strcpy(tempPath[0], strtok(cmd, " "));                                                                                                         //Copia il comando cmd in tempPath[0] (cmd è il comando senza spazi)
                                     for (j = 1; j < argCounter; j++) {                                                                                                             //Cicla da 0 al numero di argomenti
