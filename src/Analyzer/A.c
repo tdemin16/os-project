@@ -217,6 +217,9 @@ int main(int argc, char *argv[]) {
                 if (!_close) {
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
                         if (!strncmp(cmd, "close", 5)) {
+                            debug = fopen(str, "a");
+                            fprintf(debug, "A: %s\n", cmd);
+                            fclose(debug);
                             closeAll(fd_1);
 
                             while (wait(NULL) > 0)
@@ -227,6 +230,9 @@ int main(int argc, char *argv[]) {
 
                         if (!strncmp(cmd, "add", 3)) {
                             if (!analyzing) {
+                                debug = fopen(str, "a");
+                                fprintf(debug, "A: %s\n", cmd);
+                                fclose(debug);
                                 if ((strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL)) {
                                     printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");
                                     fflush(stdout);
@@ -260,6 +266,9 @@ int main(int argc, char *argv[]) {
 
                         if (!strncmp(cmd, "remove", 6)) {
                             if (!analyzing) {
+                                debug = fopen(str, "a");
+                                fprintf(debug, "A: %s\n", cmd);
+                                fclose(debug);
                                 if ((strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL)) {
                                     printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");
                                     fflush(stdout);
@@ -296,6 +305,9 @@ int main(int argc, char *argv[]) {
 
                         if (!strncmp(cmd, "reset", 5)) {
                             if (!analyzing) {
+                                debug = fopen(str, "a");
+                                fprintf(debug, "A: %s\n", cmd);
+                                fclose(debug);
                                 resetPathList(lista);
                                 count = 0;
                                 memset(sum, '\0', sizeof(char) * DIM_RESP);
@@ -316,6 +328,9 @@ int main(int argc, char *argv[]) {
 
                         if (!strncmp(cmd, "reanalyze", 9)) {
                             if (!analyzing) {
+                                debug = fopen(str, "a");
+                                fprintf(debug, "A: %s\n", cmd);
+                                fclose(debug);
                                 for (j = 0; j < lista->count; j++) {
                                     lista->analyzed[j] = 0;
                                 }
@@ -340,6 +355,9 @@ int main(int argc, char *argv[]) {
 
                         if (!strncmp(cmd, "analyze", 7)) {
                             if (!analyzing) {
+                                debug = fopen(str, "a");
+                                fprintf(debug, "A: %s\n", cmd);
+                                fclose(debug);
                                 pathSent = 0;
                                 notAnalyzed = 0;
                                 perc = 0;
@@ -366,6 +384,9 @@ int main(int argc, char *argv[]) {
                         }
 
                         if (!strncmp(cmd, "set", 3)) {
+                            debug = fopen(str, "a");
+                            fprintf(debug, "A: %s\n", cmd);
+                            fclose(debug);
                             if (checkArg(cmd, &argCounter)) {
                                 if (argCounter == 2) {
                                     if (!strncmp(cmd, "setn", 4)) {
@@ -379,6 +400,7 @@ int main(int argc, char *argv[]) {
                                             if (analyzing) {
                                                 i = 0;
                                                 pathSent = perc;
+                                                _write = FALSE;
                                             }
                                         } else {
                                             printf("\nn non e` stato modificato.\n");
@@ -397,6 +419,7 @@ int main(int argc, char *argv[]) {
                                             if (analyzing) {
                                                 i = 0;
                                                 pathSent = perc;
+                                                _write = FALSE;
                                             }
                                         } else {
                                             printf("\nm non e` stato modificato.\n");
@@ -411,6 +434,7 @@ int main(int argc, char *argv[]) {
                                         if (analyzing) {
                                             i = 0;
                                             pathSent = perc;
+                                            _write = FALSE;
                                         }
                                     } else {
                                         printf("\nn e m non sono stati modificati.\n");
