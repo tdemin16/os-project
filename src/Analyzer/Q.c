@@ -115,18 +115,5 @@ int main(int argc, char* argv[]) {
             fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
         }
     }
-
-    respSent = FALSE;
-    strcpy(resp, "#CLOSE");
-    while (!respSent) {  //finchè la risposta non è stata inviata riprova
-        if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
-            if (errno != EAGAIN) {
-                value_return = err_write();
-            }
-        } else {
-            respSent = TRUE;
-        }
-    }
-
     return value_return;
 }
