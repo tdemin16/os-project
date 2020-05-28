@@ -19,7 +19,7 @@
 #define TRUE 1
 #define FALSE 0
 #define DIM_V 95
-#define DIM_RESP 1051
+#define DIM_RESP 2102
 #define DIM_CMD 4096
 #define DIM_PATH 4096
 
