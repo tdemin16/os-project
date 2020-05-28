@@ -94,7 +94,6 @@ int main(int argc, char* argv[]) {
             fprintf(debug, "AVVIATO P con m = %d\n", m);
             fclose(debug);
             while (value_return == 0 && (!_close)) {
-                usleep(500000);
                 //Write
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
