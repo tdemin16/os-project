@@ -100,36 +100,57 @@ int main() {                            //struttura main
         }                                                //
     }                                                    //
 
-    while (value_return == 0 && !_close) {                                                                                                                      //
-        if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {                                                                                                             //
-            if (!strncmp(cmd, "close", 5)) {                                                                                                                    //
-                _close = TRUE;                                                                                                                                  //
-                printf(BOLDWHITE "R" RESET ": Closing...\n");                                                                                                   //
-            } else if (!retrieve && (!strncmp(cmd, "print", 5) || !strncmp(cmd, "report", 6))) {                                                                //Add flags
-                retrieve = TRUE;                                                                                                                                //
-                _r_write = TRUE;                                                                                                                                //
-                checkArg(cmd, &spaces);                                                                                                                         //
-                if (strstr(cmd, "report") != NULL) {                                                                                                            //
-                    if (spaces != 2) {                                                                                                                          //
-                        _r_write = FALSE;                                                                                                                       //
-                        retrieve = FALSE;                                                                                                                       //
-                        printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");      //
-                        fflush(stdout);                                                                                                                         //
-                    } else {                                                                                                                                    //
-                        dupl = strdup(cmd);                                                                                                                     //
-                        flag = strtok(dupl, " ");                                                                                                               //
-                        flag = strtok(NULL, " ");                                                                                                               //
-                        if (strncmp(flag, "-c", 2) && strncmp(flag, "-a", 2)) {                                                                                 //
-                            _r_write = FALSE;                                                                                                                   //
-                            retrieve = FALSE;                                                                                                                   //
-                            printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");  //
-                            fflush(stdout);                                                                                                                     //
-                        } else {                                                                                                                                //
-                            strcpy(cmd, flag);                                                                                                                  //
-                        }                                                                                                                                       //
-                        free(dupl);                                                                                                                             //
-                    }                                                                                                                                           //
-                }                                                                                                                                               //
+    while (value_return == 0 && !_close) {
+        if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
+            if (!strncmp(cmd, "close", 5)) {
+                _close = TRUE;
+                printf(BOLDWHITE "R" RESET ": Closing...\n");
+            } else if (!retrieve && (!strncmp(cmd, "print", 5) || !strncmp(cmd, "report", 6))) {
+                retrieve = TRUE;
+                _r_write = TRUE;
+                checkArg(cmd, &spaces);
+                if (strstr(cmd, "report") != NULL) {
+                    if (spaces != 2) {
+                        _r_write = FALSE;
+                        retrieve = FALSE;
+                        printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
+                        fflush(stdout);
+                    } else {
+                        dupl = strdup(cmd);
+                        flag = strtok(dupl, " ");
+                        flag = strtok(NULL, " ");
+                        if (strncmp(flag, "-c", 2) && strncmp(flag, "-a", 2)) {
+                            _r_write = FALSE;
+                            retrieve = FALSE;
+                            printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
+                            fflush(stdout);
+                        } else {
+                            strcpy(cmd, flag);
+                        }
+                        free(dupl);
+                    }
+                }
+                if (strstr(cmd, "print") != NULL) {
+                    if (spaces > 2) {
+                        _r_write = FALSE;
+                        retrieve = FALSE;
+                        printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
+                        fflush(stdout);
+                    } else if (spaces == 2) {
+                        dupl = strdup(cmd);
+                        flag = strtok(dupl, " ");
+                        flag = strtok(NULL, " ");
+                        if (strncmp(flag, "-d", 2)) {
+                            _r_write = FALSE;
+                            retrieve = FALSE;
+                            printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
+                            fflush(stdout);
+                        } else {
+                            strcpy(cmd, flag);
+                        }
+                        free(dupl);
+                    }
+                }
                 while (value_return == 0 && _r_write) {
                     if (write(fd2_fifo, cmd, DIM_CMD) == -1) {
                         if (errno != EAGAIN) {

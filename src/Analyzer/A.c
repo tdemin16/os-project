@@ -68,11 +68,11 @@ int main(int argc, char *argv[]) {  //Main
     //Utility
     int i;
     int j;
-    int count = 0;    //numero di file univoci da analizzare
-    int perc = 0;     //Ricevimento parziale file
-    char n_exec[12];  //Stringa di appoggio per creare gli argomenti da dare a C
-    char m_exec[12];  //Stringa di appoggio per creare gli argomenti da dare a C
-    struct stat attr; //Necessaria per aggiornare last_edit di un file
+    int count = 0;     //numero di file univoci da analizzare
+    int perc = 0;      //Ricevimento parziale file
+    char n_exec[12];   //Stringa di appoggio per creare gli argomenti da dare a C
+    char m_exec[12];   //Stringa di appoggio per creare gli argomenti da dare a C
+    struct stat attr;  //Necessaria per aggiornare last_edit di un file
 
     char analyzing = FALSE;    //Indica se i figli stanno eseguendo l'analisi
     int pathSent = 0;          //Indica quanti percorsi sono stati mandati
@@ -528,11 +528,11 @@ int main(int argc, char *argv[]) {  //Main
 
                 //R
                 if (!_close && value_return == 0) {
-                    if (retrieve) {                                                                                                          //Se R puo` richiedere dati
-                        if (read(fd2_fifo, print_method, DIM_CMD) > 0) {                                                                     //Prova a leggere da R
-                            if (!strncmp(print_method, "print", 5) || !strncmp(print_method, "-c", 2) || !strncmp(print_method, "-a", 2)) {  //Controlla che i comandi ricevuti siano corretti
-                                retrieve = FALSE;                                                                                            //Se si smette di leggere da R per inviargli i dati
-                                if (analyzing) {                                                                                             //Se sta analizzando stampa un messaggio di errore
+                    if (retrieve) {                                                                                                                                             //Se R puo` richiedere dati
+                        if (read(fd2_fifo, print_method, DIM_CMD) > 0) {                                                                                                        //Prova a leggere da R
+                            if (!strncmp(print_method, "print", 5) || !strncmp(print_method, "-c", 2) || !strncmp(print_method, "-a", 2) || !strncmp(print_method, "-d", 2)) {  //Controlla che i comandi ricevuti siano corretti
+                                retrieve = FALSE;                                                                                                                               //Se si smette di leggere da R per inviargli i dati
+                                if (analyzing) {                                                                                                                                //Se sta analizzando stampa un messaggio di errore
                                     printf(BOLDYELLOW "\n[ATTENZIONE]" RESET " Analisi in corso, non e` possibile stampare\n");
                                 }
                             }
@@ -545,6 +545,16 @@ int main(int argc, char *argv[]) {  //Main
                                 }
                             } else {
                                 strcpy(tmp_resp, "#ANALYZING");  //Se e` in analisi, setta la stringa di fine invio ad #ANALYZING per indicare che R non puo` ottenere dati in questo momento
+                            }
+
+                            write(fd1_fifo, tmp_resp, DIM_PATH + 2);
+                            strcpy(tmp_resp, "///");  //RIpristina la stringa di fine carattere a "///" nel caso in cui sia stata modificata precedentemente
+                        }
+                        if (!strncmp(print_method, "-d", 2)) { //Se il comando e` -d
+                            if (!analyzing) { //Se non sta anlizzando
+                                //Inserire for con invio
+                            } else {
+                                strcpy(tmp_resp, "#ANALYZING"); //In caso contrario avverte R che in questo momento non puo` ottenere datei
                             }
 
                             write(fd1_fifo, tmp_resp, DIM_PATH + 2);
@@ -627,7 +637,7 @@ int main(int argc, char *argv[]) {  //Main
                                         if (!compare_mtime(lista, id_r, file)) {  //Controlla che non sia stato modificato durante l'analisi
                                             stat(file, &attr);
                                             lista->last_edit[id_r] = attr.st_mtime;
-                                            printf(BOLDYELLOW"[ATTENTION] "RESET"Il file %s\ne` stato modificato durante l'analisi.\nUsa il comando" BOLDWHITE " reanalyze" RESET " per rianalizzare tutti i file\n\n", file);
+                                            printf(BOLDYELLOW "[ATTENTION] " RESET "Il file %s\ne` stato modificato durante l'analisi.\nUsa il comando" BOLDWHITE " reanalyze" RESET " per rianalizzare tutti i file\n\n", file);
                                         }
                                     }
                                 } else {

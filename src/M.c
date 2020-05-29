@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {  //main
                 }
 
                 if (res_cmd == 1) {                                              //Il comando deve essere mandato ad R
-                    if (!strcmp(cmd, "print") || strstr(cmd, "report")) {        //Controllo se la stringa di comando è "print" o se contiene report
+                    if (strstr(cmd, "print") != NULL || strstr(cmd, "report") != NULL) {         //Controllo se la stringa di comando è "print" o se contiene report
                         while (value_return == 0 && _write) {                    //Scrive il comando ad R
                             if (write(fd[R * 2 + WRITE], cmd, DIM_CMD) == -1) {  //Verifico la corretta scrittura su R, in caso negativo controllo:
                                 if (errno != EAGAIN) {                           //Se l'errore è differente da EAGAIN
@@ -256,7 +256,7 @@ int check_command(char *cmd) {
 
     if (!strcmp(cmd, "close")) {  //Se il comando e` close
         res = 0;
-    } else if (strstr(cmd, "report") != NULL || !strcmp(cmd, "print")) {  //Se il comando contiene report oppure e` uguale a print
+    } else if (strstr(cmd, "report") != NULL || strstr(cmd, "print") != NULL) {  //Se il comando contiene report oppure e` uguale a print
         res = 1;
         if (!strncmp(cmd, "report", 6)) {
             checkArg(cmd, &spaces);
