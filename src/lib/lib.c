@@ -319,7 +319,7 @@ char sameId(char *a, char *b) {
 // Ctrl-C at keyboard
 
 //Aggiunge alla PathList passata tutti i file contenenti, restituisce 0 se è andato tutto bene
-int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, int *res, int* duplicate) {
+int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, int *res, int *duplicate) {
     char type;
     int i;
     FILE *fp;
@@ -491,8 +491,8 @@ int createPipe(int *fd, int size_pipe) {
     int i;
     int ret = 0;
     for (i = 0; i < size_pipe - 1; i += 2) {
-        if (pipe(fd + i) == -1) {       //Controlla se ci sono errori nella creazione della pipe
-            ret = ERR_PIPE;  //In caso di errore setta il valore di ritorno
+        if (pipe(fd + i) == -1) {  //Controlla se ci sono errori nella creazione della pipe
+            ret = ERR_PIPE;        //In caso di errore setta il valore di ritorno
         }
     }
     return ret;
@@ -961,31 +961,31 @@ void printCluster(char *char_count) {
 
 void printInfoCluster() {
     int i;
-    printf(WHITE"Lettere minuscole:\t"RESET);
+    printf(WHITE "Lettere minuscole:\t" RESET);
     for (i = 65; i <= 90; i++) {
         printf("%c ", i + 32);
     }
     printf("\n");
-    printf(WHITE"Lettere maiuscole:\t"RESET);
+    printf(WHITE "Lettere maiuscole:\t" RESET);
     for (i = 33; i <= 58; i++) {
         printf("%c ", i + 32);
     }
     printf("\n");
-    printf(WHITE"Spazi:\t "RESET);
+    printf(WHITE "Spazi:\t " RESET);
     printf("\n");
-    printf(WHITE"Numeri:\t\t\t"RESET);
+    printf(WHITE "Numeri:\t\t\t" RESET);
     for (i = 16; i <= 25; i++) {
         printf("%c ", i + 32);
     }
     printf("\n");
-    printf(WHITE"Segni di punteggiatura:\t"RESET);
+    printf(WHITE "Segni di punteggiatura:\t" RESET);
     for (i = 1; i <= 31; i++) {
         if (i == 1 || i == 2 || (i >= 7 && i <= 9) || (i >= 12 && i <= 15) || i == 26 || i == 27 || i == 31) {
             printf("%c ", i + 32);
         }
     }
     printf("\n");
-    printf(WHITE"Caratteri speciali:\t"RESET);
+    printf(WHITE "Caratteri speciali:\t" RESET);
     for (i = 3; i <= 94; i++) {
         if ((i >= 3 && i <= 6) || i == 10 || i == 11 || (i >= 28 && i <= 30) || i == 32 || (i >= 59 && i <= 64) || (i >= 91 && i <= 94)) {
             printf("%c ", i + 32);
@@ -1018,33 +1018,6 @@ int file_len(FILE *fp) {
         //printf("%d", len);
     }
     return len - 1;
-}
-
-m_process *splitter(FILE *fp, int m) {
-    //This is for splitting the parts
-    m_process *div = malloc(m);
-    int file_length = file_len(fp);   //get the length of the file in terms of chars
-    int int_div = (file_length / m);  //get the integer of the subdivision of the file
-    //double double_div = ((double)file_length / (double)m); //get the double of the subdivision of the file
-    int rest = file_length - (int_div * m);  //get the number of chars that are out of consideration
-    int i;
-
-    for (i = 0; i < m; i++) {
-        if (i == 0) {
-            div[i].begin = 0;
-        } else {
-            div[i].begin = div[i - 1].end;
-        }
-        div[i].end = div[i].begin + int_div;
-        //printf("\nRest: %d", rest);
-        if (rest != 0) {
-            div[i].end += 1;
-            rest--;
-        }
-        div[i].part = i;
-    }
-
-    return div;
 }
 
 //The next 3 functions are for conversion of (int) to (char*)
