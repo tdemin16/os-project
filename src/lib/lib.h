@@ -24,22 +24,15 @@
 #define DIM_PATH 4096
 
 #define ERR_ARGS_A 1
-#define ERR_PIPE 4
-#define ERR_FILE 5
-#define ERR_FORK 6
-#define ERR_WRITE 7
-#define ERR_FCNTL 8
-#define ERR_EXEC 9
-#define ERR_DATA 10
-#define ERR_FIFO 11
-#define ERR_UNLINK 12
-#define ERR_OPEN_PROC 13
-#define ERR_SIGNAL 14
-#define ERR_CLOSE 15
-#define ERR_ARGS_R 16
-#define ERR_ENXIO 18
-#define ERR_ARGS_M 19
-#define ERR_KILL_PROC 20
+#define ERR_PIPE 2
+#define ERR_FILE 3
+#define ERR_FORK 4
+#define ERR_WRITE 5
+#define ERR_FCNTL 6
+#define ERR_EXEC 7
+#define ERR_FIFO 8
+#define ERR_CLOSE 9
+#define ERR_KILL_PROC 10
 
 #define REMOVED -2
 #define INEXISTENCE -1
@@ -79,26 +72,22 @@ typedef struct {
     time_t *last_edit;
 } array;
 
-typedef struct m_process {
-    int begin;
-    int end;
-    int part;
-    //char *DIR; //Da usare per dare il file(???)
-} m_process;
-
 typedef struct process {
     int size;   //size of list process
     int *pid;   //vector containing all pids
     int count;  //counter to remember how many variables are inside the list
 } process;
 
-//functions for process to work
+//Funzione di gestione della struttura processi e gestione chiusura
 process *create_process(int);
 void insertProcess(process *, pid_t);
 void printList(process *);
 void freeList(process *);
+void add_process_to_v(pid_t, int *);
+void initialize_processes(pid_t *, int);
+void handle_sigint(int);
 
-//Array struct functions -- sostituiscono lista (momentaneamente?)
+//Funzioni di gestione della struttura PathList
 array *createPathList(int);
 void reallocPathList(array *, int);
 char insertPathList(array *, char *, int);
@@ -107,58 +96,60 @@ char removeFromPathList(array *, char *c);
 void printPathList(array *);
 void freePathList(array *);
 int dimPathList(array *);
-void setAnalyzed(array *, int, int);
-int getAnalyzed(array *, int);
 void resetPathList(array *);
 int compare_mtime(array *, int, char *);
 void cleanRemoved(array *);
 
-void close_pipes(int *, int);
-int unlock_pipes(int *, int);
-
-// /src/Analyzer/A.c
-int parser2(int, char **, array *, int *, int *, int *, int *, int*);
+//Parser e funzioni ausiliarie
+int parser2(int, char **, array *, int *, int *, int *, int *, int *);
 int parser_CheckArguments(int, char **, int *, int *);
 int parser_LenghtCommand(char *);
 void parser_CreateCommand(char *);
-void handle_sigint(int);
-int parse_string(char *, int *v);
-void add_process_to_v(pid_t, int *);
-void initialize_processes(pid_t *, int);
-char fileExist(char *);
-void setOnFly(int, int, int *);
-void setmOnFly(int, int *);
-void closeAll(int *);
-void reallocPipe(int *, int);
-int createPipe(int *, int);
-//parser A.c
-char checkArg(char *, int *);
 
-// /src/Analyzer/C.c
-void parseOnFly(char *, int *, int *);
-int parseSetOnFly(char* ,int*,int*);
-void mParseOnFly(char *, int *);
-void nClearAndClose(int *, int);
-void mSendOnFly(int *, int, int);
+//Funzioni
+void setAnalyzed(array *, int, int);
+int getAnalyzed(array *, int);
+
+//Funzioni IPC
+void close_pipes(int *, int);
+int unlock_pipes(int *, int);
 void forkC(int *, int *, int *, int *);
 void forkP(int *, int *, int *, int *);
 void execC(int *, int *, int *, int *, int *, int *);
 void execP(int *, int *, int *, int *, int *, int *);
-// /src/Analyzer/Q.c
+int createPipe(int *, int);
+
+//Funzioni Set on Fly e chiusura
+void setOnFly(int, int, int *);
+void setmOnFly(int, int *);
+void mParseOnFly(char *, int *);
+void parseOnFly(char *, int *, int *);
+int parseSetOnFly(char *, int *, int *);
+void nClearAndClose(int *, int);
+void mSendOnFly(int *, int, int);
+void closeAll(int *);
+
+//Funzioni di elaborazione stringhe e vettori
+int parse_string(char *, int *v);
 void initialize_vector(long *);
 void set_add(long *, char);
 void get_subset(int *, long *, int, int);
-void print_vector(int *);
 void get_frequencies(int *, long *, int, int);
-//int err_file_open(); used here
-
-// /src/Analyzer/P.c
 int file_len(FILE *);
-m_process *splitter(FILE *, int);
-inline void swap(char *, char *);
-char *reverse(char *, int, int);
-char *itoa(int, char *, int);
 void arrayToCsv(long *, char *);
+
+//Funzioni di controllo percorsi
+char fileExist(char *);
+
+//Funzioni di controllo e parsing comandi
+char checkArg(char *, int *);
+
+//Funzioni di output
+void printStat(char *);
+void analyzeCluster(char *, char *);
+void printCluster(char *);
+void printInfoCluster();
+
 char *integer_to_string(int);
 int countDigit(int);
 int lenghtCsv(int *);
@@ -166,17 +157,8 @@ char sumCsv(char *, char *);
 void createCsv(long *, char *, char *);
 char addCsvToArray(char *, long *);
 char sameId(char *, char *);
-//int err_file_open(); used here
 
-// /src/R.c
-void printStat(char *);
-void analyzeCluster(char *, char *);
-void printCluster(char *);
-void printInfoCluster();
-float roundValue(float, int);
-void percAvanzamento(int, int);
-
-//Error handlers
+//Errori
 int err_file_open();
 int err_pipe();
 int err_args_A();
@@ -187,16 +169,8 @@ int err_fork();
 int err_write();
 int err_fcntl();
 int err_exec(int);
-int err_m_not_valid();
-int err_part_not_valid();
-int err_process_open(pid_t);
 int err_fifo();
-int err_unlink();
-int err_signal();
 int err_close();
-int err_args_R();
-int err_enxio();
-int err_args_M();
 int err_kill_process_R();
 int err_kill_process_A();
 int err_kill_process_C();

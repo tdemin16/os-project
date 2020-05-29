@@ -45,7 +45,6 @@ int main(int argc, char* argv[]) {
 
     //Parsing arguments-------------------------------------------------------
     m = atoi(argv[1]);
-    if (m == 0) value_return = err_m_not_valid();
 
     //Generating pipes-------------------------------------------------------
     if (value_return == 0) {
