@@ -93,6 +93,7 @@ int main(int argc, char* argv[]) {
             FILE* debug = fopen(str, "a");
             fprintf(debug, "AVVIATO P con m = %d\n", m);
             fclose(debug);
+            value_return = 1;
             while (value_return == 0 && (!_close)) {
                 //Write
                 if (!_write) {                                         //Se non ha finito di scrivere
@@ -120,8 +121,8 @@ int main(int argc, char* argv[]) {
                                     if (createPipe(fd, size_pipe) != 0) {
                                         value_return = err_pipe();
                                     }
-                                    if (unlock_pipes(fd, size_pipe) == -1) {     //Set nonblocking pipes
-                                        value_return = err_fcntl();              //Gestione errore sullo sblocco pipe
+                                    if (unlock_pipes(fd, size_pipe) == -1) {  //Set nonblocking pipes
+                                        value_return = err_fcntl();           //Gestione errore sullo sblocco pipe
                                     }
                                     forkP(&m, &f, &id, &value_return);                              //Forko i processi
                                     if (f == 0) execP(&m, &f, &id, fd, &value_return, &size_pipe);  //Exec dei processi forkati
@@ -242,6 +243,26 @@ int main(int argc, char* argv[]) {
             free(fd);
             freePathList(sum);
         }
+    }
+
+    if (value_return != 0) {
+        char str[15];
+        sprintf(str, "P%d.txt", getpid());
+        FILE* debug = fopen(str, "a");
+        fprintf(debug, "Devo andare con il kill di %d:\n", f);
+        if (f == 0) {
+            pid_t to_kill = getppid();  // ricevo il pid padre da killare
+            fprintf(debug, "Killo %d\n", to_kill);
+            if (kill(to_kill, 9) != 0) {
+                fprintf(debug, "Kill già avvenuto(?)");
+            }
+        }
+
+        else {  //è un processo padre
+            fprintf(debug, "Processo padre\n");
+            wait(0);
+        }
+        fclose(debug);
     }
 
     if (value_return == 0) {
