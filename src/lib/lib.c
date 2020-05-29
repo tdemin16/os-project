@@ -1134,21 +1134,6 @@ int err_input_A(char *file) {
     return ERR_ARGS_A;
 }
 
-int err_args_C() {
-    fprintf(stderr, "\nErrore argomenti C\n\n");
-    return ERR_ARGS_C;
-}
-
-int err_args_Q() {
-    fprintf(stderr, "[!] Errore nella sintassi del comando\nusa: ./Q inizio_analisi fine_analisi\n");
-    return ERR_ARGS_Q;
-}
-
-int err_args_P() {
-    fprintf(stderr, "[!] Errore nella sintassi del comando\nusa: ./P m\n");
-    return ERR_ARGS_P;
-}
-
 int err_file() {
     fprintf(stderr, "Errore, nessun file inserito\n");
     return ERR_FILE;
@@ -1166,12 +1151,6 @@ int err_write() {
 //Error if fopen has failed //Refers to Q.c
 int err_file_open() {
     fprintf(stderr, "[!] Errore nell'apertura del file\n");
-    return ERR_FILE;
-}
-
-//Error if end point is over EOF //Refers to Q.c
-int err_end_file() {
-    fprintf(stderr, "\n[!] Errore, sei andato oltre la fine del file\n");
     return ERR_FILE;
 }
 

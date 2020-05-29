@@ -24,8 +24,6 @@
 #define DIM_PATH 4096
 
 #define ERR_ARGS_A 1
-#define ERR_ARGS_C 2
-#define ERR_ARGS_Q 3
 #define ERR_PIPE 4
 #define ERR_FILE 5
 #define ERR_FORK 6
@@ -39,7 +37,6 @@
 #define ERR_SIGNAL 14
 #define ERR_CLOSE 15
 #define ERR_ARGS_R 16
-#define ERR_ARGS_P 17
 #define ERR_ENXIO 18
 #define ERR_ARGS_M 19
 #define ERR_KILL_PROC 20
@@ -153,8 +150,6 @@ void set_add(long *, char);
 void get_subset(int *, long *, int, int);
 void print_vector(int *);
 void get_frequencies(int *, long *, int, int);
-//int err_end_file(); used here
-//int err_args_Q(); used here
 //int err_file_open(); used here
 
 // /src/Analyzer/P.c
@@ -171,7 +166,6 @@ char sumCsv(char *, char *);
 void createCsv(long *, char *, char *);
 char addCsvToArray(char *, long *);
 char sameId(char *, char *);
-//int err_args_P(); used here
 //int err_file_open(); used here
 
 // /src/R.c
@@ -185,13 +179,9 @@ void percAvanzamento(int, int);
 //Error handlers
 int err_file_open();
 int err_pipe();
-int err_end_file();
 int err_args_A();
 int err_overflow();
 int err_input_A(char *);
-int err_args_C();
-int err_args_P();
-int err_args_Q();
 int err_file();
 int err_fork();
 int err_write();

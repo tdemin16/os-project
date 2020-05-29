@@ -44,12 +44,8 @@ int main(int argc, char* argv[]) {
     int pendingPath = 0;
 
     //Parsing arguments-------------------------------------------------------
-    if (argc != 2) {
-        value_return = err_args_P();
-    } else {
-        m = atoi(argv[1]);
-        if (m == 0) value_return = err_m_not_valid();
-    }
+    m = atoi(argv[1]);
+    if (m == 0) value_return = err_m_not_valid();
 
     //Generating pipes-------------------------------------------------------
     if (value_return == 0) {
@@ -91,7 +87,7 @@ int main(int argc, char* argv[]) {
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
-                            if (!strncmp(path, "#", 1)) {  //Se si tratta di un comando
+                            if (!strncmp(path, "#", 1)) {              //Se si tratta di un comando
                                 if (!strncmp(path, "#CLOSE", 6)) {
                                     _read = TRUE;
                                     _close = TRUE;
