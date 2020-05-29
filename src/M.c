@@ -14,8 +14,8 @@ void handle_sigint(int sig) {        //handler per il CTRL-C, ha l'obiettivo di
             i--;
         }
     }
-    freeList(p);         //Libero la lista di processi che ho salvato
-    exit(-1);  //Eseguo exit con codice di ritorno -1
+    freeList(p);  //Libero la lista di processi che ho salvato
+    exit(-1);     //Eseguo exit con codice di ritorno -1
 }
 
 int main(int argc, char *argv[]) {  //main
@@ -150,10 +150,12 @@ int main(int argc, char *argv[]) {  //main
                             while (read(fptr, c, 1)) putchar(c[0]);  //Finché puoi leggere dal file stampa i caratteri (fino ad ottenere l'intero file)
                             close(fptr);                             //Infine chiudi il file
                         } else {                                     //Altrimenti c'è stato un errore nell'apertura del file
-                            err_file_open();                         //
-                        }                                            //
-                        printf("\n> ");                              //A capo
-                        fflush(stdout);                              //Libero il buffer
+                            err_file_open();
+                        }
+                        printf(BOLDWHITE"\nCRITERI DI CLUSTERING\n"RESET);
+                        printInfoCluster();
+                        printf("\n> ");  //A capo
+                        fflush(stdout);  //Libero il buffer
                     } else {
                         printf(BOLDBLUE "\nLista Comandi disponibili\n" RESET);                                                                      //STAMPA INFO
                         printf(BOLDWHITE "add </path1> </path2>" RESET ": aggiunge uno o piu` file e/o una o piu` directory\n");                     //

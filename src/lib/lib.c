@@ -961,31 +961,31 @@ void printCluster(char *char_count) {
 
 void printInfoCluster() {
     int i;
-    printf("Lettere minuscole:\t");
+    printf(WHITE"Lettere minuscole:\t"RESET);
     for (i = 65; i <= 90; i++) {
         printf("%c ", i + 32);
     }
     printf("\n");
-    printf("Lettere maiuscole:\t");
+    printf(WHITE"Lettere maiuscole:\t"RESET);
     for (i = 33; i <= 58; i++) {
         printf("%c ", i + 32);
     }
     printf("\n");
-    printf("Spazi:\t ");
+    printf(WHITE"Spazi:\t "RESET);
     printf("\n");
-    printf("Numeri:\t\t\t");
+    printf(WHITE"Numeri:\t\t\t"RESET);
     for (i = 16; i <= 25; i++) {
         printf("%c ", i + 32);
     }
     printf("\n");
-    printf("Segni di punteggiatura:\t");
+    printf(WHITE"Segni di punteggiatura:\t"RESET);
     for (i = 1; i <= 31; i++) {
         if (i == 1 || i == 2 || (i >= 7 && i <= 9) || (i >= 12 && i <= 15) || i == 26 || i == 27 || i == 31) {
             printf("%c ", i + 32);
         }
     }
     printf("\n");
-    printf("Caratteri speciali:\t");
+    printf(WHITE"Caratteri speciali:\t"RESET);
     for (i = 3; i <= 94; i++) {
         if ((i >= 3 && i <= 6) || i == 10 || i == 11 || (i >= 28 && i <= 30) || i == 32 || (i >= 59 && i <= 64) || (i >= 91 && i <= 94)) {
             printf("%c ", i + 32);
