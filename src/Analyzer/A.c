@@ -326,9 +326,9 @@ int main(int argc, char *argv[]) {  //Main
                                                 printf("\n");
                                             }
                                             if (lista->count == 0) {
-                                                printf("La lista dei file e' vuota, per resettare il risultati precedenti usare" BOLDWHITE "reset" RESET "\n\n");  //
+                                                printf("La lista dei file e' vuota, per resettare il risultati precedenti usare" BOLDWHITE "reset" RESET "\n\n");
                                             } else {
-                                                printf("Per analizzare anche i file che sono gia' stati analizzati usare il comando " BOLDWHITE "reanalyze" RESET "\n\n");  //
+                                                printf("Per analizzare anche i file che sono gia' stati analizzati usare il comando " BOLDWHITE "reanalyze" RESET "\n\n");
                                             }
 
                                         } else {
@@ -382,7 +382,6 @@ int main(int argc, char *argv[]) {  //Main
                                     initialize_vector(v);                        //Azzera i valori contenuti in v
                                     _write = FALSE;                              //Abilita la scrittura
                                     time(&start);                                //Inizio timer
-                                    printf("\n");
                                 } else {  //Messaggio nel caso di lista vuota
                                     printf(BOLDYELLOW "\n[ATTENTION]" RESET " Non ci sono file da analizzare\n\n> ");
                                     fflush(stdout);
@@ -403,7 +402,7 @@ int main(int argc, char *argv[]) {  //Main
                                     time(&start);
                                 }  //Inizio timer
                                 else {
-                                    printf("\nNon ci sono file da analizzare\n\n> ");
+                                    printf(BOLDYELLOW "\n[ATTENTION]" RESET " Non ci sono file da analizzare\n\n> ");
                                     fflush(stdout);
                                 }
                             } else {
@@ -644,7 +643,7 @@ int main(int argc, char *argv[]) {  //Main
                                 count -= lista->count;
                                 time(&end);  //Diminuisce count della lunghezza della lista
                                 elapsed = difftime(end, start);
-                                printf(WHITE "Analizzati " RESET "%d " WHITE "files in %d secondi" RESET "\n", pathSent - notAnalyzed, (int)elapsed);
+                                printf(WHITE "\nAnalizzati " RESET "%d " WHITE "files in %d secondi" RESET "\n", pathSent - notAnalyzed, (int)elapsed);
                                 arrayToCsv(v, sum);  //Crea la stringa delle somme
                                 pathSent = 0;        //Setta i percorsi inviati a 0
                                 analyzing = FALSE;  //Esce dalla procedura di analisi
