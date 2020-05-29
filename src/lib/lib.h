@@ -145,6 +145,8 @@ void printStat(char *);
 void analyzeCluster(char *, char *);
 void printCluster(char *);
 void printInfoCluster();
+void printHelp();
+void printInfo();
 
 
 

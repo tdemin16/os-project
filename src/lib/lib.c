@@ -8,31 +8,31 @@ process *create_process(int size) {
     st->count = 0;                                     //Set count to 0 (start point)
     int i;                                             //Declaring a new int
     for (i = 0; i < size; i++)                         //for cycle from 0 to end point
-    {                                                  //
-        st->pid[i] = -1;                               //Set the default value (-1) to every pid in the list
-    }                                                  //
+    {
+        st->pid[i] = -1;  //Set the default value (-1) to every pid in the list
+    }
     //printf("Lista allocata\n");
     return st;  //return process
 }
 
-void insertProcess(process *tmp, pid_t val) {                            //Insert process val in list tmp
-    if (tmp->count == tmp->size)                                         //If tmp->pid isn't enough big to contain another value
-    {                                                                    //
+void insertProcess(process *tmp, pid_t val) {  //Insert process val in list tmp
+    if (tmp->count == tmp->size)               //If tmp->pid isn't enough big to contain another value
+    {
         int i;                                                           //Initialize i
         tmp->size *= 2;                                                  //We doubled the size
         tmp->pid = (int *)realloc(tmp->pid, sizeof(int *) * tmp->size);  //We realloc it's memory to double it
         for (i = tmp->count; i < tmp->size; i++) {                       //Cycle from old size to new size
             tmp->pid[i] = -1;                                            //Set pid[i] to -1 (from old size to new size)
-        }                                                                //
-    }                                                                    //
-    tmp->pid[tmp->count] = val;                                          //Insert the pid "val" in position count of tmp
-    tmp->count++;                                                        //Increase the count of variables inside
+        }
+    }
+    tmp->pid[tmp->count] = val;  //Insert the pid "val" in position count of tmp
+    tmp->count++;                //Increase the count of variables inside
 }
 
 void freeList(process *tmp) {  // free the list tmp
     free(tmp->pid);            // free the array of pid
     free(tmp);                 // free the list tmp
-}  //
+}
 
 void initialize_processes(pid_t *p, int dim) {
     int i;
@@ -791,7 +791,6 @@ char checkArg(char cmd[DIM_CMD], int *argCounter) {
     return ret;
 }
 
-
 void printStat(char *char_count) {
     int v[DIM_V];
     int i, k;
@@ -930,6 +929,51 @@ void printInfoCluster() {
         }
     }
     printf("\n");
+}
+
+void printHelp() {
+    printf(BOLDWHITE "\nLISTA COMANDI DISPONIBILI\n" RESET);
+    printf(BOLDWHITE "add </path1> </path2>" RESET ": aggiunge uno o piu` file e/o una o piu` directory\n");
+    printf(BOLDBLACK "\t es: add ../src ../deploy.sh\n" RESET);
+    printf(BOLDWHITE "remove </path1> </path2>" RESET ": rimuove uno o piu` file e/o una o piu` directory\n");
+    printf(BOLDBLACK "\t es: remove ../src ../deploy.sh\n" RESET);
+    printf(BOLDWHITE "reset" RESET ": elimina dalla cache del programma le statistiche e tutti i percorsi analizzati e non\n");
+    printf(BOLDWHITE "print" RESET " <-flag>\n");
+    printf(WHITE "\tNessun flag" RESET ": stampa tutti i file inseriti\n");
+    printf(WHITE "\t-d" RESET ": stampa tutti i file che dall'ultima analisi sono risultati inesistenti\n");
+    printf(WHITE "\t-x" RESET ": stampa tutti i file che sono stati analizzati\n");
+    printf(BOLDWHITE "analyze" RESET ": analizza tutti i file non ancora analizzati\n");
+    printf(BOLDWHITE "reanalyze" RESET ": analizza tutti i file anche quelli gia` analizzati\n");
+    printf(BOLDWHITE "stat" RESET ": durante l'analisi stampa a video lo stato di avanzamento\n");
+    printf(BOLDWHITE "set <n> <m>" RESET ": setta i nuovi valori di n e m\n");
+    printf(BOLDBLACK "\t es: set 4 5\n" RESET);
+    printf(BOLDWHITE "setn <val>" RESET ": setta i nuovi valori di n\n");
+    printf(BOLDBLACK "\t es: setn 4\n" RESET);
+    printf(BOLDWHITE "setm <val>" RESET ": setta i nuovi valori di m\n");
+    printf(BOLDBLACK "\t es: setm 5\n" RESET);
+    printf(BOLDWHITE "report" RESET " <-flag>\n");
+    printf(WHITE "\t-c" RESET ": stampa le statistiche per cluster\n");
+    printf(WHITE "\t-a" RESET ": stampa la frequenza di ogni carattere\n");
+    printf(BOLDWHITE "info" RESET ": mostra informazioni aggiuntive sul programma\n");
+    printf(BOLDWHITE "close" RESET ": chiude il programma\n\n> ");
+    fflush(stdout);
+}
+
+void printInfo() {
+    int fptr;
+    char c[1];
+    fptr = open("../README.txt", O_RDONLY);  //Apre il file di README in sola lettura
+    printf("\n");
+    if (fptr != -1) {                            //Se non ci sono stati errori
+        while (read(fptr, c, 1)) putchar(c[0]);  //Stampa del README.txt
+        close(fptr);                             //Chiude il file
+    } else {
+        err_file_open();
+    }
+    printf(BOLDWHITE "\nCRITERI DI CLUSTERING\n" RESET);
+    printInfoCluster();  //Stampa il criteri con il quale viene eseguito il clustering
+    printf("\n> ");
+    fflush(stdout);
 }
 
 //Error handlers

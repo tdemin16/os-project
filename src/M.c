@@ -31,15 +31,41 @@ int main(int argc, char *argv[]) {  //main
     int _write = TRUE;
     int i;
     int id;
-    int fptr;
-    int c[1];
 
     //IPC Variables--------------------------------------------------
     int fd[4];
     char array_args[4];
 
+    if (argc == 1) {
+        printf(BOLDWHITE "\nBENVENUTO\n" RESET);
+        printf("Usa " WHITE "help" RESET " per vedere l'elenco dei comandi\n");
+        printf("Usa " WHITE "info" RESET " per avere informazioni riguardo al programma\n");
+        printf("Usa " WHITE "close" RESET " per chiudere il programma\n");
+        printf("Premi " WHITE "invio" RESET " per avviare il programma\n\n> ");
+        fflush(stdout);
+        do {
+            strcpy(cmd, "");  //svuota la stringa per il prossimo comando
+            fflush(stdout);
+            ch = '\0';
+
+            while (ch != '\n') {  //fino al "lancio" (invio, '\n') del comando continua a leggere caratteri
+                ch = getc(stdin);
+                if (ch != '\n') strcat(cmd, &ch);  //concatena il carattere alla stringa cmd, ma evita di concatenare '\n'
+            }
+
+            if (!strcmp(cmd, "info")) {  //Se il comando e` info
+                printInfo();
+            } else if(!strcmp(cmd, "help")){  //Help comandi
+                printHelp();
+            } else if(!strcmp(cmd, "close")){
+                end = TRUE;
+            }
+
+        } while (strcmp(cmd, "") && strncmp(cmd, "close", 5));
+    }
+
     //IPC
-    if (value_return == 0) {                //Se il value return rimane a zero (=> non ci sono errori) prosegui
+    if (value_return == 0 && !end) {        //Se il value return rimane a zero (=> non ci sono errori) prosegui
         for (i = 0; i < 3; i += 2) {        //Cicla
             if (pipe(fd + i) == -1) {       //Controlla se ci sono errori nella creazione della pipe
                 value_return = err_pipe();  //In caso di errore setta il valore di ritorno
@@ -48,13 +74,13 @@ int main(int argc, char *argv[]) {  //main
     }
 
     //Set Non-blocking pipes (Shouldn't block anyway, just to be sure)
-    if (value_return == 0) {              //Se il value return rimane a zero (=> non ci sono errori) prosegui
+    if (value_return == 0 && !end) {      //Se il value return rimane a zero (=> non ci sono errori) prosegui
         if (unlock_pipes(fd, 4) == -1) {  //Se non riesci a sbloccare le pipe
             value_return = err_fcntl();   //Assegna a value return l'errore di fcntl
         }
     }
     insertProcess(p, getpid());                                  //Inserisci il processo con pid padre nella lista processi
-    if (value_return == 0) {                                     //Se il value return rimane a zero (=> non ci sono errori) prosegui
+    if (value_return == 0 && !end) {                             //Se il value return rimane a zero (=> non ci sono errori) prosegui
         for (i = 0; i < 2 && f > 0 && value_return == 0; i++) {  //Esegue il ciclo solo il padre e se non ci sono errori
             f = fork();                                          //esegui fork
             if (f == 0)
@@ -141,46 +167,11 @@ int main(int argc, char *argv[]) {  //main
                     _write = TRUE;  //Reimposta la write a TRUE
                 }
 
-                if (res_cmd == 3) {                              //Il comando spetta ad M
-                    if (!strcmp(cmd, "info")) {                  //Se il comando e` info
-                        fptr = open("../README.txt", O_RDONLY);  //Apre il file di README in sola lettura
-                        printf("\n");
-                        if (fptr != -1) {                            //Se non ci sono stati errori
-                            while (read(fptr, c, 1)) putchar(c[0]);  //Stampa del README.txt
-                            close(fptr);                             //Chiude il file
-                        } else {
-                            err_file_open();
-                        }
-                        printf(BOLDWHITE "\nCRITERI DI CLUSTERING\n" RESET);
-                        printInfoCluster();  //Stampa il criteri con il quale viene eseguito il clustering
-                        printf("\n> ");
-                        fflush(stdout);
+                if (res_cmd == 3) {              //Il comando spetta ad M
+                    if (!strcmp(cmd, "info")) {  //Se il comando e` info
+                        printInfo();
                     } else {  //Help comandi
-                        printf(BOLDWHITE "\nLISTA COMANDI DISPONIBILI\n" RESET);
-                        printf(BOLDWHITE "add </path1> </path2>" RESET ": aggiunge uno o piu` file e/o una o piu` directory\n");
-                        printf(BOLDBLACK "\t es: add ../src ../deploy.sh\n" RESET);
-                        printf(BOLDWHITE "remove </path1> </path2>" RESET ": rimuove uno o piu` file e/o una o piu` directory\n");
-                        printf(BOLDBLACK "\t es: remove ../src ../deploy.sh\n" RESET);
-                        printf(BOLDWHITE "reset" RESET ": elimina dalla cache del programma le statistiche e tutti i percorsi analizzati e non\n");
-                        printf(BOLDWHITE "print" RESET " <-flag>\n");
-                        printf(WHITE "\tNessun flag" RESET ": stampa tutti i file inseriti\n");
-                        printf(WHITE "\t-d" RESET ": stampa tutti i file che dall'ultima analisi sono risultati inesistenti\n");
-                        printf(WHITE "\t-x" RESET ": stampa tutti i file che sono stati analizzati\n");
-                        printf(BOLDWHITE "analyze" RESET ": analizza tutti i file non ancora analizzati\n");
-                        printf(BOLDWHITE "reanalyze" RESET ": analizza tutti i file anche quelli gia` analizzati\n");
-                        printf(BOLDWHITE "stat" RESET ": durante l'analisi stampa a video lo stato di avanzamento\n");
-                        printf(BOLDWHITE "set <n> <m>" RESET ": setta i nuovi valori di n e m\n");
-                        printf(BOLDBLACK "\t es: set 4 5\n" RESET);
-                        printf(BOLDWHITE "setn <val>" RESET ": setta i nuovi valori di n\n");
-                        printf(BOLDBLACK "\t es: setn 4\n" RESET);
-                        printf(BOLDWHITE "setm <val>" RESET ": setta i nuovi valori di m\n");
-                        printf(BOLDBLACK "\t es: setm 5\n" RESET);
-                        printf(BOLDWHITE "report" RESET " <-flag>\n");
-                        printf(WHITE "\t-c" RESET ": stampa le statistiche per cluster\n");
-                        printf(WHITE "\t-a" RESET ": stampa la frequenza di ogni carattere\n");
-                        printf(BOLDWHITE "info" RESET ": mostra informazioni aggiuntive sul programma\n");
-                        printf(BOLDWHITE "close" RESET ": chiude il programma\n\n> ");
-                        fflush(stdout);
+                        printHelp();
                     }
                 }
             }
@@ -192,7 +183,7 @@ int main(int argc, char *argv[]) {  //main
         }
     }
 
-    if (value_return == 0) {
+    if (value_return == 0 && !end) {
         if (id == A && f == 0) {  //A SIDE
 
             strcpy(array_args, "./A");  //Copio ./A nella stringa array_args
@@ -212,7 +203,7 @@ int main(int argc, char *argv[]) {  //main
         }
     }
 
-    if (value_return == 0) {
+    if (value_return == 0 && !end) {
         if (id == R && f == 0) {                   //R SIDE
             strcpy(array_args, "./R");             //Copio "./R" nella stringa di array_args
             argv[0] = array_args;                  //ad argv[0] assegno array_args
