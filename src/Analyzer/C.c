@@ -95,7 +95,8 @@ int main(int argc, char* argv[]) {
             FILE* debug = fopen(str, "a");
             fprintf(debug, "AVVIATO C\n");
             fclose(debug);
-            while (value_return == 0 && (!_close)) {  //Cicla finche` non ha finito di leggere o scrivere o va in errore
+            value_return = 1;
+            while (value_return == 0 && (!_close)) {                   //Cicla finche` non ha finito di leggere o scrivere o va in errore
                 if (!_write) {                                         //CICLO DI SCRITTURA
                     if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
@@ -229,6 +230,9 @@ int main(int argc, char* argv[]) {
                     fprintf(debug, "C: SLEEP\n");
                     fclose(debug);
                 }
+                debug = fopen(str, "a");
+                fprintf(debug, "C: value_return = %d\n", value_return);
+                fclose(debug);
             }
 
             while (wait(NULL) > 0)
@@ -238,6 +242,25 @@ int main(int argc, char* argv[]) {
             close_pipes(fd, size_pipe);  //Chiude tutte le pipes
             free(fd);                    //Libera la memoria delle pipes
         }
+    }
+    if (value_return != 0) {
+        char str[15];
+        sprintf(str, "C%d.txt", getpid());
+        FILE* debug = fopen(str, "a");
+        fprintf(debug, "Devo andare con il kill di %d:\n", getpid());
+        if (getpid() == 0) {
+            pid_t to_kill = getppid();  // ricevo il pid padre da killare
+            fprintf(debug, "Killo %d\n", to_kill);
+            if (kill(to_kill, 9) != 0) {
+                fprintf(debug, "Kill già avvenuto(?)");
+            }
+        }
+
+        else {  //è un processo padre
+            fprintf(debug, "Processo padre\n");
+            wait(0);
+        }
+        fclose(debug);
     }
 
     if (value_return == 0) {
