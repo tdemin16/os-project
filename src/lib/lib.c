@@ -791,56 +791,7 @@ char checkArg(char cmd[DIM_CMD], int *argCounter) {
     return ret;
 }
 
-void reallocPipe(int *fd, int size_pipe) {
-    free(fd);
-    fd = (int *)malloc(size_pipe * sizeof(int));
-}
 
-// /src/Analyzer/C.c
-
-//Retrun -1 if n and m are the same as before, 0 otherwise
-
-void add_process_to_v(pid_t f, int *v) {
-    int i = 0;
-    while (v[i] != 0) {
-        i++;
-    }
-    v[i] = f;
-}
-
-///src/Analyzer/Q.c
-//Initialize frequence vector all to 0
-
-//Increase frequence of the global vector in the position val_ascii
-
-//get the chars from the .txt files from the begin (b) to the end (e)
-
-//display how meny times chars are in the text (display only visited chars)
-void print_vector(int v[]) {
-    int i;
-    for (i = 0; i < DIM_V; i++) {
-        if (v[i] != 0) {
-            printf("\n%c è comparso %d volte", (i + 32), v[i]);
-        }
-    }
-}
-
-int countDigit(int n) {
-    int count = 0;
-    if (n == 0) {
-        count++;
-    } else {
-        while (n != 0) {
-            n = n / 10;
-            ++count;
-        }
-    }
-    return count;
-}
-
-///src/C.c
-
-///src/R.c
 void printStat(char *char_count) {
     int v[DIM_V];
     int i, k;
