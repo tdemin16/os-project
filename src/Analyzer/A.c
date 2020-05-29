@@ -5,26 +5,26 @@ process *p;            //Dichiaro p (è globale perché handle_sigint non può a
 int fd1_fifo;          //A writes in R
 int fd2_fifo;          //R writes in A
 
-void handle_sigint(int sig) {                                                                                             //handler per il CTRL-C, ha l'obiettivo di
-    int i = p->count - 1;                                                                                                 //Parto dalla fine (poiché nella lista i processi figli vengono salvati dopo il processo padre)
-    if (i > 0) {                                                                                                          //Se i > 0 => ci sono processi avviati
-        while (i != 0) {                                                                                                  //Ciclo while fino a quando non ho controllato tutti i processi
-            if (p->pid[i] > 0) {                                                                                          //Controllo che non sia un processo padre
-                if (kill(p->pid[i], 9) == 0) {                                                                            //Provo a killare il pid[i]
-                    printf(BOLDGREEN "\tProcesso %d terminato con successo!\n" RESET, p->pid[i]);                         //Se ha successo allora stampo la corretta terminazione
-                } else {                                                                                                  //Altrimenti
-                    printf(RED "\t[ERRORE]" RESET " Errore, non sono riuscito a chiudere il processo %d!", p->pid[i]);    //Qualcosa è andato storto nel kill
-                }                                                                                                         //
-            }                                                                                                             //
-            i--;                                                                                                          //itero i--
-        }                                                                                                                 //
-    }                                                                                                                     //
-    if (!close(fd1_fifo) && !close(fd2_fifo)) {                                                                           //close fifo
-        printf(BOLDGREEN "[!]" RESET " Chiusura fifo completata\n");                                                      //
-    }                                                                                                                     //
-    freeList(p);                                                                                                          //Libero la lista di processi che ho salvato
-    printf(BOLDGREEN "[COMPLETATO]" RESET " ... Chiusura processo terminata\n");                                          //Stampo a terminale la fine della chiusura processi
-    exit(-1);                                                                                                             //Eseguo exit con codice di ritorno -1
+void handle_sigint(int sig) {                                                                                           //handler per il CTRL-C, ha l'obiettivo di
+    int i = p->count - 1;                                                                                               //Parto dalla fine (poiché nella lista i processi figli vengono salvati dopo il processo padre)
+    if (i > 0) {                                                                                                        //Se i > 0 => ci sono processi avviati
+        while (i != 0) {                                                                                                //Ciclo while fino a quando non ho controllato tutti i processi
+            if (p->pid[i] > 0) {                                                                                        //Controllo che non sia un processo padre
+                if (kill(p->pid[i], 9) == 0) {                                                                          //Provo a killare il pid[i]
+                    printf(BOLDGREEN "\tProcesso %d terminato con successo!\n" RESET, p->pid[i]);                       //Se ha successo allora stampo la corretta terminazione
+                } else {                                                                                                //Altrimenti
+                    printf(RED "\t[ERRORE]" RESET " Errore, non sono riuscito a chiudere il processo %d!", p->pid[i]);  //Qualcosa è andato storto nel kill
+                }                                                                                                       //
+            }                                                                                                           //
+            i--;                                                                                                        //itero i--
+        }                                                                                                               //
+    }                                                                                                                   //
+    if (!close(fd1_fifo) && !close(fd2_fifo)) {                                                                         //close fifo
+        printf(BOLDGREEN "[!]" RESET " Chiusura fifo completata\n");                                                    //
+    }                                                                                                                   //
+    freeList(p);                                                                                                        //Libero la lista di processi che ho salvato
+    printf(BOLDGREEN "[COMPLETATO]" RESET " ... Chiusura processo terminata\n");                                        //Stampo a terminale la fine della chiusura processi
+    exit(-1);                                                                                                           //Eseguo exit con codice di ritorno -1
 }  //
 
 void sig_term_handler(int signum, siginfo_t *info, void *ptr) {  //handler per SIGTERM
@@ -246,7 +246,7 @@ int main(int argc, char *argv[]) {  //Main
                                         strcpy(tempPath[j], strtok(NULL, " "));  //Stessa copia della riga superirore
                                     }
                                     if (parser2(argCounter, tempPath, lista, &count, &n, &m, &vReturn, &duplicate) == 0) {  //Se il parsing funziona (=> i file sono stati aggiunti correttamente)
-                                        printf("\n" WHITE "Aggiunti" RESET " %d files\n", vReturn);             //Stampo il corretto parsing
+                                        printf("\n" WHITE "Aggiunti" RESET " %d files\n", vReturn);                         //Stampo il corretto parsing
                                     } else {
                                         //err_args_A();
                                     }
@@ -501,8 +501,8 @@ int main(int argc, char *argv[]) {  //Main
                                         free(dupl);  //Libera la memoria della stringa d'appoggio
                                     }
                                 } else if (argCounter == 3) {                                  //Se il numero di argomenti e` 3
-                                    if (strncmp(cmd, "setm", 3) && strncmp(cmd, "setn", 3)) {  //Controlla che non ci sia scritto sem o setn
-                                        if (parseSetOnFly(cmd, &n, &m) == 0) {                 //Controlla che la correttezza del comando
+                                    if (strncmp(cmd, "setm", 4) && strncmp(cmd, "setn", 4)) {  //Controlla che non ci sia scritto sem o setn
+                                        if (parseSetOnFly(cmd, &n, &m) == 0) {  //Controlla che la correttezza del comando
                                             printf("\n" BOLDYELLOW "[ATTENTION]" RESET " n e m sono stati modificati\n\n");
                                             setOnFly(n, m, fd_1);  //Avvia la procedura di setOnFLy
                                             if (analyzing) {       //Se il sistema sta analizzando
@@ -566,6 +566,7 @@ int main(int argc, char *argv[]) {  //Main
                                 strcpy(type_resp, "#ANALYZING");  //Avverte R della situazione
                             } else {
                                 strcpy(type_resp, sum);  //Copia nella stringa di risposta la somma dei valori
+                                printf("Invio %s\n", type_resp);
                             }
                             write(fd1_fifo, type_resp, DIM_RESP);  //Scrive la risposta
                         }
