@@ -4,25 +4,19 @@ int check_command(char *str);  //controlla il comando un numero corrispondente: 
 
 process *p;  //Declaring p (it's global because hendle_sigint can't have parameters, only int sig)
 
-void handle_sigint(int sig) {                                                                                           //handler per il CTRL-C, ha l'obiettivo di
-    printf(BOLDYELLOW "\n[ATTENZIONE]" RESET " Ricevuta terminazione per R, inizio terminazione processo ... \n");      //Stampo a terminale la corretta ricezione del comando Ctrl-C
-    int i = p->count - 1;                                                                                               //Parto dalla fine (poiché nella lista i processi figli vengono salvati dopo il processo padre)
-    if (i > 0) {                                                                                                        //Se i > 0 => ci sono processi avviati
-        while (i != 0) {                                                                                                //Ciclo while fino a quando non ho controllato tutti i processi
-            if (p->pid[i] > 0) {                                                                                        //Controllo che non sia un processo padre
-                if (kill(p->pid[i], 9) == 0) {                                                                          //Provo a killare il pid[i]
-                    printf(BOLDGREEN "\tProcesso %d terminato con successo!\n" RESET, p->pid[i]);                       //Se ha successo allora stampo la corretta terminazione
-                } else {                                                                                                //Altrimenti
-                    printf(RED "\t[ERRORE]" RESET " Errore, non sono riuscito a chiudere il processo %d!", p->pid[i]);  //Qualcosa è andato storto nel kill
-                }                                                                                                       //
-            }                                                                                                           //
-            i--;                                                                                                        //itero i--
-        }                                                                                                               //
-    }                                                                                                                   //
-    freeList(p);                                                                                                        //Libero la lista di processi che ho salvato
-    printf(BOLDGREEN "[COMPLETATO]" RESET " ... Chiusura processo terminata\n");                                        //Stampo a terminale la fine della chiusura processi
-    exit(-1);                                                                                                           //Eseguo exit con codice di ritorno -1
-}  //
+void handle_sigint(int sig) {        //handler per il CTRL-C, ha l'obiettivo di
+    int i = p->count - 1;            //Parto dalla fine (poiché nella lista i processi figli vengono salvati dopo il processo padre)
+    if (i > 0) {                     //Se i > 0 => ci sono processi avviati
+        while (i != 0) {             //Ciclo while fino a quando non ho controllato tutti i processi
+            if (p->pid[i] > 0) {     //Controllo che non sia un processo padre
+                kill(p->pid[i], 9);  //Provo a killare il pid[i]
+            }
+            i--;  //itero i--
+        }
+    }
+    freeList(p);  //Libero la lista di processi che ho salvato
+    exit(-1);     //Eseguo exit con codice di ritorno -1
+}
 
 int main(int argc, char *argv[]) {  //main
     signal(SIGINT, handle_sigint);  //Handler per SIGINT (Ctrl-C)
@@ -116,8 +110,9 @@ int main(int argc, char *argv[]) {  //main
                         }                                                    //
                     }                                                        //
                     _write = TRUE;                                           //Reimposto la write a TRUE
-                    while (wait(NULL) > 0);                                  // ---??? Non comprendo il perché del ciclo ???---
-                }                                                            //
+                    while (wait(NULL) > 0)
+                        ;  // ---??? Non comprendo il perché del ciclo ???---
+                }          //
 
                 if (res_cmd == 1) {                                              //Se invece res_cmd == 1 dobbiamo stabilire una connessione tra il processo M ed R
                     if (!strcmp(cmd, "print") || strstr(cmd, "report")) {        //Controllo se la stringa di comando è "print" o se contiene report
