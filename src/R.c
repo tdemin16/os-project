@@ -140,7 +140,7 @@ int main() {                            //struttura main
                         dupl = strdup(cmd);
                         flag = strtok(dupl, " ");
                         flag = strtok(NULL, " ");
-                        if (strncmp(flag, "-d", 2)) {
+                        if (strncmp(flag, "-d", 2) && strncmp(flag, "-x", 2)) {
                             _r_write = FALSE;
                             retrieve = FALSE;
                             printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
@@ -186,6 +186,24 @@ int main() {                            //struttura main
                 }
             }
             if (!strncmp(cmd, "-d", 2)) {
+                if (read(fd1_fifo, path, DIM_PATH) > 0) {
+                    if (strstr(path, "#") != NULL) {
+                        if (strncmp(path, "#ANALYZING", 10)) {
+                            printf("%s\n", path);
+                            usleep(10000);
+                            arr = TRUE;
+                        } else {
+                            retrieve = FALSE;
+                        }
+                    } else if (!strncmp(path, "///", 3)) {
+                        retrieve = FALSE;
+                        if (!arr) printf("Lista vuota\n");
+                        printf("\n> ");
+                        fflush(stdout);
+                    }
+                }
+            }
+            if (!strncmp(cmd, "-x", 2)) {
                 if (read(fd1_fifo, path, DIM_PATH) > 0) {
                     if (strstr(path, "#") != NULL) {
                         if (strncmp(path, "#ANALYZING", 10)) {
