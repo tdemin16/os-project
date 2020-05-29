@@ -100,14 +100,17 @@ int main(int argc, char *argv[]) {  //Main
     long v[DIM_V];        //Array con valori totali
     int notAnalyzed = 0;  //Flag indicante se e` avvenuta o meno la lettura della pipe
     int argCounter = 0;
+    int totFiles = 0;
     initialize_vector(v);  //Inizializzazione vettore dei valori totali
     int val = 0;
-
+    time_t start, end;
+    double elapsed;
     if (argc > 1) {                                                              //Caso in cui ci sono degli argomenti all'avvio
         val = parser2(argc, argv, lista, &count, &n, &m, &vReturn, &duplicate);  //Parsing degli argomenti
         if (val == 0) {                                                          //Controlla i parametri passati ad A
             if (vReturn > 0) {                                                   //Vuol dire che c'è stato un errore nell'inserimento di PathList
                 _write = FALSE;                                                  //Non può scrivere
+                time(&start);
             }
         } else {
             system("clear");                                  //Libera il terminale
@@ -371,7 +374,8 @@ int main(int argc, char *argv[]) {  //Main
                                 for (j = 0; j < lista->count; j++) {  //Setta tutti i file come non analizzati
                                     lista->analyzed[j] = 0;
                                 }
-                                pathSent = 0;                                    //Azzera il numero di percorsi da inviare
+                                pathSent = 0;  //Azzera il numero di percorsi da inviare
+                                totFiles = 0;
                                 notAnalyzed = 0;                                 //Azzera il numero di percorsi non analizzati
                                 perc = 0;                                        //Azzerca il numero di percorsi ritornati
                                 count = lista->count;                            //Setta count alla quantita` di percorsi inseriti nella lista
@@ -379,6 +383,7 @@ int main(int argc, char *argv[]) {  //Main
                                     memset(sum, '\0', sizeof(char) * DIM_RESP);  //Setta la stringa dei totali a '\0
                                     initialize_vector(v);                        //Azzera i valori contenuti in v
                                     _write = FALSE;                              //Abilita la scrittura
+                                    time(&start);                                //Inizio timer
                                     printf("\n");
                                 } else {  //Messaggio nel caso di lista vuota
                                     printf(BOLDYELLOW "\n[ATTENTION]" RESET " Non ci sono file da analizzare\n\n> ");
@@ -393,10 +398,13 @@ int main(int argc, char *argv[]) {  //Main
                         if (!strncmp(cmd, "analyze", 7)) {  //Se il comando inserito e` analyze
                             if (!analyzing) {               //Controlla che il sistema non sia in analisi
                                 pathSent = 0;               //Azzera il numero di percorsi inviati
-                                notAnalyzed = 0;            //Azzera il numero di percorsi non analizzati
-                                perc = 0;                   //Azzera il numero di percorsi ritornati
-                                if (count > 0)              //Se ci sono dei file da poter analizzare
-                                    _write = FALSE;         //Abilita la scrittura
+                                totFiles = 0;
+                                notAnalyzed = 0;     //Azzera il numero di percorsi non analizzati
+                                perc = 0;            //Azzera il numero di percorsi ritornati
+                                if (count > 0) {     //Se ci sono dei file da poter analizzare
+                                    _write = FALSE;  //Abilita la scrittura
+                                    time(&start);
+                                }  //Inizio timer
                                 else
                                     printf("\nNon ci sono file da analizzare\n");
                             } else {
@@ -488,7 +496,7 @@ int main(int argc, char *argv[]) {  //Main
                                 printf(BOLDYELLOW "\n[ATTENTION]" RESET " Il comando " WHITE "stat" RESET " puo` essere utilizzato solo durante l'analisi.\n\n> ");
                                 fflush(stdout);
                             } else {
-                                printf(WHITE"Percentuale avanzamento"RESET": %.3g%%\n\n", (float)perc / (float)pathSent * 100);
+                                printf(WHITE "Percentuale avanzamento" RESET ": %.3g%%\n\n", (float)perc / (float)totFiles * 100);
                             }
                         }
                     }
@@ -575,8 +583,9 @@ int main(int argc, char *argv[]) {  //Main
                                 value_return = err_write();                            //Ritorna l'errore sulla scrittura
                             }
                         } else {
-                            i++;                  //Passa all'elemento successivo
-                            pathSent++;           //Incrementa il numero di percorsi inviati
+                            i++;         //Passa all'elemento successivo
+                            pathSent++;  //Incrementa il numero di percorsi inviati
+                            totFiles++;
                             if (pathSent == 1) {  //Se ha inviato il primo percorso
                                 _read = FALSE;    //Abilita la read
                             }
@@ -625,23 +634,16 @@ int main(int argc, char *argv[]) {  //Main
                                 perc++;                      //Aumenta il numero di file ricevuti
                             }
 
-                            //Barretta
-
-                            /* char *ptr = strchr(lista->pathList[id_r], '\0');
-                            if (ptr) {
-                                int index = ptr - lista->pathList[id_r];
-                                char *last_ten = &lista->pathList[id_r][index - 50];
-                                printf("\033[A\33[2KT\r"BOLDGREEN"[ANALYZED]"RESET" ..%s\n", last_ten);
-                                fflush(stdout);
-                            } */
-
-                            if (_write == TRUE && perc == pathSent && value_return == 0) {  //Se ha finito di scrivere e ha ricevuto tutti i percorsi
-                                count -= lista->count;                                      //Diminuisce count della lunghezza della lista
-                                printf(WHITE "Numero file analizzati" RESET ": %d\n", pathSent - notAnalyzed);
+                            if (_write == TRUE && perc == totFiles && value_return == 0) {  //Se ha finito di scrivere e ha ricevuto tutti i percorsi
+                                count -= lista->count;
+                                time(&end);  //Diminuisce count della lunghezza della lista
+                                elapsed = difftime(end, start);
+                                printf(WHITE "Analizzati " RESET "%d " WHITE "files in %d secondi"RESET"\n", totFiles - notAnalyzed, (int)elapsed);
                                 arrayToCsv(v, sum);  //Crea la stringa delle somme
                                 pathSent = 0;        //Setta i percorsi inviati a 0
-                                analyzing = FALSE;   //Esce dalla procedura di analisi
-                                _read = FALSE;       //Smette di leggere
+                                totFiles = 0;
+                                analyzing = FALSE;  //Esce dalla procedura di analisi
+                                _read = FALSE;      //Smette di leggere
                                 if (notAnalyzed > 0) {
                                     printf(BOLDWHITE "[ATTENZIONE]" RESET " %d file non analizzati. Usare il comando " WHITE "print -d" RESET " visualizzare i file non piu\n", notAnalyzed);
                                 }
