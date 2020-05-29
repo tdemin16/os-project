@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {  //Main
             }
 
             while (value_return == 0 && !_close) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
-
+sleep(1);
                 //M - STDIN
                 if (!_close) {                                   //Controlla close non sia già settato a true
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {  //La read non ha errori

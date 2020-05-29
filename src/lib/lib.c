@@ -585,6 +585,21 @@ void closeAll(int *fd_1) {
     }
 }
 
+void nCleanSon(int *fd, int n) {
+    char cleanPipe = FALSE;
+    int son = 0;
+    cleanPipe = FALSE;
+    char resp[DIM_RESP];
+    while (!cleanPipe) {  //Ciclo per svuotare tutte le pipe in lettura da Q a P
+        cleanPipe = TRUE;
+        for (son = 0; son < n; son++) {  //Cicla tra tutti i figli
+            if (read(fd[son * 4 + 0], resp, DIM_RESP) > 0) {
+                cleanPipe = FALSE;
+            }
+        }
+    }
+}
+
 int parse_string(char *string, int v[DIM_V]) {
     int i = 0;
     int max = 0;

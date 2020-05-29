@@ -46,6 +46,7 @@ int main(int argc, char* argv[]) {
         value_return = err_fcntl();
     }
     while (value_return == 0 && !_close) {
+        sleep(1);
         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //Legge un percorso
             pendingPath++;
             if (pendingPath == 1) {

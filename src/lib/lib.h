@@ -120,6 +120,7 @@ int parseSetOnFly(char *, int *, int *);
 void nClearAndClose(int *, int);
 void mSendOnFly(int *, int, int);
 void closeAll(int *);
+void nCleanSon(int *, int);
 
 //Funzioni di elaborazione stringhe e vettori
 int parse_string(char *, int *v);

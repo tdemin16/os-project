@@ -88,6 +88,7 @@ int main(int argc, char* argv[]) {
         j = 0;
         if (f > 0) {                                                   //PARENT SIDE
             while (value_return == 0 && (!_close)) {                   //Cicla finche` non ha finito di leggere o scrivere o va in errore
+                sleep(1);
                 if (!_write) {                                         //CICLO DI SCRITTURA
                     if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
