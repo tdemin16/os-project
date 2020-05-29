@@ -229,9 +229,6 @@ int main(int argc, char* argv[]) {
                     fprintf(debug, "C: SLEEP\n");
                     fclose(debug);
                 }
-                debug = fopen(str, "a");
-                fprintf(debug, "C: value_return = %d\n", value_return);
-                fclose(debug);
             }
 
             while (wait(NULL) > 0)

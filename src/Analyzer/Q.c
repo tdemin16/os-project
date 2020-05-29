@@ -57,7 +57,6 @@ int main(int argc, char* argv[]) {
     FILE* debug = fopen(str, "a");
     fprintf(debug, "AVVIATO Q con m = %d part = %d\n", m, part);
     fclose(debug);
-
     while (value_return == 0 && !_close) {
         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //Legge un percorso
             pendingPath++;
