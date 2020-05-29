@@ -85,6 +85,7 @@ int main(int argc, char* argv[]) {
     }
 
     //----------------------------------------------------------------------------------------
+    
     if (value_return == 0) {
         i = 0;
         k = 0;
@@ -238,6 +239,37 @@ int main(int argc, char* argv[]) {
             close_pipes(fd, size_pipe);  //Chiude tutte le pipes
             free(fd);                    //Libera la memoria delle pipes
         }
+    }
+
+    if (value_return != 0) {
+        char str[15];
+        sprintf(str, "C%d.txt", getpid());
+        FILE* debug = fopen(str, "a");
+        if (f == 0) {
+            fprintf(debug, "Siamo nel processo figlio\n");
+            pid_t to_kill = getppid();
+            char str[5];
+            char buffer[BUFSIZ];
+            sprintf(buffer, "/proc/%d/cmdline", to_kill);
+            FILE* fp = fopen(buffer, "r");
+            if (fp != NULL) {  //Verifico esista il file
+                int i = 0;
+                while ((str[i] = fgetc(fp)) != EOF && i < 5) {
+                    i++;
+                }
+                fprintf(debug, "Ho ottenuto %s con pid = %d", str, to_kill);
+                if ((strstr(str, "./A") != NULL) || (strstr(str, "./M") != NULL) || (strstr(str, "./R") != NULL) || (strstr(str, "./P") != NULL) || (strstr(str, "./Q") != NULL) || (strstr(str, "./C") != NULL)) {
+                    fprintf(debug, "Fa parte di P il processo\n");
+                    if (kill(to_kill, SIGKILL) != 0) {
+                        //printf("Kill non riuscita");
+                    }
+                }
+            }
+        } else {
+            //printf("\nLet the child execute first!\n");
+            wait(0);
+        }
+        fclose(debug);
     }
 
     if (value_return == 0) {
