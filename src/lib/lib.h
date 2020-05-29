@@ -100,7 +100,6 @@ char sameId(char *, char *);
 int parser2(int, char **, array *, int *, int *, int *, int *, int *);
 int parser_CheckArguments(int, char **, int *, int *);
 int parser_LenghtCommand(char *);
-void parser_CreateCommand(char *);
 
 //Funzioni IPC
 void close_pipes(int *, int);

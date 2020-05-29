@@ -41,7 +41,6 @@ void initialize_processes(pid_t *p, int dim) {
     }
 }
 
-
 array *createPathList(int size) {                        //allocate an array for the PathList
     array *st = (array *)malloc(sizeof(array));          //allocate list of paths
     st->size = size;                                     //assign the size of the array
@@ -120,34 +119,6 @@ char insertPathList(array *tmp, char *c, int val) {
     return ret;
 }
 
-char removeFromPathList(array *tmp, char *c) {
-    int i;
-    char ret = FALSE;
-    char *dup1 = NULL;
-    char *dup2 = NULL;
-    char *compare1;
-    char *compare2;
-
-    for (i = 0; i < tmp->count; i++) {
-        dup1 = strdup(tmp->pathList[i]);
-        dup2 = strdup(c);
-        compare1 = strtok(dup1, "#");
-        compare1 = strtok(NULL, "#");
-        compare2 = strtok(dup2, "#");
-        compare2 = strtok(NULL, "#");
-
-        if (!strcmp(compare1, compare2)) {
-            if (tmp->analyzed[i] != REMOVED) {
-                tmp->analyzed[i] = REMOVED;
-                ret = TRUE;
-            }
-        }
-        free(dup1);
-        free(dup2);
-    }
-    return ret;
-}
-
 int insertAndSumPathList(array *tmp, char *c, int val) {
     int i;
     char sum = FALSE;
@@ -180,6 +151,34 @@ int insertAndSumPathList(array *tmp, char *c, int val) {
     return ret;
 }
 
+char removeFromPathList(array *tmp, char *c) {
+    int i;
+    char ret = FALSE;
+    char *dup1 = NULL;
+    char *dup2 = NULL;
+    char *compare1;
+    char *compare2;
+
+    for (i = 0; i < tmp->count; i++) {
+        dup1 = strdup(tmp->pathList[i]);
+        dup2 = strdup(c);
+        compare1 = strtok(dup1, "#");
+        compare1 = strtok(NULL, "#");
+        compare2 = strtok(dup2, "#");
+        compare2 = strtok(NULL, "#");
+
+        if (!strcmp(compare1, compare2)) {
+            if (tmp->analyzed[i] != REMOVED) {
+                tmp->analyzed[i] = REMOVED;
+                ret = TRUE;
+            }
+        }
+        free(dup1);
+        free(dup2);
+    }
+    return ret;
+}
+
 void freePathList(array *tmp) {
     int i;
     for (i = 0; i < tmp->size; i++) {
@@ -189,20 +188,6 @@ void freePathList(array *tmp) {
     free(tmp->analyzed);
     free(tmp->last_edit);
     free(tmp);
-}
-
-void setAnalyzed(array *tmp, int pos, int value) {
-    if (pos >= tmp->count) {
-        printf("Errore, il file da analizzare non e` presente in questa posizione\n");
-    } else if (value > -1 && value < 3) {
-        tmp->analyzed[pos] = value;
-    } else {
-        printf("Errore, valore assegnato al percorso non valido\n");
-    }
-}
-
-int getAnalyzed(array *tmp, int pos) {
-    return tmp->analyzed[pos];  //-1 if not analyzed
 }
 
 void resetPathList(array *tmp) {
@@ -245,25 +230,6 @@ void cleanRemoved(array *lista) {
     }
     freePathList(tmp);
 }
-
-//Returns -1 if fails
-int unlock_pipes(int *fd, int size) {
-    int i;
-    int ret = 0;
-    for (i = 0; i < size && ret == 0; i++) {
-        if (fcntl(fd[i], F_SETFL, O_NONBLOCK)) {
-            ret = -1;
-        }
-    }
-    return ret;
-}
-
-void close_pipes(int *fd, int size) {
-    int i;
-    for (i = 0; i < size; i++) {
-        close(fd[i]);
-    }
-}
 char sameId(char *a, char *b) {
     char ret = FALSE;
     char *dup1 = NULL;
@@ -280,11 +246,6 @@ char sameId(char *a, char *b) {
     return ret;
 }
 
-// /src/Analyzer/A.c
-// Handler for SIGINT, caused by
-// Ctrl-C at keyboard
-
-//Aggiunge alla PathList passata tutti i file contenenti, restituisce 0 se è andato tutto bene
 int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, int *res, int *duplicate) {
     char type;
     int i;
@@ -390,15 +351,91 @@ int parser_CheckArguments(int argc, char *argv[], int *n, int *m) {
     return ret;
 }
 
-char fileExist(char *fname) {
-    char ret = FALSE;
-    if (access(fname, F_OK) != -1) ret = TRUE;
+//Returns -1 if fails
+
+void close_pipes(int *fd, int size) {
+    int i;
+    for (i = 0; i < size; i++) {
+        close(fd[i]);
+    }
+}
+
+int unlock_pipes(int *fd, int size) {
+    int i;
+    int ret = 0;
+    for (i = 0; i < size && ret == 0; i++) {
+        if (fcntl(fd[i], F_SETFL, O_NONBLOCK)) {
+            ret = -1;
+        }
+    }
+    return ret;
+}
+
+void forkC(int *n, int *f, int *id, int *value_return) {
+    int i;
+    for (i = 0; i<*n && * f> 0 && *value_return == 0; i++) {
+        *f = fork();
+        if (*f == 0) {
+            *id = i;                     //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
+        } else if (*f == -1) {           //Controllo che non ci siano stati errori durante il fork
+            *value_return = err_fork();  //In caso di errore setta il valore di ritorno a ERR_FORK
+        }
+    }
+}
+void forkP(int *m, int *f, int *id, int *value_return) {
+    int i;
+    for (i = 0; i<*m && * f> 0 && *value_return == 0; i++) {
+        *f = fork();
+        if (*f == 0) {
+            *id = i;                     //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
+        } else if (*f == -1) {           //Controllo che non ci siano stati errori durante il fork
+            *value_return = err_fork();  //In caso di errore setta il valore di ritorno a ERR_FORK
+        }
+    }
+}
+
+void execC(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) {
+    char str[12];
+    sprintf(str, "%d", *m);
+    char *args[3] = {"./P", str, NULL};
+    dup2(fd[*id * 4 + 2], STDIN_FILENO);
+    dup2(fd[*id * 4 + 1], STDOUT_FILENO);
+    close_pipes(fd, *size_pipe);
+    free(fd);
+    if (execvp(args[0], args) == -1) {  //Test exec
+        //fprintf(stderr, "%d", errno);
+        *value_return = err_exec(errno);  //Set value return
+    }
+}
+void execP(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) {
+    char str[12];
+    sprintf(str, "%d", *id);
+    char str2[12];
+    sprintf(str2, "%d", *m);
+    char *args[4] = {"./Q", str, str2, NULL};
+    dup2(fd[*id * 4 + 2], STDIN_FILENO);
+    dup2(fd[*id * 4 + 1], STDOUT_FILENO);
+    close_pipes(fd, *size_pipe);
+    free(fd);
+    if (execvp(args[0], args) == -1) {  //Test exec
+        //fprintf(stderr, "%d", errno);
+        *value_return = err_exec(errno);  //Set value return
+    }
+}
+
+int createPipe(int *fd, int size_pipe) {
+    int i;
+    int ret = 0;
+    for (i = 0; i < size_pipe - 1; i += 2) {
+        if (pipe(fd + i) == -1) {  //Controlla se ci sono errori nella creazione della pipe
+            ret = ERR_PIPE;        //In caso di errore setta il valore di ritorno
+        }
+    }
     return ret;
 }
 
 void setOnFly(int n, int m, int *fd_1) {
     if (fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) {
-        //value_return = err_fcntl();
     }
     char resp[DIM_RESP];
     while (read(fd_1[READ], resp, DIM_RESP) > 0) {
@@ -407,11 +444,11 @@ void setOnFly(int n, int m, int *fd_1) {
     sprintf(onFly, "#SET#%d#%d#", n, m);
     if (write(fd_1[WRITE], onFly, DIM_PATH) == -1) {  //Prova a scrivere sulla pipe
         if (errno != EAGAIN) {                        //Se avviene un errore e non e` causato dalla dimensione della pipe
-            //value_return = err_write();               //Ritorna l'errore sulla scrittura
         } else
             fprintf(stderr, "errore set on-fly, pipe piena");
     }
 }
+
 void setmOnFly(int m, int *fd_1) {
     if (fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) {
         //value_return = err_fcntl();
@@ -429,59 +466,15 @@ void setmOnFly(int m, int *fd_1) {
     }
 }
 
-void closeAll(int *fd_1) {
-    if (fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) {
-        //value_return = err_fcntl();
-    }
-    char path[DIM_PATH];
-    while (read(fd_1[READ], path, DIM_PATH) > 0) {
-    }
-    if (write(fd_1[WRITE], "#CLOSE", DIM_PATH) == -1) {  //Prova a scrivere sulla pipe
-        if (errno != EAGAIN) {                           //Se avviene un errore e non e` causato dalla dimensione della pipe
-            //value_return = err_write();               //Ritorna l'errore sulla scrittura
-        }
-    }
+void mParseOnFly(char *path, int *m) {
+    char *token;
+    char *dupPath = strdup(path);
+    token = strtok(dupPath, "#");
+    token = strtok(NULL, "#");
+    *m = atoi(token);
+    free(dupPath);
 }
 
-void reallocPipe(int *fd, int size_pipe) {
-    free(fd);
-    fd = (int *)malloc(size_pipe * sizeof(int));
-}
-int createPipe(int *fd, int size_pipe) {
-    int i;
-    int ret = 0;
-    for (i = 0; i < size_pipe - 1; i += 2) {
-        if (pipe(fd + i) == -1) {  //Controlla se ci sono errori nella creazione della pipe
-            ret = ERR_PIPE;        //In caso di errore setta il valore di ritorno
-        }
-    }
-    return ret;
-}
-
-char checkArg(char cmd[DIM_CMD], int *argCounter) {
-    int j;
-    char ret = TRUE;
-    if (!(strstr(cmd, "  ") != NULL)) {
-        *argCounter = 1;
-        for (j = 0; j < DIM_CMD; j++) {
-            //printf("%d\n", cmd[j]);
-            if (cmd[j] == ' ') {
-                (*argCounter)++;
-            }
-            if (cmd[j] == '\0') {
-                if (cmd[j - 1] == ' ')
-                    ret = FALSE;
-                else
-                    j = DIM_CMD - 1;
-            }
-        }
-    } else {
-        ret = FALSE;
-    }
-    return ret;
-}
-
-// /src/Analyzer/C.c
 void parseOnFly(char *path, int *n, int *m) {
     char *token;
     char *dupPath = strdup(path);
@@ -493,7 +486,6 @@ void parseOnFly(char *path, int *n, int *m) {
     free(dupPath);
 }
 
-//Retrun -1 if n and m are the same as before, 0 otherwise
 int parseSetOnFly(char *string, int *n, int *m) {
     int tmpn;
     int tmpm;
@@ -514,15 +506,6 @@ int parseSetOnFly(char *string, int *n, int *m) {
 
     free(dupPath);
     return ret;
-}
-
-void mParseOnFly(char *path, int *m) {
-    char *token;
-    char *dupPath = strdup(path);
-    token = strtok(dupPath, "#");
-    token = strtok(NULL, "#");
-    *m = atoi(token);
-    free(dupPath);
 }
 
 void nClearAndClose(int *fd, int n) {
@@ -583,64 +566,19 @@ void mSendOnFly(int *fd, int n, int m) {
         }
     }
 }
-void forkC(int *n, int *f, int *id, int *value_return) {
-    int i;
-    for (i = 0; i<*n && * f> 0 && *value_return == 0; i++) {
-        *f = fork();
-        if (*f == 0) {
-            *id = i;                     //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
-        } else if (*f == -1) {           //Controllo che non ci siano stati errori durante il fork
-            *value_return = err_fork();  //In caso di errore setta il valore di ritorno a ERR_FORK
+
+void closeAll(int *fd_1) {
+    if (fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) {
+        //value_return = err_fcntl();
+    }
+    char path[DIM_PATH];
+    while (read(fd_1[READ], path, DIM_PATH) > 0) {
+    }
+    if (write(fd_1[WRITE], "#CLOSE", DIM_PATH) == -1) {  //Prova a scrivere sulla pipe
+        if (errno != EAGAIN) {                           //Se avviene un errore e non e` causato dalla dimensione della pipe
+            //value_return = err_write();               //Ritorna l'errore sulla scrittura
         }
     }
-}
-void forkP(int *m, int *f, int *id, int *value_return) {
-    int i;
-    for (i = 0; i<*m && * f> 0 && *value_return == 0; i++) {
-        *f = fork();
-        if (*f == 0) {
-            *id = i;                     //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
-        } else if (*f == -1) {           //Controllo che non ci siano stati errori durante il fork
-            *value_return = err_fork();  //In caso di errore setta il valore di ritorno a ERR_FORK
-        }
-    }
-}
-
-void execC(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) {
-    char str[12];
-    sprintf(str, "%d", *m);
-    char *args[3] = {"./P", str, NULL};
-    dup2(fd[*id * 4 + 2], STDIN_FILENO);
-    dup2(fd[*id * 4 + 1], STDOUT_FILENO);
-    close_pipes(fd, *size_pipe);
-    free(fd);
-    if (execvp(args[0], args) == -1) {  //Test exec
-        //fprintf(stderr, "%d", errno);
-        *value_return = err_exec(errno);  //Set value return
-    }
-}
-void execP(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) {
-    char str[12];
-    sprintf(str, "%d", *id);
-    char str2[12];
-    sprintf(str2, "%d", *m);
-    char *args[4] = {"./Q", str, str2, NULL};
-    dup2(fd[*id * 4 + 2], STDIN_FILENO);
-    dup2(fd[*id * 4 + 1], STDOUT_FILENO);
-    close_pipes(fd, *size_pipe);
-    free(fd);
-    if (execvp(args[0], args) == -1) {  //Test exec
-        //fprintf(stderr, "%d", errno);
-        *value_return = err_exec(errno);  //Set value return
-    }
-}
-
-void add_process_to_v(pid_t f, int *v) {
-    int i = 0;
-    while (v[i] != 0) {
-        i++;
-    }
-    v[i] = f;
 }
 
 int parse_string(char *string, int v[DIM_V]) {
@@ -661,8 +599,6 @@ int parse_string(char *string, int v[DIM_V]) {
     return max;
 }
 
-///src/Analyzer/Q.c
-//Initialize frequence vector all to 0
 void initialize_vector(long *v) {
     int i;
     for (i = 0; i < DIM_V; i++) {
@@ -670,7 +606,6 @@ void initialize_vector(long *v) {
     }
 }
 
-//Increase frequence of the global vector in the position val_ascii
 void set_add(long *v, char c) {
     int val_ascii;
     val_ascii = ((int)c) - 32;  //casting char to int and difference 32 (in order to save space on the vector) //Se vogliamo togliere lo spazio basta fare -33
@@ -679,7 +614,6 @@ void set_add(long *v, char c) {
     }
 }
 
-//get the chars from the .txt files from the begin (b) to the end (e)
 void get_subset(int *fp, long *v, int b, int e) {
     int i = b;
     char c[1];
@@ -707,24 +641,30 @@ void get_frequencies(int *fp, long *freq, int part, int m) {
     get_subset(fp, freq, begin, end);
 }
 
-//display how meny times chars are in the text (display only visited chars)
-void print_vector(int v[]) {
-    int i;
-    for (i = 0; i < DIM_V; i++) {
-        if (v[i] != 0) {
-            printf("\n%c è comparso %d volte", (i + 32), v[i]);
-        }
+int file_len(FILE *fp) {
+    int len = 0;
+    char c;
+    while (!feof(fp)) {
+        fscanf(fp, "%c", &c);
+        len++;
+        //printf("%d", len);
     }
+    return len - 1;
 }
 
-int lenghtCsv(int v[DIM_V]) {
+void arrayToCsv(long *v, char *res) {
     int i;
-    int dim = 0;
-    for (i = 0; i < DIM_V; i++) {
-        dim += countDigit(v[i]);
+    char str[12];
+    for (i = 0; i < DIM_RESP; i++) {
+        res[i] = '\0';
     }
-    dim += 95;
-    return dim;
+    sprintf(str, "%ld", v[0]);
+    strcat(res, str);
+    for (i = 1; i < DIM_V; i++) {
+        strcat(res, ",");
+        sprintf(str, "%ld", v[i]);
+        strcat(res, str);
+    }
 }
 
 int countDigit(int n) {
@@ -740,26 +680,16 @@ int countDigit(int n) {
     return count;
 }
 
-void createCsv(long *v, char *res, char *id) {
+int lenghtCsv(int v[DIM_V]) {
     int i;
-    char str[12];
-    for (i = 0; i < DIM_RESP; i++) {
-        res[i] = '\0';
+    int dim = 0;
+    for (i = 0; i < DIM_V; i++) {
+        dim += countDigit(v[i]);
     }
-
-    strcat(res, id);
-    strcat(res, "#");
-    sprintf(str, "%ld", v[0]);
-    strcat(res, str);
-    for (i = 1; i < DIM_V; i++) {
-        strcat(res, ",");
-        sprintf(str, "%ld", v[i]);
-        strcat(res, str);
-    }
-    strcat(res, "#");
+    dim += 95;
+    return dim;
 }
 
-///src/C.c
 char sumCsv(char *str1, char *str2) {
     char ret = FALSE;
     int i;
@@ -795,6 +725,25 @@ char sumCsv(char *str1, char *str2) {
     return ret;
 }
 
+void createCsv(long *v, char *res, char *id) {
+    int i;
+    char str[12];
+    for (i = 0; i < DIM_RESP; i++) {
+        res[i] = '\0';
+    }
+
+    strcat(res, id);
+    strcat(res, "#");
+    sprintf(str, "%ld", v[0]);
+    strcat(res, str);
+    for (i = 1; i < DIM_V; i++) {
+        strcat(res, ",");
+        sprintf(str, "%ld", v[i]);
+        strcat(res, str);
+    }
+    strcat(res, "#");
+}
+
 char addCsvToArray(char *tmp, long *v) {
     char ret = FALSE;
     int i = 0;
@@ -812,6 +761,84 @@ char addCsvToArray(char *tmp, long *v) {
     }
     return ret;
 }
+
+char fileExist(char *fname) {
+    char ret = FALSE;
+    if (access(fname, F_OK) != -1) ret = TRUE;
+    return ret;
+}
+
+char checkArg(char cmd[DIM_CMD], int *argCounter) {
+    int j;
+    char ret = TRUE;
+    if (!(strstr(cmd, "  ") != NULL)) {
+        *argCounter = 1;
+        for (j = 0; j < DIM_CMD; j++) {
+            //printf("%d\n", cmd[j]);
+            if (cmd[j] == ' ') {
+                (*argCounter)++;
+            }
+            if (cmd[j] == '\0') {
+                if (cmd[j - 1] == ' ')
+                    ret = FALSE;
+                else
+                    j = DIM_CMD - 1;
+            }
+        }
+    } else {
+        ret = FALSE;
+    }
+    return ret;
+}
+
+void reallocPipe(int *fd, int size_pipe) {
+    free(fd);
+    fd = (int *)malloc(size_pipe * sizeof(int));
+}
+
+// /src/Analyzer/C.c
+
+//Retrun -1 if n and m are the same as before, 0 otherwise
+
+void add_process_to_v(pid_t f, int *v) {
+    int i = 0;
+    while (v[i] != 0) {
+        i++;
+    }
+    v[i] = f;
+}
+
+///src/Analyzer/Q.c
+//Initialize frequence vector all to 0
+
+//Increase frequence of the global vector in the position val_ascii
+
+//get the chars from the .txt files from the begin (b) to the end (e)
+
+//display how meny times chars are in the text (display only visited chars)
+void print_vector(int v[]) {
+    int i;
+    for (i = 0; i < DIM_V; i++) {
+        if (v[i] != 0) {
+            printf("\n%c è comparso %d volte", (i + 32), v[i]);
+        }
+    }
+}
+
+int countDigit(int n) {
+    int count = 0;
+    if (n == 0) {
+        count++;
+    } else {
+        while (n != 0) {
+            n = n / 10;
+            ++count;
+        }
+    }
+    return count;
+}
+
+///src/C.c
 
 ///src/R.c
 void printStat(char *char_count) {
@@ -952,98 +979,6 @@ void printInfoCluster() {
         }
     }
     printf("\n");
-}
-
-void percAvanzamento(int n, int tot) {
-    int hashtag = (int)((float)n * 10 / (float)tot);
-    int i;
-    printf("[");
-    for (i = 0; i < 10; i++) {
-        if (i < hashtag)
-            printf("#");
-        else
-            printf(".");
-    }
-    printf("]\n");
-}
-
-///src/Analyzer/P.c
-//return file length in terms of chars
-int file_len(FILE *fp) {
-    int len = 0;
-    char c;
-    while (!feof(fp)) {
-        fscanf(fp, "%c", &c);
-        len++;
-        //printf("%d", len);
-    }
-    return len - 1;
-}
-
-//The next 3 functions are for conversion of (int) to (char*)
-// inline function to swap two numbers
-inline void swap(char *x, char *y) {
-    char t = *x;
-    *x = *y;
-    *y = t;
-}
-
-// function to reverse buffer[i..j]
-char *reverse(char *buffer, int i, int j) {
-    while (i < j)
-        swap(&buffer[i++], &buffer[j--]);
-
-    return buffer;
-}
-
-// Iterative function to implement itoa() function in C
-char *itoa(int value, char *buffer, int base) {
-    // invalid input
-    if (base < 2 || base > 32)
-        return buffer;
-
-    // consider absolute value of number
-    int n = abs(value);
-
-    int i = 0;
-    while (n) {
-        int r = n % base;
-
-        if (r >= 10)
-            buffer[i++] = 65 + (r - 10);
-        else
-            buffer[i++] = 48 + r;
-
-        n = n / base;
-    }
-
-    // if number is 0
-    if (i == 0) buffer[i++] = '0';
-
-    // If base is 10 and value is negative, the resulting string
-    // is preceded with a minus sign (-)
-    // With any other base, value is always considered unsigned
-    if (value < 0 && base == 10) buffer[i++] = '-';
-
-    buffer[i] = '\0';  // null terminate string
-
-    // reverse the string and return it
-    return reverse(buffer, 0, i - 1);
-}
-
-void arrayToCsv(long *v, char *res) {
-    int i;
-    char str[12];
-    for (i = 0; i < DIM_RESP; i++) {
-        res[i] = '\0';
-    }
-    sprintf(str, "%ld", v[0]);
-    strcat(res, str);
-    for (i = 1; i < DIM_V; i++) {
-        strcat(res, ",");
-        sprintf(str, "%ld", v[i]);
-        strcat(res, str);
-    }
 }
 
 //Error handlers
