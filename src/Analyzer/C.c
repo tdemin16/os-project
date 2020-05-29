@@ -90,18 +90,10 @@ int main(int argc, char* argv[]) {
         k = 0;
         j = 0;
         if (f > 0) {  //PARENT SIDE
-            char str[15];
-            sprintf(str, "C%d.txt", getpid());
-            FILE* debug = fopen(str, "a");
-            fprintf(debug, "AVVIATO C\n");
-            fclose(debug);
             while (value_return == 0 && (!_close)) {                   //Cicla finche` non ha finito di leggere o scrivere o va in errore
                 if (!_write) {                                         //CICLO DI SCRITTURA
                     if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
-                            debug = fopen(str, "a");
-                            fprintf(debug, "C: LEGGO %s\n", path);
-                            fclose(debug);
                             if (!strncmp(path, "#", 1)) {
                                 if (!strncmp(path, "#CLOSE", 6)) {
                                     _read = TRUE;
@@ -148,9 +140,6 @@ int main(int argc, char* argv[]) {
                                     if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
                                         value_return = err_fcntl();
                                     }
-                                    debug = fopen(str, "a");
-                                    fprintf(debug, "C: WAKE UP\n");
-                                    fclose(debug);
                                 }
                                 if (write(fd[j * 4 + 3], path, DIM_PATH) == -1) {  //Provo a scrivere
                                     if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
@@ -160,9 +149,6 @@ int main(int argc, char* argv[]) {
                                         strcpy(failedPath, path);
                                     }
                                 } else {  //scritto con successo
-                                    debug = fopen(str, "a");
-                                    fprintf(debug, "C: Inviato a %d: %s\n", j, path);
-                                    fclose(debug);
                                     count++;          //Tengo conto della scrittura
                                     j = (j + 1) % n;  //Usato per ciclare su tutte le pipe in scrittura
                                 }
@@ -174,9 +160,6 @@ int main(int argc, char* argv[]) {
                                 value_return = err_write();                      //Setta il valore di ritorno
                             }
                         } else {
-                            debug = fopen(str, "a");
-                            fprintf(debug, "C: Inviato a %d: %s\n", j, failedPath);
-                            fclose(debug);
                             stop = FALSE;     //Se la scrittura va a buon fine esco dallo stato di stop
                             count++;          //Tengo conto dell'invio
                             j = (j + 1) % n;  //Incremento i in maniera ciclica
@@ -188,9 +171,6 @@ int main(int argc, char* argv[]) {
                 if (!_read) {
                     if (send_r) {                                       //Coontrolla se non ci sonon valori non inviati
                         if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {  //Prova a leggere dalla pipe
-                            debug = fopen(str, "a");
-                            fprintf(debug, "C: LEGGO DA P %s\n", resp);
-                            fclose(debug);
                             if (strstr(resp, "#") != NULL) {                       //Controlla che nella stringa sia contenuto il carattere #
                                 if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {  //Prova a scrivere sulla pipe del padre
                                     if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
@@ -212,22 +192,14 @@ int main(int argc, char* argv[]) {
                         }
                     }
                     k = (k + 1) % n;  //Cicla tra le pipes
-                    debug = fopen(str, "a");
-                    fprintf(debug, "C: PENDING %d\n", pendingPath);
-                    fclose(debug);
                 }
 
                 if (pendingPath == 0) {
                     oldfl = fcntl(STDIN_FILENO, F_GETFL);
                     if (oldfl == -1) {
-                        debug = fopen(str, "a");
-                        fprintf(debug, "C: ERRORE OLDFL\n");
-                        fclose(debug);
+
                     }
                     fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
-                    debug = fopen(str, "a");
-                    fprintf(debug, "C: SLEEP\n");
-                    fclose(debug);
                 }
             }
 
@@ -239,25 +211,6 @@ int main(int argc, char* argv[]) {
             free(fd);                    //Libera la memoria delle pipes
         }
     }
-    /*if (value_return != 0) {
-        char str[15];
-        sprintf(str, "C%d.txt", getpid());
-        FILE* debug = fopen(str, "a");
-        fprintf(debug, "Devo andare con il kill di %d:\n", getpid());
-        if (getpid() == 0) {
-            pid_t to_kill = getppid();  // ricevo il pid padre da killare
-            fprintf(debug, "Killo %d\n", to_kill);
-            if (kill(to_kill, 9) != 0) {
-                fprintf(debug, "Kill già avvenuto(?)");
-            }
-        }
-
-        else {  //è un processo padre
-            fprintf(debug, "Processo padre\n");
-            wait(0);
-        }
-        fclose(debug);
-    }*/
 
     if (value_return == 0) {
         if (f == 0) {  //SON SIDE
