@@ -482,6 +482,15 @@ int main(int argc, char *argv[]) {  //Main
                             printf("> ");
                             fflush(stdout);
                         }
+
+                        if (!strncmp(cmd, "stat", 4)) {
+                            if (!analyzing) {
+                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Il comando " WHITE "stat" RESET " puo` essere utilizzato solo durante l'analisi.\n\n> ");
+                                fflush(stdout);
+                            } else {
+                                printf(WHITE"Percentuale avanzamento"RESET": %.3g%%\n\n", (float)perc / (float)pathSent * 100);
+                            }
+                        }
                     }
                 }
 

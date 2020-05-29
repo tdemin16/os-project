@@ -8,7 +8,7 @@ $MAKE
 
 if [ $? -eq 0 ]; then 
     cd $BUILD_DIR
-    ./M
+    ./M ../test/test100
 else
     echo Fail during building.
 fi
