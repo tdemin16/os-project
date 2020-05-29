@@ -37,17 +37,10 @@ int main(int argc, char* argv[]) {
     char resp[DIM_RESP];
     int oldfl;
     int pendingPath = 0;
+
     //Parsing Arguments--------------------------------------------------------------------
-    if (argc != 3) {
-        value_return = err_args_Q();
-    } else {
-        m = atoi(argv[2]);
-        if (m == 0) value_return = err_m_not_valid();
-    }
-    if (value_return == 0) {
-        part = atoi(argv[1]);
-        if (part >= m) value_return = err_part_not_valid();
-    }
+    m = atoi(argv[2]);
+    part = atoi(argv[1]);
 
     if (fcntl(STDOUT_FILENO, F_SETFL, O_NONBLOCK)) {
         value_return = err_fcntl();
@@ -68,7 +61,6 @@ int main(int argc, char* argv[]) {
                 analyze = strtok(NULL, "#");
                 fp = open(analyze, O_RDONLY);
                 if (fp == -1) {
-                    //value_return = err_file_open();
                     for (i = 0; i < DIM_V; i++) {
                         v[i] = -1;
                     }
@@ -94,7 +86,7 @@ int main(int argc, char* argv[]) {
         if (pendingPath == 0) {
             oldfl = fcntl(STDIN_FILENO, F_GETFL);
             if (oldfl == -1) {
-                /* handle error */
+                value_return = err_fcntl();
             }
             fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
         }

@@ -1067,21 +1067,6 @@ int err_input_A(char *file) {
     return ERR_ARGS_A;
 }
 
-int err_args_C() {
-    fprintf(stderr, "\nErrore argomenti C\n\n");
-    return ERR_ARGS_C;
-}
-
-int err_args_Q() {
-    fprintf(stderr, "[!] Errore nella sintassi del comando\nusa: ./Q inizio_analisi fine_analisi\n");
-    return ERR_ARGS_Q;
-}
-
-int err_args_P() {
-    fprintf(stderr, "[!] Errore nella sintassi del comando\nusa: ./P m\n");
-    return ERR_ARGS_P;
-}
-
 int err_file() {
     fprintf(stderr, "Errore, nessun file inserito\n");
     return ERR_FILE;
@@ -1102,12 +1087,6 @@ int err_file_open() {
     return ERR_FILE;
 }
 
-//Error if end point is over EOF //Refers to Q.c
-int err_end_file() {
-    fprintf(stderr, "\n[!] Errore, sei andato oltre la fine del file\n");
-    return ERR_FILE;
-}
-
 int err_fcntl() {
     fprintf(stderr, "Errore, sblocco pipe non riuscito\n");
     return ERR_FCNTL;
@@ -1118,52 +1097,14 @@ int err_exec(int err) {
     return ERR_EXEC;
 }
 
-int err_m_not_valid() {
-    fprintf(stderr, "[!] Il valore di m non è valido, deve essere m > 0\n");
-    return ERR_DATA;
-}
-
-int err_part_not_valid() {
-    fprintf(stderr, "[!] Il valore di part non è valido, deve essere < m\n");
-    return ERR_DATA;
-}
-int err_process_open(pid_t p) {
-    fprintf(stderr, "[!] Errore, il processo %d è ancora aperto!\n", p);
-    return ERR_OPEN_PROC;
-}
 int err_fifo() {
     fprintf(stderr, "Errore nella creazione della pipe fifo\n");
     return ERR_FIFO;
 }
 
-int err_unlink() {
-    fprintf(stderr, "Errore nella eliminzazione della pipe fifo\n");
-    return ERR_UNLINK;
-}
-
-int err_signal() {
-    fprintf(stderr, "Errore, call signal non riuscita\n");
-    return ERR_SIGNAL;
-}
-
 int err_close() {
     fprintf(stderr, "Errore nella chiusura del file\n");
     return ERR_CLOSE;
-}
-
-int err_args_R() {
-    fprintf(stderr, "Errore nella sintassi del comando. Usa:\n-c: Stampa per cluster\n");
-    return ERR_ARGS_R;
-}
-
-int err_enxio() {
-    fprintf(stderr, "Errore, R e' stato avviato senza un processo A\n");
-    return ERR_ENXIO;
-}
-
-int err_args_M() {
-    fprintf(stderr, "\nErrore nella sintassi del comando.\nUsa: /M nomeFile nomeCartella\nPuoi usare -setn e -setm per cambiare n e m\nes: /M A.c ../Analyzer/ -setn 3 -setm 4\n\n");
-    return ERR_ARGS_M;
 }
 
 int err_kill_process_R() {

@@ -24,25 +24,15 @@
 #define DIM_PATH 4096
 
 #define ERR_ARGS_A 1
-#define ERR_ARGS_C 2
-#define ERR_ARGS_Q 3
-#define ERR_PIPE 4
-#define ERR_FILE 5
-#define ERR_FORK 6
-#define ERR_WRITE 7
-#define ERR_FCNTL 8
-#define ERR_EXEC 9
-#define ERR_DATA 10
-#define ERR_FIFO 11
-#define ERR_UNLINK 12
-#define ERR_OPEN_PROC 13
-#define ERR_SIGNAL 14
-#define ERR_CLOSE 15
-#define ERR_ARGS_R 16
-#define ERR_ARGS_P 17
-#define ERR_ENXIO 18
-#define ERR_ARGS_M 19
-#define ERR_KILL_PROC 20
+#define ERR_PIPE 2
+#define ERR_FILE 3
+#define ERR_FORK 4
+#define ERR_WRITE 5
+#define ERR_FCNTL 6
+#define ERR_EXEC 7
+#define ERR_FIFO 8
+#define ERR_CLOSE 9
+#define ERR_KILL_PROC 10
 
 #define REMOVED -2
 #define INEXISTENCE -1
@@ -162,28 +152,16 @@ void printInfoCluster();
 //Errori
 int err_file_open();
 int err_pipe();
-int err_end_file();
 int err_args_A();
 int err_overflow();
 int err_input_A(char *);
-int err_args_C();
-int err_args_P();
-int err_args_Q();
 int err_file();
 int err_fork();
 int err_write();
 int err_fcntl();
 int err_exec(int);
-int err_m_not_valid();
-int err_part_not_valid();
-int err_process_open(pid_t);
 int err_fifo();
-int err_unlink();
-int err_signal();
 int err_close();
-int err_args_R();
-int err_enxio();
-int err_args_M();
 int err_kill_process_R();
 int err_kill_process_A();
 int err_kill_process_C();

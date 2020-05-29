@@ -366,12 +366,6 @@ int main(int argc, char *argv[]) {  //Main
                             fflush(stdout);
                         }
 
-                        if (!strncmp(cmd, "debug", 5)) {  //DA RIMUOVERE
-                            printf("count = %d\npathSent=%d\n", count, pathSent);
-                            printf("> ");
-                            fflush(stdout);
-                        }
-
                         if (!strncmp(cmd, "reanalyze", 9)) {          //Se il comando e` reanalyze
                             if (!analyzing) {                         //Controlla che il sistema non sia in analisi
                                 for (j = 0; j < lista->count; j++) {  //Setta tutti i file come non analizzati
@@ -409,12 +403,6 @@ int main(int argc, char *argv[]) {  //Main
                                 printf("\nAnalisi in corso, comando non disponibile\n");
                             }
                             printf("\n");
-                        }
-
-                        if (!strncmp(cmd, "oldprint", 8)) {
-                            printPathList(lista);
-                            printf("\n> ");
-                            fflush(stdout);
                         }
 
                         if (!strncmp(cmd, "clear", 5)) {  //Pulisce la console

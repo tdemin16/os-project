@@ -191,27 +191,6 @@ int main(int argc, char *argv[]) {  //main
         }
     }
 
-    //value_return = 1;
-    /*if (value_return != 0) {
-        char str[15];
-        sprintf(str, "A%d.txt", getpid());
-        FILE *debug = fopen(str, "a");
-        fprintf(debug, "Devo andare con il kill di %d:\n", getpid());
-        if (getpid() == 0) {
-            pid_t to_kill = getppid();  // ricevo il pid padre da killare
-            fprintf(debug, "Killo %d\n", to_kill);
-            if (kill(to_kill, 9) != 0) {
-                fprintf(debug, "Kill già avvenuto(?)");
-            }
-        }
-
-        else {  //è un processo padre
-            fprintf(debug, "Processo padre\n");
-            wait(0);
-        }
-        fclose(debug);
-    }*/
-
     if (value_return == 0) {
         if (id == A && f == 0) {  //A SIDE
 
@@ -265,7 +244,7 @@ int check_command(char *cmd) {
             checkArg(cmd, &spaces);
             if (spaces != 2) res = -1;  //Controlla la corretta sintassi del comando
         }
-    } else if (!strncmp(cmd, "add", 3) || !strncmp(cmd, "remove", 6) || !strcmp(cmd, "reset") || !strcmp(cmd, "analyze") || !strcmp(cmd, "reanalyze") || !strncmp(cmd, "set", 3) || !strncmp(cmd, "clear", 4) || !strncmp(cmd, "oldprint", 8) || !strncmp(cmd, "debug", 5)) {  //A
+    } else if (!strncmp(cmd, "add", 3) || !strncmp(cmd, "remove", 6) || !strcmp(cmd, "reset") || !strcmp(cmd, "analyze") || !strcmp(cmd, "reanalyze") || !strncmp(cmd, "set", 3) || !strncmp(cmd, "clear", 4)) {  //A
         res = 2;
     } else if (!strcmp(cmd, "help") || !strcmp(cmd, "info")) {  //HELP e info
         res = 3;
