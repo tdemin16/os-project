@@ -184,9 +184,9 @@ int main(int argc, char *argv[]) {  //Main
         } while (value_return == 0 && !p_create);  //Cicla fino a quando value_return == 0 e p_create è falso
     }
 
-    system("clear");                                    //pulisce il terminale
-    printf(BOLDWHITE "ANALYZER AVVIATO" RESET "\n\n");  //Avvisa l'avvio di analyzer
-    fflush(stdout);                                     //libera il buffer
+    system("clear");                            //pulisce il terminale
+    printf(BOLDWHITE "ANALYZER" RESET "\n\n");  //Avvisa l'avvio di analyzer
+    fflush(stdout);                             //libera il buffer
 
     if (value_return == 0 && !_close) {  //Se non ci sono stati errori e il flag close non è a true (_close serve per la chiusura dei programmi)
         f = fork();                      //Fork dei processi
@@ -405,18 +405,20 @@ int main(int argc, char *argv[]) {  //Main
                                     _write = FALSE;  //Abilita la scrittura
                                     time(&start);
                                 }  //Inizio timer
-                                else
-                                    printf("\nNon ci sono file da analizzare\n");
+                                else {
+                                    printf("\nNon ci sono file da analizzare\n\n> ");
+                                    fflush(stdout);
+                                }
                             } else {
-                                printf("\nAnalisi in corso, comando non disponibile\n");
+                                printf("\nAnalisi in corso, comando non disponibile\n\n");
                             }
-                            printf("\n");
                         }
 
                         if (!strncmp(cmd, "clear", 5)) {  //Pulisce la console
                             if (!analyzing) {
                                 system("clear");
-                                printf("\n> ");
+                                printf(BOLDWHITE "ANALYZER" RESET "\n\n");
+                                printf("> ");
                                 fflush(stdout);
                             } else {
                                 printf(BOLDYELLOW "\n[ATTENZIONE]" RESET " Analisi in corso, non e` possibile pulire il terminale.\n");
@@ -591,7 +593,6 @@ int main(int argc, char *argv[]) {  //Main
                                 value_return = err_write();                            //Ritorna l'errore sulla scrittura
                             }
                         } else {
-                            printf("%s\n", lista->pathList[i]);
                             i++;         //Passa all'elemento successivo
                             pathSent++;  //Incrementa il numero di percorsi inviati
                             totFiles++;
@@ -611,9 +612,8 @@ int main(int argc, char *argv[]) {  //Main
                 //Read
                 if (!_read && value_return == 0) {               //Esegue il blocco fiche` non c'e` piu` nulla nella pipe o non avviene un errore
                     if (read(fd_2[READ], resp, DIM_RESP) > 0) {  //Prova a leggere dal figlio
-                        printf("%s\n", resp);
-                        if (strstr(resp, "#") != NULL) {  //Controlla che ci sia almeno un # nel messaggio
-                            tmp = strdup(resp);           //Da qui esegue il parsing della stringa ritornatagli
+                        if (strstr(resp, "#") != NULL) {         //Controlla che ci sia almeno un # nel messaggio
+                            tmp = strdup(resp);                  //Da qui esegue il parsing della stringa ritornatagli
                             id_r = atoi(strtok(tmp, "#"));
                             resp_val = strtok(NULL, "#");
                             tmpResp = strdup(resp_val);

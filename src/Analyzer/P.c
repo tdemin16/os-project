@@ -82,7 +82,6 @@ int main(int argc, char* argv[]) {
     if (value_return == 0) {
         if (f > 0) {  //PARENT SIDE
             while (value_return == 0 && (!_close)) {
-                sleep(1);
                 //Write
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
