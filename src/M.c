@@ -15,7 +15,7 @@ void handle_sigint(int sig) {        //handler per il CTRL-C, ha l'obiettivo di
         }
     }
     freeList(p);         //Libero la lista di processi che ho salvato
-    exit(value_return);  //Eseguo exit con codice di ritorno -1
+    exit(-1);  //Eseguo exit con codice di ritorno -1
 }
 
 int main(int argc, char *argv[]) {  //main
