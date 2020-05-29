@@ -887,7 +887,8 @@ void printStat(char *char_count) {
     }
 }
 
-void analyzeCluster(char *char_count, char *resp) {
+void analyzeCluster(char *stringa, char *resp) {
+    char *char_count = strdup(stringa);
     int v[DIM_V];
     int i;
     int lettereMin = 0;
@@ -901,6 +902,7 @@ void analyzeCluster(char *char_count, char *resp) {
         v[i] = 0;
     }
     parse_string(char_count, v);
+    free(char_count);
     for (i = 0; i < DIM_V; i++) {
         if (i == 0) {
             spazi += v[i];
