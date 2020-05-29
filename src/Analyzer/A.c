@@ -72,6 +72,7 @@ int main(int argc, char *argv[]) {  //Main
     int perc = 0;     //Ricevimento parziale file
     char n_exec[12];  //Stringa di appoggio per creare gli argomenti da dare a C
     char m_exec[12];  //Stringa di appoggio per creare gli argomenti da dare a C
+    struct stat attr; //Necessaria per aggiornare last_edit di un file
 
     char analyzing = FALSE;    //Indica se i figli stanno eseguendo l'analisi
     int pathSent = 0;          //Indica quanti percorsi sono stati mandati
@@ -624,7 +625,9 @@ int main(int argc, char *argv[]) {  //Main
                                     perc++;                                                         //Aumenta l'avanzamento della barretta
                                     if (value_return == 0) {
                                         if (!compare_mtime(lista, id_r, file)) {  //Controlla che non sia stato modificato durante l'analisi
-                                            printf("\nIl file %s\ne` stato modificato durante l'analisi.\nUsa il comando" BOLDWHITE " reanalyze" RESET " per rianalizzarlo\n\n", file);
+                                            stat(file, &attr);
+                                            lista->last_edit[id_r] = attr.st_mtime;
+                                            printf(BOLDYELLOW"[ATTENTION] "RESET"Il file %s\ne` stato modificato durante l'analisi.\nUsa il comando" BOLDWHITE " reanalyze" RESET " per rianalizzare tutti i file\n\n", file);
                                         }
                                     }
                                 } else {
