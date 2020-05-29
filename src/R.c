@@ -230,6 +230,10 @@ int main() {                            //struttura main
                         printf("\n> ");
                         fflush(stdout);
                         retrieve = FALSE;
+                    } else if (!strncmp(resp, "#EMPTY", 6)) {
+                        printf(BOLDRED "[ERRORE]" RESET " Non ci sono statistiche da stampare\n\n> ");
+                        fflush(stdout);
+                        retrieve = FALSE;
                     }
                 }
             }
@@ -240,6 +244,10 @@ int main() {                            //struttura main
                     } else if (strstr(resp, ",") != NULL) {
                         printStat(resp);
                         printf("\n> ");
+                        fflush(stdout);
+                        retrieve = FALSE;
+                    } else if (!strncmp(resp, "#EMPTY", 6)) {
+                        printf(BOLDRED "[ERRORE]" RESET " Non ci sono statistiche da stampare\n\n> ");
                         fflush(stdout);
                         retrieve = FALSE;
                     }
