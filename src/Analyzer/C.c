@@ -95,7 +95,6 @@ int main(int argc, char* argv[]) {
             FILE* debug = fopen(str, "a");
             fprintf(debug, "AVVIATO C\n");
             fclose(debug);
-            value_return = 1;
             while (value_return == 0 && (!_close)) {                   //Cicla finche` non ha finito di leggere o scrivere o va in errore
                 if (!_write) {                                         //CICLO DI SCRITTURA
                     if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
