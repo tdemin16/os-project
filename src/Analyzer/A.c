@@ -591,6 +591,7 @@ int main(int argc, char *argv[]) {  //Main
                                 value_return = err_write();                            //Ritorna l'errore sulla scrittura
                             }
                         } else {
+                            printf("%s\n", lista->pathList[i]);
                             i++;         //Passa all'elemento successivo
                             pathSent++;  //Incrementa il numero di percorsi inviati
                             totFiles++;
@@ -610,8 +611,9 @@ int main(int argc, char *argv[]) {  //Main
                 //Read
                 if (!_read && value_return == 0) {               //Esegue il blocco fiche` non c'e` piu` nulla nella pipe o non avviene un errore
                     if (read(fd_2[READ], resp, DIM_RESP) > 0) {  //Prova a leggere dal figlio
-                        if (strstr(resp, "#") != NULL) {         //Controlla che ci sia almeno un # nel messaggio
-                            tmp = strdup(resp);                  //Da qui esegue il parsing della stringa ritornatagli
+                        printf("%s\n", resp);
+                        if (strstr(resp, "#") != NULL) {  //Controlla che ci sia almeno un # nel messaggio
+                            tmp = strdup(resp);           //Da qui esegue il parsing della stringa ritornatagli
                             id_r = atoi(strtok(tmp, "#"));
                             resp_val = strtok(NULL, "#");
                             tmpResp = strdup(resp_val);
