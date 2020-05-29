@@ -100,7 +100,6 @@ void reallocPathList(array *, int);
 char insertPathList(array *, char *, int);
 int insertAndSumPathList(array *, char *, int);
 char removeFromPathList(array *, char *c);
-void printPathList(array *);
 void freePathList(array *);
 void resetPathList(array *);
 int compare_mtime(array *, int, char *);

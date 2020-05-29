@@ -1,22 +1,5 @@
 #include "lib.h"
 
-/*
-void sig_term_handler(int signum, siginfo_t *info, void *ptr) {
-    write(STDERR_FILENO, SIGTERM_MSG, sizeof(SIGTERM_MSG));
-    printf("CIao\n");
-}
-
-void catch_sigterm() {
-    static struct sigaction _sigact;
-
-    memset(&_sigact, 0, sizeof(_sigact));
-    _sigact.sa_sigaction = sig_term_handler;
-    _sigact.sa_flags = SA_SIGINFO;
-
-    sigaction(SIGTERM, &_sigact, NULL);
-}
-*/
-
 //Allocate memory for process* and process->pid
 process *create_process(int size) {
     process *st = (process *)malloc(sizeof(process));  //Allocate process memory
@@ -46,17 +29,18 @@ void insertProcess(process *tmp, pid_t val) {                            //Inser
     tmp->count++;                                                        //Increase the count of variables inside
 }
 
-void printList(process *tmp) {  //ONLY FOR TESTING -- NOT FOR PROJECT -- use it to print the process saved in tmp
-    int i;
-    for (i = 0; i < tmp->count; i++) {
-        printf("%d: A=%d\n", i, tmp->pid[i]);
-    }
-}
-
 void freeList(process *tmp) {  // free the list tmp
     free(tmp->pid);            // free the array of pid
     free(tmp);                 // free the list tmp
 }  //
+
+void initialize_processes(pid_t *p, int dim) {
+    int i;
+    for (i = 0; i < dim; i++) {
+        p[i] = -1;
+    }
+}
+
 
 array *createPathList(int size) {                        //allocate an array for the PathList
     array *st = (array *)malloc(sizeof(array));          //allocate list of paths
@@ -73,6 +57,20 @@ array *createPathList(int size) {                        //allocate an array for
         st->analyzed[i] = -1;                                           //set analyzed to -1 (= not analyzed)
     }                                                                   //
     return st;                                                          //return the created list of paths
+}
+
+void reallocPathList(array *tmp, int newSize) {
+    int i;
+    tmp->size *= newSize;
+    tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
+    tmp->analyzed = (int *)realloc(tmp->analyzed, sizeof(int *) * tmp->size);
+    tmp->last_edit = (time_t *)realloc(tmp->last_edit, sizeof(time_t *) * tmp->size);
+
+    for (i = tmp->count; i < tmp->size; i++) {
+        tmp->pathList[i] = (char *)malloc(sizeof(char *) * (DIM_PATH));
+        memset(tmp->pathList[i], '\0', sizeof(char *) * DIM_PATH);  //set the first character to '\0' (= end of string)
+        tmp->analyzed[i] = -1;
+    }
 }
 
 char insertPathList(array *tmp, char *c, int val) {
@@ -180,38 +178,6 @@ int insertAndSumPathList(array *tmp, char *c, int val) {
         if (val == 0) ret = tmp->count - 1;
     }
     return ret;
-}
-
-void reallocPathList(array *tmp, int newSize) {
-    int i;
-    tmp->size *= newSize;
-    tmp->pathList = (char **)realloc(tmp->pathList, sizeof(char **) * tmp->size);
-    tmp->analyzed = (int *)realloc(tmp->analyzed, sizeof(int *) * tmp->size);
-    tmp->last_edit = (time_t *)realloc(tmp->last_edit, sizeof(time_t *) * tmp->size);
-
-    for (i = tmp->count; i < tmp->size; i++) {
-        tmp->pathList[i] = (char *)malloc(sizeof(char *) * (DIM_PATH));
-        memset(tmp->pathList[i], '\0', sizeof(char *) * DIM_PATH);  //set the first character to '\0' (= end of string)
-        tmp->analyzed[i] = -1;
-    }
-}
-
-void printPathList(array *tmp) {
-    int i;
-    if (tmp->count == 0) {
-        printf("\nLista vuota\n\n");
-    }
-    printf("\n");
-    for (i = 0; i < tmp->count; i++) {
-        usleep(10000);
-        printf("%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
-        //fprintf(stderr, "%d: A=%d %s\n", i, tmp->analyzed[i], tmp->pathList[i]);
-    }
-    printf("\n");
-}
-
-int dimPathList(array *tmp) {
-    return tmp->count;
 }
 
 void freePathList(array *tmp) {
@@ -424,12 +390,6 @@ int parser_CheckArguments(int argc, char *argv[], int *n, int *m) {
     return ret;
 }
 
-void initialize_processes(pid_t *p, int dim) {
-    int i;
-    for (i = 0; i < dim; i++) {
-        p[i] = -1;
-    }
-}
 char fileExist(char *fname) {
     char ret = FALSE;
     if (access(fname, F_OK) != -1) ret = TRUE;
