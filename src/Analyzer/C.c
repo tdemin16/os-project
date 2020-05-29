@@ -102,6 +102,9 @@ int main(int argc, char* argv[]) {
                                     nClearAndClose(fd, n);  //mando #CLOSE alle n pipe
                                     while (wait(NULL) > 0)  //Aspetto che vengano chiusi
                                         ;
+                                    while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
+                                        ;
+                                    nCleanSon(fd, n);
                                     close_pipes(fd, size_pipe);
                                     parseOnFly(path, &n, &m);  //Estrae n e m dalla stringa #SET#N#M#
                                     size_pipe = n * 4;
@@ -124,8 +127,6 @@ int main(int argc, char* argv[]) {
                                             value_return = ERR_EXEC;
                                         }
                                     }
-                                    while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
-                                        ;
 
                                 } else if (!strncmp(path, "#SETM#", 6)) {
                                     j = 0;
