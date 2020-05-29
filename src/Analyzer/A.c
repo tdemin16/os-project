@@ -209,15 +209,15 @@ int main(int argc, char *argv[]) {  //Main
                 if (!_close) {                                   //Controlla close non sia già settato a true
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {  //La read non ha errori
                         if (!strncmp(cmd, "close", 5)) {         //Verifica se cmd è close, in tal caso prosegue alla chiusura dei processi
-                            closeAll(fd_1);         //chiudi tutti i processi figli
-                            while (wait(NULL) > 0)  //Attende che tutti i processi figli siano chiusi prima di terminare
+                            closeAll(fd_1);                      //chiudi tutti i processi figli
+                            while (wait(NULL) > 0)               //Attende che tutti i processi figli siano chiusi prima di terminare
                                 ;
                             _close = TRUE;  //flag close settato a TRUE, obbliga il programma a terminare
                             printf(BOLDWHITE "A" RESET ": Closing...\n");
                         }
 
-                        if (!strncmp(cmd, "add", 3)) {  //Se invece il comando è "add"
-                            if (!analyzing) {           //Verifica che non stia già analizzando
+                        if (!strncmp(cmd, "add", 3)) {                                                       //Se invece il comando è "add"
+                            if (!analyzing) {                                                                //Verifica che non stia già analizzando
                                 if (strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL) {          //Mentra analizza controlla se l'utente cambia setn o setm
                                     printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\n");  //in tal caso verifica se sono correttamente inseriti
                                     printf("Usa help per vedere la lista di comandi utilizzabili.\n\n");     //Stampa errore se sono stati inseriti comandi errati
@@ -250,8 +250,8 @@ int main(int argc, char *argv[]) {  //Main
                             fflush(stdout);
                         }
 
-                        if (!strncmp(cmd, "remove", 6)) {  //Se il comando è "remove"
-                            if (!analyzing) {              //Verifica che non stia già analizzando
+                        if (!strncmp(cmd, "remove", 6)) {                                                                                                             //Se il comando è "remove"
+                            if (!analyzing) {                                                                                                                         //Verifica che non stia già analizzando
                                 if ((strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL)) {                                                                 //Mentra analizza controlla se l'utente cambia setn o setm ed in tal caso verifica se sono correttamente inseriti
                                     printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");  //Stampa errore se sono stati inseriti comandi errati
                                     fflush(stdout);                                                                                                                   //Libera il buffer
@@ -299,8 +299,8 @@ int main(int argc, char *argv[]) {  //Main
                             fflush(stdout);                                             //Libera il buffer
                         }                                                               //
 
-                        if (!strncmp(cmd, "remove", 6)) {  //Se il comando è "remove"
-                            if (!analyzing) {              //Verifica che non stia già analizzando
+                        if (!strncmp(cmd, "remove", 6)) {                                                                                                             //Se il comando è "remove"
+                            if (!analyzing) {                                                                                                                         //Verifica che non stia già analizzando
                                 if ((strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL)) {                                                                 //Mentra analizza controlla se l'utente cambia setn o setm ed in tal caso verifica se sono correttamente inseriti
                                     printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");  //Stampa errore se sono stati inseriti comandi errati
                                     fflush(stdout);
@@ -352,8 +352,8 @@ int main(int argc, char *argv[]) {  //Main
                             fflush(stdout);
                         }
 
-                        if (!strncmp(cmd, "reset", 5)) {  //Se il comando e` reset
-                            if (!analyzing) {             //Controlla che il programma non sia in analisi
+                        if (!strncmp(cmd, "reset", 5)) {                     //Se il comando e` reset
+                            if (!analyzing) {                                //Controlla che il programma non sia in analisi
                                 resetPathList(lista);                        //Svuota la lista
                                 count = 0;                                   //Riporta il numero di file presenti nella lista
                                 memset(sum, '\0', sizeof(char) * DIM_RESP);  //Setta la stringa dei totali a '\0
@@ -372,8 +372,8 @@ int main(int argc, char *argv[]) {  //Main
                             fflush(stdout);
                         }
 
-                        if (!strncmp(cmd, "reanalyze", 9)) {  //Se il comando e` reanalyze
-                            if (!analyzing) {                 //Controlla che il sistema non sia in analisi
+                        if (!strncmp(cmd, "reanalyze", 9)) {          //Se il comando e` reanalyze
+                            if (!analyzing) {                         //Controlla che il sistema non sia in analisi
                                 for (j = 0; j < lista->count; j++) {  //Setta tutti i file come non analizzati
                                     lista->analyzed[j] = 0;
                                 }
@@ -398,11 +398,11 @@ int main(int argc, char *argv[]) {  //Main
 
                         if (!strncmp(cmd, "analyze", 7)) {  //Se il comando inserito e` analyze
                             if (!analyzing) {               //Controlla che il sistema non sia in analisi
-                                pathSent = 0;        //Azzera il numero di percorsi inviati
-                                notAnalyzed = 0;     //Azzera il numero di percorsi non analizzati
-                                perc = 0;            //Azzera il numero di percorsi ritornati
-                                if (count > 0)       //Se ci sono dei file da poter analizzare
-                                    _write = FALSE;  //Abilita la scrittura
+                                pathSent = 0;               //Azzera il numero di percorsi inviati
+                                notAnalyzed = 0;            //Azzera il numero di percorsi non analizzati
+                                perc = 0;                   //Azzera il numero di percorsi ritornati
+                                if (count > 0)              //Se ci sono dei file da poter analizzare
+                                    _write = FALSE;         //Abilita la scrittura
                                 else
                                     printf("\nNon ci sono file da analizzare\n");
                             } else {
@@ -512,23 +512,41 @@ int main(int argc, char *argv[]) {  //Main
                         if (!strncmp(print_method, "print", 5)) {     //Se il comando e` print
                             if (!analyzing) {                         //Controlla che il progrmma non sia in analisi
                                 for (j = 0; j < lista->count; j++) {  //Invia tutti i percorsi inseriti
-                                    write(fd1_fifo, lista->pathList[j], DIM_PATH + 2);
+                                    write(fd1_fifo, lista->pathList[j], DIM_PATH);
                                 }
                             } else {
                                 strcpy(tmp_resp, "#ANALYZING");  //Se e` in analisi, setta la stringa di fine invio ad #ANALYZING per indicare che R non puo` ottenere dati in questo momento
                             }
 
-                            write(fd1_fifo, tmp_resp, DIM_PATH + 2);
+                            write(fd1_fifo, tmp_resp, DIM_PATH);
                             strcpy(tmp_resp, "///");  //RIpristina la stringa di fine carattere a "///" nel caso in cui sia stata modificata precedentemente
                         }
-                        if (!strncmp(print_method, "-d", 2)) { //Se il comando e` -d
-                            if (!analyzing) { //Se non sta anlizzando
-                                //Inserire for con invio
+                        if (!strncmp(print_method, "-d", 2)) {        //Se il comando e` -d
+                            if (!analyzing) {                         //Se non sta analizzando
+                                for (j = 0; j < lista->count; j++) {  //Invia tutti i percorsi inseriti con flag deleted
+                                    if (lista->analyzed[j] == REMOVED) {
+                                        write(fd1_fifo, lista->pathList[j], DIM_PATH);
+                                    }
+                                }
                             } else {
-                                strcpy(tmp_resp, "#ANALYZING"); //In caso contrario avverte R che in questo momento non puo` ottenere datei
+                                strcpy(tmp_resp, "#ANALYZING");  //In caso contrario avverte R che in questo momento non puo` ottenere datei
                             }
 
-                            write(fd1_fifo, tmp_resp, DIM_PATH + 2);
+                            write(fd1_fifo, tmp_resp, DIM_PATH);
+                            strcpy(tmp_resp, "///");  //RIpristina la stringa di fine carattere a "///" nel caso in cui sia stata modificata precedentemente
+                        }
+                        if (!strncmp(print_method, "-x", 2)) {        //Se il comando e` -x
+                            if (!analyzing) {                         //Se non sta analizzando
+                                for (j = 0; j < lista->count; j++) {  //Invia tutti i percorsi inseriti con flag analyzed
+                                    if (lista->analyzed[j] == ANALYZED) {
+                                        write(fd1_fifo, lista->pathList[j], DIM_PATH);
+                                    }
+                                }
+                            } else {
+                                strcpy(tmp_resp, "#ANALYZING");  //In caso contrario avverte R che in questo momento non puo` ottenere datei
+                            }
+
+                            write(fd1_fifo, tmp_resp, DIM_PATH);
                             strcpy(tmp_resp, "///");  //RIpristina la stringa di fine carattere a "///" nel caso in cui sia stata modificata precedentemente
                         }
                         if (!strncmp(print_method, "-c", 2)) {   //Se il comando e` -c
@@ -622,7 +640,7 @@ int main(int argc, char *argv[]) {  //Main
 
                             if (_write == TRUE && perc == pathSent && value_return == 0) {  //Se ha finito di scrivere e ha ricevuto tutti i percorsi
                                 count -= lista->count;                                      //Diminuisce count della lunghezza della lista
-                                printf(WHITE "Numero file analizzati" RESET ": %d\n", pathSent-notAnalyzed);
+                                printf(WHITE "Numero file analizzati" RESET ": %d\n", pathSent - notAnalyzed);
                                 arrayToCsv(v, sum);  //Crea la stringa delle somme
                                 pathSent = 0;        //Setta i percorsi inviati a 0
                                 analyzing = FALSE;   //Esce dalla procedura di analisi

@@ -46,9 +46,9 @@
 
 #define REMOVED -2
 #define INEXISTENCE -1
-#define TO_BE_ANALIZED 0
-#define ANALIZED 1
-#define ANALIZED_INEXISTENCE 2
+#define TO_BE_ANALYZED 0
+#define ANALYZED 1
+#define ANALYZED_INEXISTENCE 2
 
 #define A 0
 #define R 1
