@@ -105,10 +105,10 @@ int parser_LenghtCommand(char *);
 //Funzioni IPC
 void close_pipes(int *, int);
 int unlock_pipes(int *, int);
-void forkC(int *, int *, int *, int *);
-void forkP(int *, int *, int *, int *);
-void execC(int *, int *, int *, int *, int *, int *);
-void execP(int *, int *, int *, int *, int *, int *);
+char forkC(int *, int *, int *, int *);
+char forkP(int *, int *, int *, int *);
+char execC(int *, int *, int *, int *, int *, int *);
+char execP(int *, int *, int *, int *, int *, int *);
 int createPipe(int *, int);
 
 //Funzioni Set on Fly e chiusura

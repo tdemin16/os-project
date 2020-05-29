@@ -107,10 +107,16 @@ int main(int argc, char* argv[]) {
                                     if (unlock_pipes(fd, size_pipe) == -1) {  //Set nonblocking pipes
                                         value_return = err_fcntl();           //Gestione errore sullo sblocco pipe
                                     }
-                                    forkP(&m, &f, &id, &value_return);                              //Forko i processi
-                                    if (f == 0) execP(&m, &f, &id, fd, &value_return, &size_pipe);  //Exec dei processi forkati
-                                    send_r = TRUE;                                                  //setto a true per evitare che vada nel ramo sbagliato della read sotto
-                                    resetPathList(sum);                                             //resetto sum
+                                    if (!forkP(&m, &f, &id, &value_return)) {
+                                        value_return = ERR_FORK;
+                                    }  //Forko i processi
+                                    if (f == 0) {
+                                        if (!execP(&m, &f, &id, fd, &value_return, &size_pipe)){
+                                            value_return = ERR_EXEC;
+                                        }
+                                    }                    //Exec dei processi forkati
+                                    send_r = TRUE;       //setto a true per evitare che vada nel ramo sbagliato della read sotto
+                                    resetPathList(sum);  //resetto sum
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
                                 }

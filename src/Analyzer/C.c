@@ -116,8 +116,14 @@ int main(int argc, char* argv[]) {
                                     if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {  //Sblocca lo stdin (teoricamente non necessario)
                                         value_return = err_fcntl();                  //Gestione errore sullo sblocco pipe
                                     }
-                                    forkC(&n, &f, &id, &value_return);
-                                    if (f == 0) execC(&m, &f, &id, fd, &value_return, &size_pipe);
+                                    if (!forkC(&n, &f, &id, &value_return)) {
+                                        value_return = ERR_FORK;
+                                    }
+                                    if (f == 0) {
+                                        if (!execC(&m, &f, &id, fd, &value_return, &size_pipe)){
+                                            value_return = ERR_EXEC;
+                                        }
+                                    }
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
 

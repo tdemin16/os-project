@@ -371,7 +371,7 @@ int unlock_pipes(int *fd, int size) {
     return ret;
 }
 
-void forkC(int *n, int *f, int *id, int *value_return) {
+char forkC(int *n, int *f, int *id, int *value_return) {
     int i;
     for (i = 0; i<*n && * f> 0 && *value_return == 0; i++) {
         *f = fork();
@@ -381,8 +381,9 @@ void forkC(int *n, int *f, int *id, int *value_return) {
             *value_return = err_fork();  //In caso di errore setta il valore di ritorno a ERR_FORK
         }
     }
+    return TRUE;
 }
-void forkP(int *m, int *f, int *id, int *value_return) {
+char forkP(int *m, int *f, int *id, int *value_return) {
     int i;
     for (i = 0; i<*m && * f> 0 && *value_return == 0; i++) {
         *f = fork();
@@ -392,9 +393,10 @@ void forkP(int *m, int *f, int *id, int *value_return) {
             *value_return = err_fork();  //In caso di errore setta il valore di ritorno a ERR_FORK
         }
     }
+    return TRUE;
 }
 
-void execC(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) {
+char execC(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) {
     char str[12];
     sprintf(str, "%d", *m);
     char *args[3] = {"./P", str, NULL};
@@ -406,8 +408,9 @@ void execC(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) 
         //fprintf(stderr, "%d", errno);
         *value_return = err_exec(errno);  //Set value return
     }
+    return TRUE;
 }
-void execP(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) {
+char execP(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) {
     char str[12];
     sprintf(str, "%d", *id);
     char str2[12];
@@ -421,6 +424,7 @@ void execP(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) 
         //fprintf(stderr, "%d", errno);
         *value_return = err_exec(errno);  //Set value return
     }
+    return TRUE;
 }
 
 int createPipe(int *fd, int size_pipe) {
