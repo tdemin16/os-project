@@ -650,14 +650,16 @@ int main(int argc, char *argv[]) {  //Main
 
                             if (_write == TRUE && perc == pathSent && value_return == 0) {  //Se ha finito di scrivere e ha ricevuto tutti i percorsi
                                 count -= lista->count;                                      //Diminuisce count della lunghezza della lista
-                                printf(WHITE "Numero file analizzati" RESET ": %d\n", pathSent);
+                                printf(WHITE "Numero file analizzati" RESET ": %d\n", pathSent-notAnalyzed);
                                 arrayToCsv(v, sum);  //Crea la stringa delle somme
                                 pathSent = 0;        //Setta i percorsi inviati a 0
                                 analyzing = FALSE;   //Esce dalla procedura di analisi
                                 _read = FALSE;       //Smette di leggere
                                 if (notAnalyzed > 0) {
-                                    printf(BOLDWHITE "[ATTENZIONE]" RESET " %d file non analizzati. Usare il comando " WHITE "reanalyze" RESET " per rianalizzarli\n", notAnalyzed);
+                                    printf(BOLDWHITE "[ATTENZIONE]" RESET " %d file non analizzati. Usare il comando " WHITE "print -d" RESET " visualizzare i file non piu\n", notAnalyzed);
                                 }
+                                count = notAnalyzed;
+                                notAnalyzed = 0;
                                 printf("\n> ");
                                 fflush(stdout);
                             }

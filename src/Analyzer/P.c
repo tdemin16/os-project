@@ -95,6 +95,7 @@ int main(int argc, char* argv[]) {
             fclose(debug);
             while (value_return == 0 && (!_close)) {
                 //Write
+                sleep(10);
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere

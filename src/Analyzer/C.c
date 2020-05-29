@@ -96,6 +96,7 @@ int main(int argc, char* argv[]) {
             fprintf(debug, "AVVIATO C\n");
             fclose(debug);
             while (value_return == 0 && (!_close)) {                   //Cicla finche` non ha finito di leggere o scrivere o va in errore
+                sleep(10);
                 if (!_write) {                                         //CICLO DI SCRITTURA
                     if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
@@ -229,9 +230,6 @@ int main(int argc, char* argv[]) {
                     fprintf(debug, "C: SLEEP\n");
                     fclose(debug);
                 }
-                debug = fopen(str, "a");
-                fprintf(debug, "C: value_return = %d\n", value_return);
-                fclose(debug);
             }
 
             while (wait(NULL) > 0)
