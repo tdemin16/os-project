@@ -554,9 +554,13 @@ int main(int argc, char *argv[]) {  //Main
                             write(fd1_fifo, tmp_resp, DIM_PATH);
                             strcpy(tmp_resp, "///");  //RIpristina la stringa di fine carattere a "///" nel caso in cui sia stata modificata precedentemente
                         }
-                        if (!strncmp(print_method, "-c", 2)) {   //Se il comando e` -c
-                            if (!analyzing) {                    //Se non sta analizzando
-                                analyzeCluster(sum, type_resp);  //Esegue la statistica
+                        if (!strncmp(print_method, "-c", 2)) {  //Se il comando e` -c
+                            if (!analyzing) {                   //Se non sta analizzando
+                                if (strstr(sum, ",") != NULL) {
+                                    analyzeCluster(sum, type_resp);  //Esegue la statistica
+                                } else {
+                                    strcpy(type_resp, "#EMPTY");
+                                }
                             } else {
                                 strcpy(type_resp, "#ANALYZING");  //In caso contrario avverte R che in questo momento non puo` ottenere dati
                             }
@@ -566,7 +570,11 @@ int main(int argc, char *argv[]) {  //Main
                             if (analyzing) {                      //Se sta analizzando
                                 strcpy(type_resp, "#ANALYZING");  //Avverte R della situazione
                             } else {
-                                strcpy(type_resp, sum);  //Copia nella stringa di risposta la somma dei valori
+                                if (strstr(sum, ",") != NULL) {
+                                    strcpy(type_resp, sum);  //Copia nella stringa di risposta la somma dei valori
+                                } else {
+                                    strcpy(type_resp, "#EMPTY");
+                                }
                             }
                             write(fd1_fifo, type_resp, DIM_RESP);  //Scrive la risposta
                         }
@@ -638,7 +646,7 @@ int main(int argc, char *argv[]) {  //Main
                                 count -= lista->count;
                                 time(&end);  //Diminuisce count della lunghezza della lista
                                 elapsed = difftime(end, start);
-                                printf(WHITE "Analizzati " RESET "%d " WHITE "files in %d secondi"RESET"\n", totFiles - notAnalyzed, (int)elapsed);
+                                printf(WHITE "Analizzati " RESET "%d " WHITE "files in %d secondi" RESET "\n", totFiles - notAnalyzed, (int)elapsed);
                                 arrayToCsv(v, sum);  //Crea la stringa delle somme
                                 pathSent = 0;        //Setta i percorsi inviati a 0
                                 totFiles = 0;
