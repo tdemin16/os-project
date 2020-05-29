@@ -21,23 +21,22 @@ void handle_sigint(int sig) {        //handler per il CTRL-C, ha l'obiettivo di
 int main(int argc, char *argv[]) {  //main
     signal(SIGINT, handle_sigint);  //Handler per SIGINT (Ctrl-C)
 
-    //------------------------------ DEFINIZIONE VARIABILI
     p = create_process(1);  //Allocazione dinamica di p con dimensione 1
     int value_return = 0;   //Assegno il valore di default 0 a value return
     pid_t f = getpid();     //Inizializzo p e assegno il pid del processo M
     char cmd[DIM_CMD];      //contiente il comando lanciato
     char ch = '0';          //per leggere un carattere per volta
     int end = FALSE;        //TRUE se lanciato il comando "close"
-    int res_cmd;            //Inizializzo variabile
-    int _write = TRUE;      //Inizializzo variabile per il write e la assegno a TRUE
-    int i;                  //Inizializzo variabile di iterazione i
-    int id;                 //Inizializzo variabile
-    int fptr;               //Inizializzo variabile
-    int c[1];               //Inizializzo variabile
+    int res_cmd;
+    int _write = TRUE;
+    int i;
+    int id;
+    int fptr;
+    int c[1];
 
     //IPC Variables--------------------------------------------------
-    int fd[4];           //Inizializzo variabile
-    char array_args[4];  //Inizializzo variabile
+    int fd[4];
+    char array_args[4];
 
     //IPC
     if (value_return == 0) {                //Se il value return rimane a zero (=> non ci sono errori) prosegui
@@ -56,19 +55,19 @@ int main(int argc, char *argv[]) {  //main
     }
     insertProcess(p, getpid());                                  //Inserisci il processo con pid padre nella lista processi
     if (value_return == 0) {                                     //Se il value return rimane a zero (=> non ci sono errori) prosegui
-        for (i = 0; i < 2 && f > 0 && value_return == 0; i++) {  //Cicla
+        for (i = 0; i < 2 && f > 0 && value_return == 0; i++) {  //Esegue il ciclo solo il padre e se non ci sono errori
             f = fork();                                          //esegui fork
-            if (f == 0)                                          //se f == 0
-                id = i;                                          //vuol dire che siamo ancora nel processo padre e quindi ad id assegna i
-            else if (f == -1)                                    //se f == -1
-                value_return = err_fork();                       //vuol dire che c'è stato un errore, dunque value return prende il valore di errore nel fare forking
-            else                                                 //altrimenti è andato a buon fine e siamo nel processo figlio:
-                insertProcess(p, f);                             //inserisci il nuovo processo con pid f nella lista processi avviati
+            if (f == 0)
+                id = i;  //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
+            else if (f == -1)
+                value_return = err_fork();  //vuol dire che c'è stato un errore, dunque value return prende il valore di errore nel fare forking
+            else                            //altrimenti è andato a buon fine e siamo nel processo figlio:
+                insertProcess(p, f);        //inserisci il nuovo processo con pid f nella lista processi avviati
         }
     }
 
     //--------------------------------------------------------------------------------
-    if (value_return == 0) {                     //Se il value return rimane a zero (=> non ci sono errori) prosegui
+    if (value_return == 0) {
         if (f > 0) {                             //PARENT SIDE
             while (!end && value_return == 0) {  //CICLO DI ATTESA COMANDI IN INPUT
                 strcpy(cmd, "");                 //svuota la stringa per il prossimo comando
@@ -157,7 +156,7 @@ int main(int argc, char *argv[]) {  //main
                         printf("\n> ");
                         fflush(stdout);
                     } else {  //Help comandi
-                        printf(BOLDBLUE "\nLista Comandi disponibili\n" RESET);
+                        printf(BOLDWHITE "\nLISTA COMANDI DISPONIBILI\n" RESET);
                         printf(BOLDWHITE "add </path1> </path2>" RESET ": aggiunge uno o piu` file e/o una o piu` directory\n");
                         printf(BOLDBLACK "\t es: add ../src ../deploy.sh\n" RESET);
                         printf(BOLDWHITE "remove </path1> </path2>" RESET ": rimuove uno o piu` file e/o una o piu` directory\n");
@@ -167,7 +166,9 @@ int main(int argc, char *argv[]) {  //main
                         printf(WHITE "\tNessun flag" RESET ": stampa tutti i file inseriti\n");
                         printf(WHITE "\t-d" RESET ": stampa tutti i file che dall'ultima analisi sono risultati inesistenti\n");
                         printf(WHITE "\t-x" RESET ": stampa tutti i file che sono stati analizzati\n");
-                        printf(BOLDWHITE "analyze" RESET ": avvia l'analizzatore\n");
+                        printf(BOLDWHITE "analyze" RESET ": analizza tutti i file non ancora analizzati\n");
+                        printf(BOLDWHITE "reanalyze" RESET ": analizza tutti i file anche quelli gia` analizzati\n");
+                        printf(BOLDWHITE "stat" RESET ": durante l'analisi stampa a video lo stato di avanzamento\n");
                         printf(BOLDWHITE "set <n> <m>" RESET ": setta i nuovi valori di n e m\n");
                         printf(BOLDBLACK "\t es: set 4 5\n" RESET);
                         printf(BOLDWHITE "setn <val>" RESET ": setta i nuovi valori di n\n");
@@ -244,7 +245,7 @@ int check_command(char *cmd) {
             checkArg(cmd, &spaces);
             if (spaces != 2) res = -1;  //Controlla la corretta sintassi del comando
         }
-    } else if (!strncmp(cmd, "add", 3) || !strncmp(cmd, "remove", 6) || !strcmp(cmd, "reset") || !strcmp(cmd, "analyze") || !strcmp(cmd, "reanalyze") || !strncmp(cmd, "set", 3) || !strncmp(cmd, "clear", 4)) {  //A
+    } else if (!strncmp(cmd, "add", 3) || !strncmp(cmd, "remove", 6) || !strcmp(cmd, "reset") || !strcmp(cmd, "analyze") || !strcmp(cmd, "reanalyze") || !strncmp(cmd, "set", 3) || !strncmp(cmd, "clear", 5) || !strncmp(cmd, "stat", 4)) {  //A
         res = 2;
     } else if (!strcmp(cmd, "help") || !strcmp(cmd, "info")) {  //HELP e info
         res = 3;

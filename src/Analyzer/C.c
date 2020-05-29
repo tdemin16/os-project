@@ -78,9 +78,8 @@ int main(int argc, char* argv[]) {
             f = fork();
             if (f == 0) {
                 id = i;                     //Assegno ad id il valore di i cosi' ogni figlio avra' un id diverso
-            } else if (f == -1) {           //Controllo che non ci siano stati errori durante il fork
+            } else if (f == -1)             //Controllo che non ci siano stati errori durante il fork
                 value_return = err_fork();  //In caso di errore setta il valore di ritorno a ERR_FORK
-            }
         }
     }
 
@@ -89,7 +88,7 @@ int main(int argc, char* argv[]) {
         i = 0;
         k = 0;
         j = 0;
-        if (f > 0) {  //PARENT SIDE
+        if (f > 0) {                                                   //PARENT SIDE
             while (value_return == 0 && (!_close)) {                   //Cicla finche` non ha finito di leggere o scrivere o va in errore
                 if (!_write) {                                         //CICLO DI SCRITTURA
                     if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
@@ -148,7 +147,7 @@ int main(int argc, char* argv[]) {
                                         stop = TRUE;
                                         strcpy(failedPath, path);
                                     }
-                                } else {  //scritto con successo
+                                } else {              //scritto con successo
                                     count++;          //Tengo conto della scrittura
                                     j = (j + 1) % n;  //Usato per ciclare su tutte le pipe in scrittura
                                 }
@@ -169,8 +168,8 @@ int main(int argc, char* argv[]) {
 
                 //Read
                 if (!_read) {
-                    if (send_r) {                                       //Coontrolla se non ci sonon valori non inviati
-                        if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {  //Prova a leggere dalla pipe
+                    if (send_r) {                                                  //Coontrolla se non ci sonon valori non inviati
+                        if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {             //Prova a leggere dalla pipe
                             if (strstr(resp, "#") != NULL) {                       //Controlla che nella stringa sia contenuto il carattere #
                                 if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {  //Prova a scrivere sulla pipe del padre
                                     if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
@@ -197,7 +196,6 @@ int main(int argc, char* argv[]) {
                 if (pendingPath == 0) {
                     oldfl = fcntl(STDIN_FILENO, F_GETFL);
                     if (oldfl == -1) {
-
                     }
                     fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
                 }
