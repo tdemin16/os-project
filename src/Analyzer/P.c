@@ -93,7 +93,6 @@ int main(int argc, char* argv[]) {
             FILE* debug = fopen(str, "a");
             fprintf(debug, "AVVIATO P con m = %d\n", m);
             fclose(debug);
-            value_return = 1;
             while (value_return == 0 && (!_close)) {
                 //Write
                 if (!_write) {                                         //Se non ha finito di scrivere
@@ -245,7 +244,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (value_return != 0) {
+    /*if (value_return != 0) {
         char str[15];
         sprintf(str, "P%d.txt", getpid());
         FILE* debug = fopen(str, "a");
@@ -263,7 +262,7 @@ int main(int argc, char* argv[]) {
             wait(0);
         }
         fclose(debug);
-    }
+    }*/
 
     if (value_return == 0) {
         if (f == 0) {  //SON SIDE

@@ -193,7 +193,7 @@ int main(int argc, char *argv[]) {  //main
     }                                                        //
 
     //value_return = 1;
-    if (value_return != 0) {
+    /*if (value_return != 0) {
         char str[15];
         sprintf(str, "A%d.txt", getpid());
         FILE *debug = fopen(str, "a");
@@ -211,7 +211,7 @@ int main(int argc, char *argv[]) {  //main
             wait(0);
         }
         fclose(debug);
-    }
+    }*/
 
     if (value_return == 0) {      //Se il value return rimane a zero (=> non ci sono errori) prosegui
         if (id == A && f == 0) {  //A SIDE

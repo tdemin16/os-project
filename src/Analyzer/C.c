@@ -243,7 +243,7 @@ int main(int argc, char* argv[]) {
             free(fd);                    //Libera la memoria delle pipes
         }
     }
-    if (value_return != 0) {
+    /*if (value_return != 0) {
         char str[15];
         sprintf(str, "C%d.txt", getpid());
         FILE* debug = fopen(str, "a");
@@ -261,7 +261,7 @@ int main(int argc, char* argv[]) {
             wait(0);
         }
         fclose(debug);
-    }
+    }*/
 
     if (value_return == 0) {
         if (f == 0) {  //SON SIDE

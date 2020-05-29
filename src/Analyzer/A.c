@@ -682,7 +682,7 @@ int main(int argc, char *argv[]) {  //Main
             close(fd_2[WRITE]);
 
             //value_return = 1;
-            if (value_return != 0) {
+            /*if (value_return != 0) {
                 char str[15];
                 sprintf(str, "A%d.txt", getpid());
                 FILE *debug = fopen(str, "a");
@@ -700,7 +700,7 @@ int main(int argc, char *argv[]) {  //Main
                     wait(0);
                 }
                 fclose(debug);
-            }
+            }*/
 
             //Chiusura pipe fifo
             if (value_return == 0) {
