@@ -114,12 +114,12 @@ int main(int argc, char *argv[]) {  //main
                         ;
                 }
 
-                if (res_cmd == 1) {                                              //Il comando deve essere mandato ad R
-                    if (strstr(cmd, "print") != NULL || strstr(cmd, "report") != NULL) {         //Controllo se la stringa di comando è "print" o se contiene report
-                        while (value_return == 0 && _write) {                    //Scrive il comando ad R
-                            if (write(fd[R * 2 + WRITE], cmd, DIM_CMD) == -1) {  //Verifico la corretta scrittura su R, in caso negativo controllo:
-                                if (errno != EAGAIN) {                           //Se l'errore è differente da EAGAIN
-                                    value_return = err_write();                  //Allora a value return assegno errore della write
+                if (res_cmd == 1) {                                                       //Il comando deve essere mandato ad R
+                    if (strstr(cmd, "print") != NULL || strstr(cmd, "report") != NULL) {  //Controllo se la stringa di comando è "print" o se contiene report
+                        while (value_return == 0 && _write) {                             //Scrive il comando ad R
+                            if (write(fd[R * 2 + WRITE], cmd, DIM_CMD) == -1) {           //Verifico la corretta scrittura su R, in caso negativo controllo:
+                                if (errno != EAGAIN) {                                    //Se l'errore è differente da EAGAIN
+                                    value_return = err_write();                           //Allora a value return assegno errore della write
                                 }
                             } else {
                                 _write = FALSE;  //Smette di scrivere ad R
@@ -163,7 +163,10 @@ int main(int argc, char *argv[]) {  //main
                         printf(BOLDWHITE "remove </path1> </path2>" RESET ": rimuove uno o piu` file e/o una o piu` directory\n");
                         printf(BOLDBLACK "\t es: remove ../src ../deploy.sh\n" RESET);
                         printf(BOLDWHITE "reset" RESET ": elimina dalla cache del programma le statistiche e tutti i percorsi analizzati e non\n");
-                        printf(BOLDWHITE "print" RESET ": stampa a video tutte il percorso di tutti i file analizzati\n");
+                        printf(BOLDWHITE "print" RESET " <-flag>\n");
+                        printf(WHITE "\tNessun flag" RESET ": stampa tutti i file inseriti\n");
+                        printf(WHITE "\t-d" RESET ": stampa tutti i file che dall'ultima analisi sono risultati inesistenti\n");
+                        printf(WHITE "\t-x" RESET ": stampa tutti i file che sono stati analizzati\n");
                         printf(BOLDWHITE "analyze" RESET ": avvia l'analizzatore\n");
                         printf(BOLDWHITE "set <n> <m>" RESET ": setta i nuovi valori di n e m\n");
                         printf(BOLDBLACK "\t es: set 4 5\n" RESET);

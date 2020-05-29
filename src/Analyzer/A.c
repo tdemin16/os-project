@@ -499,11 +499,11 @@ int main(int argc, char *argv[]) {  //Main
 
                 //R
                 if (!_close && value_return == 0) {
-                    if (retrieve) {                                                                                                                                             //Se R puo` richiedere dati
-                        if (read(fd2_fifo, print_method, DIM_CMD) > 0) {                                                                                                        //Prova a leggere da R
-                            if (!strncmp(print_method, "print", 5) || !strncmp(print_method, "-c", 2) || !strncmp(print_method, "-a", 2) || !strncmp(print_method, "-d", 2)) {  //Controlla che i comandi ricevuti siano corretti
-                                retrieve = FALSE;                                                                                                                               //Se si smette di leggere da R per inviargli i dati
-                                if (analyzing) {                                                                                                                                //Se sta analizzando stampa un messaggio di errore
+                    if (retrieve) {                                                                                                                                                                                //Se R puo` richiedere dati
+                        if (read(fd2_fifo, print_method, DIM_CMD) > 0) {                                                                                                                                           //Prova a leggere da R
+                            if (!strncmp(print_method, "print", 5) || !strncmp(print_method, "-c", 2) || !strncmp(print_method, "-a", 2) || !strncmp(print_method, "-d", 2) || !strncmp(print_method, "-x", 2)) {  //Controlla che i comandi ricevuti siano corretti
+                                retrieve = FALSE;                                                                                                                                                                  //Se si smette di leggere da R per inviargli i dati
+                                if (analyzing) {                                                                                                                                                                   //Se sta analizzando stampa un messaggio di errore
                                     printf(BOLDYELLOW "\n[ATTENZIONE]" RESET " Analisi in corso, non e` possibile stampare\n");
                                 }
                             }

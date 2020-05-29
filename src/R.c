@@ -61,44 +61,44 @@ int main() {                            //struttura main
 
     //IPC--------------------------------------------------------------------------------------------
 
-    if (value_return == 0) {                                           //
-        printf("Waiting for A...\n");                                  //
-        printf("Use " BOLDYELLOW "[CTRL+C]" RESET " to interrupt\n");  //
+    if (value_return == 0) {
+        printf("Waiting for A...\n");
+        printf("Use " BOLDYELLOW "[CTRL+C]" RESET " to interrupt\n");
 
         if (mkfifo(fifo1, 0666) == -1) {    //Prova a creare la pipe
             if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
                 value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
-            }                               //
-        }                                   //
+            }
+        }
 
-        fd1_fifo = open(fifo1, O_RDONLY);                   //
-        if (fd1_fifo == -1) {                               //
-            value_return = err_fifo();                      //
-        }                                                   //
-        do {                                                //
-            if (!enoent) {                                  //
-                if (mkfifo(fifo2, 0666) == -1) {            //Prova a creare la pipe
-                    if (errno != EEXIST) {                  //In caso di errore controlla che la pipe non fosse gia` presente
-                        value_return = err_fifo();          //Ritorna errore se l'operazione non va a buon fine
-                    }                                       //
-                }                                           //
-            }                                               //
-            fd2_fifo = open(fifo2, O_WRONLY | O_NONBLOCK);  //
-            if (fd2_fifo != -1) {                           //
-                p_create = TRUE;                            //
-            } else if (errno == ENOENT) {                   //
-                enoent = FALSE;                             //
-            } else if (errno != ENXIO) {                    //
-                value_return = err_fifo();                  //
-            }                                               //
-        } while (value_return == 0 && !p_create);           //
-    }                                                       //
+        fd1_fifo = open(fifo1, O_RDONLY);
+        if (fd1_fifo == -1) {
+            value_return = err_fifo();
+        }
+        do {
+            if (!enoent) {
+                if (mkfifo(fifo2, 0666) == -1) {    //Prova a creare la pipe
+                    if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
+                        value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
+                    }
+                }
+            }
+            fd2_fifo = open(fifo2, O_WRONLY | O_NONBLOCK);
+            if (fd2_fifo != -1) {
+                p_create = TRUE;
+            } else if (errno == ENOENT) {
+                enoent = FALSE;
+            } else if (errno != ENXIO) {
+                value_return = err_fifo();
+            }
+        } while (value_return == 0 && !p_create);
+    }
 
-    if (value_return == 0) {                             //
-        if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {  //
-            value_return = err_fcntl();                  //
-        }                                                //
-    }                                                    //
+    if (value_return == 0) {
+        if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {
+            value_return = err_fcntl();
+        }
+    }
 
     while (value_return == 0 && !_close) {
         if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
@@ -140,7 +140,7 @@ int main() {                            //struttura main
                         dupl = strdup(cmd);
                         flag = strtok(dupl, " ");
                         flag = strtok(NULL, " ");
-                        if (strncmp(flag, "-d", 2)) {
+                        if (strncmp(flag, "-d", 2) && strncmp(flag, "-x", 2)) {
                             _r_write = FALSE;
                             retrieve = FALSE;
                             printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
@@ -168,7 +168,43 @@ int main() {                            //struttura main
         }
         while (retrieve) {
             if (!strncmp(cmd, "print", 5)) {
-                if (read(fd1_fifo, path, DIM_PATH + 2) > 0) {
+                if (read(fd1_fifo, path, DIM_PATH) > 0) {
+                    if (strstr(path, "#") != NULL) {
+                        if (strncmp(path, "#ANALYZING", 10)) {
+                            printf("%s\n", path);
+                            usleep(10000);
+                            arr = TRUE;
+                        } else {
+                            retrieve = FALSE;
+                        }
+                    } else if (!strncmp(path, "///", 3)) {
+                        retrieve = FALSE;
+                        if (!arr) printf("Lista vuota\n");
+                        printf("\n> ");
+                        fflush(stdout);
+                    }
+                }
+            }
+            if (!strncmp(cmd, "-d", 2)) {
+                if (read(fd1_fifo, path, DIM_PATH) > 0) {
+                    if (strstr(path, "#") != NULL) {
+                        if (strncmp(path, "#ANALYZING", 10)) {
+                            printf("%s\n", path);
+                            usleep(10000);
+                            arr = TRUE;
+                        } else {
+                            retrieve = FALSE;
+                        }
+                    } else if (!strncmp(path, "///", 3)) {
+                        retrieve = FALSE;
+                        if (!arr) printf("Lista vuota\n");
+                        printf("\n> ");
+                        fflush(stdout);
+                    }
+                }
+            }
+            if (!strncmp(cmd, "-x", 2)) {
+                if (read(fd1_fifo, path, DIM_PATH) > 0) {
                     if (strstr(path, "#") != NULL) {
                         if (strncmp(path, "#ANALYZING", 10)) {
                             printf("%s\n", path);
