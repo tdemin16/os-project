@@ -91,11 +91,8 @@ typedef struct process {
 //Funzione di gestione della struttura processi e gestione chiusura
 process *create_process(int);
 void insertProcess(process *, pid_t);
-void printList(process *);
 void freeList(process *);
-void add_process_to_v(pid_t, int *);
 void initialize_processes(pid_t *, int);
-void handle_sigint(int);
 
 //Funzioni di gestione della struttura PathList
 array *createPathList(int);
@@ -105,20 +102,16 @@ int insertAndSumPathList(array *, char *, int);
 char removeFromPathList(array *, char *c);
 void printPathList(array *);
 void freePathList(array *);
-int dimPathList(array *);
 void resetPathList(array *);
 int compare_mtime(array *, int, char *);
 void cleanRemoved(array *);
+char sameId(char *, char *);
 
 //Parser e funzioni ausiliarie
 int parser2(int, char **, array *, int *, int *, int *, int *, int *);
 int parser_CheckArguments(int, char **, int *, int *);
 int parser_LenghtCommand(char *);
 void parser_CreateCommand(char *);
-
-//Funzioni
-void setAnalyzed(array *, int, int);
-int getAnalyzed(array *, int);
 
 //Funzioni IPC
 void close_pipes(int *, int);
@@ -147,6 +140,11 @@ void get_subset(int *, long *, int, int);
 void get_frequencies(int *, long *, int, int);
 int file_len(FILE *);
 void arrayToCsv(long *, char *);
+int countDigit(int);
+int lenghtCsv(int *);
+char sumCsv(char *, char *);
+void createCsv(long *, char *, char *);
+char addCsvToArray(char *, long *);
 
 //Funzioni di controllo percorsi
 char fileExist(char *);
@@ -160,13 +158,7 @@ void analyzeCluster(char *, char *);
 void printCluster(char *);
 void printInfoCluster();
 
-char *integer_to_string(int);
-int countDigit(int);
-int lenghtCsv(int *);
-char sumCsv(char *, char *);
-void createCsv(long *, char *, char *);
-char addCsvToArray(char *, long *);
-char sameId(char *, char *);
+
 
 //Errori
 int err_file_open();
