@@ -42,8 +42,6 @@ int main(int argc, char* argv[]) {
     int sum_value;
     int oldfl;
     int pendingPath = 0;
-    /*  char cleanPipe = FALSE;
-    int son = 0; */
 
     //Parsing arguments-------------------------------------------------------
     if (argc != 2) {
@@ -88,21 +86,11 @@ int main(int argc, char* argv[]) {
     //----------------------------------------------------------------------
     if (value_return == 0) {
         if (f > 0) {  //PARENT SIDE
-            char str[15];
-            sprintf(str, "P%d.txt", getpid());
-            FILE* debug = fopen(str, "a");
-            fprintf(debug, "AVVIATO P con m = %d\n", m);
-            fclose(debug);
             while (value_return == 0 && (!_close)) {
                 //Write
-
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
-                            debug = fopen(str, "a");
-                            fprintf(debug, "P: LEGGO %s\n", path);
-                            fclose(debug);
-
                             if (!strncmp(path, "#", 1)) {  //Se si tratta di un comando
                                 if (!strncmp(path, "#CLOSE", 6)) {
                                     _read = TRUE;
@@ -134,16 +122,10 @@ int main(int argc, char* argv[]) {
                                 pendingPath = 0;
                             } else {            //Se si tratta di un percorso
                                 pendingPath++;  //Incremento il numero di percorsi da analizzare
-                                debug = fopen(str, "a");
-                                fprintf(debug, "P: PENDING: %d\n", pendingPath);
-                                fclose(debug);
                                 if (pendingPath == 1) {
                                     if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {  //Se è il primo sblocco lo stdin
                                         value_return = err_fcntl();
                                     }
-                                    debug = fopen(str, "a");
-                                    fprintf(debug, "P: WAKE UP\n");
-                                    fclose(debug);
                                 }
                                 for (i = 0; i < m; i++) {  //Provo a inviare path a tutti i Q
                                     if (write(fd[i * 4 + 3], path, DIM_PATH) == -1) {
@@ -155,9 +137,6 @@ int main(int argc, char* argv[]) {
                                         }
                                     } else {
                                         terminated[i] = TRUE;
-                                        debug = fopen(str, "a");
-                                        fprintf(debug, "P: INVIATO %s\n", path);
-                                        fclose(debug);
                                     }
                                 }
                             }
@@ -174,9 +153,6 @@ int main(int argc, char* argv[]) {
                                     }
                                 } else {
                                     terminated[i] = TRUE;
-                                    debug = fopen(str, "a");
-                                    fprintf(debug, "P: INVIATO %s\n", path);
-                                    fclose(debug);
                                 }
                             }
                         }
@@ -188,9 +164,6 @@ int main(int argc, char* argv[]) {
                     if (send_r) {
                         for (i = 0; i < m; i++) {  //Cicla tra tutti i figli
                             if (read(fd[i * 4 + 0], resp, DIM_RESP) > 0) {
-                                debug = fopen(str, "a");
-                                fprintf(debug, "P: (<) LEGGO  %s\n", resp);
-                                fclose(debug);
                                 if (strstr(resp, "#") != NULL) {
                                     sum_value = insertAndSumPathList(sum, resp, m - 1);
                                     if (sum_value > -1) {  //Qualcosa è arrivato a 0,
@@ -203,9 +176,6 @@ int main(int argc, char* argv[]) {
                                             }
                                         } else {
                                             pendingPath--;
-                                            debug = fopen(str, "a");
-                                            fprintf(debug, "P: RITORNO %s PENDING: %d\n", resp, pendingPath);
-                                            fclose(debug);
                                         }
                                     }
                                 }
@@ -217,9 +187,6 @@ int main(int argc, char* argv[]) {
                         } else {
                             send_r = TRUE;
                             pendingPath--;
-                            debug = fopen(str, "a");
-                            fprintf(debug, "P: RITORNO %s PENDING: %d\n", resp, pendingPath);
-                            fclose(debug);
                         }
                     }
                 }
@@ -229,9 +196,6 @@ int main(int argc, char* argv[]) {
                         /* handle error */
                     }
                     fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
-                    debug = fopen(str, "a");
-                    fprintf(debug, "P: SLEEP\n");
-                    fclose(debug);
                     resetPathList(sum);
                 }
             }
@@ -244,26 +208,6 @@ int main(int argc, char* argv[]) {
             freePathList(sum);
         }
     }
-
-    /*if (value_return != 0) {
-        char str[15];
-        sprintf(str, "P%d.txt", getpid());
-        FILE* debug = fopen(str, "a");
-        fprintf(debug, "Devo andare con il kill di %d:\n", f);
-        if (f == 0) {
-            pid_t to_kill = getppid();  // ricevo il pid padre da killare
-            fprintf(debug, "Killo %d\n", to_kill);
-            if (kill(to_kill, 9) != 0) {
-                fprintf(debug, "Kill già avvenuto(?)");
-            }
-        }
-
-        else {  //è un processo padre
-            fprintf(debug, "Processo padre\n");
-            wait(0);
-        }
-        fclose(debug);
-    }*/
 
     if (value_return == 0) {
         if (f == 0) {  //SON SIDE
