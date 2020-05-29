@@ -11,15 +11,15 @@ void handle_sigint(int sig) {        //handler per il CTRL-C, ha l'obiettivo di
             if (p->pid[i] > 0) {     //Controllo che non sia un processo padre
                 kill(p->pid[i], 9);  //Provo a killare il pid[i]
             }
-            i--;  //itero i--
+            i--;
         }
     }
 
     close(fd1_fifo);
     close(fd2_fifo);
 
-    freeList(p);  //Libero la lista di processi che ho salvato
-    exit(-1);     //Eseguo exit con codice di ritorno -1
+    freeList(p);         //Libero la lista di processi che ho salvato
+    exit(value_return);  //Eseguo exit con codice di ritorno -1
 }
 
 void sig_term_handler(int signum, siginfo_t *info, void *ptr) {  //Handler per ricezione di SIGTERM

@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
     char path[DIM_PATH];
     int _close = FALSE;
     char respSent = FALSE;
-    char resp[DIM_RESP];  
+    char resp[DIM_RESP];
     int oldfl;
     int pendingPath = 0;
     //Parsing Arguments--------------------------------------------------------------------
@@ -115,6 +115,6 @@ int main(int argc, char* argv[]) {
         }
     }
     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
-                                    ;
+        ;
     return value_return;
 }

@@ -19,7 +19,8 @@ void handle_sigint(int sig) {        //handler per il CTRL-C, ha l'obiettivo di
     close(fd2_fifo);
 
     freeList(p);  //Libero la lista di processi che ho salvato
-    exit(-1);     //Eseguo exit con codice di ritorno -1
+    printf("\n");
+    exit(value_return);  //Eseguo exit con codice di ritorno -1
 }
 
 void sig_term_handler(int signum, siginfo_t *info, void *ptr) {  //handler per SIGTERM
