@@ -238,7 +238,7 @@ int check_command(char *cmd) {
 
     if (!strcmp(cmd, "close")) {  //Se il comando e` close
         res = 0;
-    } else if (strstr(cmd, "report") != NULL || strstr(cmd, "print") != NULL) {  //Se il comando contiene report oppure e` uguale a print
+    } else if (!strncmp(cmd, "report", 6) || !strncmp(cmd, "print", 5)) {  //Se il comando contiene report oppure e` uguale a print
         res = 1;
         if (!strncmp(cmd, "report", 6)) {
             checkArg(cmd, &spaces);
