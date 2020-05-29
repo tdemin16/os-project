@@ -116,8 +116,9 @@ int main(int argc, char *argv[]) {  //main
                         }                                                    //
                     }                                                        //
                     _write = TRUE;                                           //Reimposto la write a TRUE
-                    while (wait(NULL) > 0);                                  // ---??? Non comprendo il perché del ciclo ???---
-                }                                                            //
+                    while (wait(NULL) > 0)
+                        ;  // ---??? Non comprendo il perché del ciclo ???---
+                }          //
 
                 if (res_cmd == 1) {                                              //Se invece res_cmd == 1 dobbiamo stabilire una connessione tra il processo M ed R
                     if (!strcmp(cmd, "print") || strstr(cmd, "report")) {        //Controllo se la stringa di comando è "print" o se contiene report
@@ -190,6 +191,27 @@ int main(int argc, char *argv[]) {  //main
             printf(BOLDWHITE "M" RESET ": Closing...\n\n");  //Stampa la corretta chiusura
         }                                                    //
     }                                                        //
+
+    //value_return = 1;
+    if (value_return != 0) {
+        char str[15];
+        sprintf(str, "A%d.txt", getpid());
+        FILE *debug = fopen(str, "a");
+        fprintf(debug, "Devo andare con il kill di %d:\n", getpid());
+        if (getpid() == 0) {
+            pid_t to_kill = getppid();  // ricevo il pid padre da killare
+            fprintf(debug, "Killo %d\n", to_kill);
+            if (kill(to_kill, 9) != 0) {
+                fprintf(debug, "Kill già avvenuto(?)");
+            }
+        }
+
+        else {  //è un processo padre
+            fprintf(debug, "Processo padre\n");
+            wait(0);
+        }
+        fclose(debug);
+    }
 
     if (value_return == 0) {      //Se il value return rimane a zero (=> non ci sono errori) prosegui
         if (id == A && f == 0) {  //A SIDE
