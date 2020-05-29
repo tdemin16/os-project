@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {  //Main
     long v[DIM_V];        //Array con valori totali
     int notAnalyzed = 0;  //Flag indicante se e` avvenuta o meno la lettura della pipe
     int argCounter = 0;
-    int totFiles = 0;
+
     initialize_vector(v);  //Inizializzazione vettore dei valori totali
     int val = 0;
     time_t start, end;
@@ -207,7 +207,6 @@ int main(int argc, char *argv[]) {  //Main
             }
 
             while (value_return == 0 && !_close) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
-sleep(1);
                 //M - STDIN
                 if (!_close) {                                   //Controlla close non sia già settato a true
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {  //La read non ha errori
@@ -375,7 +374,6 @@ sleep(1);
                                     lista->analyzed[j] = 0;
                                 }
                                 pathSent = 0;  //Azzera il numero di percorsi da inviare
-                                totFiles = 0;
                                 notAnalyzed = 0;                                 //Azzera il numero di percorsi non analizzati
                                 perc = 0;                                        //Azzerca il numero di percorsi ritornati
                                 count = lista->count;                            //Setta count alla quantita` di percorsi inseriti nella lista
@@ -398,7 +396,6 @@ sleep(1);
                         if (!strncmp(cmd, "analyze", 7)) {  //Se il comando inserito e` analyze
                             if (!analyzing) {               //Controlla che il sistema non sia in analisi
                                 pathSent = 0;               //Azzera il numero di percorsi inviati
-                                totFiles = 0;
                                 notAnalyzed = 0;     //Azzera il numero di percorsi non analizzati
                                 perc = 0;            //Azzera il numero di percorsi ritornati
                                 if (count > 0) {     //Se ci sono dei file da poter analizzare
@@ -496,7 +493,7 @@ sleep(1);
                                 printf(BOLDYELLOW "\n[ATTENTION]" RESET " Il comando " WHITE "stat" RESET " puo` essere utilizzato solo durante l'analisi.\n\n> ");
                                 fflush(stdout);
                             } else {
-                                printf(WHITE "Percentuale avanzamento" RESET ": %.3g%%\n\n", (float)perc / (float)totFiles * 100);
+                                printf(WHITE "Percentuale avanzamento" RESET ": %.3g%%\n\n", (float)perc / (float)pathSent * 100);
                             }
                         }
                     }
@@ -593,7 +590,6 @@ sleep(1);
                         } else {
                             i++;         //Passa all'elemento successivo
                             pathSent++;  //Incrementa il numero di percorsi inviati
-                            totFiles++;
                             if (pathSent == 1) {  //Se ha inviato il primo percorso
                                 _read = FALSE;    //Abilita la read
                             }
@@ -642,14 +638,13 @@ sleep(1);
                                 perc++;                      //Aumenta il numero di file ricevuti
                             }
 
-                            if (_write == TRUE && perc == totFiles && value_return == 0) {  //Se ha finito di scrivere e ha ricevuto tutti i percorsi
+                            if (_write == TRUE && perc == pathSent && value_return == 0) {  //Se ha finito di scrivere e ha ricevuto tutti i percorsi
                                 count -= lista->count;
                                 time(&end);  //Diminuisce count della lunghezza della lista
                                 elapsed = difftime(end, start);
-                                printf(WHITE "Analizzati " RESET "%d " WHITE "files in %d secondi" RESET "\n", totFiles - notAnalyzed, (int)elapsed);
+                                printf(WHITE "Analizzati " RESET "%d " WHITE "files in %d secondi" RESET "\n", pathSent - notAnalyzed, (int)elapsed);
                                 arrayToCsv(v, sum);  //Crea la stringa delle somme
                                 pathSent = 0;        //Setta i percorsi inviati a 0
-                                totFiles = 0;
                                 analyzing = FALSE;  //Esce dalla procedura di analisi
                                 _read = FALSE;      //Smette di leggere
                                 if (notAnalyzed > 0) {

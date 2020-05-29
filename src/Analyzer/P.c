@@ -82,7 +82,6 @@ int main(int argc, char* argv[]) {
     if (value_return == 0) {
         if (f > 0) {  //PARENT SIDE
             while (value_return == 0 && (!_close)) {
-                sleep(1);
                 //Write
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
@@ -96,6 +95,9 @@ int main(int argc, char* argv[]) {
                                     nClearAndClose(fd, m);  //Mando a tutti i figli il comando di chiusura
                                     while (wait(NULL) > 0)  //Aspetto che vengano chiusi
                                         ;
+                                    while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
+                                        ;
+                                    nCleanSon(fd, m);
                                     close_pipes(fd, size_pipe);
                                     mParseOnFly(path, &m);  //Estraggo m da path
 
@@ -112,14 +114,12 @@ int main(int argc, char* argv[]) {
                                         value_return = ERR_FORK;
                                     }  //Forko i processi
                                     if (f == 0) {
-                                        if (!execP(&m, &f, &id, fd, &value_return, &size_pipe)){
+                                        if (!execP(&m, &f, &id, fd, &value_return, &size_pipe)) {
                                             value_return = ERR_EXEC;
                                         }
                                     }                    //Exec dei processi forkati
                                     send_r = TRUE;       //setto a true per evitare che vada nel ramo sbagliato della read sotto
                                     resetPathList(sum);  //resetto sum
-                                    while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
-                                        ;
                                 }
                                 pendingPath = 0;
                             } else {            //Se si tratta di un percorso
