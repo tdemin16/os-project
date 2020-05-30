@@ -525,24 +525,18 @@ int parseSetOnFly(char *string, int *n, int *m) {
     return ret;
 }
 
+<<<<<<< HEAD
 int nClearAndClose(int *fd, int n, char str[15]) {
     int i;
     char sentClose = FALSE;
     char path[DIM_PATH];
     int ret = 0;
-    FILE *debug;
     int terminated[n];  //Indica se un file e` stato mandato o meno
     for (i = 0; i < n; i++) {
-        debug = fopen(str, "a");
-        fprintf(debug, "Controllo pipe con %d\n", i);
-        fclose(debug);
         if (fcntl(fd[i * 4 + 2], F_SETFL, O_NONBLOCK)) {
             ret = err_fcntl();
         }
         while (read(fd[i * 4 + 2], path, DIM_PATH) > 0) {
-            debug = fopen(str, "a");
-            fprintf(debug, "ELIMINO %s dalla pipe\n", path);
-            fclose(debug);
         }
         terminated[i] = FALSE;
     }
@@ -554,21 +548,12 @@ int nClearAndClose(int *fd, int n, char str[15]) {
                 if (write(fd[i * 4 + 3], path, DIM_PATH) == -1) {
                     if (errno != EAGAIN) {
                         ret = err_write();
-                        debug = fopen(str, "a");
-                        fprintf(debug, "ERRORE WRITE\n");
-                        fclose(debug);
                     } else {
-                        debug = fopen(str, "a");
-                        fprintf(debug, "INVIO CLOSE FALLITO A %d\n", i);
-                        fclose(debug);
                         sentClose = FALSE;  //Se non ci riesce setta send a false
                         terminated[i] = FALSE;
                     }
                 } else {
                     terminated[i] = TRUE;
-                    debug = fopen(str, "a");
-                    fprintf(debug, "INVIO CLOSE RIUSCITO A %d\n", i);
-                    fclose(debug);
                 }
             }
         }
@@ -642,8 +627,7 @@ void nCleanSon(int *fd, int n) {
     }
 }
 
-char sendCheck(char str[15]) {
-    FILE *debug;
+char sendCheck() {
     char resp[DIM_RESP];
     strcpy(resp, "#CHECK");
     char CheckSent = FALSE;
@@ -652,24 +636,16 @@ char sendCheck(char str[15]) {
         if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {  //Scrive il carattere di teminazione
             if (errno != EAGAIN) {
                 ret = FALSE;
-            } else {
-                debug = fopen(str, "a");
-                fprintf(debug, "INVIO CHECK NON RIUSCITO\n");
-                fclose(debug);
             }
         } else {
             CheckSent = TRUE;
-            debug = fopen(str, "a");
-            fprintf(debug, "INVIO CHECK RIUSCITO\n");
-            fclose(debug);
         }
     }
     return ret;
 }
 
-void readCheck(int *fd, int n, char str[15]) {
+void readCheck(int *fd, int n) {
     int recived = 0;
-    FILE *debug;
     int k;
     char resp[DIM_RESP];
     if (n == 0) {
@@ -678,13 +654,6 @@ void readCheck(int *fd, int n, char str[15]) {
             if (read(fd[READ], resp, DIM_RESP) > 0) {  //Prova a leggere dal figlio
                 if (!strncmp(resp, "#CHECK", 6)) {
                     recived++;
-                    debug = fopen(str, "a");
-                    fprintf(debug, "CHECK RICEVUTO: %d su %d\n", recived, n);
-                    fclose(debug);
-                } else {
-                    debug = fopen(str, "a");
-                    fprintf(debug, "STRINGA IGNORATA: %s\n", resp);
-                    fclose(debug);
                 }
             }
         }
@@ -693,13 +662,6 @@ void readCheck(int *fd, int n, char str[15]) {
             if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {  //Prova a leggere dalla pipe
                 if (!strncmp(resp, "#CHECK", 6)) {
                     recived++;
-                    debug = fopen(str, "a");
-                    fprintf(debug, "CHECK RICEVUTO: %d su %d\n", recived, n);
-                    fclose(debug);
-                } else {
-                    debug = fopen(str, "a");
-                    fprintf(debug, "STRINGA IGNORATA: %s\n", resp);
-                    fclose(debug);
                 }
             }
             k = (k + 1) % n;

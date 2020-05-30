@@ -45,11 +45,6 @@ int main(int argc, char* argv[]) {
     if (fcntl(STDOUT_FILENO, F_SETFL, O_NONBLOCK)) {
         value_return = err_fcntl();
     }
-       char str[15];
-    sprintf(str, "Q%d.txt", getpid());
-    FILE* debug = fopen(str, "a");
-    fprintf(debug, "AVVIATO Q con m = %d part = %d\n", m, part);
-    fclose(debug);
 
     while (value_return == 0 && !_close) {
         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //Legge un percorso
@@ -59,9 +54,6 @@ int main(int argc, char* argv[]) {
                     value_return = err_fcntl();
                 }
             }
-            debug = fopen(str, "a");
-            fprintf(debug, "Q: LEGGO %s\n", path);
-            fclose(debug);
             if (!strncmp(path, "#CLOSE", 6)) {  //Se leggo una stringa di terminazione
                 _close = TRUE;                  //Setto end a true
             } else {                            //Senno' analizzo il path
@@ -78,9 +70,6 @@ int main(int argc, char* argv[]) {
                     close(fp);
                 }
                 createCsv(v, resp, id);
-                debug = fopen(str, "a");
-                fprintf(debug, "Q: ANALIZZATO %s \n", resp);
-                fclose(debug);
                 respSent = FALSE;
                 while (!respSent) {  //finchè la risposta non è stata inviata riprova
                     if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {
@@ -90,9 +79,6 @@ int main(int argc, char* argv[]) {
                     } else {
                         respSent = TRUE;
                         pendingPath--;
-                        debug = fopen(str, "a");
-                        fprintf(debug, "Q: RISCRIVO %s \n", resp);
-                        fclose(debug);
                     }
                 }
                 free(tmpDup);

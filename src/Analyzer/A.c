@@ -201,11 +201,6 @@ int main(int argc, char *argv[]) {  //Main
         if (f > 0) {              //PARENT SIDE
             insertProcess(p, f);  //Inserisce processo figlio f nella lista processi p
             i = 0;
-            char str[15];
-            sprintf(str, "A%d.txt", getpid());
-            FILE *debug = fopen(str, "a");
-            fprintf(debug, "AVVIATO A\n");
-            fclose(debug);
             if (lista->count == 0) {
                 printf("> ");
                 fflush(stdout);
@@ -216,9 +211,6 @@ int main(int argc, char *argv[]) {  //Main
                 if (!_close) {                                   //Controlla close non sia già settato a true
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {  //La read non ha errori
                         if (!strncmp(cmd, "close", 5)) {         //Verifica se cmd è close, in tal caso prosegue alla chiusura dei processi
-                            debug = fopen(str, "a");
-                            fprintf(debug, "A: %s\n", cmd);
-                            fclose(debug);
                             closeAll(fd_1);         //chiudi tutti i processi figli
                             while (wait(NULL) > 0)  //Attende che tutti i processi figli siano chiusi prima di terminare
                                 ;
@@ -227,10 +219,7 @@ int main(int argc, char *argv[]) {  //Main
                         }
 
                         if (!strncmp(cmd, "add", 3)) {  //Se invece il comando è "add"
-                            if (!analyzing) {
-                                debug = fopen(str, "a");
-                                fprintf(debug, "A: %s\n", cmd);
-                                fclose(debug);                                                               //Verifica che non stia già analizzando
+                            if (!analyzing) {                                                       //Verifica che non stia già analizzando
                                 if (strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL) {          //Mentra analizza controlla se l'utente cambia setn o setm
                                     printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\n");  //in tal caso verifica se sono correttamente inseriti
                                     printf("Usa help per vedere la lista di comandi utilizzabili.\n\n");     //Stampa errore se sono stati inseriti comandi errati
@@ -263,10 +252,6 @@ int main(int argc, char *argv[]) {  //Main
 
                         if (!strncmp(cmd, "remove", 6)) {  //Se il comando è "remove"
                             if (!analyzing) {              //Verifica che non stia già analizzando
-                                debug = fopen(str, "a");
-                                fprintf(debug, "A: %s\n", cmd);
-                                fclose(debug);
-
                                 if ((strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL)) {                                                                 //Mentra analizza controlla se l'utente cambia setn o setm ed in tal caso verifica se sono correttamente inseriti
                                     printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");  //Stampa errore se sono stati inseriti comandi errati
                                     fflush(stdout);
@@ -316,9 +301,6 @@ int main(int argc, char *argv[]) {  //Main
 
                         if (!strncmp(cmd, "reset", 5)) {  //Se il comando e` reset
                             if (!analyzing) {             //Controlla che il programma non sia in analisi
-                                debug = fopen(str, "a");
-                                fprintf(debug, "A: %s\n", cmd);
-                                fclose(debug);
                                 resetPathList(lista);                        //Svuota la lista
                                 count = 0;                                   //Riporta il numero di file presenti nella lista
                                 memset(sum, '\0', sizeof(char) * DIM_RESP);  //Setta la stringa dei totali a '\0
@@ -334,9 +316,6 @@ int main(int argc, char *argv[]) {  //Main
 
                         if (!strncmp(cmd, "reanalyze", 9)) {  //Se il comando e` reanalyze
                             if (!analyzing) {                 //Controlla che il sistema non sia in analisi
-                                debug = fopen(str, "a");
-                                fprintf(debug, "A: %s\n", cmd);
-                                fclose(debug);
                                 for (j = 0; j < lista->count; j++) {  //Setta tutti i file come non analizzati
                                     lista->analyzed[j] = 0;
                                 }
@@ -363,9 +342,6 @@ int main(int argc, char *argv[]) {  //Main
 
                         if (!strncmp(cmd, "analyze", 7)) {  //Se il comando inserito e` analyze
                             if (!analyzing) {               //Controlla che il sistema non sia in analisi
-                                debug = fopen(str, "a");
-                                fprintf(debug, "A: %s\n", cmd);
-                                fclose(debug);
                                 pathSent = 0;             //Azzera il numero di percorsi inviati
                                 notAnalyzed = 0;          //Azzera il numero di percorsi non analizzati
                                 perc = 0;                 //Azzera il numero di percorsi ritornati
@@ -397,9 +373,6 @@ int main(int argc, char *argv[]) {  //Main
                         }
 
                         if (!strncmp(cmd, "set", 3)) {  //Se il comando inserito e` set
-                            debug = fopen(str, "a");
-                            fprintf(debug, "A: %s\n", cmd);
-                            fclose(debug);
                             if (checkArg(cmd, &argCounter)) {
                                 if (argCounter == 2) {                              //Controlla che il numero di argomenti sia due
                                     if (!strncmp(cmd, "setn", 4)) {                 //Controlla che il comando sia setn
@@ -409,7 +382,7 @@ int main(int argc, char *argv[]) {  //Main
                                         if (atoi(new_n) > 0 && atoi(new_n) != n) {  //Controlla che n sia > 0 e diverso dal precedente
                                             n = atoi(new_n);                        //Cambia il valore di n
                                             setOnFly(n, m, fd_1);                   //Avvia la procedura di setonfly
-                                            readCheck(fd_2, 0,str); 
+                                            readCheck(fd_2, 0); 
                                             printf("\n" BOLDYELLOW "[ATTENTION]" RESET " n e` stato modificato\n\n");
                                             if (analyzing) {      //Se il sistema sta analizzando
                                                 i = 0;            //Riparte dal primo elemento di pathlist
@@ -429,10 +402,7 @@ int main(int argc, char *argv[]) {  //Main
                                         if (atoi(new_m) > 0 && atoi(new_m) != m) {  //Controlla che m sia > 0 e diverso dal precedente
                                             m = atoi(new_m);                        //Aggiorna m
                                             setmOnFly(m, fd_1);                     //Avvia la procedura si setmOnFly
-                                            readCheck(fd_2, 0,str);                     //Aspetta finche' il check non e' arrivato
-                                            debug = fopen(str, "a");
-                                            fprintf(debug, "A: LETTO CHECK\n");
-                                            fclose(debug);
+                                            readCheck(fd_2, 0);                     //Aspetta finche' il check non e' arrivato
                                             printf("\n" BOLDYELLOW "[ATTENTION]" RESET " m e` stato modificato\n\n");
                                             if (analyzing) {      //Se il sistema sta analizzando
                                                 i = 0;            //Riparte dal primo elemento di pathlist
@@ -450,7 +420,7 @@ int main(int argc, char *argv[]) {  //Main
                                         if (parseSetOnFly(cmd, &n, &m) == 0) {                 //Controlla che la correttezza del comando
                                             printf("\n" BOLDYELLOW "[ATTENTION]" RESET " n e m sono stati modificati\n\n");
                                             setOnFly(n, m, fd_1);  //Avvia la procedura di setOnFLy
-                                            readCheck(fd_2, 0,str); 
+                                            readCheck(fd_2, 0); 
                                             if (analyzing) {       //Se il sistema sta analizzando
                                                 i = 0;             //Riparte dal primo elemento di pathlist
                                                 pathSent = perc;   //Porta il numero di percorsi inviati al numero di percorsi ricevuti
@@ -588,16 +558,10 @@ int main(int argc, char *argv[]) {  //Main
                                 value_return = err_write();                            //Ritorna l'errore sulla scrittura
                             }
                         } else {
-                            debug = fopen(str, "a");
-                            fprintf(debug, "A: INVIATO %s\n", lista->pathList[i]);
-                            fclose(debug);
                             i++;                  //Passa all'elemento successivo
                             pathSent++;           //Incrementa il numero di percorsi inviati
                             if (pathSent == 1) {  //Se ha inviato il primo percorso
                                 _read = FALSE;    //Abilita la read
-                                debug = fopen(str, "a");
-                                fprintf(debug, "A: ABILITO LA READ\n");
-                                fclose(debug);
                             }
                         }
                     } else {
@@ -606,9 +570,6 @@ int main(int argc, char *argv[]) {  //Main
                     if (i == lista->count) {  //Qunado ha finito di inviare
                         _write = TRUE;        //Disabilita la write
                         i = 0;                //Azzera il contatore sulla posizione dei percorsi
-                        debug = fopen(str, "a");
-                        fprintf(debug, "A: CHIUDO LA WRITE\n");
-                        fclose(debug);
                     }
                 }
 
@@ -624,9 +585,6 @@ int main(int argc, char *argv[]) {  //Main
                             tmpPercorso = strdup(lista->pathList[id_r]);
                             file = strtok(tmpPercorso, "#");
                             file = strtok(NULL, "#");
-                            debug = fopen(str, "a");
-                            fprintf(debug, "A: RICEVUTO %s\n", lista->pathList[id_r]);
-                            fclose(debug);
                             if (firstVal != -1) {                                                   //Controlla che non ci siano stati errori nell'analisi
                                 if (fileExist(file)) {                                              //File esistente
                                     lista->analyzed[id_r] = 1;                                      //Setta il flag ad Analizzato
