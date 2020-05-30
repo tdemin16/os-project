@@ -7,7 +7,7 @@ help:
 	@echo "make clean	[ elimina il contenuto della cartella ./bin/ ]"
 	@echo "make help	[ mostra questo testo. in futuro il contenuto di README.md ]\n"
 	@echo "-----------------------------------------------------------------------------"
-	cat ./README.md 
+	cat ./README.txt
 
 build:
 	@if [ ! -d "./bin" ]; then \

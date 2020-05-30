@@ -249,7 +249,7 @@ int check_command(char *cmd) {
             checkArg(cmd, &spaces);
             if (spaces != 2) res = -1;  //Controlla la corretta sintassi del comando
         }
-    } else if (!strncmp(cmd, "add", 3) || !strncmp(cmd, "remove", 6) || !strcmp(cmd, "reset") || !strcmp(cmd, "analyze") || !strcmp(cmd, "reanalyze") || !strncmp(cmd, "set", 3) || !strncmp(cmd, "clear", 5) || !strncmp(cmd, "stat", 4)) {  //A
+    } else if (!strncmp(cmd, "add", 3) || !strncmp(cmd, "remove", 6) || !strcmp(cmd, "reset") || !strcmp(cmd, "analyze") || !strcmp(cmd, "reanalyze") || !strncmp(cmd, "set", 3) || !strncmp(cmd, "clear", 5) || !strncmp(cmd, "stat", 4) || !strncmp(cmd, "proc", 4)) {  //A
         res = 2;
     } else if (!strcmp(cmd, "help") || !strcmp(cmd, "info")) {  //HELP e info
         res = 3;
