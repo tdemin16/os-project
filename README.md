@@ -8,7 +8,7 @@ E-Mail di Gruppo: thomas.demin@studenti.unitn.it
 * Andrea Bonomi - 201487 - andrea.bonomi-2@studenti.unitn.it
 
 ## Descrizione Progetto
-Il programma e` stato sviluppato suddividendo i vari processi fra i componenti del gruppo (nice joke).
+Il programma e` stato sviluppato suddividendo i vari processi fra i componenti del gruppo.
 ### Q
 > "Ogni processo Q analizza uno spezzone di ogni file di input a cui accede. "n" ed "m" hanno come valore
 di default rispettivamente 3 e 4 ma possono essere passati come argomenti."
