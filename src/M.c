@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {  //main
 
     if (argc == 1) {
         system("clear");
-        printf(BOLDWHITE "\nBENVENUTO\n" RESET);
+        printf(BOLDWHITE "BENVENUTO\n" RESET);
         printf("Usa " WHITE "help" RESET " per vedere l'elenco dei comandi\n");
         printf("Usa " WHITE "info" RESET " per avere informazioni riguardo al programma\n");
         printf("Usa " WHITE "clear" RESET " per pulire il terminale\n");
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {  //main
                 end = TRUE;
             } else if (!strcmp(cmd, "clear")) {
                 system("clear");
-                printf(BOLDWHITE "\nBENVENUTO\n" RESET);
+                printf(BOLDWHITE "BENVENUTO\n" RESET);
                 printf("Usa " WHITE "help" RESET " per vedere l'elenco dei comandi\n");
                 printf("Usa " WHITE "info" RESET " per avere informazioni riguardo al programma\n");
                 printf("Usa " WHITE "clear" RESET " per pulire il terminale\n");

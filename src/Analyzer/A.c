@@ -257,7 +257,7 @@ int main(int argc, char *argv[]) {  //Main
                                     err_args_A();    //Ritorna errore degli argomenti di A
                                 }
                             } else {  //Altrimenti l'analisi è ancora in corso, quindi non può fare altro a ciò che è scritto sopra
-                                printf("\nAnalisi in corso, comando non disponibile\n");
+                                printf(BOLDYELLOW"\n[ATTENTION]"RESET" Analisi in corso, comando non disponibile\n");
                             }
                             printf("\n> ");
                             fflush(stdout);
@@ -310,7 +310,7 @@ int main(int argc, char *argv[]) {  //Main
                                     err_args_A();  //Errore negli argomenti di A
                                 }
                             } else {  //In alternativa vuol dire che sta analizzando e dunque non può rimuovere i files
-                                printf("\nAnalisi in corso, comando non disponibile\n");
+                                printf(BOLDYELLOW"\n[ATTENTION]"RESET" Analisi in corso, comando non disponibile\n\n");
                             }
                             printf("> ");
                             fflush(stdout);
@@ -327,7 +327,8 @@ int main(int argc, char *argv[]) {  //Main
                                 initialize_vector(v);                        //Azzera v
                                 printf(BOLDYELLOW "\n[ATTENTION]" RESET " Tutti i file sono stati rimossi.\n\n");
                             } else {
-                                printf("\nAnalisi in corso, comando non disponibile\n");
+                                printf(BOLDYELLOW"\n[ATTENTION]"RESET" Analisi in corso, comando non disponibile\n\n");
+                                fflush(stdout);
                             }
                             printf("> ");
                             fflush(stdout);
@@ -352,11 +353,11 @@ int main(int argc, char *argv[]) {  //Main
                                     time(&start);                                //Inizio timer
                                     update_mtime(lista);                         //Aggiorno i valori di last_edit
                                 } else {                                         //Messaggio nel caso di lista vuota
-                                    printf(BOLDYELLOW "\n[ATTENTION]" RESET " Non ci sono file da analizzare\n\n> ");
+                                    printf(BOLDYELLOW "\n[ATTENTION]" RESET " Non ci sono file da analizzare\n");
                                     fflush(stdout);
                                 }
                             } else {
-                                printf("\nAnalisi in corso, comando non disponibile\n");
+                                printf(BOLDYELLOW"\n[ATTENTION]"RESET" Analisi in corso, comando non disponibile\n");
                             }
                             printf("\n> ");
                             fflush(stdout);
@@ -379,7 +380,8 @@ int main(int argc, char *argv[]) {  //Main
                                     fflush(stdout);
                                 }
                             } else {
-                                printf("\nAnalisi in corso, comando non disponibile\n\n");
+                                printf(BOLDYELLOW"\n[ATTENTION]"RESET" Analisi in corso, comando non disponibile\n\n> ");
+                                fflush(stdout);
                             }
                             printf("\n> ");
                             fflush(stdout);
@@ -478,7 +480,8 @@ int main(int argc, char *argv[]) {  //Main
                                 printf(BOLDYELLOW "\n[ATTENTION]" RESET " Il comando " WHITE "stat" RESET " puo` essere utilizzato solo durante l'analisi.\n\n> ");
                                 fflush(stdout);
                             } else {
-                                printf(WHITE "Percentuale avanzamento" RESET ": %.3g%%\n\n", (float)perc / (float)pathSent * 100);
+                                printf(WHITE "\nPercentuale avanzamento" RESET ": %.3g%%\n\n> ", (float)perc / (float)pathSent * 100);
+                                fflush(stdout);
                             }
                         }
 
@@ -489,7 +492,8 @@ int main(int argc, char *argv[]) {  //Main
                                 printf("%d processi Q\n\n> ", n * m);
                                 fflush(stdout);
                             } else {
-                                printf("Analisi in corso, comando non disponibile\n");
+                                printf(BOLDYELLOW"\n[ATTENTION]"RESET" Analisi in corso, comando non disponibile\n\n> ");
+                                fflush(stdout);
                             }
                         }
                     }
@@ -648,7 +652,6 @@ int main(int argc, char *argv[]) {  //Main
                                 count -= lista->count;
                                 time(&end);  //Diminuisce count della lunghezza della lista
                                 elapsed = difftime(end, start);
-                                fflush(stdin);
                                 printf("\r"WHITE "Analizzati " RESET "%d " WHITE "files in %d secondi" RESET "\n", pathSent - notAnalyzed, (int)elapsed);
                                 arrayToCsv(v, sum);  //Crea la stringa delle somme
                                 pathSent = 0;        //Setta i percorsi inviati a 0
