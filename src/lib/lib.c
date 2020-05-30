@@ -535,6 +535,12 @@ void nClearAndClose(int *fd, int n, char str[15]) {
     FILE *debug;
     int terminated[n];  //Indica se un file e` stato mandato o meno
     for (i = 0; i < n; i++) {
+        debug = fopen(str, "a");
+        fprintf(debug, "Controllo pipe con %d\n", i);
+        fclose(debug);
+        if (fcntl(fd[i * 4 + 3], F_SETFL, O_NONBLOCK)) {
+            //value_return = err_fcntl();
+        }
         while (read(fd[i * 4 + 3], path, DIM_PATH) > 0) {
             debug = fopen(str, "a");
             fprintf(debug, "ELIMINO %s dalla pipe\n", path);
@@ -562,7 +568,7 @@ void nClearAndClose(int *fd, int n, char str[15]) {
                 } else {
                     terminated[i] = TRUE;
                     debug = fopen(str, "a");
-                    fprintf(debug, "INVIO CLOSE RIUSCITO A %d\n",i);
+                    fprintf(debug, "INVIO CLOSE RIUSCITO A %d\n", i);
                     fclose(debug);
                 }
             }
@@ -606,6 +612,7 @@ void closeAll(int *fd_1) {
     }
     char path[DIM_PATH];
     while (read(fd_1[READ], path, DIM_PATH) > 0) {
+        //fprintf(stderr, "Eliminato %s\n", path);
     }
     if (write(fd_1[WRITE], "#CLOSE", DIM_PATH) == -1) {  //Prova a scrivere sulla pipe
         if (errno != EAGAIN) {                           //Se avviene un errore e non e` causato dalla dimensione della pipe
