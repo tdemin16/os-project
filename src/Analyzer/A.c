@@ -358,6 +358,8 @@ int main(int argc, char *argv[]) {  //Main
                             } else {
                                 printf("\nAnalisi in corso, comando non disponibile\n");
                             }
+                            printf("\n> ");
+                            fflush(stdout);
                         }
 
                         if (!strncmp(cmd, "analyze", 7)) {  //Se il comando inserito e` analyze
@@ -379,6 +381,8 @@ int main(int argc, char *argv[]) {  //Main
                             } else {
                                 printf("\nAnalisi in corso, comando non disponibile\n\n");
                             }
+                            printf("\n> ");
+                            fflush(stdout);
                         }
 
                         if (!strncmp(cmd, "clear", 5)) {  //Pulisce la console
@@ -644,7 +648,8 @@ int main(int argc, char *argv[]) {  //Main
                                 count -= lista->count;
                                 time(&end);  //Diminuisce count della lunghezza della lista
                                 elapsed = difftime(end, start);
-                                printf(WHITE "\nAnalizzati " RESET "%d " WHITE "files in %d secondi" RESET "\n", pathSent - notAnalyzed, (int)elapsed);
+                                fflush(stdin);
+                                printf("\r"WHITE "Analizzati " RESET "%d " WHITE "files in %d secondi" RESET "\n", pathSent - notAnalyzed, (int)elapsed);
                                 arrayToCsv(v, sum);  //Crea la stringa delle somme
                                 pathSent = 0;        //Setta i percorsi inviati a 0
                                 analyzing = FALSE;   //Esce dalla procedura di analisi
