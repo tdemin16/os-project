@@ -599,7 +599,7 @@ int main(int argc, char *argv[]) {  //Main
                         _write = TRUE;        //Disabilita la write
                         i = 0;                //Azzera il contatore sulla posizione dei percorsi
                         debug = fopen(str, "a");
-                        fprintf(debug, "A: CHIUDO LA READ\n");
+                        fprintf(debug, "A: CHIUDO LA WRITE\n");
                         fclose(debug);
                     }
                 }
