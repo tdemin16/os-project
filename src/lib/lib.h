@@ -120,12 +120,12 @@ int setmOnFly(int, int *);
 void mParseOnFly(char *, int *);
 void parseOnFly(char *, int *, int *);
 int parseSetOnFly(char *, int *, int *);
-int nClearAndClose(int *, int, char *);
+int nClearAndClose(int *, int);
 int mSendOnFly(int *, int, int);
 int closeAll(int *);
 void nCleanSon(int *, int);
-char sendCheck(char *);
-void readCheck(int *, int, char *);
+char sendCheck();
+void readCheck(int *, int);
 
 //Funzioni di elaborazione stringhe e vettori
 int parse_string(char *, int *v);

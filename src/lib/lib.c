@@ -525,7 +525,7 @@ int parseSetOnFly(char *string, int *n, int *m) {
     return ret;
 }
 
-int nClearAndClose(int *fd, int n, char str[15]) {
+int nClearAndClose(int *fd, int n) {
     int i;
     char sentClose = FALSE;
     char path[DIM_PATH];
