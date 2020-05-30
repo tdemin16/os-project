@@ -87,13 +87,13 @@ int main(int argc, char* argv[]) {
         i = 0;
         k = 0;
         j = 0;
-        if (f > 0) {                                  //PARENT SIDE
+        if (f > 0) {  //PARENT SIDE
             char str[15];
             sprintf(str, "C%d.txt", getpid());
             FILE* debug = fopen(str, "a");
             fprintf(debug, "AVVIATO C\n");
             fclose(debug);
-            while (value_return == 0 && (!_close)) {  //Cicla finche` non ha finito di leggere o scrivere o va in errore
+            while (value_return == 0 && (!_close)) {                   //Cicla finche` non ha finito di leggere o scrivere o va in errore
                 if (!_write) {                                         //CICLO DI SCRITTURA
                     if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
@@ -104,12 +104,12 @@ int main(int argc, char* argv[]) {
                                 if (!strncmp(path, "#CLOSE", 6)) {
                                     _read = TRUE;
                                     _close = TRUE;
-                                    nClearAndClose(fd, n,str);
+                                    nClearAndClose(fd, n, str);
                                 } else if (!strncmp(path, "#SET#", 5) || !strncmp(path, "#SETN", 5)) {
                                     j = 0;
                                     k = 0;
-                                    nClearAndClose(fd, n,str);  //mando #CLOSE alle n pipe
-                                    while (wait(NULL) > 0)  //Aspetto che vengano chiusi
+                                    nClearAndClose(fd, n, str);  //mando #CLOSE alle n pipe
+                                    while (wait(NULL) > 0)       //Aspetto che vengano chiusi
                                         ;
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
@@ -141,11 +141,11 @@ int main(int argc, char* argv[]) {
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
                                     send_r = TRUE;
-                                    readCheck(fd,n,str); //Aspetta qui finchè non legge check da tutti i figli
+                                    readCheck(fd, n, str);  //Aspetta qui finchè non legge check da tutti i figli
                                     debug = fopen(str, "a");
                                     fprintf(debug, "C: LETTI TUTTI I CHECK\n");
                                     fclose(debug);
-                                    if(!sendCheck(str)){ //Invia il check al padre
+                                    if (!sendCheck(str)) {  //Invia il check al padre
                                         value_return = err_write();
                                     }
                                     debug = fopen(str, "a");
@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) {
                                         stop = TRUE;
                                         strcpy(failedPath, path);
                                     }
-                                } else {              //scritto con successo
+                                } else {  //scritto con successo
                                     debug = fopen(str, "a");
                                     fprintf(debug, "C: Inviato a %d: %s\n", j, path);
                                     fclose(debug);
@@ -194,8 +194,8 @@ int main(int argc, char* argv[]) {
 
                 //Read
                 if (!_read) {
-                    if (send_r) {                                                  //Coontrolla se non ci sonon valori non inviati
-                        if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {             //Prova a leggere dalla pipe
+                    if (send_r) {                                       //Coontrolla se non ci sonon valori non inviati
+                        if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {  //Prova a leggere dalla pipe
                             debug = fopen(str, "a");
                             fprintf(debug, "C: LEGGO DA P %s\n", resp);
                             fclose(debug);
