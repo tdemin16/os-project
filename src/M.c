@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {  //main
     char array_args[4];
 
     if (argc == 1) {
+        system("clear");
         printf(BOLDWHITE "\nBENVENUTO\n" RESET);
         printf("Usa " WHITE "help" RESET " per vedere l'elenco dei comandi\n");
         printf("Usa " WHITE "info" RESET " per avere informazioni riguardo al programma\n");
@@ -85,7 +86,7 @@ int main(int argc, char *argv[]) {  //main
                 printf("Usa " WHITE "close" RESET " per chiudere il programma\n");
                 printf("Premi " WHITE "invio" RESET " per avviare il programma\n\n> ");
                 fflush(stdout);
-            } else {
+            } else if(strcmp(cmd, "")){
                 printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
                 fflush(stdout);
             }
