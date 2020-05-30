@@ -1114,7 +1114,7 @@ int err_overflow() {
 }
 
 int err_input_A(char *file) {
-    fprintf(stderr, "\nErrore input\nFile/Directory non esistente: %s\n\n", file);
+    fprintf(stderr, BOLDRED"\n[ERROR]"RESET" File/Directory non esistente: %s\n", file);
     return ERR_ARGS_A;
 }
 
