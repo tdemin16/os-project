@@ -88,27 +88,19 @@ int main(int argc, char* argv[]) {
         k = 0;
         j = 0;
         if (f > 0) {  //PARENT SIDE
-            char str[15];
-            sprintf(str, "C%d.txt", getpid());
-            FILE* debug = fopen(str, "a");
-            fprintf(debug, "AVVIATO C\n");
-            fclose(debug);
             while (value_return == 0 && (!_close)) {                   //Cicla finche` non ha finito di leggere o scrivere o va in errore
                 if (!_write) {                                         //CICLO DI SCRITTURA
                     if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
-                            debug = fopen(str, "a");
-                            fprintf(debug, "C: LEGGO %s\n", path);
-                            fclose(debug);
                             if (!strncmp(path, "#", 1)) {
                                 if (!strncmp(path, "#CLOSE", 6)) {
                                     _read = TRUE;
                                     _close = TRUE;
-                                    nClearAndClose(fd, n, str);
+                                    nClearAndClose(fd, n);
                                 } else if (!strncmp(path, "#SET#", 5) || !strncmp(path, "#SETN", 5)) {
                                     j = 0;
                                     k = 0;
-                                    nClearAndClose(fd, n, str);  //mando #CLOSE alle n pipe
+                                    nClearAndClose(fd, n);  //mando #CLOSE alle n pipe
                                     while (wait(NULL) > 0)       //Aspetto che vengano chiusi
                                         ;
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
@@ -132,7 +124,7 @@ int main(int argc, char* argv[]) {
                                     if (f == 0) {
                                         execC(&m, &f, &id, fd, &value_return, &size_pipe);
                                     }
-                                    if (!sendCheck(str)) {
+                                    if (!sendCheck()) {
                                         value_return = err_write();
                                     }
 
@@ -144,16 +136,10 @@ int main(int argc, char* argv[]) {
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
                                     send_r = TRUE;
-                                    readCheck(fd, n, str);  //Aspetta qui finchè non legge check da tutti i figli
-                                    debug = fopen(str, "a");
-                                    fprintf(debug, "C: LETTI TUTTI I CHECK\n");
-                                    fclose(debug);
-                                    if (!sendCheck(str)) {  //Invia il check al padre
+                                    readCheck(fd, n);  //Aspetta qui finchè non legge check da tutti i figli
+                                    if (!sendCheck()) {  //Invia il check al padre
                                         value_return = err_write();
                                     }
-                                    debug = fopen(str, "a");
-                                    fprintf(debug, "C: CHECK INVIATO\n");
-                                    fclose(debug);
                                 }
                                 pendingPath = 0;
                             } else {  //Se si tratta di un percorso
@@ -171,9 +157,6 @@ int main(int argc, char* argv[]) {
                                         strcpy(failedPath, path);
                                     }
                                 } else {  //scritto con successo
-                                    debug = fopen(str, "a");
-                                    fprintf(debug, "C: Inviato a %d: %s\n", j, path);
-                                    fclose(debug);
                                     count++;          //Tengo conto della scrittura
                                     j = (j + 1) % n;  //Usato per ciclare su tutte le pipe in scrittura
                                 }
@@ -185,9 +168,6 @@ int main(int argc, char* argv[]) {
                                 value_return = err_write();                      //Setta il valore di ritorno
                             }
                         } else {
-                            debug = fopen(str, "a");
-                            fprintf(debug, "C: Inviato a %d: %s\n", j, failedPath);
-                            fclose(debug);
                             stop = FALSE;     //Se la scrittura va a buon fine esco dallo stato di stop
                             count++;          //Tengo conto dell'invio
                             j = (j + 1) % n;  //Incremento i in maniera ciclica
@@ -199,9 +179,6 @@ int main(int argc, char* argv[]) {
                 if (!_read) {
                     if (send_r) {                                       //Coontrolla se non ci sonon valori non inviati
                         if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {  //Prova a leggere dalla pipe
-                            debug = fopen(str, "a");
-                            fprintf(debug, "C: LEGGO DA P %s\n", resp);
-                            fclose(debug);
                             if (strstr(resp, "#") != NULL) {                       //Controlla che nella stringa sia contenuto il carattere #
                                 if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {  //Prova a scrivere sulla pipe del padre
                                     if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena
@@ -223,9 +200,6 @@ int main(int argc, char* argv[]) {
                         }
                     }
                     k = (k + 1) % n;  //Cicla tra le pipes
-                    debug = fopen(str, "a");
-                    fprintf(debug, "C: PENDING %d\n", pendingPath);
-                    fclose(debug);
                 }
 
                 if (pendingPath == 0) {
@@ -233,9 +207,6 @@ int main(int argc, char* argv[]) {
                     if (oldfl == -1) {
                     }
                     fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
-                    debug = fopen(str, "a");
-                    fprintf(debug, "C: SLEEP\n");
-                    fclose(debug);
                 }
             }
 
