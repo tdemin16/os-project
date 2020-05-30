@@ -82,26 +82,48 @@ int main(int argc, char* argv[]) {
     //----------------------------------------------------------------------
     if (value_return == 0) {
         if (f > 0) {  //PARENT SIDE
+            char str[15];
+            sprintf(str, "P%d.txt", getpid());
+            FILE* debug = fopen(str, "a");
+            fprintf(debug, "AVVIATO P con m = %d\n", m);
+            fclose(debug);
             while (value_return == 0 && (!_close)) {
                 //Write
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
-                            if (!strncmp(path, "#", 1)) {              //Se si tratta di un comando
+                            debug = fopen(str, "a");
+                            fprintf(debug, "P: LEGGO %s\n", path);
+                            fclose(debug);
+                            if (!strncmp(path, "#", 1)) {  //Se si tratta di un comando
                                 if (!strncmp(path, "#CLOSE", 6)) {
                                     _read = TRUE;
                                     _close = TRUE;
-                                    nClearAndClose(fd, m);
+                                    nClearAndClose(fd, m, str);
+                                    debug = fopen(str, "a");
+                                    fprintf(debug, "P: MI KILLO\n");
+                                    fclose(debug);
                                 } else if (!strncmp(path, "#SETM#", 6)) {
-                                    nClearAndClose(fd, m);  //Mando a tutti i figli il comando di chiusura
+                                    nClearAndClose(fd, m, str);  //Mando a tutti i figli il comando di chiusura
+                                    debug = fopen(str, "a");
+                                    fprintf(debug, "P: INVIATO CLOSE A TUTTI\n");
+                                    fclose(debug);
                                     while (wait(NULL) > 0)  //Aspetto che vengano chiusi
                                         ;
+                                    debug = fopen(str, "a");
+                                    fprintf(debug, "P: FIGLI UCCISI\n");
+                                    fclose(debug);
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
-                                    nCleanSon(fd, m);
+                                    debug = fopen(str, "a");
+                                    fprintf(debug, "P: STDOUT SVUOTATO\n");
+                                    fclose(debug);
+                                    //nCleanSon(fd, m);
                                     close_pipes(fd, size_pipe);
                                     mParseOnFly(path, &m);  //Estraggo m da path
-
+                                    debug = fopen(str, "a");
+                                    fprintf(debug, "P: NUOVO M: %d\n", m);
+                                    fclose(debug);
                                     size_pipe = m * 4;  //ridimensiono le pipe
                                     free(fd);
                                     fd = (int*)malloc(size_pipe * sizeof(int));  //Le rialloco
@@ -117,6 +139,12 @@ int main(int argc, char* argv[]) {
                                     }                    //Exec dei processi forkati
                                     send_r = TRUE;       //setto a true per evitare che vada nel ramo sbagliato della read sotto
                                     resetPathList(sum);  //resetto sum
+                                    if (!sendCheck(str)) {
+                                        value_return = err_write();
+                                    }
+                                    debug = fopen(str, "a");
+                                    fprintf(debug, "P: CHECK MANDATO\n");
+                                    fclose(debug);
                                 }
                                 pendingPath = 0;
                             } else {            //Se si tratta di un percorso
@@ -136,6 +164,9 @@ int main(int argc, char* argv[]) {
                                         }
                                     } else {
                                         terminated[i] = TRUE;
+                                        debug = fopen(str, "a");
+                                        fprintf(debug, "P: INVIATO %s\n", path);
+                                        fclose(debug);
                                     }
                                 }
                             }
@@ -152,6 +183,9 @@ int main(int argc, char* argv[]) {
                                     }
                                 } else {
                                     terminated[i] = TRUE;
+                                    debug = fopen(str, "a");
+                                    fprintf(debug, "P: INVIATO %s\n", path);
+                                    fclose(debug);
                                 }
                             }
                         }
@@ -163,6 +197,9 @@ int main(int argc, char* argv[]) {
                     if (send_r) {
                         for (i = 0; i < m; i++) {  //Cicla tra tutti i figli
                             if (read(fd[i * 4 + 0], resp, DIM_RESP) > 0) {
+                                debug = fopen(str, "a");
+                                fprintf(debug, "P: (<) LEGGO  %s\n", resp);
+                                fclose(debug);
                                 if (strstr(resp, "#") != NULL) {
                                     sum_value = insertAndSumPathList(sum, resp, m - 1);
                                     if (sum_value > -1) {  //Qualcosa è arrivato a 0,
@@ -175,6 +212,9 @@ int main(int argc, char* argv[]) {
                                             }
                                         } else {
                                             pendingPath--;
+                                            debug = fopen(str, "a");
+                                            fprintf(debug, "P: RITORNO %s PENDING: %d\n", resp, pendingPath);
+                                            fclose(debug);
                                         }
                                     }
                                 }
@@ -186,6 +226,9 @@ int main(int argc, char* argv[]) {
                         } else {
                             send_r = TRUE;
                             pendingPath--;
+                            debug = fopen(str, "a");
+                            fprintf(debug, "P: RITORNO %s PENDING: %d\n", resp, pendingPath);
+                            fclose(debug);
                         }
                     }
                 }

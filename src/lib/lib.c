@@ -217,8 +217,8 @@ int compare_mtime(array *tmp, int i, char *str) {
 void update_mtime(array *lista) {
     int i;
     struct stat attr;
-    char* tmpPercorso;
-    char* file;
+    char *tmpPercorso;
+    char *file;
     for (i = 0; i < lista->count; i++) {
         tmpPercorso = strdup(lista->pathList[i]);
         file = strtok(tmpPercorso, "#");
@@ -393,7 +393,7 @@ int unlock_pipes(int *fd, int size) {
     return ret;
 }
 
-char forkC(int *n, int *f, int *id, int *value_return) {
+void forkC(int *n, int *f, int *id, int *value_return) {
     int i;
     for (i = 0; i<*n && * f> 0 && *value_return == 0; i++) {
         *f = fork();
@@ -403,9 +403,8 @@ char forkC(int *n, int *f, int *id, int *value_return) {
             *value_return = err_fork();  //In caso di errore setta il valore di ritorno a ERR_FORK
         }
     }
-    return TRUE;
 }
-char forkP(int *m, int *f, int *id, int *value_return) {
+void forkP(int *m, int *f, int *id, int *value_return) {
     int i;
     for (i = 0; i<*m && * f> 0 && *value_return == 0; i++) {
         *f = fork();
@@ -415,10 +414,9 @@ char forkP(int *m, int *f, int *id, int *value_return) {
             *value_return = err_fork();  //In caso di errore setta il valore di ritorno a ERR_FORK
         }
     }
-    return TRUE;
 }
 
-char execC(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) {
+void execC(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) {
     char str[12];
     sprintf(str, "%d", *m);
     char *args[3] = {"./P", str, NULL};
@@ -426,12 +424,11 @@ char execC(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) 
     dup2(fd[*id * 4 + 1], STDOUT_FILENO);
     close_pipes(fd, *size_pipe);
     free(fd);
-    if (execvp(args[0], args) == -1) {  //Test exec
+    if (execvp(args[0], args) == -1) {    //Test exec
         *value_return = err_exec(errno);  //Set value return
     }
-    return TRUE;
 }
-char execP(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) {
+void execP(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) {
     char str[12];
     sprintf(str, "%d", *id);
     char str2[12];
@@ -441,10 +438,9 @@ char execP(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) 
     dup2(fd[*id * 4 + 1], STDOUT_FILENO);
     close_pipes(fd, *size_pipe);
     free(fd);
-    if (execvp(args[0], args) == -1) {  //Test exec
+    if (execvp(args[0], args) == -1) {    //Test exec
         *value_return = err_exec(errno);  //Set value return
     }
-    return TRUE;
 }
 
 int createPipe(int *fd, int size_pipe) {
@@ -532,13 +528,17 @@ int parseSetOnFly(char *string, int *n, int *m) {
     return ret;
 }
 
-void nClearAndClose(int *fd, int n) {
+void nClearAndClose(int *fd, int n, char str[15]) {
     int i;
     char sentClose = FALSE;
     char path[DIM_PATH];
+    FILE *debug;
     int terminated[n];  //Indica se un file e` stato mandato o meno
     for (i = 0; i < n; i++) {
         while (read(fd[i * 4 + 3], path, DIM_PATH) > 0) {
+            debug = fopen(str, "a");
+            fprintf(debug, "ELIMINO %s dalla pipe\n", path);
+            fclose(debug);
         }
         terminated[i] = FALSE;
     }
@@ -549,12 +549,21 @@ void nClearAndClose(int *fd, int n) {
             if (!terminated[i]) {
                 if (write(fd[i * 4 + 3], path, DIM_PATH) == -1) {
                     if (errno != EAGAIN) {
+                        debug = fopen(str, "a");
+                        fprintf(debug, "ERRORE WRITE\n");
+                        fclose(debug);
                     } else {
+                        debug = fopen(str, "a");
+                        fprintf(debug, "INVIO CLOSE FALLITO A %d\n", i);
+                        fclose(debug);
                         sentClose = FALSE;  //Se non ci riesce setta send a false
                         terminated[i] = FALSE;
                     }
                 } else {
                     terminated[i] = TRUE;
+                    debug = fopen(str, "a");
+                    fprintf(debug, "INVIO CLOSE RIUSCITO A %d\n",i);
+                    fclose(debug);
                 }
             }
         }
@@ -616,6 +625,71 @@ void nCleanSon(int *fd, int n) {
             if (read(fd[son * 4 + 0], resp, DIM_RESP) > 0) {
                 cleanPipe = FALSE;
             }
+        }
+    }
+}
+
+char sendCheck(char str[15]) {
+    FILE *debug;
+    char resp[DIM_RESP];
+    strcpy(resp, "#CHECK");
+    char CheckSent = FALSE;
+    char ret = TRUE;
+    while (!CheckSent && ret == TRUE) {
+        if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {  //Scrive il carattere di teminazione
+            if (errno != EAGAIN) {
+                ret = FALSE;
+            } else {
+                debug = fopen(str, "a");
+                fprintf(debug, "INVIO CHECK NON RIUSCITO\n");
+                fclose(debug);
+            }
+        } else {
+            CheckSent = TRUE;
+            debug = fopen(str, "a");
+            fprintf(debug, "INVIO CHECK RIUSCITO\n");
+            fclose(debug);
+        }
+    }
+    return ret;
+}
+
+void readCheck(int *fd, int n, char str[15]) {
+    int recived = 0;
+    FILE *debug;
+    int k;
+    char resp[DIM_RESP];
+    if (n == 0) {
+        n = 1;
+        while (recived < n) {
+            if (read(fd[READ], resp, DIM_RESP) > 0) {  //Prova a leggere dal figlio
+                if (!strncmp(resp, "#CHECK", 6)) {
+                    recived++;
+                    debug = fopen(str, "a");
+                    fprintf(debug, "CHECK RICEVUTO: %d su %d\n", recived, n);
+                    fclose(debug);
+                } else {
+                    debug = fopen(str, "a");
+                    fprintf(debug, "STRINGA IGNORATA: %s\n", resp);
+                    fclose(debug);
+                }
+            }
+        }
+    } else {
+        while (recived < n) {
+            if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {  //Prova a leggere dalla pipe
+                if (!strncmp(resp, "#CHECK", 6)) {
+                    recived++;
+                    debug = fopen(str, "a");
+                    fprintf(debug, "CHECK RICEVUTO: %d su %d\n", recived, n);
+                    fclose(debug);
+                } else {
+                    debug = fopen(str, "a");
+                    fprintf(debug, "STRINGA IGNORATA: %s\n", resp);
+                    fclose(debug);
+                }
+            }
+            k = (k + 1) % n;
         }
     }
 }

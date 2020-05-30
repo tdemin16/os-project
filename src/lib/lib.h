@@ -12,8 +12,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <unistd.h>
 #include <time.h>
+#include <unistd.h>
 
 #define READ 0
 #define WRITE 1
@@ -79,7 +79,7 @@ typedef struct process {
     int count;  //counter to remember how many variables are inside the list
 } process;
 
-void close_all_process();//Funzione per chiudere l'intero programma
+void close_all_process();  //Funzione per chiudere l'intero programma
 
 //Funzione di gestione della struttura processi e gestione chiusura
 process *create_process(int);
@@ -96,7 +96,7 @@ char removeFromPathList(array *, char *c);
 void freePathList(array *);
 void resetPathList(array *);
 int compare_mtime(array *, int, char *);
-void update_mtime(array*);
+void update_mtime(array *);
 void cleanRemoved(array *);
 char sameId(char *, char *);
 
@@ -108,10 +108,10 @@ int parser_LenghtCommand(char *);
 //Funzioni IPC
 void close_pipes(int *, int);
 int unlock_pipes(int *, int);
-char forkC(int *, int *, int *, int *);
-char forkP(int *, int *, int *, int *);
-char execC(int *, int *, int *, int *, int *, int *);
-char execP(int *, int *, int *, int *, int *, int *);
+void forkC(int *, int *, int *, int *);
+void forkP(int *, int *, int *, int *);
+void execC(int *, int *, int *, int *, int *, int *);
+void execP(int *, int *, int *, int *, int *, int *);
 int createPipe(int *, int);
 
 //Funzioni Set on Fly e chiusura
@@ -120,10 +120,12 @@ void setmOnFly(int, int *);
 void mParseOnFly(char *, int *);
 void parseOnFly(char *, int *, int *);
 int parseSetOnFly(char *, int *, int *);
-void nClearAndClose(int *, int);
+void nClearAndClose(int *, int, char *);
 void mSendOnFly(int *, int, int);
 void closeAll(int *);
 void nCleanSon(int *, int);
+char sendCheck(char *);
+void readCheck(int *, int, char *);
 
 //Funzioni di elaborazione stringhe e vettori
 int parse_string(char *, int *v);
@@ -152,8 +154,6 @@ void printCluster(char *);
 void printInfoCluster();
 void printHelp();
 void printInfo();
-
-
 
 //Errori
 int err_file_open();
