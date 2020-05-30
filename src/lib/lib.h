@@ -167,10 +167,6 @@ int err_fcntl();
 int err_exec(int);
 int err_fifo();
 int err_close();
-int err_kill_process_R();
-int err_kill_process_A();
-int err_kill_process_C();
-int err_kill_process_P();
-int err_kill_process_Q();
+int err_kill_process();
 
 #endif

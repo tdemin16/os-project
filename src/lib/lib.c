@@ -1063,27 +1063,6 @@ int err_close() {
     return ERR_CLOSE;
 }
 
-int err_kill_process_R() {
-    //fprintf(stderr, "\n[!] Errore, il processo R è stato killato al di fuori del programma!\n");
-    return ERR_KILL_PROC;
-}
-
-int err_kill_process_A() {
-    //fprintf(stderr, "\n[!] Errore, il processo A è stato killato al di fuori del programma!\n");
-    return ERR_KILL_PROC;
-}
-
-int err_kill_process_C() {
-    //fprintf(stderr, "\n[!] Errore, il processo C è stato killato al di fuori del programma!\n");
-    return ERR_KILL_PROC;
-}
-
-int err_kill_process_P() {
-    //fprintf(stderr, "\n[!] Errore, il processo P è stato killato al di fuori del programma!\n");
-    return ERR_KILL_PROC;
-}
-
-int err_kill_process_Q() {
-    //fprintf(stderr, "\n[!] Errore, il processo Q è stato killato al di fuori del programma!\n");
+int err_kill_process() {
     return ERR_KILL_PROC;
 }
