@@ -432,7 +432,9 @@ int main(int argc, char *argv[]) {  //Main
                                     fflush(stdout);
                                 }
                             }
-                            printf("> ");
+                            if(!analyzing) {
+                                printf("> ");
+                            }
                             fflush(stdout);
                         }
 

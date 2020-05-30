@@ -120,13 +120,9 @@ int main(int argc, char* argv[]) {
                                     if (fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK)) {  //Sblocca lo stdin (teoricamente non necessario)
                                         value_return = err_fcntl();                  //Gestione errore sullo sblocco pipe
                                     }
-                                    if (!forkC(&n, &f, &id, &value_return)) {
-                                        value_return = ERR_FORK;
-                                    }
+                                    forkC(&n, &f, &id, &value_return);
                                     if (f == 0) {
-                                        if (!execC(&m, &f, &id, fd, &value_return, &size_pipe)) {
-                                            value_return = ERR_EXEC;
-                                        }
+                                        execC(&m, &f, &id, fd, &value_return, &size_pipe);
                                     }
 
                                 } else if (!strncmp(path, "#SETM#", 6)) {

@@ -427,7 +427,6 @@ char execC(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) 
     close_pipes(fd, *size_pipe);
     free(fd);
     if (execvp(args[0], args) == -1) {  //Test exec
-        //fprintf(stderr, "%d", errno);
         *value_return = err_exec(errno);  //Set value return
     }
     return TRUE;
@@ -443,7 +442,6 @@ char execP(int *m, int *f, int *id, int *fd, int *value_return, int *size_pipe) 
     close_pipes(fd, *size_pipe);
     free(fd);
     if (execvp(args[0], args) == -1) {  //Test exec
-        //fprintf(stderr, "%d", errno);
         *value_return = err_exec(errno);  //Set value return
     }
     return TRUE;
