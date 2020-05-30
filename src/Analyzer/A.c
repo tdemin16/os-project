@@ -25,6 +25,7 @@ void handle_sigint(int sig) {        //handler per il CTRL-C, ha l'obiettivo di
 
 void sig_term_handler(int signum, siginfo_t *info, void *ptr) {  //handler per SIGTERM
     value_return = err_kill_process_A();                         //Nel caso accada ritorna errore processo A killato al di fuori del programma
+    close_all_process();
 }
 
 void catch_sigterm() {  //Funzione per consentire l'acquisizione del SIGTERM
@@ -207,7 +208,7 @@ int main(int argc, char *argv[]) {  //Main
             }
 
             while (value_return == 0 && !_close) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
-sleep(1);
+                sleep(1);
                 //M - STDIN
                 if (!_close) {                                   //Controlla close non sia già settato a true
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {  //La read non ha errori
@@ -688,6 +689,10 @@ sleep(1);
 
             freePathList(lista);  //Libera la lista
         }
+    }
+
+    if (value_return != 0) {
+        close_all_process();
     }
 
     if (value_return == 0) {

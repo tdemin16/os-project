@@ -3,6 +3,7 @@ int value_return = 0;
 
 void sig_term_handler(int signum, siginfo_t* info, void* ptr) {
     value_return = err_kill_process_P();
+    close_all_process();
 }
 
 void catch_sigterm() {
@@ -112,7 +113,7 @@ int main(int argc, char* argv[]) {
                                         value_return = ERR_FORK;
                                     }  //Forko i processi
                                     if (f == 0) {
-                                        if (!execP(&m, &f, &id, fd, &value_return, &size_pipe)){
+                                        if (!execP(&m, &f, &id, fd, &value_return, &size_pipe)) {
                                             value_return = ERR_EXEC;
                                         }
                                     }                    //Exec dei processi forkati
@@ -209,6 +210,9 @@ int main(int argc, char* argv[]) {
             free(fd);
             freePathList(sum);
         }
+    }
+    if (value_return != 0) {
+        close_all_process();
     }
 
     if (value_return == 0) {

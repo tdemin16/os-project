@@ -3,6 +3,7 @@
 int value_return = 0;
 void sig_term_handler(int signum, siginfo_t* info, void* ptr) {
     value_return = err_kill_process_C();
+    close_all_process();
 }
 
 void catch_sigterm() {
@@ -86,8 +87,8 @@ int main(int argc, char* argv[]) {
         i = 0;
         k = 0;
         j = 0;
-        if (f > 0) {                                                   //PARENT SIDE
-            while (value_return == 0 && (!_close)) {                   //Cicla finche` non ha finito di leggere o scrivere o va in errore
+        if (f > 0) {                                  //PARENT SIDE
+            while (value_return == 0 && (!_close)) {  //Cicla finche` non ha finito di leggere o scrivere o va in errore
                 sleep(1);
                 if (!_write) {                                         //CICLO DI SCRITTURA
                     if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
@@ -121,7 +122,7 @@ int main(int argc, char* argv[]) {
                                         value_return = ERR_FORK;
                                     }
                                     if (f == 0) {
-                                        if (!execC(&m, &f, &id, fd, &value_return, &size_pipe)){
+                                        if (!execC(&m, &f, &id, fd, &value_return, &size_pipe)) {
                                             value_return = ERR_EXEC;
                                         }
                                     }
@@ -213,6 +214,10 @@ int main(int argc, char* argv[]) {
             close_pipes(fd, size_pipe);  //Chiude tutte le pipes
             free(fd);                    //Libera la memoria delle pipes
         }
+    }
+
+    if (value_return != 0) {
+        close_all_process();
     }
 
     if (value_return == 0) {
