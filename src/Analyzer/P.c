@@ -3,6 +3,7 @@ int value_return = 0;
 
 void sig_term_handler(int signum, siginfo_t* info, void* ptr) {
     value_return = err_kill_process_P();
+    close_all_process();
 }
 
 void catch_sigterm() {
@@ -209,6 +210,9 @@ int main(int argc, char* argv[]) {
             free(fd);
             freePathList(sum);
         }
+    }
+    if (value_return != 0) {
+        close_all_process();
     }
 
     if (value_return == 0) {

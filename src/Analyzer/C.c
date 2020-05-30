@@ -3,6 +3,7 @@
 int value_return = 0;
 void sig_term_handler(int signum, siginfo_t* info, void* ptr) {
     value_return = err_kill_process_C();
+    close_all_process();
 }
 
 void catch_sigterm() {
@@ -213,6 +214,10 @@ int main(int argc, char* argv[]) {
             close_pipes(fd, size_pipe);  //Chiude tutte le pipes
             free(fd);                    //Libera la memoria delle pipes
         }
+    }
+
+    if (value_return != 0) {
+        close_all_process();
     }
 
     if (value_return == 0) {

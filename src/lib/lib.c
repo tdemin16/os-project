@@ -1,5 +1,12 @@
 #include "lib.h"
 
+void close_all_process() {
+    fprintf(stderr, BOLDRED "\n[ERRORE]" RESET "\tIl programma verrà terminato a seguito di un errore inatteso.\n");
+    int grp_id = getpgrp();
+    kill(-grp_id, 9);
+    exit(-1);
+}
+
 //Allocate memory for process* and process->pid
 process *create_process(int size) {
     process *st = (process *)malloc(sizeof(process));  //Allocate process memory
@@ -1073,26 +1080,26 @@ int err_close() {
 }
 
 int err_kill_process_R() {
-    fprintf(stderr, "\n[!] Errore, il processo R è stato killato al di fuori del programma!\n");
+    //fprintf(stderr, "\n[!] Errore, il processo R è stato killato al di fuori del programma!\n");
     return ERR_KILL_PROC;
 }
 
 int err_kill_process_A() {
-    fprintf(stderr, "\n[!] Errore, il processo A è stato killato al di fuori del programma!\n");
+    //fprintf(stderr, "\n[!] Errore, il processo A è stato killato al di fuori del programma!\n");
     return ERR_KILL_PROC;
 }
 
 int err_kill_process_C() {
-    fprintf(stderr, "\n[!] Errore, il processo C è stato killato al di fuori del programma!\n");
+    //fprintf(stderr, "\n[!] Errore, il processo C è stato killato al di fuori del programma!\n");
     return ERR_KILL_PROC;
 }
 
 int err_kill_process_P() {
-    fprintf(stderr, "\n[!] Errore, il processo P è stato killato al di fuori del programma!\n");
+    //fprintf(stderr, "\n[!] Errore, il processo P è stato killato al di fuori del programma!\n");
     return ERR_KILL_PROC;
 }
 
 int err_kill_process_Q() {
-    fprintf(stderr, "\n[!] Errore, il processo Q è stato killato al di fuori del programma!\n");
+    //fprintf(stderr, "\n[!] Errore, il processo Q è stato killato al di fuori del programma!\n");
     return ERR_KILL_PROC;
 }

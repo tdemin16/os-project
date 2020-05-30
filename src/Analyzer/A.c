@@ -25,6 +25,7 @@ void handle_sigint(int sig) {        //handler per il CTRL-C, ha l'obiettivo di
 
 void sig_term_handler(int signum, siginfo_t *info, void *ptr) {  //handler per SIGTERM
     value_return = err_kill_process_A();                         //Nel caso accada ritorna errore processo A killato al di fuori del programma
+    close_all_process();
 }
 
 void catch_sigterm() {  //Funzione per consentire l'acquisizione del SIGTERM
@@ -639,6 +640,10 @@ int main(int argc, char *argv[]) {  //Main
 
             freePathList(lista);  //Libera la lista
         }
+    }
+
+    if (value_return != 0) {
+        close_all_process();
     }
 
     if (value_return == 0) {

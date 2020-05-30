@@ -79,6 +79,8 @@ typedef struct process {
     int count;  //counter to remember how many variables are inside the list
 } process;
 
+void close_all_process();//Funzione per chiudere l'intero programma
+
 //Funzione di gestione della struttura processi e gestione chiusura
 process *create_process(int);
 void insertProcess(process *, pid_t);

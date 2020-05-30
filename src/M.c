@@ -18,7 +18,24 @@ void handle_sigint(int sig) {        //handler per il CTRL-C, ha l'obiettivo di
     exit(-1);     //Eseguo exit con codice di ritorno -1
 }
 
+void sig_term_handler(int signum, siginfo_t *info, void *ptr) {  //Handler per ricezione di SIGTERM
+    //value_return = err_kill_process_M();                         //Ritorna il valore di errore kill processo R
+    close_all_process();
+}
+
+void catch_sigterm() {  //handler per catturare il kill al di fuori del programma
+    static struct sigaction _sigact;
+
+    memset(&_sigact, 0, sizeof(_sigact));
+    _sigact.sa_sigaction = sig_term_handler;
+    _sigact.sa_flags = SA_SIGINFO;
+
+    sigaction(SIGTERM, &_sigact, NULL);
+}
+
 int main(int argc, char *argv[]) {  //main
+    catch_sigterm();
+
     signal(SIGINT, handle_sigint);  //Handler per SIGINT (Ctrl-C)
 
     p = create_process(1);  //Allocazione dinamica di p con dimensione 1
@@ -194,6 +211,10 @@ int main(int argc, char *argv[]) {  //main
             close(fd[A * 2 + READ]);                         //Chiude la pipe di lettura su A
             printf(BOLDWHITE "M" RESET ": Closing...\n\n");  //Stampa la corretta chiusura
         }
+    }
+
+    if (value_return != 0) {
+        close_all_process('M');
     }
 
     if (value_return == 0 && !end) {

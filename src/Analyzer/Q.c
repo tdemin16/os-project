@@ -1,9 +1,9 @@
-//Updated to 2020.05.02
 #include "../lib/lib.h"
 int value_return = 0;
 
 void sig_term_handler(int signum, siginfo_t* info, void* ptr) {
     value_return = err_kill_process_Q();
+    close_all_process();
 }
 
 void catch_sigterm() {
@@ -93,5 +93,9 @@ int main(int argc, char* argv[]) {
     }
     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
         ;
+    if (value_return != 0) {
+        close_all_process();
+    }
+
     return value_return;
 }
