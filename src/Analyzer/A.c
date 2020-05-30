@@ -246,8 +246,6 @@ int main(int argc, char *argv[]) {  //Main
                                     }
                                     if (parser2(argCounter, tempPath, lista, &count, &n, &m, &vReturn, &duplicate) == 0) {  //Se il parsing funziona (=> i file sono stati aggiunti correttamente)
                                         printf("\n" WHITE "Aggiunti" RESET " %d files\n", vReturn);                         //Stampo il corretto parsing
-                                    } else {
-                                        //err_args_A();
                                     }
                                     for (j = 0; j < argCounter; j++) {  //Cicla da 0 al numero di argomenti
                                         free(tempPath[j]);              //Libera la lista tempPath[j]
