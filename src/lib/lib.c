@@ -579,7 +579,7 @@ void mSendOnFly(int *fd, int n, int m) {
     char path[DIM_PATH];
     int terminated[n];  //Indica se un file e` stato mandato o meno
     for (i = 0; i < n; i++) {
-        while (read(fd[i * 4 + 3], path, DIM_PATH) > 0) {
+        while (read(fd[i * 4 + 2], path, DIM_PATH) > 0) {
         }
         terminated[i] = FALSE;
     }
