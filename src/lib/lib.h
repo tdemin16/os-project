@@ -116,13 +116,13 @@ int createPipe(int *, int);
 
 //Funzioni Set on Fly e chiusura
 int setOnFly(int, int, int *);
-void setmOnFly(int, int *);
+int setmOnFly(int, int *);
 void mParseOnFly(char *, int *);
 void parseOnFly(char *, int *, int *);
 int parseSetOnFly(char *, int *, int *);
-void nClearAndClose(int *, int, char *);
-void mSendOnFly(int *, int, int);
-void closeAll(int *);
+int nClearAndClose(int *, int, char *);
+int mSendOnFly(int *, int, int);
+int closeAll(int *);
 void nCleanSon(int *, int);
 char sendCheck(char *);
 void readCheck(int *, int, char *);
@@ -133,7 +133,6 @@ void initialize_vector(long *);
 void set_add(long *, char);
 void get_subset(int *, long *, int, int);
 void get_frequencies(int *, long *, int, int);
-int file_len(FILE *);
 void arrayToCsv(long *, char *);
 int countDigit(int);
 int lenghtCsv(int *);
@@ -153,7 +152,7 @@ void analyzeCluster(char *, char *);
 void printCluster(char *);
 void printInfoCluster();
 void printHelp();
-void printInfo();
+int printInfo();
 
 //Errori
 int err_file_open();

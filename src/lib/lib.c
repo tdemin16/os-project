@@ -449,10 +449,11 @@ int createPipe(int *fd, int size_pipe) {
 int setOnFly(int n, int m, int *fd_1) {
     int ret = 0;
     if (fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) {
+        ret = err_fcntl();
     }
     char resp[DIM_RESP];
-    while (read(fd_1[READ], resp, DIM_RESP) > 0) {
-    }
+    while (read(fd_1[READ], resp, DIM_RESP) > 0)
+        ;
     char onFly[DIM_PATH];
     sprintf(onFly, "#SET#%d#%d#", n, m);
     if (write(fd_1[WRITE], onFly, DIM_PATH) == -1) {  //Prova a scrivere sulla pipe
@@ -463,21 +464,23 @@ int setOnFly(int n, int m, int *fd_1) {
     return ret;
 }
 
-void setmOnFly(int m, int *fd_1) {
+int setmOnFly(int m, int *fd_1) {
+    int ret = 0;
     if (fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) {
-        //value_return = err_fcntl();
+        ret = err_fcntl();
     }
     char resp[DIM_RESP];
-    while (read(fd_1[READ], resp, DIM_RESP) > 0) {
-    }
+    while (read(fd_1[READ], resp, DIM_RESP) > 0)
+        ;
     char onFly[DIM_PATH];
     sprintf(onFly, "#SETM#%d#", m);
     if (write(fd_1[WRITE], onFly, DIM_PATH) == -1) {  //Prova a scrivere sulla pipe
         if (errno != EAGAIN) {                        //Se avviene un errore e non e` causato dalla dimensione della pipe
-            //value_return = err_write();               //Ritorna l'errore sulla scrittura
+            ret = err_write();                        //Ritorna l'errore sulla scrittura
         } else
             fprintf(stderr, "errore set on-fly, pipe piena\n");
     }
+    return ret;
 }
 
 void mParseOnFly(char *path, int *m) {
@@ -522,10 +525,11 @@ int parseSetOnFly(char *string, int *n, int *m) {
     return ret;
 }
 
-void nClearAndClose(int *fd, int n, char str[15]) {
+int nClearAndClose(int *fd, int n, char str[15]) {
     int i;
     char sentClose = FALSE;
     char path[DIM_PATH];
+    int ret = 0;
     FILE *debug;
     int terminated[n];  //Indica se un file e` stato mandato o meno
     for (i = 0; i < n; i++) {
@@ -533,7 +537,7 @@ void nClearAndClose(int *fd, int n, char str[15]) {
         fprintf(debug, "Controllo pipe con %d\n", i);
         fclose(debug);
         if (fcntl(fd[i * 4 + 2], F_SETFL, O_NONBLOCK)) {
-            //value_return = err_fcntl();
+            ret = err_fcntl();
         }
         while (read(fd[i * 4 + 2], path, DIM_PATH) > 0) {
             debug = fopen(str, "a");
@@ -549,6 +553,7 @@ void nClearAndClose(int *fd, int n, char str[15]) {
             if (!terminated[i]) {
                 if (write(fd[i * 4 + 3], path, DIM_PATH) == -1) {
                     if (errno != EAGAIN) {
+                        ret = err_write();
                         debug = fopen(str, "a");
                         fprintf(debug, "ERRORE WRITE\n");
                         fclose(debug);
@@ -568,10 +573,13 @@ void nClearAndClose(int *fd, int n, char str[15]) {
             }
         }
     }
+
+    return ret;
 }
 
-void mSendOnFly(int *fd, int n, int m) {
+int mSendOnFly(int *fd, int n, int m) {
     int i;
+    int ret = 0;
     char sentClose = FALSE;
     char path[DIM_PATH];
     int terminated[n];  //Indica se un file e` stato mandato o meno
@@ -588,6 +596,7 @@ void mSendOnFly(int *fd, int n, int m) {
             if (!terminated[i]) {
                 if (write(fd[i * 4 + 3], path, DIM_PATH) == -1) {
                     if (errno != EAGAIN) {
+                        ret = err_write();
                     } else {
                         sentClose = FALSE;  //Se non ci riesce setta send a false
                         terminated[i] = FALSE;
@@ -598,21 +607,24 @@ void mSendOnFly(int *fd, int n, int m) {
             }
         }
     }
+    return ret;
 }
 
-void closeAll(int *fd_1) {
+int closeAll(int *fd_1) {
+    int ret = 0;
     if (fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) {
-        //value_return = err_fcntl();
+        ret = err_fcntl();
     }
     char path[DIM_PATH];
-    while (read(fd_1[READ], path, DIM_PATH) > 0) {
-        //fprintf(stderr, "Eliminato %s\n", path);
-    }
+    while (read(fd_1[READ], path, DIM_PATH) > 0)
+        ;
     if (write(fd_1[WRITE], "#CLOSE", DIM_PATH) == -1) {  //Prova a scrivere sulla pipe
         if (errno != EAGAIN) {                           //Se avviene un errore e non e` causato dalla dimensione della pipe
-            //value_return = err_write();               //Ritorna l'errore sulla scrittura
+            ret = err_write();                           //Ritorna l'errore sulla scrittura
         }
     }
+
+    return ret;
 }
 
 void nCleanSon(int *fd, int n) {
@@ -738,7 +750,7 @@ void get_subset(int *fp, long *v, int b, int e) {
     }
 }
 
-void get_frequencies(int *fp, long *freq, int part, int m) {
+void get_frequencies(int *fp, long *freq, int part, int m) { //Questa funzione e` in O(1)
     initialize_vector(freq);                      //Inizializza il vettore delle frequenze
     int file_length = lseek(*fp, 0, SEEK_END);    //Salva la lunghezza totale del file
     int char_parts = file_length / m;             //Conta di quanti caratteri deve essere ogni parte (floor round)
@@ -753,17 +765,6 @@ void get_frequencies(int *fp, long *freq, int part, int m) {
         end += remain;                            //Avanza di remain
     }
     get_subset(fp, freq, begin, end);
-}
-
-int file_len(FILE *fp) {
-    int len = 0;
-    char c;
-    while (!feof(fp)) {
-        fscanf(fp, "%c", &c);
-        len++;
-        //printf("%d", len);
-    }
-    return len - 1;
 }
 
 void arrayToCsv(long *v, char *res) {
@@ -1074,8 +1075,9 @@ void printHelp() {
     fflush(stdout);
 }
 
-void printInfo() {
+int printInfo() {
     int fptr;
+    int ret = 0;
     char c[1];
     fptr = open("../README.txt", O_RDONLY);  //Apre il file di README in sola lettura
     printf("\n");
@@ -1083,12 +1085,14 @@ void printInfo() {
         while (read(fptr, c, 1)) putchar(c[0]);  //Stampa del README.txt
         close(fptr);                             //Chiude il file
     } else {
-        err_file_open();
+        ret = err_file_open();
     }
     printf(BOLDWHITE "\nCRITERI DI CLUSTERING\n" RESET);
     printInfoCluster();  //Stampa il criteri con il quale viene eseguito il clustering
     printf("\n> ");
     fflush(stdout);
+
+    return ret;
 }
 
 //Error handlers
