@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {  //main
             }
 
             if (!strcmp(cmd, "info")) {  //Se il comando e` info
-                printInfo();
+                value_return = printInfo();
             } else if (!strcmp(cmd, "help")) {  //Help comandi
                 printHelp();
             } else if (!strcmp(cmd, "close")) {
@@ -199,7 +199,7 @@ int main(int argc, char *argv[]) {  //main
 
                 if (res_cmd == 3) {              //Il comando spetta ad M
                     if (!strcmp(cmd, "info")) {  //Se il comando e` info
-                        printInfo();
+                        value_return = printInfo();
                     } else {  //Help comandi
                         printHelp();
                     }
