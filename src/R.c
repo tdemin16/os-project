@@ -32,6 +32,7 @@ void handle_sigint(int sig) {                                                   
 
 void sig_term_handler(int signum, siginfo_t *info, void *ptr) {  //Handler per ricezione di SIGTERM
     value_return = err_kill_process_R();                         //Ritorna il valore di errore kill processo R
+    close_process();
 }  //
 
 void catch_sigterm() {  //handler per catturare il kill al di fuori del programma
@@ -198,6 +199,11 @@ int main() {                            //struttura main
             }
         }
     }
+    if (value_return != 0)
+    {
+        close_process();
+    }
+    
 
     if (value_return == 0) {
         if (close(fd1_fifo) == -1) {

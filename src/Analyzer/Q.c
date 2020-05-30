@@ -4,6 +4,7 @@ int value_return = 0;
 
 void sig_term_handler(int signum, siginfo_t* info, void* ptr) {
     value_return = err_kill_process_Q();
+    close_process();
 }
 
 void catch_sigterm() {
@@ -57,7 +58,7 @@ int main(int argc, char* argv[]) {
     FILE* debug = fopen(str, "a");
     fprintf(debug, "AVVIATO Q con m = %d part = %d\n", m, part);
     fclose(debug);
-
+    //value_return = 1;
     while (value_return == 0 && !_close) {
         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //Legge un percorso
             pendingPath++;
@@ -116,5 +117,11 @@ int main(int argc, char* argv[]) {
     }
     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                     ;
+
+    if (value_return != 0)
+    {
+        close_process();
+    }
+    
     return value_return;
 }

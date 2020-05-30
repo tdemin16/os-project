@@ -95,6 +95,8 @@ typedef struct process {
     int count;  //counter to remember how many variables are inside the list
 } process;
 
+void close_process();
+
 //functions for process to work
 process *create_process(int);
 void insertProcess(process *, pid_t);

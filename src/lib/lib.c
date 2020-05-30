@@ -1,21 +1,20 @@
 #include "lib.h"
 
-/*
-void sig_term_handler(int signum, siginfo_t *info, void *ptr) {
-    write(STDERR_FILENO, SIGTERM_MSG, sizeof(SIGTERM_MSG));
-    printf("CIao\n");
+void close_process() {
+    //char str[15];
+    //sprintf(str, "%d.txt", getpid());
+    //FILE *debug = fopen(str, "a");
+    //fprintf(debug, "Siamo nel processo figlio\n");
+    int grp_id = getpgrp();
+    //fprintf(debug, "Ho ottenuto gruppo %d\n", grp_id);
+    if (kill(-grp_id, SIGKILL) != 0) {
+        //fprintf(stderr, "errore");
+    }
+
+    //fprintf(debug, "Chiuso dopo close_process\n");
+    //fclose(debug);
+    exit(-1);
 }
-
-void catch_sigterm() {
-    static struct sigaction _sigact;
-
-    memset(&_sigact, 0, sizeof(_sigact));
-    _sigact.sa_sigaction = sig_term_handler;
-    _sigact.sa_flags = SA_SIGINFO;
-
-    sigaction(SIGTERM, &_sigact, NULL);
-}
-*/
 
 //Allocate memory for process* and process->pid
 process *create_process(int size) {
@@ -319,7 +318,7 @@ char sameId(char *a, char *b) {
 // Ctrl-C at keyboard
 
 //Aggiunge alla PathList passata tutti i file contenenti, restituisce 0 se è andato tutto bene
-int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, int *res, int* duplicate) {
+int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, int *res, int *duplicate) {
     char type;
     int i;
     FILE *fp;
@@ -491,8 +490,8 @@ int createPipe(int *fd, int size_pipe) {
     int i;
     int ret = 0;
     for (i = 0; i < size_pipe - 1; i += 2) {
-        if (pipe(fd + i) == -1) {       //Controlla se ci sono errori nella creazione della pipe
-            ret = ERR_PIPE;  //In caso di errore setta il valore di ritorno
+        if (pipe(fd + i) == -1) {  //Controlla se ci sono errori nella creazione della pipe
+            ret = ERR_PIPE;        //In caso di errore setta il valore di ritorno
         }
     }
     return ret;
