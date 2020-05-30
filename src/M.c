@@ -57,6 +57,7 @@ int main(int argc, char *argv[]) {  //main
         printf(BOLDWHITE "\nBENVENUTO\n" RESET);
         printf("Usa " WHITE "help" RESET " per vedere l'elenco dei comandi\n");
         printf("Usa " WHITE "info" RESET " per avere informazioni riguardo al programma\n");
+        printf("Usa " WHITE "clear" RESET " per pulire il terminale\n");
         printf("Usa " WHITE "close" RESET " per chiudere il programma\n");
         printf("Premi " WHITE "invio" RESET " per avviare il programma\n\n> ");
         fflush(stdout);
@@ -76,6 +77,18 @@ int main(int argc, char *argv[]) {  //main
                 printHelp();
             } else if (!strcmp(cmd, "close")) {
                 end = TRUE;
+            } else if (!strcmp(cmd, "clear")) {
+                system("clear");
+                printf(BOLDWHITE "\nBENVENUTO\n" RESET);
+                printf("Usa " WHITE "help" RESET " per vedere l'elenco dei comandi\n");
+                printf("Usa " WHITE "info" RESET " per avere informazioni riguardo al programma\n");
+                printf("Usa " WHITE "clear" RESET " per pulire il terminale\n");
+                printf("Usa " WHITE "close" RESET " per chiudere il programma\n");
+                printf("Premi " WHITE "invio" RESET " per avviare il programma\n\n> ");
+                fflush(stdout);
+            } else {
+                printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
+                fflush(stdout);
             }
 
         } while (strcmp(cmd, "") && strncmp(cmd, "close", 5));

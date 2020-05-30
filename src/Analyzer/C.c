@@ -89,7 +89,6 @@ int main(int argc, char* argv[]) {
         j = 0;
         if (f > 0) {                                  //PARENT SIDE
             while (value_return == 0 && (!_close)) {  //Cicla finche` non ha finito di leggere o scrivere o va in errore
-                sleep(1);
                 if (!_write) {                                         //CICLO DI SCRITTURA
                     if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
@@ -104,6 +103,9 @@ int main(int argc, char* argv[]) {
                                     nClearAndClose(fd, n);  //mando #CLOSE alle n pipe
                                     while (wait(NULL) > 0)  //Aspetto che vengano chiusi
                                         ;
+                                    while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
+                                        ;
+                                    nCleanSon(fd, n);
                                     close_pipes(fd, size_pipe);
                                     parseOnFly(path, &n, &m);  //Estrae n e m dalla stringa #SET#N#M#
                                     size_pipe = n * 4;
@@ -126,8 +128,6 @@ int main(int argc, char* argv[]) {
                                             value_return = ERR_EXEC;
                                         }
                                     }
-                                    while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
-                                        ;
 
                                 } else if (!strncmp(path, "#SETM#", 6)) {
                                     j = 0;
