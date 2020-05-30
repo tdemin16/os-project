@@ -213,6 +213,22 @@ int compare_mtime(array *tmp, int i, char *str) {
 
     return value_return;
 }
+
+void update_mtime(array *lista) {
+    int i;
+    struct stat attr;
+    char* tmpPercorso;
+    char* file;
+    for (i = 0; i < lista->count; i++) {
+        tmpPercorso = strdup(lista->pathList[i]);
+        file = strtok(tmpPercorso, "#");
+        file = strtok(NULL, "#");
+        stat(file, &attr);
+        lista->last_edit[i] = attr.st_mtime;
+        free(tmpPercorso);
+    }
+}
+
 void cleanRemoved(array *lista) {
     int j;
     char *dup = NULL;
@@ -273,7 +289,7 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
         else
             type = REMOVE;
         for (i = 1; i < argc && ret == 0; i++) {
-            if (!strcmp(argv[i], "-setn") || !strcmp(argv[i], "-setm")) {  //----ERRORI -setn
+            if (!strcmp(argv[i], "-setn") || !strcmp(argv[i], "-setm")) {
                 i++;
             } else {
                 char command[parser_LenghtCommand(argv[i])];
@@ -299,7 +315,6 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
                             if (removeFromPathList(lista, path)) {
                                 (*count)--;
                                 (*res)++;
-                                //printf("%s\n", resolved_path);
                             } else {
                                 (*duplicate)++;
                             }
@@ -980,6 +995,7 @@ void printHelp() {
     printf(BOLDWHITE "report" RESET " <-flag>\n");
     printf(WHITE "\t-c" RESET ": stampa le statistiche per cluster\n");
     printf(WHITE "\t-a" RESET ": stampa la frequenza di ogni carattere\n");
+    printf(BOLDWHITE "proc" RESET ": stampa a video il numero di processi totali\n");
     printf(BOLDWHITE "info" RESET ": mostra informazioni aggiuntive sul programma\n");
     printf(BOLDWHITE "close" RESET ": chiude il programma\n\n> ");
     fflush(stdout);
