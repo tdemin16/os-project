@@ -14,17 +14,14 @@ process *create_process(int size) {
     st->pid = (int *)malloc(sizeof(int *) * size);     //Allocate pid memory
     st->count = 0;                                     //Set count to 0 (start point)
     int i;                                             //Declaring a new int
-    for (i = 0; i < size; i++)                         //for cycle from 0 to end point
-    {
-        st->pid[i] = -1;  //Set the default value (-1) to every pid in the list
+    for (i = 0; i < size; i++) {                       //for cycle from 0 to end point
+        st->pid[i] = -1;                               //Set the default value (-1) to every pid in the list
     }
-    //printf("Lista allocata\n");
     return st;  //return process
 }
 
-void insertProcess(process *tmp, pid_t val) {  //Insert process val in list tmp
-    if (tmp->count == tmp->size)               //If tmp->pid isn't enough big to contain another value
-    {
+void insertProcess(process *tmp, pid_t val) {                            //Insert process val in list tmp
+    if (tmp->count == tmp->size) {                                       //If tmp->pid isn't enough big to contain another value
         int i;                                                           //Initialize i
         tmp->size *= 2;                                                  //We doubled the size
         tmp->pid = (int *)realloc(tmp->pid, sizeof(int *) * tmp->size);  //We realloc it's memory to double it
@@ -36,9 +33,9 @@ void insertProcess(process *tmp, pid_t val) {  //Insert process val in list tmp
     tmp->count++;                //Increase the count of variables inside
 }
 
-void freeList(process *tmp) {  // free the list tmp
-    free(tmp->pid);            // free the array of pid
-    free(tmp);                 // free the list tmp
+void freeList(process *tmp) {  //free the list tmp
+    free(tmp->pid);            //free the array of pid
+    free(tmp);                 //free the list tmp
 }
 
 void initialize_processes(pid_t *p, int dim) {
@@ -56,13 +53,12 @@ array *createPathList(int size) {                        //allocate an array for
     st->count = 0;                                       //set the counter to 0
     st->last_edit = (time_t *)malloc(sizeof(time_t *) * size);
     int i;                                                              //initialize variable i for the next cycle
-    for (i = 0; i < size; i++)                                          //start the cycle from 0 to the size of the process
-    {                                                                   //
+    for (i = 0; i < size; i++) {                                        //start the cycle from 0 to the size of the process
         st->pathList[i] = (char *)malloc(sizeof(char *) * (DIM_PATH));  //allocate the array of chars that compose the string
         memset(st->pathList[i], '\0', sizeof(char *) * DIM_PATH);       //set the first character to '\0' (= end of string)
         st->analyzed[i] = -1;                                           //set analyzed to -1 (= not analyzed)
-    }                                                                   //
-    return st;                                                          //return the created list of paths
+    }
+    return st;  //return the created list of paths
 }
 
 void reallocPathList(array *tmp, int newSize) {
@@ -104,11 +100,9 @@ char insertPathList(array *tmp, char *c, int val) {
         free(dup2);
     }
     if (present == FALSE) {
-        //printf("Provo a inserire %s, size: %d, count:%d\n", c, tmp->size, tmp->count);
         if (tmp->count == tmp->size) {
             reallocPathList(tmp, 2);
         }
-        //printf("Stringa inserita\n");
         dup2 = strdup(c);
         compare2 = strtok(dup2, "#");
         compare2 = strtok(NULL, "#");
@@ -144,11 +138,9 @@ int insertAndSumPathList(array *tmp, char *c, int val) {
     }
 
     if (sum == FALSE) {
-        //printf("Provo a inserire %s, size: %d, count:%d\n", c, tmp->size, tmp->count);
         if (tmp->count == tmp->size - 1) {
             reallocPathList(tmp, 2);
         }
-        //printf("Stringa inserita\n");
         strcpy(tmp->pathList[tmp->count], c);
         tmp->analyzed[tmp->count] = val;
         tmp->count++;
@@ -214,6 +206,7 @@ int compare_mtime(array *tmp, int i, char *str) {
     return value_return;
 }
 
+//Esegue l'update dell'ultima modifica dei file a tutta la lista
 void update_mtime(array *lista) {
     int i;
     struct stat attr;
@@ -332,17 +325,18 @@ int parser_LenghtCommand(char *search) {
     int ret = strlen("find  -type f -follow -print") + strlen(search) + 1;
     return ret;
 }
+
 //Return -1 if ERR_ARGS, 0 if all arguments are correct, i if argv[i] doesn't exist
 int parser_CheckArguments(int argc, char *argv[], int *n, int *m) {
     int ret = 0;
     int i;
-    char setn = FALSE;  // se setn = true, n è stato cambiato
+    char setn = FALSE;  //se setn = true, n è stato cambiato
     char setm = FALSE;
     if (argc < 1) {  //if number of arguments is even or less than 1, surely it's a wrong input
         ret = -1;
     } else {
         for (i = 1; i < argc && ret == 0; i++) {
-            if (!strcmp(argv[i], "-setn")) {  //----ERRORI -setn
+            if (!strcmp(argv[i], "-setn")) {  //ERRORI -setn
                 if (i + 1 < argc) {           //controlla che ci sia effettivamente un argomento dopo il -setn
                     *n = atoi(argv[i + 1]);
                     if (*n == 0) ret = -1;       //Il campo dopo -setn non è un numero
@@ -353,7 +347,7 @@ int parser_CheckArguments(int argc, char *argv[], int *n, int *m) {
                     ret = -1;
                 }
 
-            } else if (!strcmp(argv[i], "-setm")) {  //-----ERRORI -setm
+            } else if (!strcmp(argv[i], "-setm")) {  //ERRORI -setm
                 if (i + 1 < argc) {                  //controlla che ci sia effettivamente un argomento dopo il -setn
                     *m = atoi(argv[i + 1]);
                     if (*m == 0) ret = -1;       //Il campo dopo -setm non è un numero
@@ -372,8 +366,6 @@ int parser_CheckArguments(int argc, char *argv[], int *n, int *m) {
     }
     return ret;
 }
-
-//Returns -1 if fails
 
 void close_pipes(int *fd, int size) {
     int i;
@@ -454,7 +446,8 @@ int createPipe(int *fd, int size_pipe) {
     return ret;
 }
 
-void setOnFly(int n, int m, int *fd_1) {
+int setOnFly(int n, int m, int *fd_1) {
+    int ret = 0;
     if (fcntl(fd_1[READ], F_SETFL, O_NONBLOCK)) {
     }
     char resp[DIM_RESP];
@@ -464,9 +457,10 @@ void setOnFly(int n, int m, int *fd_1) {
     sprintf(onFly, "#SET#%d#%d#", n, m);
     if (write(fd_1[WRITE], onFly, DIM_PATH) == -1) {  //Prova a scrivere sulla pipe
         if (errno != EAGAIN) {                        //Se avviene un errore e non e` causato dalla dimensione della pipe
-        } else
-            fprintf(stderr, "errore set on-fly, pipe piena");
+            ret = err_write();
+        }
     }
+    return ret;
 }
 
 void setmOnFly(int m, int *fd_1) {
@@ -539,8 +533,8 @@ void nClearAndClose(int *fd, int n, char str[15]) {
         fprintf(debug, "Controllo pipe con %d\n", i);
         fclose(debug);
         if (fcntl(fd[i * 4 + 2], F_SETFL, O_NONBLOCK)) {
-        //value_return = err_fcntl();
-    }
+            //value_return = err_fcntl();
+        }
         while (read(fd[i * 4 + 2], path, DIM_PATH) > 0) {
             debug = fopen(str, "a");
             fprintf(debug, "ELIMINO %s dalla pipe\n", path);
@@ -1114,7 +1108,7 @@ int err_overflow() {
 }
 
 int err_input_A(char *file) {
-    fprintf(stderr, BOLDRED"\n[ERROR]"RESET" File/Directory non esistente: %s\n", file);
+    fprintf(stderr, BOLDRED "\n[ERROR]" RESET " File/Directory non esistente: %s\n", file);
     return ERR_ARGS_A;
 }
 

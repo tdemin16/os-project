@@ -115,7 +115,7 @@ void execP(int *, int *, int *, int *, int *, int *);
 int createPipe(int *, int);
 
 //Funzioni Set on Fly e chiusura
-void setOnFly(int, int, int *);
+int setOnFly(int, int, int *);
 void setmOnFly(int, int *);
 void mParseOnFly(char *, int *);
 void parseOnFly(char *, int *, int *);
