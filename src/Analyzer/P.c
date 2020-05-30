@@ -100,6 +100,7 @@ int main(int argc, char* argv[]) {
                                     _read = TRUE;
                                     _close = TRUE;
                                     nClearAndClose(fd, m, str);
+                                    
                                     debug = fopen(str, "a");
                                     fprintf(debug, "P: MI KILLO\n");
                                     fclose(debug);

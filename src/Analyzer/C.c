@@ -113,7 +113,7 @@ int main(int argc, char* argv[]) {
                                         ;
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
-                                    nCleanSon(fd, n);
+                                    //nCleanSon(fd, n);
                                     close_pipes(fd, size_pipe);
                                     parseOnFly(path, &n, &m);  //Estrae n e m dalla stringa #SET#N#M#
                                     size_pipe = n * 4;
@@ -131,6 +131,9 @@ int main(int argc, char* argv[]) {
                                     forkC(&n, &f, &id, &value_return);
                                     if (f == 0) {
                                         execC(&m, &f, &id, fd, &value_return, &size_pipe);
+                                    }
+                                    if (!sendCheck(str)) {
+                                        value_return = err_write();
                                     }
 
                                 } else if (!strncmp(path, "#SETM#", 6)) {

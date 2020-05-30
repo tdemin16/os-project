@@ -411,6 +411,7 @@ int main(int argc, char *argv[]) {  //Main
                                         if (atoi(new_n) > 0 && atoi(new_n) != n) {  //Controlla che n sia > 0 e diverso dal precedente
                                             n = atoi(new_n);                        //Cambia il valore di n
                                             setOnFly(n, m, fd_1);                   //Avvia la procedura di setonfly
+                                            readCheck(fd_2, 0,str); 
                                             printf("\n" BOLDYELLOW "[ATTENTION]" RESET " n e` stato modificato\n\n");
                                             if (analyzing) {      //Se il sistema sta analizzando
                                                 i = 0;            //Riparte dal primo elemento di pathlist
@@ -451,6 +452,7 @@ int main(int argc, char *argv[]) {  //Main
                                         if (parseSetOnFly(cmd, &n, &m) == 0) {                 //Controlla che la correttezza del comando
                                             printf("\n" BOLDYELLOW "[ATTENTION]" RESET " n e m sono stati modificati\n\n");
                                             setOnFly(n, m, fd_1);  //Avvia la procedura di setOnFLy
+                                            readCheck(fd_2, 0,str); 
                                             if (analyzing) {       //Se il sistema sta analizzando
                                                 i = 0;             //Riparte dal primo elemento di pathlist
                                                 pathSent = perc;   //Porta il numero di percorsi inviati al numero di percorsi ricevuti
