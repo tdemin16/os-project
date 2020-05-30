@@ -2,7 +2,7 @@
 int value_return = 0;
 
 void sig_term_handler(int signum, siginfo_t* info, void* ptr) {
-    value_return = err_kill_process_Q();
+    value_return = err_kill_process();
     close_all_process();
 }
 

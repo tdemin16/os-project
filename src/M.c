@@ -19,7 +19,6 @@ void handle_sigint(int sig) {        //handler per il CTRL-C, ha l'obiettivo di
 }
 
 void sig_term_handler(int signum, siginfo_t *info, void *ptr) {  //Handler per ricezione di SIGTERM
-    //value_return = err_kill_process_M();                         //Ritorna il valore di errore kill processo R
     close_all_process();
 }
 
