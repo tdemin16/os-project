@@ -525,7 +525,6 @@ int parseSetOnFly(char *string, int *n, int *m) {
     return ret;
 }
 
-<<<<<<< HEAD
 int nClearAndClose(int *fd, int n, char str[15]) {
     int i;
     char sentClose = FALSE;
