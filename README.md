@@ -1,65 +1,25 @@
-# LabSO1-AA_2019_2020--200569_192435_193992_201487
+# Analyzer
+## Descrizione
+Il progetto si compone di 6 file eseguibili e di una libreria (da noi composta) contenete funzioni utili. Solo 3 però sono gli eseguibili che possono essere avviati dal terminale **M**, **R** ed **A**.
 
-E-Mail di Gruppo: thomas.demin@studenti.unitn.it
+## A
+Il compito del processo **A** è di eseguire l'analisi dei percorsi che gli vengono forniti in input. Per eseguire questa procedura vengono generati:
+* Un processo **C**
+* *n* processi **P** (default: 3)
+* *m* processi **Q** (default: 4)
+Il processo A può essere avviato con alcuni argomenti in input che possono essere, percorsi di file e/o cartelle, -setn x, -setm y (es. ./A ../src ../test/test1.txt -setn 2 -setm 6, questo avvierà l'analisi sulla cartella src e sul file test1.txt con n=2 e m=6).
 
-* Thomas De Min - 200569 - thomas.demin@studenti.unitn.it
-* Benedetta Scattolin - 192435 - benedetta.scattolin@studenti.unitn.it
-* Luigi Pusiol - 193992 - luigi.pusiol@studenti.unitn.it
-* Andrea Bonomi - 201487 - andrea.bonomi-2@studenti.unitn.it
+Se il processo non dovesse essere avviato con argomenti in input oppure si vuole eseguire alcune operazioni ad analisi terminata, sono a disposizione diversi comandi:
+* add path1 path2 ...: permette di aggiungere alla lista dei file analizzabili i percorsi inseriti
+* remove path1 path2 ...: permette di rimuovere dalla lista dei file analizzabili i percorsi inseriti
+* analyze: analizza i percorsi inseriti non ancora analizzati
+* reanalyze: esegue l'analisi su tutti i percorsi, anche quelli già analizzati
+* reset: rimuove tutti i file inseriti
+* set n m: cambia il numero di processi P e Q generati (questa operazione è garantita anche durante l'analisi)
+* setn n
+* setm m
 
-## Descrizione Progetto
-Il programma e` stato sviluppato suddividendo i vari processi fra i componenti del gruppo.
-### Q
-> "Ogni processo Q analizza uno spezzone di ogni file di input a cui accede. "n" ed "m" hanno come valore
-di default rispettivamente 3 e 4 ma possono essere passati come argomenti."
+Una volta avviato A, viene eseguito un fork e generato un processo C. Questo avrà il compito di gestire la generazione dei processi P e il cambiamento del numero di P e Q. C poi distribuirà ai processi P i file in maniera equa in modo da dividere il carico su n processi. I processi P genereranno a loro volta m processi Q e, inoltre, si occuperà del riavvio di questi quando il valore m viene modificato. I processi Q, infine, spartiscono tra di loro ogni file riducendo distribuendo ulteriormente il carico.
 
-Q apre il file e riceve il contenuto in ASCII. In seguito passa al processo superiore (P) i vari dati raccolti e provvede a chiudere il file.
-
-### P
-> "Si occupa di gestire ciascuno un sottoinsieme degli input (partizionato in "n" sottogruppi) creando a sua volta "m" figli."
-
-P si occupa di creare m processi figli (Q) e passare al processo padre (C) i dati raccolti.
-
-### C
-> "Un processo C ("Counter") principale tiene traccia dei conteggi (ricevendo quindi i dati) i quali devono
-essere eseguiti da processi separati da esso generati."
-
-C provvede a generare n-P processi ed a passare i dati ad A
-
-### A
-> "Un processo/sottosistema "A" ("Analyzer") per calcolare le statistiche (che coincide o comprende
-l'albero descritto con C, P... e Q...)."
-
-A si occupa della parte di calcolo delle statistiche e di passare i file/la cartella da analizzare ai processi figli
-
-### R
-> "Un processo/sottosistema "R" ("Report") per recuperare le informazioni."
-
-R ha il solo ed unico compito di stampare le varie statistiche
-
-### M
-> "Un processo/sottosistema "M" ("Main") principale per la gestione generale: ha solo funzione di
-"gateway" e interfaccia-utente. DEVE richiamare gli altri due processi/sottosistemi di seguito
-indicati (che devono essere utilizzabili anche autonomamente direttamente da cli)."
-
-M e` il processo che si occupa di gestire l'avvio di A e di R.
-
-## Utilizzo
-Da M: (Avviamo prima ./bin/M o lo avviamo con comandi???)
-* Per analizzare una cartella di directory *dir* basta digitare da terminale "./bin/M *dir*";
-* Per analizzare un file in posizione *dir* basta digitare da terminale "./bin/M *dir*";
-* Per analizzare piu' file in posizione *dir_1*, *dir_2*, ..., *dir_n* e` sufficiente digitare "./bin/M *dir_1* *dir_2* *...* *dir_n*";
-* Per settare m ed n basta aggiungere il flag *-setn* o *-setm* a seconda del valore da cambiare, per esempio: "./bin/M *dir* -setn *5* -setm *6*";
-* Per chiudere il programma è sufficiente scrivere "close";
-* Per visualizzare l'help digitare "help";
-* Per visualizzare le info digitare "info";
-* Per visualizzare le clustered info digitare "info -c"
-
-Da A:
-* Per analizzare una cartella di directory *dir* basta digitare da terminale "./bin/A *dir*";
-* Per analizzare un file in posizione *dir* basta digitare da terminale "./bin/A *dir*";
-* Per analizzare piu' file in posizione *dir_1*, *dir_2*, ..., *dir_n* e` sufficiente digitare "./bin/A *dir_1* *dir_2* *...* *dir_n*";
-* Per settare m ed n basta aggiungere il flag *-setn* o *-setm* a seconda del valore da cambiare, per esempio: "./bin/A *dir* -setn *5* -setm *6*";
-
-Da R:
-* //TODO
+### Scelte implementative
+Dato che si trattano di processi generati in line gerarchica, è stato possibile l'uso di pipe anonime per la comunicazione tra i vari processi. Inoltre per garantire una maggiore parallelizzazione alle pipe è stato assegnato il flag **O_NONBLOCK** per evitare blocchi in lettura e scrittura. //Tb be continued...
