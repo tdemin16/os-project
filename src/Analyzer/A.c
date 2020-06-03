@@ -353,12 +353,10 @@ int main(int argc, char *argv[]) {  //Main
                                     time(&start);           //Inizio timer
                                     update_mtime(lista);    // Aggiornala lista delle ultime modifiche
                                 } else {
-                                    printf(BOLDYELLOW "\n[ATTENTION]" RESET " Non ci sono file da analizzare\n\n> ");
-                                    fflush(stdout);
+                                    printf(BOLDYELLOW "\n[ATTENTION]" RESET " Non ci sono file da analizzare\n");
                                 }
                             } else {
-                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n\n> ");
-                                fflush(stdout);
+                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n");
                             }
                             printf("\n> ");
                             fflush(stdout);
@@ -394,7 +392,7 @@ int main(int argc, char *argv[]) {  //Main
                                             }
                                         } else {
                                             printf("\nn non e` stato modificato.\n");
-                                            printf("Il valore inserito e` equivalente al precedente oppure e` uguale a 0\n\n");
+                                            printf("Il valore non e` valido\n\n");
                                         }
                                         free(dupl);  //Libera la memoria della stringa d'appoggio
 
@@ -414,7 +412,7 @@ int main(int argc, char *argv[]) {  //Main
                                             }
                                         } else {
                                             printf("\nm non e` stato modificato.\n");
-                                            printf("Il valore inserito e` equivalente al precedente oppure e` uguale a 0\n\n");
+                                            printf("Il valore non e` valido\n\n");
                                         }
                                         free(dupl);  //Libera la memoria della stringa d'appoggio
                                     }
@@ -431,7 +429,7 @@ int main(int argc, char *argv[]) {  //Main
                                             }
                                         } else {
                                             printf("\nn e m non sono stati modificati.\n");
-                                            printf("I valori inseriti sono equivalenti ai precedenti oppure uno dei due e` uguale a 0\n\n");
+                                            printf("La combinazione di valori non e` valida\n\n");
                                         }
                                     } else {
                                         printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");  //Stampa errore se sono stati inseriti comandi errati
