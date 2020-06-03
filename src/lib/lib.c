@@ -572,6 +572,9 @@ int mSendOnFly(int *fd, int n, int m) {
     char path[DIM_PATH];
     int terminated[n];  //Indica se un file e` stato mandato o meno
     for (i = 0; i < n; i++) {
+        if (fcntl(fd[i * 4 + 2], F_SETFL, O_NONBLOCK)) {
+            ret = err_fcntl();
+        }
         while (read(fd[i * 4 + 2], path, DIM_PATH) > 0) {
         }
         terminated[i] = FALSE;
