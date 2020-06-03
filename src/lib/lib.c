@@ -472,9 +472,11 @@ int setmOnFly(int m, int *fd_1) {
         ret = err_fcntl();
     }
     char resp[DIM_RESP];
+    memset(resp, '\0', sizeof(char) * DIM_RESP);
     while (read(fd_1[READ], resp, DIM_RESP) > 0)
         ;
     char onFly[DIM_PATH];
+    memset(onFly, '\0', DIM_PATH);
     sprintf(onFly, "#SETM#%d#", m);
     if (write(fd_1[WRITE], onFly, DIM_PATH) == -1) {  //Prova a scrivere sulla pipe
         if (errno != EAGAIN) {                        //Se avviene un errore e non e` causato dalla dimensione della pipe
