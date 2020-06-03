@@ -189,9 +189,9 @@ void freePathList(array *tmp) {
     free(tmp);
 }
 
-void resetPathList(array *tmp) {
+array* resetPathList(array *tmp) {
     freePathList(tmp);
-    tmp = createPathList(10);
+    return createPathList(10);
 }
 
 //Compare mtime of string1 and string2, returns TRUE if equal
@@ -452,9 +452,11 @@ int setOnFly(int n, int m, int *fd_1) {
         ret = err_fcntl();
     }
     char resp[DIM_RESP];
+    memset(resp, '\0', sizeof(char) * DIM_RESP);
     while (read(fd_1[READ], resp, DIM_RESP) > 0)
         ;
     char onFly[DIM_PATH];
+    memset(onFly, '\0', DIM_PATH);
     sprintf(onFly, "#SET#%d#%d#", n, m);
     if (write(fd_1[WRITE], onFly, DIM_PATH) == -1) {  //Prova a scrivere sulla pipe
         if (errno != EAGAIN) {                        //Se avviene un errore e non e` causato dalla dimensione della pipe

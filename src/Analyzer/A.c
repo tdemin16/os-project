@@ -52,15 +52,18 @@ int main(int argc, char *argv[]) {  //Main
     int p_create = FALSE;               //Indica se la pipe fifo e` stata creata
     char print_method[DIM_CMD];         //Comando inviato da R ad A
     char type_resp[DIM_RESP];           //Set di dati da dare ad R
-    char tmp_resp[DIM_PATH];            //Fine lettura di R
+    memset(type_resp, '\0', sizeof(char) * DIM_PATH);
+    char tmp_resp[DIM_PATH];  //Fine lettura di R
+    memset(tmp_resp, '\0', sizeof(char) * DIM_PATH);
     strcpy(tmp_resp, "///");
 
     //COMMUNICATION WITH M - STDIN
-    char cmd[DIM_CMD];   //Comando rivevuto da M
-    int _close = FALSE;  //Indica se A deve chiudersi o continuare l'esecuzione
-    char *new_n;         //Nuovo n dopo il comando set. Serve a controllare la correttezza del valore prima di riavviare i processi
-    char *new_m;         //Nuovo m dopo il comando set. Serve a controllare la correttezza del valore prima di riavviare i processi
-    char *dupl = NULL;   //Stringa di appoggio per il parsing del comando set n m
+    char cmd[DIM_CMD];                          //Comando rivevuto da M
+    memset(cmd, '\0', sizeof(char) * DIM_CMD);  //Prevent errrors on uninitialized bytes
+    int _close = FALSE;                         //Indica se A deve chiudersi o continuare l'esecuzione
+    char *new_n;                                //Nuovo n dopo il comando set. Serve a controllare la correttezza del valore prima di riavviare i processi
+    char *new_m;                                //Nuovo m dopo il comando set. Serve a controllare la correttezza del valore prima di riavviare i processi
+    char *dupl = NULL;                          //Stringa di appoggio per il parsing del comando set n m
 
     //Parsing arguments------------------------------------------------------------------------------------------
     int n = 3;  //Numero di processi P
@@ -211,15 +214,15 @@ int main(int argc, char *argv[]) {  //Main
                 if (!_close) {                                   //Controlla close non sia già settato a true
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {  //La read non ha errori
                         if (!strncmp(cmd, "close", 5)) {         //Verifica se cmd è close, in tal caso prosegue alla chiusura dei processi
-                            closeAll(fd_1);         //chiudi tutti i processi figli
-                            while (wait(NULL) > 0)  //Attende che tutti i processi figli siano chiusi prima di terminare
+                            closeAll(fd_1);                      //chiudi tutti i processi figli
+                            while (wait(NULL) > 0)               //Attende che tutti i processi figli siano chiusi prima di terminare
                                 ;
                             _close = TRUE;  //flag close settato a TRUE, obbliga il programma a terminare
                             printf(BOLDWHITE "A" RESET ": Closing...\n");
                         }
 
-                        if (!strncmp(cmd, "add", 3)) {  //Se invece il comando è "add"
-                            if (!analyzing) {                                                       //Verifica che non stia già analizzando
+                        if (!strncmp(cmd, "add", 3)) {                                                       //Se invece il comando è "add"
+                            if (!analyzing) {                                                                //Verifica che non stia già analizzando
                                 if (strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL) {          //Mentra analizza controlla se l'utente cambia setn o setm
                                     printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\n");  //in tal caso verifica se sono correttamente inseriti
                                     printf("Usa help per vedere la lista di comandi utilizzabili.\n\n");     //Stampa errore se sono stati inseriti comandi errati
@@ -244,14 +247,14 @@ int main(int argc, char *argv[]) {  //Main
                                     err_args_A();    //Ritorna errore degli argomenti di A
                                 }
                             } else {  //Altrimenti l'analisi è ancora in corso, quindi non può fare altro a ciò che è scritto sopra
-                                printf(BOLDYELLOW"\n[ATTENTION]"RESET" Analisi in corso, comando non disponibile\n");
+                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n");
                             }
                             printf("\n> ");
                             fflush(stdout);
                         }
 
-                        if (!strncmp(cmd, "remove", 6)) {  //Se il comando è "remove"
-                            if (!analyzing) {              //Verifica che non stia già analizzando
+                        if (!strncmp(cmd, "remove", 6)) {                                                                                                             //Se il comando è "remove"
+                            if (!analyzing) {                                                                                                                         //Verifica che non stia già analizzando
                                 if ((strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL)) {                                                                 //Mentra analizza controlla se l'utente cambia setn o setm ed in tal caso verifica se sono correttamente inseriti
                                     printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");  //Stampa errore se sono stati inseriti comandi errati
                                     fflush(stdout);
@@ -293,29 +296,29 @@ int main(int argc, char *argv[]) {  //Main
                                     err_args_A();  //Errore negli argomenti di A
                                 }
                             } else {  //In alternativa vuol dire che sta analizzando e dunque non può rimuovere i files
-                                printf(BOLDYELLOW"\n[ATTENTION]"RESET" Analisi in corso, comando non disponibile\n\n");
+                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n\n");
                             }
                             printf("> ");
                             fflush(stdout);
                         }
 
-                        if (!strncmp(cmd, "reset", 5)) {  //Se il comando e` reset
-                            if (!analyzing) {             //Controlla che il programma non sia in analisi
-                                resetPathList(lista);                        //Svuota la lista
+                        if (!strncmp(cmd, "reset", 5)) {                     //Se il comando e` reset
+                            if (!analyzing) {                                //Controlla che il programma non sia in analisi
+                                lista = resetPathList(lista);                        //Svuota la lista
                                 count = 0;                                   //Riporta il numero di file presenti nella lista
                                 memset(sum, '\0', sizeof(char) * DIM_RESP);  //Setta la stringa dei totali a '\0
                                 initialize_vector(v);                        //Azzera v
                                 printf(BOLDYELLOW "\n[ATTENTION]" RESET " Tutti i file sono stati rimossi.\n\n");
                             } else {
-                                printf(BOLDYELLOW"\n[ATTENTION]"RESET" Analisi in corso, comando non disponibile\n\n");
+                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n\n");
                                 fflush(stdout);
                             }
                             printf("> ");
                             fflush(stdout);
                         }
 
-                        if (!strncmp(cmd, "reanalyze", 9)) {  //Se il comando e` reanalyze
-                            if (!analyzing) {                 //Controlla che il sistema non sia in analisi
+                        if (!strncmp(cmd, "reanalyze", 9)) {          //Se il comando e` reanalyze
+                            if (!analyzing) {                         //Controlla che il sistema non sia in analisi
                                 for (j = 0; j < lista->count; j++) {  //Setta tutti i file come non analizzati
                                     lista->analyzed[j] = 0;
                                 }
@@ -334,7 +337,7 @@ int main(int argc, char *argv[]) {  //Main
                                     fflush(stdout);
                                 }
                             } else {
-                                printf(BOLDYELLOW"\n[ATTENTION]"RESET" Analisi in corso, comando non disponibile\n");
+                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n");
                             }
                             printf("\n> ");
                             fflush(stdout);
@@ -342,19 +345,19 @@ int main(int argc, char *argv[]) {  //Main
 
                         if (!strncmp(cmd, "analyze", 7)) {  //Se il comando inserito e` analyze
                             if (!analyzing) {               //Controlla che il sistema non sia in analisi
-                                pathSent = 0;             //Azzera il numero di percorsi inviati
-                                notAnalyzed = 0;          //Azzera il numero di percorsi non analizzati
-                                perc = 0;                 //Azzera il numero di percorsi ritornati
-                                if (count > 0) {          //Se ci sono dei file da poter analizzare
-                                    _write = FALSE;       //Abilita la scrittura
-                                    time(&start);         //Inizio timer
-                                    update_mtime(lista);  // Aggiornala lista delle ultime modifiche
+                                pathSent = 0;               //Azzera il numero di percorsi inviati
+                                notAnalyzed = 0;            //Azzera il numero di percorsi non analizzati
+                                perc = 0;                   //Azzera il numero di percorsi ritornati
+                                if (count > 0) {            //Se ci sono dei file da poter analizzare
+                                    _write = FALSE;         //Abilita la scrittura
+                                    time(&start);           //Inizio timer
+                                    update_mtime(lista);    // Aggiornala lista delle ultime modifiche
                                 } else {
                                     printf(BOLDYELLOW "\n[ATTENTION]" RESET " Non ci sono file da analizzare\n\n> ");
                                     fflush(stdout);
                                 }
                             } else {
-                                printf(BOLDYELLOW"\n[ATTENTION]"RESET" Analisi in corso, comando non disponibile\n\n> ");
+                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n\n> ");
                                 fflush(stdout);
                             }
                             printf("\n> ");
@@ -382,7 +385,7 @@ int main(int argc, char *argv[]) {  //Main
                                         if (atoi(new_n) > 0 && atoi(new_n) != n) {  //Controlla che n sia > 0 e diverso dal precedente
                                             n = atoi(new_n);                        //Cambia il valore di n
                                             setOnFly(n, m, fd_1);                   //Avvia la procedura di setonfly
-                                            readCheck(fd_2, 0); 
+                                            readCheck(fd_2, 0);
                                             printf("\n" BOLDYELLOW "[ATTENTION]" RESET " n e` stato modificato\n\n");
                                             if (analyzing) {      //Se il sistema sta analizzando
                                                 i = 0;            //Riparte dal primo elemento di pathlist
@@ -420,11 +423,11 @@ int main(int argc, char *argv[]) {  //Main
                                         if (parseSetOnFly(cmd, &n, &m) == 0) {                 //Controlla che la correttezza del comando
                                             printf("\n" BOLDYELLOW "[ATTENTION]" RESET " n e m sono stati modificati\n\n");
                                             setOnFly(n, m, fd_1);  //Avvia la procedura di setOnFLy
-                                            readCheck(fd_2, 0); 
-                                            if (analyzing) {       //Se il sistema sta analizzando
-                                                i = 0;             //Riparte dal primo elemento di pathlist
-                                                pathSent = perc;   //Porta il numero di percorsi inviati al numero di percorsi ricevuti
-                                                _write = FALSE;    //Abilita la scrittura
+                                            readCheck(fd_2, 0);
+                                            if (analyzing) {      //Se il sistema sta analizzando
+                                                i = 0;            //Riparte dal primo elemento di pathlist
+                                                pathSent = perc;  //Porta il numero di percorsi inviati al numero di percorsi ricevuti
+                                                _write = FALSE;   //Abilita la scrittura
                                             }
                                         } else {
                                             printf("\nn e m non sono stati modificati.\n");
@@ -462,7 +465,7 @@ int main(int argc, char *argv[]) {  //Main
                                 printf("%d processi Q\n\n> ", n * m);
                                 fflush(stdout);
                             } else {
-                                printf(BOLDYELLOW"\n[ATTENTION]"RESET" Analisi in corso, comando non disponibile\n\n> ");
+                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n\n> ");
                                 fflush(stdout);
                             }
                         }
@@ -610,7 +613,7 @@ int main(int argc, char *argv[]) {  //Main
                                 count -= lista->count;
                                 time(&end);  //Diminuisce count della lunghezza della lista
                                 elapsed = difftime(end, start);
-                                printf("\r"WHITE "Analizzati " RESET "%d " WHITE "files in %d secondi" RESET "\n", pathSent - notAnalyzed, (int)elapsed);
+                                printf("\r" WHITE "Analizzati " RESET "%d " WHITE "files in %d secondi" RESET "\n", pathSent - notAnalyzed, (int)elapsed);
                                 arrayToCsv(v, sum);  //Crea la stringa delle somme
                                 pathSent = 0;        //Setta i percorsi inviati a 0
                                 analyzing = FALSE;   //Esce dalla procedura di analisi
@@ -648,8 +651,9 @@ int main(int argc, char *argv[]) {  //Main
                     value_return = err_close();
                 }
             }
-
-            freePathList(lista);  //Libera la lista
+            if (lista->size > 0) {
+                freePathList(lista);  //Libera la lista
+            }
         }
     }
 

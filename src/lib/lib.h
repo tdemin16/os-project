@@ -94,7 +94,7 @@ char insertPathList(array *, char *, int);
 int insertAndSumPathList(array *, char *, int);
 char removeFromPathList(array *, char *c);
 void freePathList(array *);
-void resetPathList(array *);
+array* resetPathList(array *);
 int compare_mtime(array *, int, char *);
 void update_mtime(array *);
 void cleanRemoved(array *);

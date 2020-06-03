@@ -37,14 +37,14 @@ int main(int argc, char *argv[]) {  //main
 
     signal(SIGINT, handle_sigint);  //Handler per SIGINT (Ctrl-C)
 
-    p = create_process(1);       //Allocazione dinamica di p con dimensione 1
-    int value_return = 0;        //Assegno il valore di default 0 a value return
-    pid_t f = getpid();          //Inizializzo p e assegno il pid del processo M
-    char cmd[DIM_CMD];           //contiente il comando lanciato
-    memset(cmd, '\0', DIM_CMD);  //Prevents uninitialized bytes
-    char ch = '0';               //per leggere un carattere per volta
-    int end = FALSE;             //TRUE se lanciato il comando "close"
-    int _close = FALSE;          //Evita la chiusura delle pipe nel caso in cui non siano state aperte
+    p = create_process(1);                      //Allocazione dinamica di p con dimensione 1
+    int value_return = 0;                       //Assegno il valore di default 0 a value return
+    pid_t f = getpid();                         //Inizializzo p e assegno il pid del processo M
+    char cmd[DIM_CMD];                          //contiente il comando lanciato
+    memset(cmd, '\0', sizeof(char) * DIM_CMD);  //Prevents uninitialized bytes
+    char ch = '0';                              //per leggere un carattere per volta
+    int end = FALSE;                            //TRUE se lanciato il comando "close"
+    int _close = FALSE;                         //Evita la chiusura delle pipe nel caso in cui non siano state aperte
     int res_cmd;
     int _write = TRUE;
     int i;
@@ -208,7 +208,7 @@ int main(int argc, char *argv[]) {  //main
                     }
                 }
             }
-            if (!_close) { //Controllo sull'avvio o meno dell'analizzatore
+            if (!_close) {                 //Controllo sull'avvio o meno dell'analizzatore
                 close(fd[R * 2 + WRITE]);  //Chiude la pipe di scrittura su R
                 close(fd[R * 2 + READ]);   //Chiude la pipe di lettura su R
                 close(fd[A * 2 + WRITE]);  //Chiude la pipe di scrittura su A

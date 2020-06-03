@@ -119,7 +119,7 @@ int main(int argc, char* argv[]) {
                                         execP(&m, &f, &id, fd, &value_return, &size_pipe);
                                     }                    //Exec dei processi forkati
                                     send_r = TRUE;       //setto a true per evitare che vada nel ramo sbagliato della read sotto
-                                    resetPathList(sum);  //resetto sum
+                                    sum = resetPathList(sum);  //resetto sum
                                     if (!sendCheck()) {
                                         value_return = err_write();
                                     }
@@ -206,7 +206,7 @@ int main(int argc, char* argv[]) {
                         /* handle error */
                     }
                     fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
-                    resetPathList(sum);
+                    sum = resetPathList(sum);
                 }
             }
             while (wait(NULL) > 0)  //Aspetta che tutti i figli siano chiusi
