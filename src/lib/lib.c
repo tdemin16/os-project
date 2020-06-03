@@ -475,6 +475,7 @@ int setmOnFly(int m, int *fd_1) {
     while (read(fd_1[READ], resp, DIM_RESP) > 0)
         ;
     char onFly[DIM_PATH];
+    
     sprintf(onFly, "#SETM#%d#", m);
     if (write(fd_1[WRITE], onFly, DIM_PATH) == -1) {  //Prova a scrivere sulla pipe
         if (errno != EAGAIN) {                        //Se avviene un errore e non e` causato dalla dimensione della pipe
@@ -570,6 +571,9 @@ int mSendOnFly(int *fd, int n, int m) {
     char path[DIM_PATH];
     int terminated[n];  //Indica se un file e` stato mandato o meno
     for (i = 0; i < n; i++) {
+        if (fcntl(fd[i * 4 + 2], F_SETFL, O_NONBLOCK)) {
+            ret = err_fcntl();
+        }
         while (read(fd[i * 4 + 2], path, DIM_PATH) > 0) {
         }
         terminated[i] = FALSE;

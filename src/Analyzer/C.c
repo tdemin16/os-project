@@ -92,6 +92,7 @@ int main(int argc, char* argv[]) {
                 if (!_write) {                                         //CICLO DI SCRITTURA
                     if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
+                            
                             if (!strncmp(path, "#", 1)) {
                                 if (!strncmp(path, "#CLOSE", 6)) {
                                     _read = TRUE;
@@ -131,6 +132,7 @@ int main(int argc, char* argv[]) {
                                 } else if (!strncmp(path, "#SETM#", 6)) {
                                     j = 0;
                                     k = 0;
+                                    
                                     mParseOnFly(path, &m);
                                     mSendOnFly(fd, n, m);
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
