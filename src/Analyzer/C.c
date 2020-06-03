@@ -24,10 +24,13 @@ int main(int argc, char* argv[]) {
     int j;
     int k;
 
-    char path[DIM_PATH];        //Paths da mandare ai figli
+    char path[DIM_PATH];  //Paths da mandare ai figli
+    memset(path, '\0', sizeof(char) * DIM_PATH);
     char failedPath[DIM_PATH];  //Percorsi non inviati a causa della pipe piena
-    char resp[DIM_RESP];        //Stringa con i valori ricevuta dai figli
-    int count = 0;              //Maintain the current amount of files sended
+    memset(failedPath, '\0', sizeof(char) * DIM_PATH);
+    char resp[DIM_RESP];  //Stringa con i valori ricevuta dai figli
+    memset(resp, '\0', sizeof(char) * DIM_RESP);
+    int count = 0;  //Maintain the current amount of files sended
 
     //IPC Variables
     int* fd;             //pipes
@@ -87,7 +90,7 @@ int main(int argc, char* argv[]) {
         i = 0;
         k = 0;
         j = 0;
-        if (f > 0) {  //PARENT SIDE
+        if (f > 0) {                                                   //PARENT SIDE
             while (value_return == 0 && (!_close)) {                   //Cicla finche` non ha finito di leggere o scrivere o va in errore
                 if (!_write) {                                         //CICLO DI SCRITTURA
                     if (stop == FALSE) {                               //E non ci troviamo in uno stato di stop per rinvio dati
@@ -101,7 +104,7 @@ int main(int argc, char* argv[]) {
                                     j = 0;
                                     k = 0;
                                     nClearAndClose(fd, n);  //mando #CLOSE alle n pipe
-                                    while (wait(NULL) > 0)       //Aspetto che vengano chiusi
+                                    while (wait(NULL) > 0)  //Aspetto che vengano chiusi
                                         ;
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
@@ -136,7 +139,7 @@ int main(int argc, char* argv[]) {
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
                                     send_r = TRUE;
-                                    readCheck(fd, n);  //Aspetta qui finchè non legge check da tutti i figli
+                                    readCheck(fd, n);    //Aspetta qui finchè non legge check da tutti i figli
                                     if (!sendCheck()) {  //Invia il check al padre
                                         value_return = err_write();
                                     }
@@ -156,7 +159,7 @@ int main(int argc, char* argv[]) {
                                         stop = TRUE;
                                         strcpy(failedPath, path);
                                     }
-                                } else {  //scritto con successo
+                                } else {              //scritto con successo
                                     count++;          //Tengo conto della scrittura
                                     j = (j + 1) % n;  //Usato per ciclare su tutte le pipe in scrittura
                                 }
@@ -177,8 +180,8 @@ int main(int argc, char* argv[]) {
 
                 //Read
                 if (!_read) {
-                    if (send_r) {                                       //Coontrolla se non ci sonon valori non inviati
-                        if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {  //Prova a leggere dalla pipe
+                    if (send_r) {                                                  //Coontrolla se non ci sonon valori non inviati
+                        if (read(fd[k * 4 + 0], resp, DIM_RESP) > 0) {             //Prova a leggere dalla pipe
                             if (strstr(resp, "#") != NULL) {                       //Controlla che nella stringa sia contenuto il carattere #
                                 if (write(STDOUT_FILENO, resp, DIM_RESP) == -1) {  //Prova a scrivere sulla pipe del padre
                                     if (errno != EAGAIN) {                         //Controlla che non sia una errore di pipe piena

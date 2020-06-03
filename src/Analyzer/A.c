@@ -304,7 +304,7 @@ int main(int argc, char *argv[]) {  //Main
 
                         if (!strncmp(cmd, "reset", 5)) {                     //Se il comando e` reset
                             if (!analyzing) {                                //Controlla che il programma non sia in analisi
-                                lista = resetPathList(lista);                        //Svuota la lista
+                                lista = resetPathList(lista);                //Svuota la lista
                                 count = 0;                                   //Riporta il numero di file presenti nella lista
                                 memset(sum, '\0', sizeof(char) * DIM_RESP);  //Setta la stringa dei totali a '\0
                                 initialize_vector(v);                        //Azzera v

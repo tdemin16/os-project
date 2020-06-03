@@ -189,7 +189,7 @@ void freePathList(array *tmp) {
     free(tmp);
 }
 
-array* resetPathList(array *tmp) {
+array *resetPathList(array *tmp) {
     freePathList(tmp);
     return createPathList(10);
 }
@@ -715,19 +715,19 @@ void get_subset(int *fp, long *v, int b, int e) {
     }
 }
 
-void get_frequencies(int *fp, long *freq, int part, int m) { //Questa funzione e` in O(1)
-    initialize_vector(freq);                      //Inizializza il vettore delle frequenze
-    int file_length = lseek(*fp, 0, SEEK_END);    //Salva la lunghezza totale del file
-    int char_parts = file_length / m;             //Conta di quanti caratteri deve essere ogni parte (floor round)
-    int remain = file_length - (char_parts * m);  //Resto della divisione precedente -> utilizzato per correggere i caratteri per parte
-    int begin = part * char_parts;                //Calcola l'inizio con parte per numero di caratteri per parte (es. part = 2, char_parts = 3, begin = 6) 000 111 222
-    int end = begin + char_parts;                 //La fine e` l'inizio piu` il numero di caratteri per parte
-    if (remain > part) {                          //Redistribuisce i caretteri in piu` sui primi "remain" parti, percio` se la parte e` minore di remain deve ricevere caratteri aggiuntivi
-        begin += part;                            //Avanza di un carattere per il numero della parte
-        end += part + 1;                          //Avanza di un carattere per il numero della parte + 1
-    } else {                                      //Caso in cui la parte non debba ricevere caratteri aggiuntivi
-        begin += remain;                          //Avanza di remain
-        end += remain;                            //Avanza di remain
+void get_frequencies(int *fp, long *freq, int part, int m) {  //Questa funzione e` in O(1)
+    initialize_vector(freq);                                  //Inizializza il vettore delle frequenze
+    int file_length = lseek(*fp, 0, SEEK_END);                //Salva la lunghezza totale del file
+    int char_parts = file_length / m;                         //Conta di quanti caratteri deve essere ogni parte (floor round)
+    int remain = file_length - (char_parts * m);              //Resto della divisione precedente -> utilizzato per correggere i caratteri per parte
+    int begin = part * char_parts;                            //Calcola l'inizio con parte per numero di caratteri per parte (es. part = 2, char_parts = 3, begin = 6) 000 111 222
+    int end = begin + char_parts;                             //La fine e` l'inizio piu` il numero di caratteri per parte
+    if (remain > part) {                                      //Redistribuisce i caretteri in piu` sui primi "remain" parti, percio` se la parte e` minore di remain deve ricevere caratteri aggiuntivi
+        begin += part;                                        //Avanza di un carattere per il numero della parte
+        end += part + 1;                                      //Avanza di un carattere per il numero della parte + 1
+    } else {                                                  //Caso in cui la parte non debba ricevere caratteri aggiuntivi
+        begin += remain;                                      //Avanza di remain
+        end += remain;                                        //Avanza di remain
     }
     get_subset(fp, freq, begin, end);
 }

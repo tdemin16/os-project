@@ -32,9 +32,11 @@ int main(int argc, char* argv[]) {
 
     //IPC Arguments
     char path[DIM_PATH];
+    memset(path, '\0', sizeof(char) * DIM_PATH);
     int _close = FALSE;
     char respSent = FALSE;
     char resp[DIM_RESP];
+    memset(resp, '\0', sizeof(char) * DIM_RESP);
     int oldfl;
     int pendingPath = 0;
 

@@ -22,7 +22,9 @@ int main(int argc, char* argv[]) {
     int m = 4;
     int i;
     char path[DIM_PATH];
+    memset(path, '\0', sizeof(char) * DIM_PATH);
     char resp[DIM_RESP];
+    memset(resp, '\0', sizeof(char) * DIM_RESP);
 
     //IPC Variables
     int* fd;
@@ -87,24 +89,24 @@ int main(int argc, char* argv[]) {
                 if (!_write) {                                         //Se non ha finito di scrivere
                     if (send_w) {                                      // se il file è stato mandato a tutti i q, leggo il prossimo
                         if (read(STDIN_FILENO, path, DIM_PATH) > 0) {  //provo a leggere
-                            if (!strncmp(path, "#", 1)) {  //Se si tratta di un comando
+                            if (!strncmp(path, "#", 1)) {              //Se si tratta di un comando
                                 if (!strncmp(path, "#CLOSE", 6)) {
                                     _read = TRUE;
                                     _close = TRUE;
                                     nClearAndClose(fd, m);
                                 } else if (!strncmp(path, "#SETM#", 6)) {
                                     nClearAndClose(fd, m);  //Mando a tutti i figli il comando di chiusura
-      
+
                                     while (wait(NULL) > 0)  //Aspetto che vengano chiusi
                                         ;
-                                   
+
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
-                              
+
                                     //nCleanSon(fd, m);
                                     close_pipes(fd, size_pipe);
                                     mParseOnFly(path, &m);  //Estraggo m da path
-                              
+
                                     size_pipe = m * 4;  //ridimensiono le pipe
                                     free(fd);
                                     fd = (int*)malloc(size_pipe * sizeof(int));  //Le rialloco
@@ -117,13 +119,12 @@ int main(int argc, char* argv[]) {
                                     forkP(&m, &f, &id, &value_return);  //Fork
                                     if (f == 0) {
                                         execP(&m, &f, &id, fd, &value_return, &size_pipe);
-                                    }                    //Exec dei processi forkati
-                                    send_r = TRUE;       //setto a true per evitare che vada nel ramo sbagliato della read sotto
+                                    }                          //Exec dei processi forkati
+                                    send_r = TRUE;             //setto a true per evitare che vada nel ramo sbagliato della read sotto
                                     sum = resetPathList(sum);  //resetto sum
                                     if (!sendCheck()) {
                                         value_return = err_write();
                                     }
-                                  
                                 }
                                 pendingPath = 0;
                             } else {            //Se si tratta di un percorso
@@ -143,7 +144,6 @@ int main(int argc, char* argv[]) {
                                         }
                                     } else {
                                         terminated[i] = TRUE;
-                          
                                     }
                                 }
                             }
@@ -160,7 +160,6 @@ int main(int argc, char* argv[]) {
                                     }
                                 } else {
                                     terminated[i] = TRUE;
-                                
                                 }
                             }
                         }
@@ -172,7 +171,6 @@ int main(int argc, char* argv[]) {
                     if (send_r) {
                         for (i = 0; i < m; i++) {  //Cicla tra tutti i figli
                             if (read(fd[i * 4 + 0], resp, DIM_RESP) > 0) {
-          
                                 if (strstr(resp, "#") != NULL) {
                                     sum_value = insertAndSumPathList(sum, resp, m - 1);
                                     if (sum_value > -1) {  //Qualcosa è arrivato a 0,
@@ -185,7 +183,6 @@ int main(int argc, char* argv[]) {
                                             }
                                         } else {
                                             pendingPath--;
-                      
                                         }
                                     }
                                 }
@@ -203,7 +200,7 @@ int main(int argc, char* argv[]) {
                 if (pendingPath == 0) {
                     oldfl = fcntl(STDIN_FILENO, F_GETFL);
                     if (oldfl == -1) {
-                        /* handle error */
+                        value_return = err_fcntl();
                     }
                     fcntl(STDIN_FILENO, F_SETFL, oldfl & ~O_NONBLOCK);
                     sum = resetPathList(sum);
