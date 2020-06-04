@@ -113,7 +113,6 @@ int main(int argc, char *argv[]) {  //Main
         if (val == 0) {                                                          //Controlla i parametri passati ad A
             if (vReturn > 0) {                                                   //Vuol dire che c'è stato un errore nell'inserimento di PathList
                 _write = FALSE;                                                  //Non può scrivere
-                time(&start);
             }
         } else {
             system("clear");                                  //Libera il terminale
@@ -186,6 +185,10 @@ int main(int argc, char *argv[]) {  //Main
             }
         } while (value_return == 0 && !p_create);  //Cicla fino a quando value_return == 0 e p_create è falso
     }
+
+    if(argc > 1 && val == 0 && vReturn > 0) {
+        time(&start); //Avvia il timer se il programma viene avviato con argomenti
+    } 
 
     system("clear");                            //pulisce il terminale
     printf(BOLDWHITE "ANALYZER" RESET "\n\n");  //Avvisa l'avvio di analyzer
