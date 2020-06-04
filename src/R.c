@@ -76,7 +76,7 @@ int main() {                        //struttura main
             fd1_fifo = open(fifo1, O_RDONLY | O_NONBLOCK);
             if (fd1_fifo != -1) {
                 p_create = TRUE;
-            } else if(errno != ENOENT) {
+            } else if (errno != ENOENT) {
                 value_return = err_fifo();
             }
         } while (value_return == 0 && !p_create);
@@ -138,6 +138,39 @@ int main() {                        //struttura main
                     }
                 }
                 if (strstr(cmd, "print") != NULL) {
+                    char *tmp = strdup(cmd);
+                    tmp = strtok(tmp, "print");
+                    tmp = strtok(tmp, " ");
+                    if (tmp == NULL) {
+                        free(tmp);
+                    } else if (spaces > 2) {
+                        _r_write = FALSE;
+                        retrieve = FALSE;
+                        printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
+                        fflush(stdout);
+                    } else if (spaces == 2) {
+                        dupl = strdup(cmd);
+                        flag = strtok(dupl, " ");
+                        flag = strtok(NULL, " ");
+                        if (strncmp(flag, "-d", 2) && strncmp(flag, "-x", 2)) {
+                            _r_write = FALSE;
+                            retrieve = FALSE;
+                            printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
+                            fflush(stdout);
+                        } else {
+                            strcpy(cmd, flag);
+                        }
+                        free(dupl);
+
+                    } else {
+                        _r_write = FALSE;
+                        retrieve = FALSE;
+                        printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
+                        fflush(stdout);
+                    }
+                }
+
+                /*if (strstr(cmd, "print") != NULL) {
                     if (spaces > 2) {
                         _r_write = FALSE;
                         retrieve = FALSE;
@@ -157,7 +190,7 @@ int main() {                        //struttura main
                         }
                         free(dupl);
                     }
-                }
+                }*/
                 while (value_return == 0 && _r_write) {
                     if (write(fd2_fifo, cmd, DIM_CMD) == -1) {
                         if (errno != EAGAIN) {
