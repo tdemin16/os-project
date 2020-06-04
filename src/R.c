@@ -23,7 +23,7 @@ void handle_sigint(int sig) {        //handler per il CTRL-C, ha l'obiettivo di
 }
 
 void sig_term_handler(int signum, siginfo_t *info, void *ptr) {  //Handler per ricezione di SIGTERM
-    value_return = err_kill_process();                         //Ritorna il valore di errore kill processo R
+    value_return = err_kill_process();                           //Ritorna il valore di errore kill processo R
     close_all_process();
 }
 
@@ -37,28 +37,28 @@ void catch_sigterm() {  //handler per catturare il kill al di fuori del programm
     sigaction(SIGTERM, &_sigact, NULL);
 }
 
-int main() {                            //struttura main
-    catch_sigterm();                    //avvio il ciclo di cattura del segnale di SIGTERM
-    signal(SIGINT, handle_sigint);      //Handler per SIGINT (Ctrl-C)
-    p = create_process(1);              //Alloca dinamicamente p con dimensione 1
-    insertProcess(p, getpid());         //Inserisce il pid di R nella prima posizione della lista p
-                                        //
-    const char *fifo1 = "/tmp/A_to_R";  //
-    const char *fifo2 = "/tmp/R_to_A";  //
-    int _close = FALSE;                 //
-    char cmd[DIM_CMD];                  //
-    int retrieve = FALSE;               //
-    int _r_write = TRUE;                //
-    char resp[DIM_RESP];                //
-    char path[DIM_PATH];                //
-    int arr = FALSE;                    //
-    int spaces;                         //
-    char *dupl = NULL;                  //
-    char *flag;                         //
-    int p_create = FALSE;               //
-    int enoent = FALSE;                 //
-                                        //
-    printf("Start R\n");                //
+int main() {                        //struttura main
+    catch_sigterm();                //avvio il ciclo di cattura del segnale di SIGTERM
+    signal(SIGINT, handle_sigint);  //Handler per SIGINT (Ctrl-C)
+    p = create_process(1);          //Alloca dinamicamente p con dimensione 1
+    insertProcess(p, getpid());     //Inserisce il pid di R nella prima posizione della lista p
+
+    const char *fifo1 = "/tmp/A_to_R";
+    const char *fifo2 = "/tmp/R_to_A";
+    int _close = FALSE;
+    char cmd[DIM_CMD];
+    int retrieve = FALSE;
+    int _r_write = TRUE;
+    char resp[DIM_RESP];
+    char path[DIM_PATH];
+    int arr = FALSE;
+    int spaces;
+    char *dupl = NULL;
+    char *flag;
+    int p_create = FALSE;
+    int enoent = FALSE;
+
+    printf("Start R\n");
 
     //IPC--------------------------------------------------------------------------------------------
 
@@ -72,10 +72,11 @@ int main() {                            //struttura main
             }
         }
 
-        fd1_fifo = open(fifo1, O_RDONLY);
+        fd1_fifo = open(fifo1, O_RDONLY | O_NONBLOCK);
         if (fd1_fifo == -1) {
             value_return = err_fifo();
         }
+
         do {
             if (!enoent) {
                 if (mkfifo(fifo2, 0666) == -1) {    //Prova a creare la pipe

@@ -50,8 +50,9 @@ int main(int argc, char *argv[]) {  //Main
     const char *fifo2 = "/tmp/R_to_A";  //Nome fifo R con A
     int retrieve = TRUE;                //Indica se deve rucperare dati da mandare ad R
     int p_create = FALSE;               //Indica se la pipe fifo e` stata creata
-    char print_method[DIM_CMD];         //Comando inviato da R ad A
-    char type_resp[DIM_RESP];           //Set di dati da dare ad R
+    int _r_write = TRUE;
+    char print_method[DIM_CMD];  //Comando inviato da R ad A
+    char type_resp[DIM_RESP];    //Set di dati da dare ad R
     memset(type_resp, '\0', sizeof(char) * DIM_PATH);
     char tmp_resp[DIM_PATH];  //Fine lettura di R
     memset(tmp_resp, '\0', sizeof(char) * DIM_PATH);
@@ -160,15 +161,16 @@ int main(int argc, char *argv[]) {  //Main
     if (value_return == 0) {
         printf("Waiting for R...\n");
         printf("Use " BOLDYELLOW "[CTRL+C]" RESET " to interrupt\n");
+
         if (mkfifo(fifo1, 0666) == -1) {    //Prova a creare la pipe
             if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
                 value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
             }
         }
 
-        fd1_fifo = open(fifo1, O_WRONLY);  //Prova ad aprire la pipe in scrittura
-        if (fd1_fifo == -1) {              //Error handling
-            value_return = err_fifo();     //value_return assume valore di errore della fifo
+        fd1_fifo = open(fifo1, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
+        if (fd1_fifo == -1) {                           //Error handling
+            value_return = err_fifo();                  //value_return assume valore di errore della fifo
         }
 
         do {
@@ -186,9 +188,9 @@ int main(int argc, char *argv[]) {  //Main
         } while (value_return == 0 && !p_create);  //Cicla fino a quando value_return == 0 e p_create è falso
     }
 
-    if(argc > 1 && val == 0 && vReturn > 0) {
-        time(&start); //Avvia il timer se il programma viene avviato con argomenti
-    } 
+    if (argc > 1 && val == 0 && vReturn > 0) {
+        time(&start);  //Avvia il timer se il programma viene avviato con argomenti
+    }
 
     system("clear");                            //pulisce il terminale
     printf(BOLDWHITE "ANALYZER" RESET "\n\n");  //Avvisa l'avvio di analyzer
@@ -479,7 +481,8 @@ int main(int argc, char *argv[]) {  //Main
                         if (read(fd2_fifo, print_method, DIM_CMD) > 0) {                                                                                                                                           //Prova a leggere da R
                             if (!strncmp(print_method, "print", 5) || !strncmp(print_method, "-c", 2) || !strncmp(print_method, "-a", 2) || !strncmp(print_method, "-d", 2) || !strncmp(print_method, "-x", 2)) {  //Controlla che i comandi ricevuti siano corretti
                                 retrieve = FALSE;                                                                                                                                                                  //Se si smette di leggere da R per inviargli i dati
-                                if (analyzing) {                                                                                                                                                                   //Se sta analizzando stampa un messaggio di errore
+                                _r_write = TRUE;
+                                if (analyzing) {  //Se sta analizzando stampa un messaggio di errore
                                     printf(BOLDYELLOW "\n[ATTENZIONE]" RESET " Analisi in corso, non e` possibile stampare\n");
                                 }
                             }
@@ -488,41 +491,96 @@ int main(int argc, char *argv[]) {  //Main
                         if (!strncmp(print_method, "print", 5)) {     //Se il comando e` print
                             if (!analyzing) {                         //Controlla che il progrmma non sia in analisi
                                 for (j = 0; j < lista->count; j++) {  //Invia tutti i percorsi inseriti
-                                    write(fd1_fifo, lista->pathList[j], DIM_PATH);
+                                    _r_write = TRUE;
+                                    while (value_return == 0 && _r_write) {
+                                        if (write(fd1_fifo, lista->pathList[j], DIM_PATH) == -1) {
+                                            if (errno != EAGAIN) {
+                                                value_return = err_write();
+                                            }
+                                        } else {
+                                            _r_write = FALSE;
+                                        }
+                                    }
+                                    _r_write = TRUE;
                                 }
                             } else {
                                 strcpy(tmp_resp, "#ANALYZING");  //Se e` in analisi, setta la stringa di fine invio ad #ANALYZING per indicare che R non puo` ottenere dati in questo momento
                             }
 
-                            write(fd1_fifo, tmp_resp, DIM_PATH);
+                            while (value_return == 0 && _r_write) {
+                                if (write(fd1_fifo, tmp_resp, DIM_PATH) == -1) {
+                                    if (errno != EAGAIN) {
+                                        value_return = err_write();
+                                    }
+                                } else {
+                                    _r_write = FALSE;
+                                }
+                            }
                             strcpy(tmp_resp, "///");  //RIpristina la stringa di fine carattere a "///" nel caso in cui sia stata modificata precedentemente
                         }
                         if (!strncmp(print_method, "-d", 2)) {        //Se il comando e` -d
                             if (!analyzing) {                         //Se non sta analizzando
                                 for (j = 0; j < lista->count; j++) {  //Invia tutti i percorsi inseriti con flag deleted
                                     if (lista->analyzed[j] == REMOVED) {
-                                        write(fd1_fifo, lista->pathList[j], DIM_PATH);
+                                        _r_write = TRUE;
+                                        while (value_return == 0 && _r_write) {
+                                            if (write(fd1_fifo, lista->pathList[j], DIM_PATH) == -1) {
+                                                if (errno != EAGAIN) {
+                                                    value_return = err_write();
+                                                }
+                                            } else {
+                                                _r_write = FALSE;
+                                            }
+                                        }
+                                        _r_write = TRUE;
                                     }
                                 }
                             } else {
                                 strcpy(tmp_resp, "#ANALYZING");  //In caso contrario avverte R che in questo momento non puo` ottenere datei
                             }
 
-                            write(fd1_fifo, tmp_resp, DIM_PATH);
+                            while (value_return == 0 && _r_write) {
+                                if (write(fd1_fifo, tmp_resp, DIM_PATH) == -1) {
+                                    if (errno != EAGAIN) {
+                                        value_return = err_write();
+                                    }
+                                } else {
+                                    _r_write = FALSE;
+                                }
+                            }
                             strcpy(tmp_resp, "///");  //RIpristina la stringa di fine carattere a "///" nel caso in cui sia stata modificata precedentemente
                         }
+
                         if (!strncmp(print_method, "-x", 2)) {        //Se il comando e` -x
                             if (!analyzing) {                         //Se non sta analizzando
                                 for (j = 0; j < lista->count; j++) {  //Invia tutti i percorsi inseriti con flag analyzed
                                     if (lista->analyzed[j] == ANALYZED) {
-                                        write(fd1_fifo, lista->pathList[j], DIM_PATH);
+                                        _r_write = TRUE;
+                                        while (value_return == 0 && _r_write) {
+                                            if (write(fd1_fifo, lista->pathList[j], DIM_PATH) == -1) {
+                                                if (errno != EAGAIN) {
+                                                    value_return = err_write();
+                                                }
+                                            } else {
+                                                _r_write = FALSE;
+                                            }
+                                        }
+                                        _r_write = TRUE;
                                     }
                                 }
                             } else {
                                 strcpy(tmp_resp, "#ANALYZING");  //In caso contrario avverte R che in questo momento non puo` ottenere datei
                             }
 
-                            write(fd1_fifo, tmp_resp, DIM_PATH);
+                            while (value_return == 0 && _r_write) {
+                                if (write(fd1_fifo, tmp_resp, DIM_PATH) == -1) {
+                                    if (errno != EAGAIN) {
+                                        value_return = err_write();
+                                    }
+                                } else {
+                                    _r_write = FALSE;
+                                }
+                            }
                             strcpy(tmp_resp, "///");  //RIpristina la stringa di fine carattere a "///" nel caso in cui sia stata modificata precedentemente
                         }
                         if (!strncmp(print_method, "-c", 2)) {  //Se il comando e` -c
@@ -535,7 +593,16 @@ int main(int argc, char *argv[]) {  //Main
                             } else {
                                 strcpy(type_resp, "#ANALYZING");  //In caso contrario avverte R che in questo momento non puo` ottenere dati
                             }
-                            write(fd1_fifo, type_resp, DIM_RESP);  //Scrive il messaggio
+                            _r_write = TRUE;
+                            while (value_return == 0 && _r_write) {
+                                if (write(fd1_fifo, type_resp, DIM_RESP) == -1) {  //Scrive il messaggio
+                                    if (errno != EAGAIN) {
+                                        value_return = err_write();
+                                    }
+                                } else {
+                                    _r_write = FALSE;
+                                }
+                            }
                         }
                         if (!strncmp(print_method, "-a", 2)) {    //Controlla se il comando e` -a
                             if (analyzing) {                      //Se sta analizzando
@@ -547,7 +614,16 @@ int main(int argc, char *argv[]) {  //Main
                                     strcpy(type_resp, "#EMPTY");
                                 }
                             }
-                            write(fd1_fifo, type_resp, DIM_RESP);  //Scrive la risposta
+                            _r_write = TRUE;
+                            while (value_return == 0 && _r_write) {
+                                if (write(fd1_fifo, type_resp, DIM_RESP) == -1) {  //Scrive il messaggio
+                                    if (errno != EAGAIN) {
+                                        value_return = err_write();
+                                    }
+                                } else {
+                                    _r_write = FALSE;
+                                }
+                            }
                         }
                         retrieve = TRUE;  //Ricomincia a leggere da R
                     }
@@ -591,7 +667,7 @@ int main(int argc, char *argv[]) {  //Main
                             file = strtok(NULL, "#");
                             if (firstVal != -1) {                                                   //Controlla che non ci siano stati errori nell'analisi
                                 if (fileExist(file)) {                                              //File esistente
-                                    lista->analyzed[id_r] = 1;                                      //Setta il flag ad Analizzato
+                                    lista->analyzed[id_r] = ANALYZED;                               //Setta il flag ad Analizzato
                                     if (addCsvToArray(resp_val, v)) value_return = err_overflow();  //Aggiunge il file al vettore delle somme
                                     perc++;                                                         //Aumenta l'avanzamento della barretta
                                     if (value_return == 0) {
