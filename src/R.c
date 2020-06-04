@@ -66,17 +66,22 @@ int main() {                        //struttura main
         printf("Waiting for A...\n");
         printf("Use " BOLDYELLOW "[CTRL+C]" RESET " to interrupt\n");
 
-        if (mkfifo(fifo1, 0666) == -1) {    //Prova a creare la pipe
-            if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
-                value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
+        do {
+            if (mkfifo(fifo1, 0666) == -1) {    //Prova a creare la pipe
+                if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
+                    value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
+                }
             }
-        }
 
-        fd1_fifo = open(fifo1, O_RDONLY | O_NONBLOCK);
-        if (fd1_fifo == -1) {
-            value_return = err_fifo();
-        }
+            fd1_fifo = open(fifo1, O_RDONLY | O_NONBLOCK);
+            if (fd1_fifo != -1) {
+                p_create = TRUE;
+            } else if(errno != ENOENT) {
+                value_return = err_fifo();
+            }
+        } while (value_return == 0 && !p_create);
 
+        p_create = FALSE;
         do {
             if (!enoent) {
                 if (mkfifo(fifo2, 0666) == -1) {    //Prova a creare la pipe

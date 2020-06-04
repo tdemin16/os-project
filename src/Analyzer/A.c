@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {  //Main
     int retrieve = TRUE;                //Indica se deve rucperare dati da mandare ad R
     int p_create = FALSE;               //Indica se la pipe fifo e` stata creata
     int _r_write = TRUE;
+    int enoent = FALSE;
     char print_method[DIM_CMD];  //Comando inviato da R ad A
     char type_resp[DIM_RESP];    //Set di dati da dare ad R
     memset(type_resp, '\0', sizeof(char) * DIM_PATH);
@@ -162,17 +163,25 @@ int main(int argc, char *argv[]) {  //Main
         printf("Waiting for R...\n");
         printf("Use " BOLDYELLOW "[CTRL+C]" RESET " to interrupt\n");
 
-        if (mkfifo(fifo1, 0666) == -1) {    //Prova a creare la pipe
-            if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
-                value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
+        do {
+            if (!enoent) {
+                if (mkfifo(fifo1, 0666) == -1) {    //Prova a creare la pipe
+                    if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
+                        value_return = err_fifo();  //Ritorna errore se l'operazione non va a buon fine
+                    }
+                }
             }
-        }
+            fd1_fifo = open(fifo1, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
+            if (fd1_fifo != -1) {
+                p_create = TRUE;
+            } else if(errno == ENOENT) {
+                enoent = FALSE;
+            } else if(errno != ENXIO) {
+                value_return = err_fifo();
+            }
+        } while (value_return == 0 && !p_create);
 
-        fd1_fifo = open(fifo1, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
-        if (fd1_fifo == -1) {                           //Error handling
-            value_return = err_fifo();                  //value_return assume valore di errore della fifo
-        }
-
+        p_create = FALSE;
         do {
             if (mkfifo(fifo2, 0666) == -1) {    //Prova a creare la pipe
                 if (errno != EEXIST) {          //In caso di errore controlla che la pipe non fosse gia` presente
