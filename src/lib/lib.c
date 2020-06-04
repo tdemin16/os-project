@@ -533,6 +533,7 @@ int nClearAndClose(int *fd, int n) {
     int i;
     char sentClose = FALSE;
     char path[DIM_PATH];
+    memset(path, '\0', sizeof(char) * DIM_PATH);
     int ret = 0;
     int terminated[n];  //Indica se un file e` stato mandato o meno
     for (i = 0; i < n; i++) {
@@ -570,6 +571,7 @@ int mSendOnFly(int *fd, int n, int m) {
     int ret = 0;
     char sentClose = FALSE;
     char path[DIM_PATH];
+    memset(path, '\0', sizeof(char) * DIM_PATH);
     int terminated[n];  //Indica se un file e` stato mandato o meno
     for (i = 0; i < n; i++) {
         if (fcntl(fd[i * 4 + 2], F_SETFL, O_NONBLOCK)) {
@@ -623,6 +625,7 @@ void nCleanSon(int *fd, int n) {
     int son = 0;
     cleanPipe = FALSE;
     char resp[DIM_RESP];
+    memset(resp, '\0', sizeof(char) * DIM_RESP);
     while (!cleanPipe) {  //Ciclo per svuotare tutte le pipe in lettura da Q a P
         cleanPipe = TRUE;
         for (son = 0; son < n; son++) {  //Cicla tra tutti i figli
@@ -635,6 +638,7 @@ void nCleanSon(int *fd, int n) {
 
 char sendCheck() {
     char resp[DIM_RESP];
+    memset(resp, '\0', sizeof(char) * DIM_RESP);
     strcpy(resp, "#CHECK");
     char CheckSent = FALSE;
     char ret = TRUE;
@@ -654,6 +658,7 @@ void readCheck(int *fd, int n) {
     int recived = 0;
     int k;
     char resp[DIM_RESP];
+    memset(resp, '\0', sizeof(char) * DIM_RESP);
     if (n == 0) {
         n = 1;
         while (recived < n) {
