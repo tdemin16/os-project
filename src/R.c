@@ -171,28 +171,6 @@ int main() {                        //struttura main
                         fflush(stdout);
                     }
                 }
-
-                /*if (strstr(cmd, "print") != NULL) {
-                    if (spaces > 2) {
-                        _r_write = FALSE;
-                        retrieve = FALSE;
-                        printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
-                        fflush(stdout);
-                    } else if (spaces == 2) {
-                        dupl = strdup(cmd);
-                        flag = strtok(dupl, " ");
-                        flag = strtok(NULL, " ");
-                        if (strncmp(flag, "-d", 2) && strncmp(flag, "-x", 2)) {
-                            _r_write = FALSE;
-                            retrieve = FALSE;
-                            printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
-                            fflush(stdout);
-                        } else {
-                            strcpy(cmd, flag);
-                        }
-                        free(dupl);
-                    }
-                }*/
                 while (value_return == 0 && _r_write) {
                     if (write(fd2_fifo, cmd, DIM_CMD) == -1) {
                         if (errno != EAGAIN) {
