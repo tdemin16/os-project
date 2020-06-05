@@ -115,6 +115,7 @@ int main() {                        //struttura main
             } else if (!retrieve && (!strncmp(cmd, "print", 5) || !strncmp(cmd, "report", 6))) {
                 retrieve = TRUE;
                 _r_write = TRUE;
+
                 checkArg(cmd, &spaces);
                 if (strstr(cmd, "report") != NULL) {
                     if (spaces != 2) {
@@ -126,7 +127,7 @@ int main() {                        //struttura main
                         dupl = strdup(cmd);
                         flag = strtok(dupl, " ");
                         flag = strtok(NULL, " ");
-                        if (strncmp(flag, "-c", 2) && strncmp(flag, "-a", 2)) {
+                        if (flag == NULL || (strncmp(flag, "-c", 2) && strncmp(flag, "-a", 2))) {
                             _r_write = FALSE;
                             retrieve = FALSE;
                             printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
@@ -143,6 +144,7 @@ int main() {                        //struttura main
                     tmp = strtok(tmp, " ");
                     if (tmp == NULL) {
                         free(tmp);
+                        //non succede nulla perché la deve valutare come semplice "print"
                     } else if (spaces > 2) {
                         _r_write = FALSE;
                         retrieve = FALSE;
