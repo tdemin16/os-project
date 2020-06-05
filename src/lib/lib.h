@@ -104,6 +104,7 @@ char sameId(char *, char *);
 int parser2(int, char **, array *, int *, int *, int *, int *, int *);
 int parser_CheckArguments(int, char **, int *, int *);
 int parser_LenghtCommand(char *);
+int check_spaces(char *);
 
 //Funzioni IPC
 void close_pipes(int *, int);

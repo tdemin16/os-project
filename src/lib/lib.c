@@ -267,6 +267,9 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
     int i;
     FILE *fp;
     *res = 0;
+    int conc = 0;
+    char* tmp;
+    int len;
     char riga[DIM_PATH - 16];
     char resolved_path[DIM_PATH - 16];
     int ret = parser_CheckArguments(argc, argv, &(*n), &(*m));
@@ -285,6 +288,17 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
             if (!strcmp(argv[i], "-setn") || !strcmp(argv[i], "-setm")) {
                 i++;
             } else {
+                conc = i;
+                while (check_spaces(argv[i])) {
+                    len = strlen(argv[i]);
+                    tmp = strdup(argv[i]);
+                    tmp[len - 1] = '\0';
+                    strcat(argv[i], " ");
+                    strcat(argv[i], argv[conc + 1]);
+                    strcat(tmp, " ");
+                    strcat(tmp, argv[conc + 1]);
+                    conc++;
+                }
                 char command[parser_LenghtCommand(argv[i])];
                 sprintf(command, "find %s -type f -follow -print", argv[i]);
                 fp = popen(command, "r");  //avvia il comando e in fp prende l'output
@@ -315,6 +329,10 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
                     }
                 }
                 pclose(fp);
+                i += conc - i;
+                if(conc != i) {
+                    free(tmp);
+                }
             }
         }
     }
@@ -329,7 +347,10 @@ int parser_LenghtCommand(char *search) {
 //Return -1 if ERR_ARGS, 0 if all arguments are correct, i if argv[i] doesn't exist
 int parser_CheckArguments(int argc, char *argv[], int *n, int *m) {
     int ret = 0;
+    char *tmp;
     int i;
+    int conc = 0;
+    int len;
     char setn = FALSE;  //se setn = true, n è stato cambiato
     char setm = FALSE;
     if (argc < 1) {  //if number of arguments is even or less than 1, surely it's a wrong input
@@ -358,11 +379,33 @@ int parser_CheckArguments(int argc, char *argv[], int *n, int *m) {
                     ret = -1;
                 }
             } else {
-                if (!fileExist(argv[i])) {
+                conc = i;
+                while (check_spaces(argv[i])) {
+                    tmp = strdup(argv[i]);
+                    len = strlen(tmp);
+                    tmp[len - 1] = '\0';
+                    strcat(argv[i], " ");
+                    strcat(argv[i], argv[conc + 1]);
+                    strcat(tmp, " ");
+                    strcat(tmp, argv[conc + 1]);
+                    conc++;
+                }
+                if (!fileExist(tmp)) {
                     ret = i;
                 }
+                i += conc - i;
+                free(tmp);
             }
         }
+    }
+    return ret;
+}
+
+int check_spaces(char *str) {
+    int len = strlen(str);
+    int ret = FALSE;
+    if (str[len - 1] == '\\') {
+        ret = TRUE;
     }
     return ret;
 }
