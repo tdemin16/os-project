@@ -278,7 +278,6 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
         ret = ERR_ARGS_A;
     } else if (ret > 0) {
         err_input_A(argv[ret]);
-        printf("ERRORE\n");
         ret = ERR_ARGS_A;
     } else {
         if (!strncmp(argv[0], "add", 3) || !strncmp(argv[0], "./A", 3))
@@ -305,7 +304,6 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
                 fp = popen(command, "r");  //avvia il comando e in fp prende l'output
                 if (fp == NULL) {
                     ret = ERR_ARGS_A;
-                    printf("Errore\n");
                 } else {  //Il comando va a buon fine
                     while (fgets(riga, sizeof(riga), fp) != NULL) {
                         realpath(riga, resolved_path);                    //risalgo al percorso assoluto
