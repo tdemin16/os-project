@@ -327,8 +327,6 @@ int parser_LenghtCommand(char *search) {
 
 //Return -1 if ERR_ARGS, 0 if all arguments are correct, i if argv[i] doesn't exist
 int parser_CheckArguments(int argc, char *argv[], int *n, int *m) {
-    //(" '%s' e '%d'\n", argv[1], argc);
-    argv[1][strlen(argv[1]) - 1] = '\0';
     int ret = 0;
     char *tmp;
     int i;
@@ -884,8 +882,8 @@ char addCsvToArray(char *tmp, long *v) {
 }
 
 char fileExist(char *fname) {
-    if(fname[strlen(fname) == '\n']) {
-        fname[strlen(fname)] = '\0';
+    if (fname[strlen(fname) - 1] == '\n') {
+        fname[strlen(fname) - 1] = '\0';
     }
     char ret = FALSE;
     if (access(fname, F_OK) != -1) ret = TRUE;
