@@ -284,7 +284,7 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
         for (i = 1; i < argc && ret == 0; i++) {
             if (!strcmp(argv[i], "-setn") || !strcmp(argv[i], "-setm")) {
                 i++;
-            } else if(strncmp(argv[i], "#DEL", 4)){
+            } else if (strncmp(argv[i], "#DEL", 4)) {
                 char command[parser_LenghtCommand(argv[i])];
                 sprintf(command, "find %s -type f -follow -print", argv[i]);
                 fp = popen(command, "r");  //avvia il comando e in fp prende l'output
@@ -327,6 +327,8 @@ int parser_LenghtCommand(char *search) {
 
 //Return -1 if ERR_ARGS, 0 if all arguments are correct, i if argv[i] doesn't exist
 int parser_CheckArguments(int argc, char *argv[], int *n, int *m) {
+    //(" '%s' e '%d'\n", argv[1], argc);
+    argv[1][strlen(argv[1]) - 1] = '\0';
     int ret = 0;
     char *tmp;
     int i;
@@ -369,20 +371,22 @@ int parser_CheckArguments(int argc, char *argv[], int *n, int *m) {
                     strcat(argv[i], argv[conc + 1]);
                     strcat(tmp, " ");
                     strcat(tmp, argv[conc + 1]);
-                    strcpy(argv[i+1], "#DEL");
+                    strcpy(argv[i + 1], "#DEL");
                     conc++;
                 }
                 if (conc != i) {
                     if (!fileExist(tmp)) {
+                        printf("Conc1");
                         ret = i;
                     }
                 } else {
                     if (!fileExist(argv[i])) {
+                        printf("Conc2");
                         ret = i;
                     }
                 }
                 i += conc - i;
-                if(conc != i) free(tmp);
+                if (conc != i) free(tmp);
             }
         }
     }
