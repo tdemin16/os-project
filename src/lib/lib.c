@@ -882,6 +882,9 @@ char addCsvToArray(char *tmp, long *v) {
 }
 
 char fileExist(char *fname) {
+    if(fname[strlen(fname) == '\n']) {
+        fname[strlen(fname)] = '\0';
+    }
     char ret = FALSE;
     if (access(fname, F_OK) != -1) ret = TRUE;
     return ret;

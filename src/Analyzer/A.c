@@ -239,7 +239,6 @@ int main(int argc, char *argv[]) {  //Main
                             char *tmp_s = strdup(cmd);
                             tmp_s = strtok(tmp_s, "add");
                             char tmp_c = tmp_s[0];
-                            //free(tmp_s);
                             if (tmp_c != ' ') {
                                 printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\n");  //in tal caso verifica se sono correttamente inseriti
                                 printf("Usa help per vedere la lista di comandi utilizzabili.\n\n");     //Stampa errore se sono stati inseriti comandi errati
