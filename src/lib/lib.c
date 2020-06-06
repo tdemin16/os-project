@@ -267,9 +267,6 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
     int i;
     FILE *fp;
     *res = 0;
-    int conc = 0;
-    char *tmp;
-    int len;
     char riga[DIM_PATH - 16];
     char resolved_path[DIM_PATH - 16];
     int ret = parser_CheckArguments(argc, argv, &(*n), &(*m));
@@ -287,18 +284,7 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
         for (i = 1; i < argc && ret == 0; i++) {
             if (!strcmp(argv[i], "-setn") || !strcmp(argv[i], "-setm")) {
                 i++;
-            } else {
-                conc = i;
-                while (check_spaces(argv[i])) {
-                    len = strlen(argv[i]);
-                    tmp = strdup(argv[i]);
-                    tmp[len - 1] = '\0';
-                    strcat(argv[i], " ");
-                    strcat(argv[i], argv[conc + 1]);
-                    strcat(tmp, " ");
-                    strcat(tmp, argv[conc + 1]);
-                    conc++;
-                }
+            } else if(strncmp(argv[i], "#DEL", 4)){
                 char command[parser_LenghtCommand(argv[i])];
                 sprintf(command, "find %s -type f -follow -print", argv[i]);
                 fp = popen(command, "r");  //avvia il comando e in fp prende l'output
@@ -328,10 +314,6 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
                     }
                 }
                 pclose(fp);
-                i += conc - i;
-                if (conc != i) {
-                    free(tmp);
-                }
             }
         }
     }
@@ -387,6 +369,8 @@ int parser_CheckArguments(int argc, char *argv[], int *n, int *m) {
                     strcat(argv[i], argv[conc + 1]);
                     strcat(tmp, " ");
                     strcat(tmp, argv[conc + 1]);
+                    strcpy(argv[i+1], "#DEL");
+                    printf("argv[i]=%s, argv[i+1]=%s\n", argv[i], argv[i+1]);
                     conc++;
                 }
                 if (conc != i) {
