@@ -370,7 +370,6 @@ int parser_CheckArguments(int argc, char *argv[], int *n, int *m) {
                     strcat(tmp, " ");
                     strcat(tmp, argv[conc + 1]);
                     strcpy(argv[i+1], "#DEL");
-                    printf("argv[i]=%s, argv[i+1]=%s\n", argv[i], argv[i+1]);
                     conc++;
                 }
                 if (conc != i) {
@@ -383,7 +382,7 @@ int parser_CheckArguments(int argc, char *argv[], int *n, int *m) {
                     }
                 }
                 i += conc - i;
-                free(tmp);
+                if(conc != i) free(tmp);
             }
         }
     }
