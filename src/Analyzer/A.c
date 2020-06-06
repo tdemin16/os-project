@@ -464,9 +464,7 @@ int main(int argc, char *argv[]) {  //Main
                                     fflush(stdout);
                                 }
                             }
-                            if (analyzing) {
-                                printf("> ");
-                            }
+                            printf("> ");
                             fflush(stdout);
                         }
 
