@@ -141,7 +141,7 @@ int main() {                        //struttura main
                 if (strstr(cmd, "print") != NULL) {
                     char *tmp = strdup(cmd);
                     tmp = strtok(tmp, "print");
-                    tmp = strtok(tmp, " ");
+                    tmp = strtok(tmp, " \n");
                     if (tmp == NULL) {
                         free(tmp);
                         //non succede nulla perché la deve valutare come semplice "print"
