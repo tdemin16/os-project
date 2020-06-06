@@ -174,9 +174,9 @@ int main(int argc, char *argv[]) {  //Main
             fd1_fifo = open(fifo1, O_WRONLY | O_NONBLOCK);  //Prova ad aprire la pipe in scrittura
             if (fd1_fifo != -1) {
                 p_create = TRUE;
-            } else if(errno == ENOENT) {
+            } else if (errno == ENOENT) {
                 enoent = FALSE;
-            } else if(errno != ENXIO) {
+            } else if (errno != ENXIO) {
                 value_return = err_fifo();
             }
         } while (value_return == 0 && !p_create);
@@ -235,34 +235,44 @@ int main(int argc, char *argv[]) {  //Main
                             printf(BOLDWHITE "A" RESET ": Closing...\n");
                         }
 
-                        if (!strncmp(cmd, "add", 3)) {                                                       //Se invece il comando è "add"
-                            if (!analyzing) {                                                                //Verifica che non stia già analizzando
-                                if (strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL) {          //Mentra analizza controlla se l'utente cambia setn o setm
-                                    printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\n");  //in tal caso verifica se sono correttamente inseriti
-                                    printf("Usa help per vedere la lista di comandi utilizzabili.\n\n");     //Stampa errore se sono stati inseriti comandi errati
-                                    fflush(stdout);                                                          //Libera il buffer
-                                } else if (checkArg(cmd, &argCounter)) {                                     //Verifica gli argomenti inseriti a comando
-                                    tempPath = malloc(argCounter * sizeof(char *));                          //Alloca memoria a tempPath
-                                    for (j = 0; j < argCounter; j++) {                                       //Cicla da 0 al numero di argomenti
-                                        tempPath[j] = malloc(DIM_PATH * sizeof(char));                       //Alloca a tempPath la dimensione DIM_PATH
+                        if (!strncmp(cmd, "add", 3)) {  //Se invece il comando è "add"
+                            char *tmp_s = strdup(cmd);
+                            tmp_s = strtok(tmp_s, "add");
+                            char tmp_c = tmp_s[0];
+                            //free(tmp_s);
+                            if (tmp_c != ' ') {
+                                printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\n");
+                                fflush(stdout);
+                            } else {
+                                if (!analyzing) {                                                                //Verifica che non stia già analizzando
+                                    if (strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL) {          //Mentra analizza controlla se l'utente cambia setn o setm
+                                        printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\n");  //in tal caso verifica se sono correttamente inseriti
+                                        printf("Usa help per vedere la lista di comandi utilizzabili.\n\n");     //Stampa errore se sono stati inseriti comandi errati
+                                        fflush(stdout);                                                          //Libera il buffer
+                                    } else if (checkArg(cmd, &argCounter)) {                                     //Verifica gli argomenti inseriti a comando
+                                        tempPath = malloc(argCounter * sizeof(char *));                          //Alloca memoria a tempPath
+                                        for (j = 0; j < argCounter; j++) {                                       //Cicla da 0 al numero di argomenti
+                                            tempPath[j] = malloc(DIM_PATH * sizeof(char));                       //Alloca a tempPath la dimensione DIM_PATH
+                                        }
+                                        strcpy(tempPath[0], strtok(cmd, " "));       //Copia il comando cmd in tempPath[0] (cmd è il comando senza spazi)
+                                        for (j = 1; j < argCounter; j++) {           //Cicla da 0 al numero di argomenti
+                                            strcpy(tempPath[j], strtok(NULL, " "));  //Stessa copia della riga superirore
+                                        }
+                                        if (parser2(argCounter, tempPath, lista, &count, &n, &m, &vReturn, &duplicate) == 0) {  //Se il parsing funziona (=> i file sono stati aggiunti correttamente)
+                                            printf("\n" WHITE "Aggiunti" RESET " %d files\n", vReturn);                         //Stampo il corretto parsing
+                                        }
+                                        for (j = 0; j < argCounter; j++) {  //Cicla da 0 al numero di argomenti
+                                            free(tempPath[j]);              //Libera la lista tempPath[j]
+                                        }
+                                        free(tempPath);  //Libera tempPath
+                                    } else {             //Altrimenti (se non ci sono setn e/o setm e non vengono inseriti comandi corretti)
+                                        err_args_A();    //Ritorna errore degli argomenti di A
                                     }
-                                    strcpy(tempPath[0], strtok(cmd, " "));       //Copia il comando cmd in tempPath[0] (cmd è il comando senza spazi)
-                                    for (j = 1; j < argCounter; j++) {           //Cicla da 0 al numero di argomenti
-                                        strcpy(tempPath[j], strtok(NULL, " "));  //Stessa copia della riga superirore
-                                    }
-                                    if (parser2(argCounter, tempPath, lista, &count, &n, &m, &vReturn, &duplicate) == 0) {  //Se il parsing funziona (=> i file sono stati aggiunti correttamente)
-                                        printf("\n" WHITE "Aggiunti" RESET " %d files\n", vReturn);                         //Stampo il corretto parsing
-                                    }
-                                    for (j = 0; j < argCounter; j++) {  //Cicla da 0 al numero di argomenti
-                                        free(tempPath[j]);              //Libera la lista tempPath[j]
-                                    }
-                                    free(tempPath);  //Libera tempPath
-                                } else {             //Altrimenti (se non ci sono setn e/o setm e non vengono inseriti comandi corretti)
-                                    err_args_A();    //Ritorna errore degli argomenti di A
+                                } else {  //Altrimenti l'analisi è ancora in corso, quindi non può fare altro a ciò che è scritto sopra
+                                    printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n");
                                 }
-                            } else {  //Altrimenti l'analisi è ancora in corso, quindi non può fare altro a ciò che è scritto sopra
-                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n");
                             }
+
                             printf("\n> ");
                             fflush(stdout);
                         }
