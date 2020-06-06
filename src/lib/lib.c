@@ -268,7 +268,7 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
     FILE *fp;
     *res = 0;
     int conc = 0;
-    char* tmp;
+    char *tmp;
     int len;
     char riga[DIM_PATH - 16];
     char resolved_path[DIM_PATH - 16];
@@ -278,6 +278,7 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
         ret = ERR_ARGS_A;
     } else if (ret > 0) {
         err_input_A(argv[ret]);
+        printf("ERRORE\n");
         ret = ERR_ARGS_A;
     } else {
         if (!strncmp(argv[0], "add", 3) || !strncmp(argv[0], "./A", 3))
@@ -330,7 +331,7 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
                 }
                 pclose(fp);
                 i += conc - i;
-                if(conc != i) {
+                if (conc != i) {
                     free(tmp);
                 }
             }
@@ -390,8 +391,14 @@ int parser_CheckArguments(int argc, char *argv[], int *n, int *m) {
                     strcat(tmp, argv[conc + 1]);
                     conc++;
                 }
-                if (!fileExist(tmp)) {
-                    ret = i;
+                if (conc != i) {
+                    if (!fileExist(tmp)) {
+                        ret = i;
+                    }
+                } else {
+                    if (!fileExist(argv[i])) {
+                        ret = i;
+                    }
                 }
                 i += conc - i;
                 free(tmp);
