@@ -376,12 +376,10 @@ int parser_CheckArguments(int argc, char *argv[], int *n, int *m) {
                 }
                 if (conc != i) {
                     if (!fileExist(tmp)) {
-                        printf("Conc1");
                         ret = i;
                     }
                 } else {
                     if (!fileExist(argv[i])) {
-                        printf("Conc2");
                         ret = i;
                     }
                 }
