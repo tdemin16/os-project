@@ -155,12 +155,6 @@ void printInfoCluster();
 void printHelp();
 int printInfo();
 
-//debug functions
-void createLog(char * debug);
-void printLog(char *debug, char *message);
-void printLogString(char *debug, char *message, char *string);
-void printLogInt(char *debug, char *message, int string);
-
 //Errori
 int err_file_open();
 int err_pipe();
