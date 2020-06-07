@@ -42,7 +42,6 @@ int main(int argc, char *argv[]) {  //Main
     printf("Start A\n");            //Stampo l'esecuzione di A
     catch_sigterm();                //Avvio l'handler per SIGTERM
     signal(SIGINT, handle_sigint);  //Handler per SIGINT (Ctrl-C)
-                                    //
     p = create_process(1);          //Allocate dynamically p with dimension 1
 
     //COMMUNICATION WITH R
