@@ -285,6 +285,7 @@ int parser2(int argc, char *argv[], array *lista, int *count, int *n, int *m, in
             if (!strcmp(argv[i], "-setn") || !strcmp(argv[i], "-setm")) {
                 i++;
             } else if (strncmp(argv[i], "#DEL", 4)) {
+                argv[i] = strtok(argv[i],"\n");
                 char command[parser_LenghtCommand(argv[i])];
                 sprintf(command, "find %s -type f -follow -print", argv[i]);
                 fp = popen(command, "r");  //avvia il comando e in fp prende l'output
