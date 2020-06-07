@@ -225,7 +225,6 @@ int main(int argc, char *argv[]) {  //Main
                 printf("> ");
                 fflush(stdout);
             }
-           createLog(logId);
             while (value_return == 0 && !_close) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
                 //M - STDIN
                 if (!_close) {                                   //Controlla close non sia già settato a true
@@ -240,7 +239,7 @@ int main(int argc, char *argv[]) {  //Main
                         if (!strncmp(cmd, "add", 3)) {  //Se invece il comando è "add"
                             char *tmp_s = strdup(cmd);
                             tmp_s = strtok(tmp_s, "add");
-                            if (tmp_s == NULL) {
+                            if (tmp_s == NULL || !strcmp(tmp_s," ")) {
                                 printf(BOLDYELLOW "\n[ATTENZIONE] " RESET "Sintassi comando errata, manca la directory, vengono aggiunti 0 files.\n");  //in tal caso verifica se sono correttamente inseriti
                                 fflush(stdout);
                             } else {
