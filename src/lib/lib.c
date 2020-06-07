@@ -1102,40 +1102,6 @@ int printInfo() {
     return ret;
 }
 
-void createLog(char *debug) {
-    int fp;
-#ifdef DEBUG
-    if (!strncmp(debug, "A", 1)) {
-        system("[ -d \"../log\" ] && rm -r \"../log\""); //Non funziona
-        system("mkdir \"../log\"");
-    }
-
-    fp = open(debug, O_WRONLY | O_APPEND | O_CREAT, 0644);
-    if (fp == -1) {
-        fprintf(stderr, "File non creato: %s\n", debug);
-    } else {
-        write(fp, "PROCESSO GENERATO CON SUCCESSO\n", 31);
-        close(fp);
-    }
-#endif
-}
-
-void printLog(char *debug, char *message) {
-#ifdef DEBUG
-
-#endif
-}
-void printLogString(char *debug, char *message, char *string) {
-#ifdef DEBUG
-
-#endif
-}
-void printLogInt(char *debug, char *message, int string) {
-#ifdef DEBUG
-
-#endif
-}
-
 //Error handlers
 int err_pipe() {
     fprintf(stderr, "Errore nella creazione della pipe\n");
