@@ -111,8 +111,8 @@ int main(int argc, char *argv[]) {  //Main
     time_t start, end;
     double elapsed;
     char logId[64];
-    sprintf(logId, "../log/A[%d].txt",getpid());
-    
+    sprintf(logId, "../log/A[%d].txt", getpid());
+
     if (argc > 1) {                                                              //Caso in cui ci sono degli argomenti all'avvio
         val = parser2(argc, argv, lista, &count, &n, &m, &vReturn, &duplicate);  //Parsing degli argomenti
         if (val == 0) {                                                          //Controlla i parametri passati ad A
@@ -228,6 +228,7 @@ int main(int argc, char *argv[]) {  //Main
             while (value_return == 0 && !_close) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
                 //M - STDIN
                 if (!_close) {                                   //Controlla close non sia già settato a true
+                    strcpy(cmd, "");
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {  //La read non ha errori
                         if (!strncmp(cmd, "close", 5)) {         //Verifica se cmd è close, in tal caso prosegue alla chiusura dei processi
                             closeAll(fd_1);                      //chiudi tutti i processi figli
@@ -235,11 +236,10 @@ int main(int argc, char *argv[]) {  //Main
                                 ;
                             _close = TRUE;  //flag close settato a TRUE, obbliga il programma a terminare
                             printf(BOLDWHITE "A" RESET ": Closing...\n");
-                        }
-                        if (!strncmp(cmd, "add", 3)) {  //Se invece il comando è "add"
+                        } else if (!strncmp(cmd, "add", 3)) {  //Se invece il comando è "add"
                             char *tmp_s = strdup(cmd);
                             tmp_s = strtok(tmp_s, "add");
-                            if (tmp_s == NULL || !strcmp(tmp_s," ")) {
+                            if (tmp_s == NULL || !strcmp(tmp_s, " ")) {
                                 printf(BOLDYELLOW "\n[ATTENZIONE] " RESET "Sintassi comando errata, manca la directory, vengono aggiunti 0 files.\n");  //in tal caso verifica se sono correttamente inseriti
                                 fflush(stdout);
                             } else {
@@ -278,12 +278,10 @@ int main(int argc, char *argv[]) {  //Main
                                     }
                                 }
                             }
-
+                            fflush(stdin);
                             printf("\n> ");
                             fflush(stdout);
-                        }
-
-                        if (!strncmp(cmd, "remove", 6)) {                                                                                                             //Se il comando è "remove"
+                        } else if (!strncmp(cmd, "remove", 6)) {                                                                                                         //Se il comando è "remove"
                             if (!analyzing) {                                                                                                                         //Verifica che non stia già analizzando
                                 if ((strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL)) {                                                                 //Mentra analizza controlla se l'utente cambia setn o setm ed in tal caso verifica se sono correttamente inseriti
                                     printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");  //Stampa errore se sono stati inseriti comandi errati
@@ -330,9 +328,7 @@ int main(int argc, char *argv[]) {  //Main
                             }
                             printf("> ");
                             fflush(stdout);
-                        }
-
-                        if (!strncmp(cmd, "reset", 5)) {                     //Se il comando e` reset
+                        } else if (!strncmp(cmd, "reset", 5)) {                     //Se il comando e` reset
                             if (!analyzing) {                                //Controlla che il programma non sia in analisi
                                 lista = resetPathList(lista);                //Svuota la lista
                                 count = 0;                                   //Riporta il numero di file presenti nella lista
@@ -345,9 +341,7 @@ int main(int argc, char *argv[]) {  //Main
                             }
                             printf("> ");
                             fflush(stdout);
-                        }
-
-                        if (!strncmp(cmd, "reanalyze", 9)) {          //Se il comando e` reanalyze
+                        } else if (!strncmp(cmd, "reanalyze", 9)) {          //Se il comando e` reanalyze
                             if (!analyzing) {                         //Controlla che il sistema non sia in analisi
                                 for (j = 0; j < lista->count; j++) {  //Setta tutti i file come non analizzati
                                     lista->analyzed[j] = 0;
@@ -371,9 +365,7 @@ int main(int argc, char *argv[]) {  //Main
                             }
                             printf("\n> ");
                             fflush(stdout);
-                        }
-
-                        if (!strncmp(cmd, "analyze", 7)) {  //Se il comando inserito e` analyze
+                        } else if (!strncmp(cmd, "analyze", 7)) {  //Se il comando inserito e` analyze
                             if (!analyzing) {               //Controlla che il sistema non sia in analisi
                                 pathSent = 0;               //Azzera il numero di percorsi inviati
                                 notAnalyzed = 0;            //Azzera il numero di percorsi non analizzati
@@ -390,9 +382,7 @@ int main(int argc, char *argv[]) {  //Main
                             }
                             printf("\n> ");
                             fflush(stdout);
-                        }
-
-                        if (!strncmp(cmd, "clear", 5)) {  //Pulisce la console
+                        } else if (!strncmp(cmd, "clear", 5)) {  //Pulisce la console
                             if (!analyzing) {
                                 system("clear");
                                 printf(BOLDWHITE "ANALYZER" RESET "\n\n");
@@ -401,9 +391,7 @@ int main(int argc, char *argv[]) {  //Main
                             } else {
                                 printf(BOLDYELLOW "\n[ATTENZIONE]" RESET " Analisi in corso, non e` possibile pulire il terminale.\n");
                             }
-                        }
-
-                        if (!strncmp(cmd, "set", 3)) {  //Se il comando inserito e` set
+                        } else if (!strncmp(cmd, "set", 3)) {  //Se il comando inserito e` set
                             if (checkArg(cmd, &argCounter)) {
                                 if (argCounter == 2) {                              //Controlla che il numero di argomenti sia due
                                     if (!strncmp(cmd, "setn", 4)) {                 //Controlla che il comando sia setn
@@ -475,9 +463,7 @@ int main(int argc, char *argv[]) {  //Main
                             }
                             printf("> ");
                             fflush(stdout);
-                        }
-
-                        if (!strncmp(cmd, "stat", 4)) {
+                        } else if (!strncmp(cmd, "stat", 4)) {
                             if (!analyzing) {
                                 printf(BOLDYELLOW "\n[ATTENTION]" RESET " Il comando " WHITE "stat" RESET " puo` essere utilizzato solo durante l'analisi.\n\n> ");
                                 fflush(stdout);
@@ -485,9 +471,7 @@ int main(int argc, char *argv[]) {  //Main
                                 printf(WHITE "\nPercentuale avanzamento" RESET ": %.3g%%\n\n> ", (float)perc / (float)pathSent * 100);
                                 fflush(stdout);
                             }
-                        }
-
-                        if (!strncmp(cmd, "proc", 4)) {
+                        } else if (!strncmp(cmd, "proc", 4)) {
                             if (!analyzing) {
                                 printf("\nAl momento sono presenti:\n");
                                 printf("%d processi P\n", n);
@@ -497,6 +481,9 @@ int main(int argc, char *argv[]) {  //Main
                                 printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n\n> ");
                                 fflush(stdout);
                             }
+                        } else {
+                            printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\n\n> ");  //Stampa errore se sono stati inseriti comandi errati
+                            fflush(stdout);
                         }
                     }
                 }

@@ -896,7 +896,6 @@ char checkArg(char cmd[DIM_CMD], int *argCounter) {
     if (!(strstr(cmd, "  ") != NULL)) {
         *argCounter = 1;
         for (j = 0; j < DIM_CMD; j++) {
-            //printf("%d\n", cmd[j]);
             if (cmd[j] == ' ') {
                 (*argCounter)++;
             }

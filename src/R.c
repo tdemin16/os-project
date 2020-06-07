@@ -181,6 +181,9 @@ int main() {                        //struttura main
                         _r_write = FALSE;
                     }
                 }
+            } else {
+                printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\n\n> ");  //Stampa errore se sono stati inseriti comandi errati
+                fflush(stdout);
             }
         }
         if (retrieve) {
