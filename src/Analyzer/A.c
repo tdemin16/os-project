@@ -110,6 +110,9 @@ int main(int argc, char *argv[]) {  //Main
     int val = 0;
     time_t start, end;
     double elapsed;
+    char logId[64];
+    sprintf(logId, "../log/A[%d].txt",getpid());
+    
     if (argc > 1) {                                                              //Caso in cui ci sono degli argomenti all'avvio
         val = parser2(argc, argv, lista, &count, &n, &m, &vReturn, &duplicate);  //Parsing degli argomenti
         if (val == 0) {                                                          //Controlla i parametri passati ad A
@@ -222,7 +225,7 @@ int main(int argc, char *argv[]) {  //Main
                 printf("> ");
                 fflush(stdout);
             }
-
+           createLog(logId);
             while (value_return == 0 && !_close) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
                 //M - STDIN
                 if (!_close) {                                   //Controlla close non sia già settato a true
