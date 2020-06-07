@@ -133,7 +133,14 @@ int main() {                        //struttura main
                             printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
                             fflush(stdout);
                         } else {
-                            strcpy(cmd, flag);
+                            if (strlen(flag) > 2) {
+                                _r_write = FALSE;
+                                retrieve = FALSE;
+                                printf(BOLDRED "\n[ERRORE]" RESET " Comando inserito non corretto.\n\n> ");
+                                fflush(stdout);
+                            } else {
+                                strcpy(cmd, flag);
+                            }
                         }
                         free(dupl);
                     }
@@ -159,8 +166,16 @@ int main() {                        //struttura main
                             retrieve = FALSE;
                             printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n> ");
                             fflush(stdout);
+
                         } else {
-                            strcpy(cmd, flag);
+                            if (strlen(flag) > 2) {
+                                _r_write = FALSE;
+                                retrieve = FALSE;
+                                printf(BOLDRED "\n[ERRORE]" RESET " Comando inserito non corretto.\n\n> ");
+                                fflush(stdout);
+                            } else {
+                                strcpy(cmd, flag);
+                            }
                         }
                         free(dupl);
 
@@ -171,7 +186,7 @@ int main() {                        //struttura main
                         fflush(stdout);
                     }
                 }
-                
+
                 while (value_return == 0 && _r_write) {
                     if (write(fd2_fifo, cmd, DIM_CMD) == -1) {
                         if (errno != EAGAIN) {

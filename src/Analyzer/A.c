@@ -111,8 +111,8 @@ int main(int argc, char *argv[]) {  //Main
     time_t start, end;
     double elapsed;
     char logId[64];
-    sprintf(logId, "../log/A[%d].txt",getpid());
-    
+    sprintf(logId, "../log/A[%d].txt", getpid());
+
     if (argc > 1) {                                                              //Caso in cui ci sono degli argomenti all'avvio
         val = parser2(argc, argv, lista, &count, &n, &m, &vReturn, &duplicate);  //Parsing degli argomenti
         if (val == 0) {                                                          //Controlla i parametri passati ad A
@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {  //Main
                         if (!strncmp(cmd, "add", 3)) {  //Se invece il comando è "add"
                             char *tmp_s = strdup(cmd);
                             tmp_s = strtok(tmp_s, "add");
-                            if (tmp_s == NULL || !strcmp(tmp_s," ")) {
+                            if (tmp_s == NULL || !strcmp(tmp_s, " ")) {
                                 printf(BOLDYELLOW "\n[ATTENZIONE] " RESET "Sintassi comando errata, manca la directory, vengono aggiunti 0 files.\n");  //in tal caso verifica se sono correttamente inseriti
                                 fflush(stdout);
                             } else {
@@ -278,7 +278,7 @@ int main(int argc, char *argv[]) {  //Main
                                     }
                                 }
                             }
-
+                            fflush(stdin);
                             printf("\n> ");
                             fflush(stdout);
                         }
@@ -328,66 +328,86 @@ int main(int argc, char *argv[]) {  //Main
                             } else {  //In alternativa vuol dire che sta analizzando e dunque non può rimuovere i files
                                 printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n\n");
                             }
+                            fflush(stdin);
                             printf("> ");
                             fflush(stdout);
                         }
 
-                        if (!strncmp(cmd, "reset", 5)) {                     //Se il comando e` reset
-                            if (!analyzing) {                                //Controlla che il programma non sia in analisi
-                                lista = resetPathList(lista);                //Svuota la lista
-                                count = 0;                                   //Riporta il numero di file presenti nella lista
-                                memset(sum, '\0', sizeof(char) * DIM_RESP);  //Setta la stringa dei totali a '\0
-                                initialize_vector(v);                        //Azzera v
-                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Tutti i file sono stati rimossi.\n\n");
-                            } else {
-                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n\n");
+                        if (!strncmp(cmd, "reset", 5)) {  //Se il comando e` reset
+                            if (strlen(cmd) > 6) {
+                                printf(BOLDRED "\n[ERRORE]" RESET " Comando inserito non corretto.\n\n");
                                 fflush(stdout);
-                            }
-                            printf("> ");
-                            fflush(stdout);
-                        }
-
-                        if (!strncmp(cmd, "reanalyze", 9)) {          //Se il comando e` reanalyze
-                            if (!analyzing) {                         //Controlla che il sistema non sia in analisi
-                                for (j = 0; j < lista->count; j++) {  //Setta tutti i file come non analizzati
-                                    lista->analyzed[j] = 0;
-                                }
-                                pathSent = 0;                                    //Azzera il numero di percorsi da inviare
-                                notAnalyzed = 0;                                 //Azzera il numero di percorsi non analizzati
-                                perc = 0;                                        //Azzerca il numero di percorsi ritornati
-                                count = lista->count;                            //Setta count alla quantita` di percorsi inseriti nella lista
-                                if (count > 0) {                                 //Se ci sono dei file da poter analizzare
+                            } else {
+                                if (!analyzing) {                                //Controlla che il programma non sia in analisi
+                                    lista = resetPathList(lista);                //Svuota la lista
+                                    count = 0;                                   //Riporta il numero di file presenti nella lista
                                     memset(sum, '\0', sizeof(char) * DIM_RESP);  //Setta la stringa dei totali a '\0
-                                    initialize_vector(v);                        //Azzera i valori contenuti in v
-                                    _write = FALSE;                              //Abilita la scrittura
-                                    time(&start);                                //Inizio timer
-                                    update_mtime(lista);                         //Aggiorno i valori di last_edit
-                                } else {                                         //Messaggio nel caso di lista vuota
-                                    printf(BOLDYELLOW "\n[ATTENTION]" RESET " Non ci sono file da analizzare\n");
+                                    initialize_vector(v);                        //Azzera v
+                                    printf(BOLDYELLOW "\n[ATTENTION]" RESET " Tutti i file sono stati rimossi.\n\n");
+                                } else {
+                                    printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n\n");
                                     fflush(stdout);
                                 }
-                            } else {
-                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n");
                             }
+                            fflush(stdin);
+                            printf("> ");
+                            fflush(stdout);
+                        }
+
+                        if (!strncmp(cmd, "reanalyze", 9)) {  //Se il comando e` reanalyze
+                            if (strlen(cmd) > 10) {
+                                printf(BOLDRED "\n[ERRORE]" RESET " Comando inserito non corretto.\n\n");
+                                fflush(stdout);
+                            } else {
+                                if (!analyzing) {                         //Controlla che il sistema non sia in analisi
+                                    for (j = 0; j < lista->count; j++) {  //Setta tutti i file come non analizzati
+                                        lista->analyzed[j] = 0;
+                                    }
+                                    pathSent = 0;                                    //Azzera il numero di percorsi da inviare
+                                    notAnalyzed = 0;                                 //Azzera il numero di percorsi non analizzati
+                                    perc = 0;                                        //Azzerca il numero di percorsi ritornati
+                                    count = lista->count;                            //Setta count alla quantita` di percorsi inseriti nella lista
+                                    if (count > 0) {                                 //Se ci sono dei file da poter analizzare
+                                        memset(sum, '\0', sizeof(char) * DIM_RESP);  //Setta la stringa dei totali a '\0
+                                        initialize_vector(v);                        //Azzera i valori contenuti in v
+                                        _write = FALSE;                              //Abilita la scrittura
+                                        time(&start);                                //Inizio timer
+                                        update_mtime(lista);                         //Aggiorno i valori di last_edit
+                                    } else {                                         //Messaggio nel caso di lista vuota
+                                        printf(BOLDYELLOW "\n[ATTENTION]" RESET " Non ci sono file da analizzare\n");
+                                        fflush(stdout);
+                                    }
+                                } else {
+                                    printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n");
+                                }
+                            }
+                            fflush(stdin);
                             printf("\n> ");
                             fflush(stdout);
                         }
 
                         if (!strncmp(cmd, "analyze", 7)) {  //Se il comando inserito e` analyze
-                            if (!analyzing) {               //Controlla che il sistema non sia in analisi
-                                pathSent = 0;               //Azzera il numero di percorsi inviati
-                                notAnalyzed = 0;            //Azzera il numero di percorsi non analizzati
-                                perc = 0;                   //Azzera il numero di percorsi ritornati
-                                if (count > 0) {            //Se ci sono dei file da poter analizzare
-                                    _write = FALSE;         //Abilita la scrittura
-                                    time(&start);           //Inizio timer
-                                    update_mtime(lista);    // Aggiornala lista delle ultime modifiche
-                                } else {
-                                    printf(BOLDYELLOW "\n[ATTENTION]" RESET " Non ci sono file da analizzare\n");
-                                }
+                            if (strlen(cmd) > 8) {
+                                printf(BOLDRED "\n[ERRORE]" RESET " Comando inserito non corretto.\n\n");
+                                fflush(stdout);
                             } else {
-                                printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n");
+                                if (!analyzing) {             //Controlla che il sistema non sia in analisi
+                                    pathSent = 0;             //Azzera il numero di percorsi inviati
+                                    notAnalyzed = 0;          //Azzera il numero di percorsi non analizzati
+                                    perc = 0;                 //Azzera il numero di percorsi ritornati
+                                    if (count > 0) {          //Se ci sono dei file da poter analizzare
+                                        _write = FALSE;       //Abilita la scrittura
+                                        time(&start);         //Inizio timer
+                                        update_mtime(lista);  // Aggiornala lista delle ultime modifiche
+                                    } else {
+                                        printf(BOLDYELLOW "\n[ATTENTION]" RESET " Non ci sono file da analizzare\n");
+                                    }
+                                } else {
+                                    printf(BOLDYELLOW "\n[ATTENTION]" RESET " Analisi in corso, comando non disponibile\n");
+                                }
                             }
+
+                            fflush(stdin);
                             printf("\n> ");
                             fflush(stdout);
                         }
@@ -473,6 +493,7 @@ int main(int argc, char *argv[]) {  //Main
                                     fflush(stdout);
                                 }
                             }
+                            fflush(stdin);
                             printf("> ");
                             fflush(stdout);
                         }
