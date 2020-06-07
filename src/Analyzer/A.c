@@ -240,15 +240,14 @@ int main(int argc, char *argv[]) {  //Main
                             tmp_s = strtok(tmp_s, "add");
                             char tmp_c = tmp_s[0];
                             if (tmp_c != ' ') {
-                                printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\n");  //in tal caso verifica se sono correttamente inseriti
+                                printf(BOLDRED "\n[ERROR] " RESET "Comando inserito non corretto.\n");  //in tal caso verifica se sono correttamente inseriti
                                 printf("Usa help per vedere la lista di comandi utilizzabili.\n\n");     //Stampa errore se sono stati inseriti comandi errati
                                 fflush(stdout);                                                          //Libera il buffer
                             } else {
                                 if (!analyzing) {                                                                //Verifica che non stia già analizzando
                                     if (strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL) {          //Mentra analizza controlla se l'utente cambia setn o setm
-                                        printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\n");  //in tal caso verifica se sono correttamente inseriti
+                                        printf(BOLDRED "\n[ERROR] " RESET "Comando inserito non corretto.\n");  //in tal caso verifica se sono correttamente inseriti
                                         printf("Usa help per vedere la lista di comandi utilizzabili.\n\n");     //Stampa errore se sono stati inseriti comandi errati
-                                        fflush(stdout);                                                          //Libera il buffer
                                     } else if (checkArg(cmd, &argCounter)) {                                     //Verifica gli argomenti inseriti a comando
                                         tempPath = malloc(argCounter * sizeof(char *));                          //Alloca memoria a tempPath
                                         for (j = 0; j < argCounter; j++) {                                       //Cicla da 0 al numero di argomenti
@@ -439,6 +438,9 @@ int main(int argc, char *argv[]) {  //Main
                                             printf("Il valore non e` valido\n\n");
                                         }
                                         free(dupl);  //Libera la memoria della stringa d'appoggio
+                                    } else {
+                                        printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");  //Stampa errore se sono stati inseriti comandi errati
+                                        fflush(stdout);
                                     }
                                 } else if (argCounter == 3) {                                  //Se il numero di argomenti e` 3
                                     if (strncmp(cmd, "setm", 4) && strncmp(cmd, "setn", 4)) {  //Controlla che non ci sia scritto sem o setn
