@@ -39,8 +39,6 @@ int main(int argc, char* argv[]) {
     memset(resp, '\0', sizeof(char) * DIM_RESP);
     int oldfl;
     int pendingPath = 0;
-    char logId[64];
-    sprintf(logId, "../log/Q[%d].txt",getpid());
 
     //Parsing Arguments--------------------------------------------------------------------
     m = atoi(argv[2]);

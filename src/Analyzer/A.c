@@ -110,8 +110,6 @@ int main(int argc, char *argv[]) {  //Main
     int val = 0;
     time_t start, end;
     double elapsed;
-    char logId[64];
-    sprintf(logId, "../log/A[%d].txt", getpid());
 
     if (argc > 1) {                                                              //Caso in cui ci sono degli argomenti all'avvio
         val = parser2(argc, argv, lista, &count, &n, &m, &vReturn, &duplicate);  //Parsing degli argomenti
