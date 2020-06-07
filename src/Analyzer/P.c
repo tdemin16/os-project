@@ -45,8 +45,6 @@ int main(int argc, char* argv[]) {
     int sum_value;
     int oldfl;
     int pendingPath = 0;
-    char logId[64];
-    sprintf(logId, "../log/[%d].txt",getpid());
 
     //Parsing arguments-------------------------------------------------------
     m = atoi(argv[1]);
