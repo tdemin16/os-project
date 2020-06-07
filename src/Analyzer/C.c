@@ -46,7 +46,9 @@ int main(int argc, char* argv[]) {
     char send_r = TRUE;    //Controlla la dimensione della pipe del padre
     int oldfl;             //usato per togliere la O_NONBLOCK dai flag
     int pendingPath = 0;
-
+    char logId[64];
+    sprintf(logId, "../log/C[%d].txt",getpid());
+    
     //Generating pipes-------------------------------------------------------
     if (value_return == 0) {
         //Crea n*4 pipes (4 per coppia padre figlio, 2 in lettura e 2 in scrittura)

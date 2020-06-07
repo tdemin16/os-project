@@ -1,5 +1,5 @@
 #!/bin/bash
-MAKE="make build"
+MAKE="make debug"
 CLEAN="make clean"
 BUILD_DIR="bin/"
 

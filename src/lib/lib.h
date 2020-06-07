@@ -94,7 +94,7 @@ char insertPathList(array *, char *, int);
 int insertAndSumPathList(array *, char *, int);
 char removeFromPathList(array *, char *c);
 void freePathList(array *);
-array* resetPathList(array *);
+array *resetPathList(array *);
 int compare_mtime(array *, int, char *);
 void update_mtime(array *);
 void cleanRemoved(array *);
@@ -154,6 +154,12 @@ void printCluster(char *);
 void printInfoCluster();
 void printHelp();
 int printInfo();
+
+//debug functions
+void createLog(char * debug);
+void printLog(char *debug, char *message);
+void printLogString(char *debug, char *message, char *string);
+void printLogInt(char *debug, char *message, int string);
 
 //Errori
 int err_file_open();
