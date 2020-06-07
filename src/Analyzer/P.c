@@ -34,7 +34,6 @@ int main(int argc, char* argv[]) {
     int _read = FALSE;
     int _write = FALSE;
     int _close = FALSE;
-    //char sentClose = FALSE;
     array* sum = createPathList(10);
     char send_w = TRUE;
     char send_r = TRUE;
@@ -102,8 +101,7 @@ int main(int argc, char* argv[]) {
 
                                     while (read(STDOUT_FILENO, resp, DIM_RESP) > 0)
                                         ;
-
-                                    //nCleanSon(fd, m);
+                                        
                                     close_pipes(fd, size_pipe);
                                     mParseOnFly(path, &m);  //Estraggo m da path
 

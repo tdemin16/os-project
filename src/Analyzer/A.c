@@ -280,6 +280,7 @@ int main(int argc, char *argv[]) {  //Main
                             fflush(stdin);
                             printf("\n> ");
                             fflush(stdout);
+                            
                         } else if (!strncmp(cmd, "remove", 6)) {                                                                                                         //Se il comando è "remove"
                             if (!analyzing) {                                                                                                                         //Verifica che non stia già analizzando
                                 if ((strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL)) {                                                                 //Mentra analizza controlla se l'utente cambia setn o setm ed in tal caso verifica se sono correttamente inseriti
@@ -328,9 +329,8 @@ int main(int argc, char *argv[]) {  //Main
                             fflush(stdin);
                             printf("> ");
                             fflush(stdout);
-                        }
 
-                        if (!strncmp(cmd, "reset", 5)) {  //Se il comando e` reset
+                        } else if (!strncmp(cmd, "reset", 5)) {  //Se il comando e` reset
                             if (strlen(cmd) > 6) {
                                 printf(BOLDRED "\n[ERRORE]" RESET " Comando inserito non corretto.\n\n");
                                 fflush(stdout);
@@ -349,9 +349,8 @@ int main(int argc, char *argv[]) {  //Main
                             fflush(stdin);
                             printf("> ");
                             fflush(stdout);
-                        }
 
-                        if (!strncmp(cmd, "reanalyze", 9)) {  //Se il comando e` reanalyze
+                        } else if (!strncmp(cmd, "reanalyze", 9)) {  //Se il comando e` reanalyze
                             if (strlen(cmd) > 10) {
                                 printf(BOLDRED "\n[ERRORE]" RESET " Comando inserito non corretto.\n\n");
                                 fflush(stdout);
@@ -381,9 +380,8 @@ int main(int argc, char *argv[]) {  //Main
                             fflush(stdin);
                             printf("\n> ");
                             fflush(stdout);
-                        }
 
-                        if (!strncmp(cmd, "analyze", 7)) {  //Se il comando inserito e` analyze
+                        } else if (!strncmp(cmd, "analyze", 7)) {  //Se il comando inserito e` analyze
                             if (strlen(cmd) > 8) {
                                 printf(BOLDRED "\n[ERRORE]" RESET " Comando inserito non corretto.\n\n");
                                 fflush(stdout);
