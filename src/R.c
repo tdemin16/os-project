@@ -108,7 +108,11 @@ int main() {                        //struttura main
     }
 
     while (value_return == 0 && !_close) {
+        memset(cmd, '\0', DIM_CMD);
         if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {
+            if(cmd[strlen(cmd) - 1] == '\n') {
+                cmd[strlen(cmd) - 1] = '\0';
+            }
             if (!strncmp(cmd, "close", 5)) {
                 _close = TRUE;
                 printf(BOLDWHITE "R" RESET ": Closing...\n");
