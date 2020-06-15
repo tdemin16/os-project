@@ -226,12 +226,12 @@ int main(int argc, char *argv[]) {  //Main
             }
             while (value_return == 0 && !_close) {  //cicla finche` non ha finito di leggere e scrivere o avviene un errore
                 //M - STDIN
-                if (!_close) {                                   //Controlla close non sia già settato a true
-                    strcpy(cmd, "");
+                if (!_close) {  //Controlla close non sia già settato a true
+                    memset(cmd, '\0', DIM_CMD);
                     if (read(STDIN_FILENO, cmd, DIM_CMD) > 0) {  //La read non ha errori
-                        if (!strncmp(cmd, "close", 5)) {         //Verifica se cmd è close, in tal caso prosegue alla chiusura dei processi
-                            closeAll(fd_1);                      //chiudi tutti i processi figli
-                            while (wait(NULL) > 0)               //Attende che tutti i processi figli siano chiusi prima di terminare
+                        if (!strncmp(cmd, "close", 5)) {  //Verifica se cmd è close, in tal caso prosegue alla chiusura dei processi
+                            closeAll(fd_1);               //chiudi tutti i processi figli
+                            while (wait(NULL) > 0)        //Attende che tutti i processi figli siano chiusi prima di terminare
                                 ;
                             _close = TRUE;  //flag close settato a TRUE, obbliga il programma a terminare
                             printf(BOLDWHITE "A" RESET ": Closing...\n");
@@ -280,8 +280,8 @@ int main(int argc, char *argv[]) {  //Main
                             fflush(stdin);
                             printf("\n> ");
                             fflush(stdout);
-                            
-                        } else if (!strncmp(cmd, "remove", 6)) {                                                                                                         //Se il comando è "remove"
+
+                        } else if (!strncmp(cmd, "remove", 6)) {                                                                                                      //Se il comando è "remove"
                             if (!analyzing) {                                                                                                                         //Verifica che non stia già analizzando
                                 if ((strstr(cmd, "-setn") != NULL || strstr(cmd, "-setm") != NULL)) {                                                                 //Mentra analizza controlla se l'utente cambia setn o setm ed in tal caso verifica se sono correttamente inseriti
                                     printf(BOLDRED "\n[ERRORE] " RESET "Comando inserito non corretto.\nUsa help per vedere la lista di comandi utilizzabili.\n\n");  //Stampa errore se sono stati inseriti comandi errati
