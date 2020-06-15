@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {  //main
         printf("Usa " WHITE "help" RESET " per vedere l'elenco dei comandi\n");
         printf("Usa " WHITE "info" RESET " per avere informazioni riguardo al programma\n");
         printf("Usa " WHITE "clear" RESET " per pulire il terminale\n");
-        printf("Usa " WHITE "close" RESET " per chiudere il programma\n");
+        printf("Usa " WHITE "close" RESET " per chiudere il programma\n\n");
         printf("Premi " WHITE "invio" RESET " per avviare il programma\n\n> ");
         fflush(stdout);
         do {
